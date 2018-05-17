@@ -1,0 +1,6 @@
+{
+    "NoReleaseTag":  "NoReleaseNotes",
+    "SectionTags":  [
+                        "Feature", "Breaking", "Minor", "Bug"
+                    ]
+}

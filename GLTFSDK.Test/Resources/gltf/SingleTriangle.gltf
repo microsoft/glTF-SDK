@@ -1,0 +1,124 @@
+{
+	"asset": {
+		"version": "2.0",
+		"generator": "Microsoft GLTF Exporter 2.1.2-b21"
+	},
+	"accessors": [{
+			"bufferView": 0,
+			"byteOffset": 0,
+			"componentType": 5123,
+			"count": 3,
+			"type": "SCALAR",
+			"max": [2.0],
+			"min": [0.0]
+		}, {
+			"bufferView": 1,
+			"byteOffset": 2,
+			"componentType": 5126,
+			"count": 3,
+			"type": "VEC3",
+			"max": [1.0, 1.0, 1.0],
+			"min": [0.0, 0.0, 0.0]
+		}, {
+			"bufferView": 2,
+			"byteOffset": 0,
+			"componentType": 5126,
+			"count": 3,
+			"type": "VEC3",
+			"max": [-0.5773502588272095, -0.5773502588272095, -0.5773502588272095],
+			"min": [-0.5773502588272095, -0.5773502588272095, -0.5773502588272095]
+		}
+	],
+	"bufferViews": [{
+			"buffer": 0,
+			"byteLength": 6,
+			"byteOffset": 0,
+			"target": 34963
+		}, {
+			"buffer": 0,
+			"byteLength": 38,
+			"byteOffset": 6,
+			"target": 34962
+		}, {
+			"buffer": 0,
+			"byteLength": 36,
+			"byteOffset": 44,
+			"target": 34962
+		}
+	],
+	"buffers": [{
+			"byteLength": 80
+		}
+	],
+	"materials": [{
+			"pbrMetallicRoughness": {
+				"baseColorFactor": [0.5187909007072449, 0.5187909007072449, 0.5187909007072449, 1.0],
+				"metallicFactor": 0.0,
+				"roughnessFactor": 0.0
+			},
+			"name": "DefaultMaterial",
+			"extensions": {
+				"KHR_materials_pbrSpecularGlossiness": {
+					"diffuseFactor": [0.49803921580314639, 0.49803921580314639, 0.49803921580314639, 1.0],
+					"specularFactor": [0.0, 0.0, 0.0]
+				}
+			}
+		}, {
+			"pbrMetallicRoughness": {
+				"baseColorFactor": [0.5187909007072449, 0.5187909007072449, 0.5187909007072449, 1.0],
+				"metallicFactor": 0.0,
+				"roughnessFactor": 0.0
+			},
+			"name": "DefaultMaterial",
+			"extensions": {
+				"KHR_materials_pbrSpecularGlossiness": {
+					"diffuseFactor": [0.49803921580314639, 0.49803921580314639, 0.49803921580314639, 1.0],
+					"specularFactor": [0.0, 0.0, 0.0]
+				}
+			}
+		}, {
+			"pbrMetallicRoughness": {
+				"baseColorFactor": [0.5187909007072449, 0.5187909007072449, 0.5187909007072449, 1.0],
+				"metallicFactor": 0.0,
+				"roughnessFactor": 0.0
+			},
+			"name": "DefaultMaterial",
+			"extensions": {
+				"KHR_materials_pbrSpecularGlossiness": {
+					"diffuseFactor": [0.49803921580314639, 0.49803921580314639, 0.49803921580314639, 1.0],
+					"specularFactor": [0.0, 0.0, 0.0]
+				}
+			}
+		}
+	],
+	"meshes": [{
+			"name": "triangle",
+			"primitives": [{
+					"attributes": {
+						"NORMAL": 2,
+						"POSITION": 1
+					},
+					"indices": 0,
+					"material": 0,
+					"mode": 4
+				}
+			]
+		}
+	],
+	"nodes": [{
+			"matrix": [1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0],
+			"mesh": 0,
+			"name": "triangle"
+		}, {
+			"children": [0],
+			"matrix": [1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0],
+			"name": "root"
+		}
+	],
+	"scenes": [{
+			"nodes": [1]
+		}
+	],
+	"scene": 0,
+	"extensionsUsed": ["KHR_materials_pbrSpecularGlossiness"]
+}

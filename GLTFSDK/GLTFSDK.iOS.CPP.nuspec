@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Microsoft.glTF.iOS.CPP</id>
+    <version>1.2.17.0</version>
+    <title>Microsoft.glTF.iOS.CPP</title>
+    <authors>Microsoft</authors>
+    <owners>Microsoft</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A C++ library for decoding and encoding glTF files.</description>
+    <copyright>(C) Microsoft Corporation. All rights reserved.</copyright>
+    <tags></tags>
+    <releaseNotes>(Replaced by NuGet build system)</releaseNotes>
+        <dependencies>
+            <dependency id="rapidjson.tempRelease" version="0.0.2.20" />
+        </dependencies>
+    </metadata>
+  <files>
+    <!-- iOS|Debug -->
+    <file src="../Built/Out/iOS/Debug/GLTFSDK/libGLTFSDK.a" target="/build/native/lib/iOS/Debug/static" />
+    <!-- iOS|Release -->
+    <file src="../Built/Out/iOS/Release/GLTFSDK/libGLTFSDK.a" target="/build/native/lib/iOS/Release/static" />
+    <!-- iOSSimulator|Debug -->
+    <file src="../Built/Out/iOSSimulator64/Debug/GLTFSDK/libGLTFSDK.a" target="/build/native/lib/iOSSimulator64/Debug/static" />
+    <!-- iOSSimulator|Release -->
+    <file src="../Built/Out/iOSSimulator64/Release/GLTFSDK/libGLTFSDK.a" target="/build/native/lib/iOSSimulator64/Release/static" />
+    <!-- Build (C++) -->
+    <file src="../GLTFSDK/Inc/**/*" target="/build/native/include" />
+    <!-- CMake Modules -->
+    <file src="../Build/CMake/FindGLTFSDK.iOS.cmake" target="" />
+    <file src="../Build/CMake/FindGLTFSDK.iOSSimulator64.cmake" target="" />
+  </files>
+</package>

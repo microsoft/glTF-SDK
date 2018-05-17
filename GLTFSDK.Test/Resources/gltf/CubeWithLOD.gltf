@@ -1,0 +1,101 @@
+{
+	"asset": {
+		"version": "2.0",
+		"generator": "Microsoft GLTF Exporter 2.1.2-b21"
+	},
+	"accessors": [{
+			"bufferView": 0,
+			"byteOffset": 0,
+			"componentType": 5123,
+			"count": 36,
+			"type": "SCALAR"
+		}, {
+			"bufferView": 1,
+			"byteOffset": 0,
+			"componentType": 5126,
+			"count": 24,
+			"type": "VEC3"
+		}, {
+			"bufferView": 2,
+			"byteOffset": 0,
+			"componentType": 5126,
+			"count": 24,
+			"type": "VEC3"
+		}
+	],
+	"bufferViews": [{
+			"buffer": 0,
+			"byteLength": 72,
+			"byteOffset": 0,
+			"target": 34963
+		}, {
+			"buffer": 0,
+			"byteLength": 288,
+			"byteOffset": 72,
+			"target": 34962
+		}, {
+			"buffer": 0,
+			"byteLength": 288,
+			"byteOffset": 360,
+			"target": 34962
+		}
+	],
+	"buffers": [{
+			"byteLength": 648
+		}
+	],
+	"materials": [{
+			"pbrMetallicRoughness": {
+				"baseColorFactor": [0.5187909007072449, 0.5187909007072449, 0.5187909007072449, 1.0],
+				"metallicFactor": 0.0,
+				"roughnessFactor": 0.0
+			},
+			"name": "DefaultMaterial",
+			"extensions": {
+				"KHR_materials_pbrSpecularGlossiness": {
+					"diffuseFactor": [0.49803921580314639, 0.49803921580314639, 0.49803921580314639, 1.0],
+					"specularFactor": [0.0, 0.0, 0.0]
+				}
+			}
+		}
+	],
+	"meshes": [{
+			"name": "polygon",
+			"primitives": [{
+					"attributes": {
+						"NORMAL": 2,
+						"POSITION": 1
+					},
+					"indices": 0,
+					"material": 0,
+					"mode": 4
+				}
+			]
+		}
+	],
+	"nodes": [{
+			"mesh": 0,
+			"name": "polygon"
+		}, {
+			"children": [0],
+			"name": "root",
+			"extensions": {
+                "MSFT_lod": {
+                    "ids": [ 3 ]
+                }
+            }
+		}, {
+			"mesh": 0,
+			"name": "polygon_lod1"
+		}, {
+			"children": [2],
+			"name": "root_lod1"
+		}
+	],
+	"scenes": [{
+			"nodes": [1]
+		}
+	],
+	"scene": 0,
+	"extensionsUsed": ["KHR_materials_pbrSpecularGlossiness", "MSFT_lod"]
+}

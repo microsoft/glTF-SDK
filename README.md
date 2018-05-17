@@ -1,3 +1,16 @@
+# Microsoft glTF SDK - A C++ Deserializer/Serializer for glTF
+
+* Windows/macOS/Android Compatible
+* glTF & glB support, including embedded Base64 support
+* Flexibility and ease of integration to any 3D engine
+* Strongly typed extension support
+* Built-in schema validation during deserialization
+* Low memory overhead
+* Utilities for converting input data of any type (e.g. float/uint8/uint16 RGB/RGBA color) into a single type such as float RGBA color
+
+# Trademarks
+
+glTF is a trademark of The Khronos Group Inc.
 
 # Contributing
 

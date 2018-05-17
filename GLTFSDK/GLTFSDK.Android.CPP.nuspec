@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Microsoft.glTF.Android.CPP</id>
+    <version>1.2.16.0</version>
+    <title>Microsoft.glTF.Android.CPP</title>
+    <authors>Microsoft</authors>
+    <owners>Microsoft</owners>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <description>A C++ library for decoding and encoding glTF files.</description>
+    <copyright>(C) Microsoft Corporation. All rights reserved.</copyright>
+    <licenseUrl>https://opensource.org/licenses/MIT</licenseUrl>
+    <projectUrl>https://aka.ms/Y8fymc</projectUrl>
+    <iconUrl>https://i.imgur.com/dj5ogtZ.png</iconUrl>
+    <tags></tags>
+    <releaseNotes>(Replaced by NuGet build system)</releaseNotes>
+        <dependencies>
+            <dependency id="rapidjson.tempRelease" version="0.0.2.20" />
+        </dependencies>
+    </metadata>
+  <files>
+    <!-- x86|Debug -->
+    <file src="..\Built\Out\android_x86\Debug\GLTFSDK\libGLTFSDK.a" target="\build\native\lib\x86\Debug\static" />
+    <!-- x86|Release -->
+    <file src="..\Built\Out\android_x86\Release\GLTFSDK\libGLTFSDK.a" target="\build\native\lib\x86\Release\static" />
+    <!-- x64|Debug -->
+    <file src="..\Built\Out\android_x86_64\Debug\GLTFSDK\libGLTFSDK.a" target="\build\native\lib\x86_64\Debug\static" />
+    <!-- x64|Release -->
+    <file src="..\Built\Out\android_x86_64\Release\GLTFSDK\libGLTFSDK.a" target="\build\native\lib\x86_64\Release\static" />
+    <!-- arm32|Debug -->
+    <file src="..\Built\Out\android_armeabi-v7a\Debug\GLTFSDK\libGLTFSDK.a" target="\build\native\lib\armeabi-v7a\Debug\static" />
+    <!-- arm32|Release -->
+    <file src="..\Built\Out\android_armeabi-v7a\Release\GLTFSDK\libGLTFSDK.a" target="\build\native\lib\armeabi-v7a\Release\static" />
+    <!-- arm64|Debug -->
+    <file src="..\Built\Out\android_arm64-v8a\Debug\GLTFSDK\libGLTFSDK.a" target="\build\native\lib\arm64-v8a\Debug\static" />
+    <!-- arm64|Release -->
+    <file src="..\Built\Out\android_arm64-v8a\Release\GLTFSDK\libGLTFSDK.a" target="\build\native\lib\arm64-v8a\Release\static" />
+    <!-- Build (C++) -->
+    <file src="..\GLTFSDK\Inc\**\*" target="\build\native\include" />
+    <!-- CMake Module -->
+    <file src="..\Build\CMake\Android\FindGLTFSDK.android_x86.cmake" target="" />
+    <file src="..\Build\CMake\Android\FindGLTFSDK.android_x86_64.cmake" target="" />
+    <file src="..\Build\CMake\Android\FindGLTFSDK.android_armeabi-v7a.cmake" target="" />
+    <file src="..\Build\CMake\Android\FindGLTFSDK.android_arm64-v8a.cmake" target="" />
+    <!-- Readme files -->
+    <file src="..\LICENSE**" target="\" />
+    <file src="..\thirdPartyNotices.txt" target="\" />
+    <file src="..\readme.md" target="\" />
+  </files>
+</package>

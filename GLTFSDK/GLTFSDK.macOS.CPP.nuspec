@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Microsoft.glTF.macOS.CPP</id>
+    <version>1.2.16.0</version>
+    <title>Microsoft.glTF.macOS.CPP</title>
+    <authors>Microsoft</authors>
+    <owners>Microsoft</owners>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <description>A C++ library for decoding and encoding glTF files.</description>
+    <copyright>(C) Microsoft Corporation. All rights reserved.</copyright>
+    <licenseUrl>https://opensource.org/licenses/MIT</licenseUrl>
+    <projectUrl>https://aka.ms/Y8fymc</projectUrl>
+    <iconUrl>https://i.imgur.com/dj5ogtZ.png</iconUrl>
+    <tags></tags>
+    <releaseNotes>(Replaced by NuGet build system)</releaseNotes>
+        <dependencies>
+            <dependency id="rapidjson.tempRelease" version="0.0.2.20" />
+        </dependencies>
+    </metadata>
+  <files>
+    <!-- x64|Debug -->
+    <file src="../Built/Out/macOS/Debug/GLTFSDK/libGLTFSDK.a" target="/build/native/lib/x64/Debug/static" />
+    <!-- x64|Release -->
+    <file src="../Built/Out/macOS/Release/GLTFSDK/libGLTFSDK.a" target="/build/native/lib/x64/Release/static" />
+    <!-- Build (C++) -->
+    <file src="../GLTFSDK/Inc/**/*" target="/build/native/include" />
+    <!-- CMake Module -->
+    <file src="../Build/CMake/FindGLTFSDK.macOS.cmake" target="" />
+    <!-- Readme files -->
+    <file src="../LICENSE**" target="/" />
+    <file src="../thirdPartyNotices.txt" target="/" />
+    <file src="../readme.md" target="/" />
+  </files>
+</package>

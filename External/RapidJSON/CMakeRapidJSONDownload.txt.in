@@ -1,0 +1,15 @@
+cmake_minimum_required(VERSION 2.8.2)
+
+project(RapidJSON-download NONE)
+
+include(ExternalProject)
+ExternalProject_Add(RapidJSON
+  GIT_REPOSITORY    https://github.com/fergsatwork/rapidjson
+  GIT_TAG           631df504108378589c17ee7a1ff9b52790a537d8
+  SOURCE_DIR        "${CMAKE_BINARY_DIR}/RapidJSON-src"
+  BINARY_DIR        "${CMAKE_BINARY_DIR}/RapidJSON-build"
+  CONFIGURE_COMMAND ""
+  BUILD_COMMAND     ""
+  INSTALL_COMMAND   ""
+  TEST_COMMAND      ""
+)

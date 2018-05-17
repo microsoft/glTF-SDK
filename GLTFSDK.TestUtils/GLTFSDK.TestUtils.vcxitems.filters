@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Test Utils Common">
+      <UniqueIdentifier>{5e81ea76-41e8-48a7-93d9-6e6e910eff6a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Test Utils Common\Header Files">
+      <UniqueIdentifier>{e22fe390-d233-41c4-90e9-00cbcd89fb15}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\GLTFSDK.TestUtils\TestUtilsCommon\UnitTestBridge.h">
+      <Filter>Test Utils Common\Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

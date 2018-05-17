@@ -1,0 +1,126 @@
+nuget {
+    nuspec {
+        id = Microsoft.glTF.CPP;
+        version : 1.2.16.0;
+        title : Microsoft.glTF.CPP;
+        authors : { Microsoft };
+        owners : { Microsoft };
+        requireLicenseAcceptance : true;
+        summary : @"A C++ library for decoding and encoding glTF files.";
+        description : @"A C++ library for decoding and encoding glTF files.";
+        copyright : @"(C) Microsoft Corporation. All rights reserved.";
+        licenseUrl : "https://opensource.org/licenses/MIT";
+        projectUrl : "https://aka.ms/Y8fymc";
+        iconUrl : "https://i.imgur.com/dj5ogtZ.png";
+        releaseNotes: "(Replaced by NuGet build system)";
+    }
+
+    dependencies {
+        // This node defines any outside items which may be needed to consume this package.
+        packages : {
+            // This is a list of other NuGet packages required to use this package.
+            // Each item follows the format "<pkg_name>/<version>"
+            // Note that this specifies the minimum required version, not the exact version.
+            rapidjson.tempRelease/0.0.2.20
+        };
+    }
+
+    files {
+        #defines {
+            BASE = "..";
+        };
+
+        readmes:{
+            #destination = ${pkg_root};
+            "${BASE}\LICENSE",
+            "${BASE}\thirdPartyNotices.txt",
+            "${BASE}\readme.md"
+        };
+
+        symbols += {
+            #output {
+                package = symbols;
+            };
+            #add-each-file : ::nuget.[symbols]targets.[${condition}].CopyToOutput;
+            #destination : ${d_bin};
+            #flatten = false;
+        };
+
+        nestedIncludePluginManager:{
+            #destination = ${d_include}GLTFSDK;
+            "${BASE}\GLTFSDK\Inc\GLTFSDK\*.h",
+        };
+
+
+        dll += {
+            #flatten = false;
+            #destination = ${d_lib};
+        };
+
+        [win32,debug] {
+            dll: {};
+
+            lib: {
+                    ${BASE}\Built\Out\v141\Win32\Debug\GLTFSDK\GLTFSDK.lib,
+            };
+            symbols: {
+                ${BASE}\Built\Int\v141\Win32\Debug\GLTFSDK\GLTFSDK.pdb
+            };
+        };
+
+        [win32,release] {
+            dll: {};
+
+            lib: {
+                    ${BASE}\Built\Out\v141\Win32\Release\GLTFSDK\GLTFSDK.lib,
+            };
+            symbols: {
+                ${BASE}\Built\Int\v141\Win32\Release\GLTFSDK\GLTFSDK.pdb
+            };
+        };
+
+        [x64,debug] {
+            dll: {};
+
+            lib: {
+                    ${BASE}\Built\Out\v141\x64\Debug\GLTFSDK\GLTFSDK.lib,
+            };
+            symbols: {
+                    ${BASE}\Built\Int\v141\x64\Debug\GLTFSDK\GLTFSDK.pdb
+            };
+        };
+
+        [x64,release] {
+            dll: {};
+
+            lib: {
+                    ${BASE}\Built\Out\v141\x64\Release\GLTFSDK\GLTFSDK.lib,
+            };
+            symbols: {
+                ${BASE}\Built\Int\v141\x64\Release\GLTFSDK\GLTFSDK.pdb
+            };
+        };
+
+        [arm,debug] {
+            dll: {};
+
+            lib: {
+                    ${BASE}\Built\Out\v141\ARM\Debug\GLTFSDK\GLTFSDK.lib,
+            };
+            symbols: {
+                    ${BASE}\Built\Int\v141\ARM\Debug\GLTFSDK\GLTFSDK.pdb
+            };
+        };
+
+        [arm,release] {
+            dll: {};
+
+            lib: {
+                    ${BASE}\Built\Out\v141\ARM\Release\GLTFSDK\GLTFSDK.lib,
+            };
+            symbols: {
+                    ${BASE}\Built\Int\v141\ARM\Release\GLTFSDK\GLTFSDK.pdb
+            };
+        };
+    };
+}

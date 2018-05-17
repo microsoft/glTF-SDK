@@ -1,0 +1,80 @@
+{
+    "scenes": [{"nodes": [0, 1]}],
+    "scene": 0,
+    "nodes": [
+        {
+            "mesh": 0,
+            "translation": [1.1, 1.2, 1.3],
+            "rotation": [0.4, 0.5, 0.6, 0.7],
+            "scale": [1.8, 1.9, 2.0],
+            "camera": 0
+        },
+        {
+            "mesh": 0,
+            "camera": 0
+        }
+    ],
+    "meshes": [
+        {
+            "primitives": [
+                {
+                    "attributes": {
+                        "POSITION": 0
+                    }
+                }
+            ]
+        }
+    ],
+    "buffers": [
+        {
+            "uri": "triangleWithoutIndices.bin",
+            "byteLength": 36
+        }
+    ],
+    "bufferViews": [
+        {
+            "buffer": 0,
+            "byteOffset": 0,
+            "byteLength": 36,
+            "target": 34962
+        }
+    ],
+    "accessors": [
+        {
+            "bufferView": 0,
+            "byteOffset": 0,
+            "componentType": 5126,
+            "count": 3,
+            "type": "VEC3"
+        }
+    ],
+    "cameras": [
+        {
+            "type": "perspective",
+            "perspective": {
+                "yfov": 0.7,
+                "znear": 0.01,
+                "extensions": {
+                    "abc": {
+                        "diffuseTexture": {
+                            "index": 1
+                        },
+                        "specularFactor": [0.0, 0.0, 0.0],
+                        "glossinessFactor": 0.0
+                    }
+                }
+            },
+            "extensions": {
+                "KHR_materials_pbrSpecularGlossiness": {
+                    "diffuseTexture": {
+                        "index": 1
+                    },
+                    "specularFactor": [0.0, 0.0, 0.0],
+                    "glossinessFactor": 0.0
+                }
+            }
+        }
+    ],
+    "asset": {"version": "2.0"},
+    "extensionsUsed": ["abc", "KHR_materials_pbrSpecularGlossiness"]
+}

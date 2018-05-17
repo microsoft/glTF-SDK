@@ -1,0 +1,11 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://microsoft.visualstudio.com/DefaultCollection/Apps/_git/bigpark.canvas.xplatScripts
+	branch = master
+	commit = dc613aec03efa5ac16d41021a6cb28b435244864
+	parent = cef0f3b6b89a94b82c80d12f8c6c00d8ae787843
+	cmdver = 0.4.0
