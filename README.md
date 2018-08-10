@@ -8,6 +8,13 @@
 * Low memory overhead
 * Utilities for converting input data of any type (e.g. float/uint8/uint16 RGB/RGBA color) into a single type such as float RGBA color
 
+# Nuget Packages
+
+* [Microsoft.glTF.CPP](https://www.nuget.org/packages/Microsoft.glTF.CPP/)
+* [Microsoft.glTF.macOS.CPP](https://www.nuget.org/packages/Microsoft.glTF.macOS.CPP/)
+* [Microsoft.glTF.iOS.CPP](https://www.nuget.org/packages/Microsoft.glTF.iOS.CPP/)
+* [Microsoft.glTF.Android.CPP](https://www.nuget.org/packages/Microsoft.glTF.Android.CPP/)
+
 # Trademarks
 
 glTF is a trademark of The Khronos Group Inc.
