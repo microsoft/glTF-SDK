@@ -5,15 +5,15 @@
 
 #include <vector>
 
+#include <GLTFSDK/GLTF.h>
+
 namespace Microsoft
 {
     namespace glTF
     {
         class Document;
         class GLTFResourceReader;
-        struct Accessor;
-        struct MeshPrimitive;
-        struct MorphTarget;
+        class BufferBuilder;
 
         namespace MeshPrimitiveUtils
         {
@@ -57,6 +57,18 @@ namespace Microsoft
 
             std::vector<uint32_t> GetJointWeights32(const Document& doc, const GLTFResourceReader& reader, const Accessor& accessor);
             std::vector<uint32_t> GetJointWeights32_0(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive);
+
+            std::string SerializeTriangulatedIndices16(const uint16_t* indices, size_t indexCount, MeshMode mode, BufferBuilder& bufferBuilder);
+            std::string SerializeTriangulatedIndices32(const uint32_t* indices, size_t indexCount, MeshMode mode, BufferBuilder& bufferBuilder);
+
+            std::string SerializeTriangulatedIndices16(const std::vector<uint16_t>& indices, MeshMode mode, BufferBuilder& bufferBuilder);
+            std::string SerializeTriangulatedIndices32(const std::vector<uint32_t>& indices, MeshMode mode, BufferBuilder& bufferBuilder);
+
+            std::string SerializeSegmentedIndices16(const uint16_t* indices, size_t indexCount, MeshMode mode, BufferBuilder& bufferBuilder);
+            std::string SerializeSegmentedIndices32(const uint32_t* indices, size_t indexCount, MeshMode mode, BufferBuilder& bufferBuilder);
+
+            std::string SerializeSegmentedIndices16(const std::vector<uint16_t>& indices, MeshMode mode, BufferBuilder& bufferBuilder);
+            std::string SerializeSegmentedIndices32(const std::vector<uint32_t>& indices, MeshMode mode, BufferBuilder& bufferBuilder);
         };
     }
 }

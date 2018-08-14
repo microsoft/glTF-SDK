@@ -1323,6 +1323,481 @@ namespace Microsoft
                     Assert::AreEqual(outputIndices[262138], 131069U);
                     Assert::AreEqual(outputIndices[262139], 0U);
                 }
+
+                GLTFSDK_TEST_METHOD(MeshPrimitiveUtilsTests, MeshPrimitiveUtils_Test_SerializeTriangulatedIndices16_Triangles)
+                {
+                    auto readerWriter = std::make_shared<const StreamReaderWriter>();
+                    auto bufferBuilder = BufferBuilder(std::make_unique<GLTFResourceWriter>(readerWriter));
+
+                    bufferBuilder.AddBuffer();
+                    bufferBuilder.AddBufferView(BufferViewTarget::ARRAY_BUFFER);
+
+                    // Serialize
+                    MeshPrimitive meshPrimitive;
+                    meshPrimitive.mode = MESH_TRIANGLES;
+
+                    std::vector<uint16_t> triangulatedIndices =
+                    {
+                        0, 3, 1,
+                        3, 2, 1,
+                        1, 2, 4,
+                        2, 5, 4
+                    };
+
+                    meshPrimitive.indicesAccessorId = MeshPrimitiveUtils::SerializeTriangulatedIndices16(triangulatedIndices, meshPrimitive.mode, bufferBuilder);
+
+                    // Read back & check
+                    Document doc;
+                    bufferBuilder.Output(doc);
+
+                    GLTFResourceReader reader(readerWriter);
+
+                    const auto& accessor = doc.accessors.Get(meshPrimitive.indicesAccessorId);
+                    Assert::AreEqual(ComponentType::COMPONENT_UNSIGNED_SHORT, accessor.componentType);
+
+                    auto outputIndices = MeshPrimitiveUtils::GetIndices16(doc, reader, meshPrimitive);
+
+                    AreEqual(triangulatedIndices, outputIndices);
+                }
+
+                GLTFSDK_TEST_METHOD(MeshPrimitiveUtilsTests, MeshPrimitiveUtils_Test_SerializeTriangulatedIndices16_TriangleStrip)
+                {
+                    auto readerWriter = std::make_shared<const StreamReaderWriter>();
+                    auto bufferBuilder = BufferBuilder(std::make_unique<GLTFResourceWriter>(readerWriter));
+
+                    bufferBuilder.AddBuffer();
+                    bufferBuilder.AddBufferView(BufferViewTarget::ARRAY_BUFFER);
+
+                    // Serialize
+                    MeshPrimitive meshPrimitive;
+                    meshPrimitive.mode = MESH_TRIANGLE_STRIP;
+
+                    std::vector<uint16_t> triangulatedIndices =
+                    {
+                        0, 3, 1,
+                        3, 2, 1,
+                        1, 2, 4,
+                        2, 5, 4
+                    };
+
+                    meshPrimitive.indicesAccessorId = MeshPrimitiveUtils::SerializeTriangulatedIndices16(triangulatedIndices, meshPrimitive.mode, bufferBuilder);
+
+                    // Read back & check
+                    Document doc;
+                    bufferBuilder.Output(doc);
+
+                    GLTFResourceReader reader(readerWriter);
+
+                    const auto& accessor = doc.accessors.Get(meshPrimitive.indicesAccessorId);
+                    Assert::AreEqual(ComponentType::COMPONENT_UNSIGNED_SHORT, accessor.componentType);
+
+                    auto outputIndices = MeshPrimitiveUtils::GetIndices16(doc, reader, meshPrimitive);
+
+                    std::vector<uint16_t> expectedIndices =
+                    {
+                        0, 3, 1, 2, 4, 5
+                    };
+
+                    AreEqual(expectedIndices, outputIndices);
+                }
+
+                GLTFSDK_TEST_METHOD(MeshPrimitiveUtilsTests, MeshPrimitiveUtils_Test_SerializeTriangulatedIndices16_TriangleFan)
+                {
+                    auto readerWriter = std::make_shared<const StreamReaderWriter>();
+                    auto bufferBuilder = BufferBuilder(std::make_unique<GLTFResourceWriter>(readerWriter));
+
+                    bufferBuilder.AddBuffer();
+                    bufferBuilder.AddBufferView(BufferViewTarget::ARRAY_BUFFER);
+
+                    // Serialize
+                    MeshPrimitive meshPrimitive;
+                    meshPrimitive.mode = MESH_TRIANGLE_FAN;
+
+                    std::vector<uint16_t> triangulatedIndices =
+                    {
+                        5, 2, 0,
+                        5, 0, 1,
+                        5, 1, 4,
+                        5, 4, 3
+                    };
+
+                    meshPrimitive.indicesAccessorId = MeshPrimitiveUtils::SerializeTriangulatedIndices16(triangulatedIndices, meshPrimitive.mode, bufferBuilder);
+
+                    // Read back & check
+                    Document doc;
+                    bufferBuilder.Output(doc);
+
+                    GLTFResourceReader reader(readerWriter);
+
+                    const auto& accessor = doc.accessors.Get(meshPrimitive.indicesAccessorId);
+                    Assert::AreEqual(ComponentType::COMPONENT_UNSIGNED_SHORT, accessor.componentType);
+
+                    auto outputIndices = MeshPrimitiveUtils::GetIndices16(doc, reader, meshPrimitive);
+
+                    std::vector<uint16_t> expectedIndices =
+                    {
+                        5, 2, 0, 1, 4, 3
+                    };
+
+                    AreEqual(expectedIndices, outputIndices);
+                }
+
+                GLTFSDK_TEST_METHOD(MeshPrimitiveUtilsTests, MeshPrimitiveUtils_Test_SerializeTriangulatedIndices32_Triangles)
+                {
+                    auto readerWriter = std::make_shared<const StreamReaderWriter>();
+                    auto bufferBuilder = BufferBuilder(std::make_unique<GLTFResourceWriter>(readerWriter));
+
+                    bufferBuilder.AddBuffer();
+                    bufferBuilder.AddBufferView(BufferViewTarget::ARRAY_BUFFER);
+
+                    // Serialize
+                    MeshPrimitive meshPrimitive;
+                    meshPrimitive.mode = MESH_TRIANGLES;
+
+                    std::vector<uint32_t> triangulatedIndices =
+                    {
+                        0, 3, 1,
+                        3, 2, 1,
+                        1, 2, 4,
+                        2, 5, 4
+                    };
+
+                    meshPrimitive.indicesAccessorId = MeshPrimitiveUtils::SerializeTriangulatedIndices32(triangulatedIndices, meshPrimitive.mode, bufferBuilder);
+
+                    // Read back & check
+                    Document doc;
+                    bufferBuilder.Output(doc);
+
+                    GLTFResourceReader reader(readerWriter);
+
+                    const auto& accessor = doc.accessors.Get(meshPrimitive.indicesAccessorId);
+                    Assert::AreEqual(ComponentType::COMPONENT_UNSIGNED_INT, accessor.componentType);
+
+                    auto outputIndices = MeshPrimitiveUtils::GetIndices32(doc, reader, meshPrimitive);
+
+                    AreEqual(triangulatedIndices, outputIndices);
+                }
+
+                GLTFSDK_TEST_METHOD(MeshPrimitiveUtilsTests, MeshPrimitiveUtils_Test_SerializeTriangulatedIndices32_TriangleStrip)
+                {
+                    auto readerWriter = std::make_shared<const StreamReaderWriter>();
+                    auto bufferBuilder = BufferBuilder(std::make_unique<GLTFResourceWriter>(readerWriter));
+
+                    bufferBuilder.AddBuffer();
+                    bufferBuilder.AddBufferView(BufferViewTarget::ARRAY_BUFFER);
+
+                    // Serialize
+                    MeshPrimitive meshPrimitive;
+                    meshPrimitive.mode = MESH_TRIANGLE_STRIP;
+
+                    std::vector<uint32_t> triangulatedIndices =
+                    {
+                        0, 3, 1,
+                        3, 2, 1,
+                        1, 2, 4,
+                        2, 5, 4
+                    };
+
+                    meshPrimitive.indicesAccessorId = MeshPrimitiveUtils::SerializeTriangulatedIndices32(triangulatedIndices, meshPrimitive.mode, bufferBuilder);
+
+                    // Read back & check
+                    Document doc;
+                    bufferBuilder.Output(doc);
+
+                    GLTFResourceReader reader(readerWriter);
+
+                    const auto& accessor = doc.accessors.Get(meshPrimitive.indicesAccessorId);
+                    Assert::AreEqual(ComponentType::COMPONENT_UNSIGNED_INT, accessor.componentType);
+
+                    auto outputIndices = MeshPrimitiveUtils::GetIndices32(doc, reader, meshPrimitive);
+
+                    std::vector<uint32_t> expectedIndices =
+                    {
+                        0, 3, 1, 2, 4, 5
+                    };
+
+                    AreEqual(expectedIndices, outputIndices);
+                }
+
+                GLTFSDK_TEST_METHOD(MeshPrimitiveUtilsTests, MeshPrimitiveUtils_Test_SerializeTriangulatedIndices32_TriangleFan)
+                {
+                    auto readerWriter = std::make_shared<const StreamReaderWriter>();
+                    auto bufferBuilder = BufferBuilder(std::make_unique<GLTFResourceWriter>(readerWriter));
+
+                    bufferBuilder.AddBuffer();
+                    bufferBuilder.AddBufferView(BufferViewTarget::ARRAY_BUFFER);
+
+                    // Serialize
+                    MeshPrimitive meshPrimitive;
+                    meshPrimitive.mode = MESH_TRIANGLE_FAN;
+
+                    std::vector<uint32_t> triangulatedIndices =
+                    {
+                        5, 2, 0,
+                        5, 0, 1,
+                        5, 1, 4,
+                        5, 4, 3
+                    };
+
+                    meshPrimitive.indicesAccessorId = MeshPrimitiveUtils::SerializeTriangulatedIndices32(triangulatedIndices, meshPrimitive.mode, bufferBuilder);
+
+                    // Read back & check
+                    Document doc;
+                    bufferBuilder.Output(doc);
+
+                    GLTFResourceReader reader(readerWriter);
+
+                    const auto& accessor = doc.accessors.Get(meshPrimitive.indicesAccessorId);
+                    Assert::AreEqual(ComponentType::COMPONENT_UNSIGNED_INT, accessor.componentType);
+
+                    auto outputIndices = MeshPrimitiveUtils::GetIndices32(doc, reader, meshPrimitive);
+
+                    std::vector<uint32_t> expectedIndices =
+                    {
+                        5, 2, 0, 1, 4, 3
+                    };
+
+                    AreEqual(expectedIndices, outputIndices);
+                }
+
+                GLTFSDK_TEST_METHOD(MeshPrimitiveUtilsTests, MeshPrimitiveUtils_Test_SerializeSegmentedIndices16_Lines)
+                {
+                    auto readerWriter = std::make_shared<const StreamReaderWriter>();
+                    auto bufferBuilder = BufferBuilder(std::make_unique<GLTFResourceWriter>(readerWriter));
+
+                    bufferBuilder.AddBuffer();
+                    bufferBuilder.AddBufferView(BufferViewTarget::ARRAY_BUFFER);
+
+                    // Serialize
+                    MeshPrimitive meshPrimitive;
+                    meshPrimitive.mode = MESH_LINES;
+
+                    std::vector<uint16_t> segmentedIndices =
+                    {
+                        4, 2,
+                        2, 1,
+                        1, 3,
+                        3, 0
+                    };
+
+                    meshPrimitive.indicesAccessorId = MeshPrimitiveUtils::SerializeSegmentedIndices16(segmentedIndices, meshPrimitive.mode, bufferBuilder);
+
+                    // Read back & check
+                    Document doc;
+                    bufferBuilder.Output(doc);
+
+                    GLTFResourceReader reader(readerWriter);
+
+                    const auto& accessor = doc.accessors.Get(meshPrimitive.indicesAccessorId);
+                    Assert::AreEqual(ComponentType::COMPONENT_UNSIGNED_SHORT, accessor.componentType);
+
+                    auto outputIndices = MeshPrimitiveUtils::GetIndices16(doc, reader, meshPrimitive);
+
+                    AreEqual(segmentedIndices, outputIndices);
+                }
+
+                GLTFSDK_TEST_METHOD(MeshPrimitiveUtilsTests, MeshPrimitiveUtils_Test_SerializeSegmentedIndices16_LineStrip)
+                {
+                    auto readerWriter = std::make_shared<const StreamReaderWriter>();
+                    auto bufferBuilder = BufferBuilder(std::make_unique<GLTFResourceWriter>(readerWriter));
+
+                    bufferBuilder.AddBuffer();
+                    bufferBuilder.AddBufferView(BufferViewTarget::ARRAY_BUFFER);
+
+                    // Serialize
+                    MeshPrimitive meshPrimitive;
+                    meshPrimitive.mode = MESH_LINE_STRIP;
+
+                    std::vector<uint16_t> segmentedIndices =
+                    {
+                        4, 2,
+                        2, 1,
+                        1, 3,
+                        3, 0
+                    };
+
+                    meshPrimitive.indicesAccessorId = MeshPrimitiveUtils::SerializeSegmentedIndices16(segmentedIndices, meshPrimitive.mode, bufferBuilder);
+
+                    // Read back & check
+                    Document doc;
+                    bufferBuilder.Output(doc);
+
+                    GLTFResourceReader reader(readerWriter);
+
+                    const auto& accessor = doc.accessors.Get(meshPrimitive.indicesAccessorId);
+                    Assert::AreEqual(ComponentType::COMPONENT_UNSIGNED_SHORT, accessor.componentType);
+
+                    auto outputIndices = MeshPrimitiveUtils::GetIndices16(doc, reader, meshPrimitive);
+
+                    std::vector<uint16_t> expectedIndices =
+                    {
+                        4, 2, 1, 3, 0
+                    };
+
+                    AreEqual(expectedIndices, outputIndices);
+                }
+
+                GLTFSDK_TEST_METHOD(MeshPrimitiveUtilsTests, MeshPrimitiveUtils_Test_SerializeSegmentedIndices16_LineLoop)
+                {
+                    auto readerWriter = std::make_shared<const StreamReaderWriter>();
+                    auto bufferBuilder = BufferBuilder(std::make_unique<GLTFResourceWriter>(readerWriter));
+
+                    bufferBuilder.AddBuffer();
+                    bufferBuilder.AddBufferView(BufferViewTarget::ARRAY_BUFFER);
+
+                    // Serialize
+                    MeshPrimitive meshPrimitive;
+                    meshPrimitive.mode = MESH_LINE_LOOP;
+
+                    std::vector<uint16_t> segmentedIndices =
+                    {
+                        4, 2,
+                        2, 1,
+                        1, 3,
+                        3, 0,
+                        0, 4
+                    };
+
+                    meshPrimitive.indicesAccessorId = MeshPrimitiveUtils::SerializeSegmentedIndices16(segmentedIndices, meshPrimitive.mode, bufferBuilder);
+
+                    // Read back & check
+                    Document doc;
+                    bufferBuilder.Output(doc);
+
+                    GLTFResourceReader reader(readerWriter);
+
+                    const auto& accessor = doc.accessors.Get(meshPrimitive.indicesAccessorId);
+                    Assert::AreEqual(ComponentType::COMPONENT_UNSIGNED_SHORT, accessor.componentType);
+
+                    auto outputIndices = MeshPrimitiveUtils::GetIndices16(doc, reader, meshPrimitive);
+
+                    std::vector<uint16_t> expectedIndices =
+                    {
+                        4, 2, 1, 3, 0
+                    };
+
+                    AreEqual(expectedIndices, outputIndices);
+                }
+
+                GLTFSDK_TEST_METHOD(MeshPrimitiveUtilsTests, MeshPrimitiveUtils_Test_SerializeSegmentedIndices32_Lines)
+                {
+                    auto readerWriter = std::make_shared<const StreamReaderWriter>();
+                    auto bufferBuilder = BufferBuilder(std::make_unique<GLTFResourceWriter>(readerWriter));
+
+                    bufferBuilder.AddBuffer();
+                    bufferBuilder.AddBufferView(BufferViewTarget::ARRAY_BUFFER);
+
+                    // Serialize
+                    MeshPrimitive meshPrimitive;
+                    meshPrimitive.mode = MESH_LINES;
+
+                    std::vector<uint32_t> segmentedIndices =
+                    {
+                        4, 2,
+                        2, 1,
+                        1, 3,
+                        3, 0
+                    };
+
+                    meshPrimitive.indicesAccessorId = MeshPrimitiveUtils::SerializeSegmentedIndices32(segmentedIndices, meshPrimitive.mode, bufferBuilder);
+
+                    // Read back & check
+                    Document doc;
+                    bufferBuilder.Output(doc);
+
+                    GLTFResourceReader reader(readerWriter);
+
+                    const auto& accessor = doc.accessors.Get(meshPrimitive.indicesAccessorId);
+                    Assert::AreEqual(ComponentType::COMPONENT_UNSIGNED_INT, accessor.componentType);
+
+                    auto outputIndices = MeshPrimitiveUtils::GetIndices32(doc, reader, meshPrimitive);
+
+                    AreEqual(segmentedIndices, outputIndices);
+                }
+
+                GLTFSDK_TEST_METHOD(MeshPrimitiveUtilsTests, MeshPrimitiveUtils_Test_SerializeSegmentedIndices32_LineStrip)
+                {
+                    auto readerWriter = std::make_shared<const StreamReaderWriter>();
+                    auto bufferBuilder = BufferBuilder(std::make_unique<GLTFResourceWriter>(readerWriter));
+
+                    bufferBuilder.AddBuffer();
+                    bufferBuilder.AddBufferView(BufferViewTarget::ARRAY_BUFFER);
+
+                    // Serialize
+                    MeshPrimitive meshPrimitive;
+                    meshPrimitive.mode = MESH_LINE_STRIP;
+
+                    std::vector<uint32_t> segmentedIndices =
+                    {
+                        4, 2,
+                        2, 1,
+                        1, 3,
+                        3, 0
+                    };
+
+                    meshPrimitive.indicesAccessorId = MeshPrimitiveUtils::SerializeSegmentedIndices32(segmentedIndices, meshPrimitive.mode, bufferBuilder);
+
+                    // Read back & check
+                    Document doc;
+                    bufferBuilder.Output(doc);
+
+                    GLTFResourceReader reader(readerWriter);
+
+                    const auto& accessor = doc.accessors.Get(meshPrimitive.indicesAccessorId);
+                    Assert::AreEqual(ComponentType::COMPONENT_UNSIGNED_INT, accessor.componentType);
+
+                    auto outputIndices = MeshPrimitiveUtils::GetIndices32(doc, reader, meshPrimitive);
+
+                    std::vector<uint32_t> expectedIndices =
+                    {
+                        4, 2, 1, 3, 0
+                    };
+
+                    AreEqual(expectedIndices, outputIndices);
+                }
+
+                GLTFSDK_TEST_METHOD(MeshPrimitiveUtilsTests, MeshPrimitiveUtils_Test_SerializeSegmentedIndices32_LineLoop)
+                {
+                    auto readerWriter = std::make_shared<const StreamReaderWriter>();
+                    auto bufferBuilder = BufferBuilder(std::make_unique<GLTFResourceWriter>(readerWriter));
+
+                    bufferBuilder.AddBuffer();
+                    bufferBuilder.AddBufferView(BufferViewTarget::ARRAY_BUFFER);
+
+                    // Serialize
+                    MeshPrimitive meshPrimitive;
+                    meshPrimitive.mode = MESH_LINE_LOOP;
+
+                    std::vector<uint32_t> segmentedIndices =
+                    {
+                        4, 2,
+                        2, 1,
+                        1, 3,
+                        3, 0,
+                        0, 4
+                    };
+
+                    meshPrimitive.indicesAccessorId = MeshPrimitiveUtils::SerializeSegmentedIndices32(segmentedIndices, meshPrimitive.mode, bufferBuilder);
+
+                    // Read back & check
+                    Document doc;
+                    bufferBuilder.Output(doc);
+
+                    GLTFResourceReader reader(readerWriter);
+
+                    const auto& accessor = doc.accessors.Get(meshPrimitive.indicesAccessorId);
+                    Assert::AreEqual(ComponentType::COMPONENT_UNSIGNED_INT, accessor.componentType);
+
+                    auto outputIndices = MeshPrimitiveUtils::GetIndices32(doc, reader, meshPrimitive);
+
+                    std::vector<uint32_t> expectedIndices =
+                    {
+                        4, 2, 1, 3, 0
+                    };
+
+                    AreEqual(expectedIndices, outputIndices);
+                }
+
             };
         }
     }
