@@ -1353,7 +1353,7 @@ namespace Microsoft
                     GLTFResourceReader reader(readerWriter);
 
                     const auto& accessor = doc.accessors.Get(meshPrimitive.indicesAccessorId);
-                    Assert::AreEqual(ComponentType::COMPONENT_UNSIGNED_SHORT, accessor.componentType);
+                    Assert::IsTrue(ComponentType::COMPONENT_UNSIGNED_SHORT == accessor.componentType);
 
                     auto outputIndices = MeshPrimitiveUtils::GetIndices16(doc, reader, meshPrimitive);
 
@@ -1389,7 +1389,7 @@ namespace Microsoft
                     GLTFResourceReader reader(readerWriter);
 
                     const auto& accessor = doc.accessors.Get(meshPrimitive.indicesAccessorId);
-                    Assert::AreEqual(ComponentType::COMPONENT_UNSIGNED_SHORT, accessor.componentType);
+                    Assert::IsTrue(ComponentType::COMPONENT_UNSIGNED_SHORT == accessor.componentType);
 
                     auto outputIndices = MeshPrimitiveUtils::GetIndices16(doc, reader, meshPrimitive);
 
@@ -1430,7 +1430,7 @@ namespace Microsoft
                     GLTFResourceReader reader(readerWriter);
 
                     const auto& accessor = doc.accessors.Get(meshPrimitive.indicesAccessorId);
-                    Assert::AreEqual(ComponentType::COMPONENT_UNSIGNED_SHORT, accessor.componentType);
+                    Assert::IsTrue(ComponentType::COMPONENT_UNSIGNED_SHORT == accessor.componentType);
 
                     auto outputIndices = MeshPrimitiveUtils::GetIndices16(doc, reader, meshPrimitive);
 
@@ -1471,7 +1471,7 @@ namespace Microsoft
                     GLTFResourceReader reader(readerWriter);
 
                     const auto& accessor = doc.accessors.Get(meshPrimitive.indicesAccessorId);
-                    Assert::AreEqual(ComponentType::COMPONENT_UNSIGNED_INT, accessor.componentType);
+                    Assert::IsTrue(ComponentType::COMPONENT_UNSIGNED_INT == accessor.componentType);
 
                     auto outputIndices = MeshPrimitiveUtils::GetIndices32(doc, reader, meshPrimitive);
 
@@ -1507,7 +1507,7 @@ namespace Microsoft
                     GLTFResourceReader reader(readerWriter);
 
                     const auto& accessor = doc.accessors.Get(meshPrimitive.indicesAccessorId);
-                    Assert::AreEqual(ComponentType::COMPONENT_UNSIGNED_INT, accessor.componentType);
+                    Assert::IsTrue(ComponentType::COMPONENT_UNSIGNED_INT == accessor.componentType);
 
                     auto outputIndices = MeshPrimitiveUtils::GetIndices32(doc, reader, meshPrimitive);
 
@@ -1548,7 +1548,7 @@ namespace Microsoft
                     GLTFResourceReader reader(readerWriter);
 
                     const auto& accessor = doc.accessors.Get(meshPrimitive.indicesAccessorId);
-                    Assert::AreEqual(ComponentType::COMPONENT_UNSIGNED_INT, accessor.componentType);
+                    Assert::IsTrue(ComponentType::COMPONENT_UNSIGNED_INT == accessor.componentType);
 
                     auto outputIndices = MeshPrimitiveUtils::GetIndices32(doc, reader, meshPrimitive);
 
@@ -1589,7 +1589,7 @@ namespace Microsoft
                     GLTFResourceReader reader(readerWriter);
 
                     const auto& accessor = doc.accessors.Get(meshPrimitive.indicesAccessorId);
-                    Assert::AreEqual(ComponentType::COMPONENT_UNSIGNED_SHORT, accessor.componentType);
+                    Assert::IsTrue(ComponentType::COMPONENT_UNSIGNED_SHORT == accessor.componentType);
 
                     auto outputIndices = MeshPrimitiveUtils::GetIndices16(doc, reader, meshPrimitive);
 
@@ -1625,7 +1625,7 @@ namespace Microsoft
                     GLTFResourceReader reader(readerWriter);
 
                     const auto& accessor = doc.accessors.Get(meshPrimitive.indicesAccessorId);
-                    Assert::AreEqual(ComponentType::COMPONENT_UNSIGNED_SHORT, accessor.componentType);
+                    Assert::IsTrue(ComponentType::COMPONENT_UNSIGNED_SHORT == accessor.componentType);
 
                     auto outputIndices = MeshPrimitiveUtils::GetIndices16(doc, reader, meshPrimitive);
 
@@ -1667,7 +1667,7 @@ namespace Microsoft
                     GLTFResourceReader reader(readerWriter);
 
                     const auto& accessor = doc.accessors.Get(meshPrimitive.indicesAccessorId);
-                    Assert::AreEqual(ComponentType::COMPONENT_UNSIGNED_SHORT, accessor.componentType);
+                    Assert::IsTrue(ComponentType::COMPONENT_UNSIGNED_SHORT == accessor.componentType);
 
                     auto outputIndices = MeshPrimitiveUtils::GetIndices16(doc, reader, meshPrimitive);
 
@@ -1708,7 +1708,7 @@ namespace Microsoft
                     GLTFResourceReader reader(readerWriter);
 
                     const auto& accessor = doc.accessors.Get(meshPrimitive.indicesAccessorId);
-                    Assert::AreEqual(ComponentType::COMPONENT_UNSIGNED_INT, accessor.componentType);
+                    Assert::IsTrue(ComponentType::COMPONENT_UNSIGNED_INT == accessor.componentType);
 
                     auto outputIndices = MeshPrimitiveUtils::GetIndices32(doc, reader, meshPrimitive);
 
@@ -1744,7 +1744,7 @@ namespace Microsoft
                     GLTFResourceReader reader(readerWriter);
 
                     const auto& accessor = doc.accessors.Get(meshPrimitive.indicesAccessorId);
-                    Assert::AreEqual(ComponentType::COMPONENT_UNSIGNED_INT, accessor.componentType);
+                    Assert::IsTrue(ComponentType::COMPONENT_UNSIGNED_INT == accessor.componentType);
 
                     auto outputIndices = MeshPrimitiveUtils::GetIndices32(doc, reader, meshPrimitive);
 
@@ -1786,7 +1786,7 @@ namespace Microsoft
                     GLTFResourceReader reader(readerWriter);
 
                     const auto& accessor = doc.accessors.Get(meshPrimitive.indicesAccessorId);
-                    Assert::AreEqual(ComponentType::COMPONENT_UNSIGNED_INT, accessor.componentType);
+                    Assert::IsTrue(ComponentType::COMPONENT_UNSIGNED_INT == accessor.componentType);
 
                     auto outputIndices = MeshPrimitiveUtils::GetIndices32(doc, reader, meshPrimitive);
 
