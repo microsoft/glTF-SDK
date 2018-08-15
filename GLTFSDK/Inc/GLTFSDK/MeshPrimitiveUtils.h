@@ -58,17 +58,17 @@ namespace Microsoft
             std::vector<uint32_t> GetJointWeights32(const Document& doc, const GLTFResourceReader& reader, const Accessor& accessor);
             std::vector<uint32_t> GetJointWeights32_0(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive);
 
-            std::string SerializeTriangulatedIndices16(const uint16_t* indices, size_t indexCount, MeshMode mode, BufferBuilder& bufferBuilder);
-            std::string SerializeTriangulatedIndices32(const uint32_t* indices, size_t indexCount, MeshMode mode, BufferBuilder& bufferBuilder);
+            std::vector<uint16_t> ReverseTriangulateIndices16(const uint16_t* indices, size_t indexCount, MeshMode mode);
+            std::vector<uint32_t> ReverseTriangulateIndices32(const uint32_t* indices, size_t indexCount, MeshMode mode);
 
-            std::string SerializeTriangulatedIndices16(const std::vector<uint16_t>& indices, MeshMode mode, BufferBuilder& bufferBuilder);
-            std::string SerializeTriangulatedIndices32(const std::vector<uint32_t>& indices, MeshMode mode, BufferBuilder& bufferBuilder);
+            std::vector<uint16_t> ReverseTriangulateIndices16(const std::vector<uint16_t>& indices, MeshMode mode);
+            std::vector<uint32_t> ReverseTriangulateIndices32(const std::vector<uint32_t>& indices, MeshMode mode);
 
-            std::string SerializeSegmentedIndices16(const uint16_t* indices, size_t indexCount, MeshMode mode, BufferBuilder& bufferBuilder);
-            std::string SerializeSegmentedIndices32(const uint32_t* indices, size_t indexCount, MeshMode mode, BufferBuilder& bufferBuilder);
+            std::vector<uint16_t> ReverseSegmentIndices16(const uint16_t* indices, size_t indexCount, MeshMode mode);
+            std::vector<uint32_t> ReverseSegmentIndices32(const uint32_t* indices, size_t indexCount, MeshMode mode);
 
-            std::string SerializeSegmentedIndices16(const std::vector<uint16_t>& indices, MeshMode mode, BufferBuilder& bufferBuilder);
-            std::string SerializeSegmentedIndices32(const std::vector<uint32_t>& indices, MeshMode mode, BufferBuilder& bufferBuilder);
+            std::vector<uint16_t> ReverseSegmentIndices16(const std::vector<uint16_t>& indices, MeshMode mode);
+            std::vector<uint32_t> ReverseSegmentIndices32(const std::vector<uint32_t>& indices, MeshMode mode);
         };
     }
 }

@@ -524,23 +524,19 @@ namespace
             throw GLTFException("Input triangulated triangle strip has fewer than 3 indices.");
         }
 
-        const size_t triangleCount = indexCount / 3;
-        const auto resultIndexCount = 2 + triangleCount;
-        std::vector<T> result(resultIndexCount);
+        std::vector<T> result;
+        result.push_back(indices[0]);
+        result.push_back(indices[1]);
 
-        result[0] = indices[0];
-        result[1] = indices[1];
-        result[2] = indices[2];
-
-        for (size_t i = 3; i < resultIndexCount; ++i)
+        for (size_t i = 2; i < indexCount; i += 3)
         {
-            if (i % 2 != 0)
+            if (i % 2 == 0)
             {
-                result[i] = indices[3 * i - 5];
+                result.push_back(indices[i]);
             }
             else
             {
-                result[i] = indices[3 * i - 4];
+                result.push_back(indices[i - 1]);
             }
         }
 
@@ -560,45 +556,32 @@ namespace
             throw GLTFException("Input triangulated triangle fan has fewer than 3 indices.");
         }
 
-        const auto triangleCount = indexCount / 3;
-        const auto resultIndexCount = 2 + triangleCount;
-        std::vector<T> result(resultIndexCount);
+        std::vector<T> result;
+        result.push_back(indices[0]);
+        result.push_back(indices[1]);
 
-        result[0] = indices[0];
-        result[1] = indices[1];
-        result[2] = indices[2];
-
-        for (size_t i = 3; i < resultIndexCount; ++i)
+        for (size_t i = 2; i < indexCount; i += 3)
         {
-            result[i] = indices[3 * i - 4];
+            result.push_back(indices[i]);
         }
 
         return result;
     }
 
-    template<typename T, ComponentType AccessorComponentType = std::is_same<T, uint16_t>::value ? ComponentType::COMPONENT_UNSIGNED_SHORT : ComponentType::COMPONENT_UNSIGNED_INT>
-    std::string SerializeTriangulatedIndices(const T* indices, size_t indexCount, MeshMode mode, BufferBuilder& bufferBuilder)
+    template<typename T>
+    std::vector<T> ReverseTriangulateIndices(const T* indices, size_t indexCount, MeshMode mode)
     {
-        static_assert(AccessorComponentType == ComponentType::COMPONENT_UNSIGNED_SHORT || AccessorComponentType == ComponentType::COMPONENT_UNSIGNED_INT,
-                      "Unsupported value of AccessorComponentType used as a template argument for SerializeTriangulatedIndices");
-
-        bufferBuilder.AddBufferView(BufferViewTarget::ELEMENT_ARRAY_BUFFER);
-
-        const auto accessorDesc = AccessorDesc(AccessorType::TYPE_SCALAR, AccessorComponentType);
-
         if (mode == MeshMode::MESH_TRIANGLE_STRIP)
         {
-            auto reconstructedIndices = ReconstructTriangleStripIndexing(indices, indexCount);
-            return bufferBuilder.AddAccessor(reconstructedIndices.data(), reconstructedIndices.size(), accessorDesc).id;
+            return ReconstructTriangleStripIndexing(indices, indexCount);
         }
         else if (mode == MeshMode::MESH_TRIANGLE_FAN)
         {
-            auto reconstructedIndices = ReconstructTriangleFanIndexing(indices, indexCount);
-            return bufferBuilder.AddAccessor(reconstructedIndices.data(), reconstructedIndices.size(), accessorDesc).id;
+            return ReconstructTriangleFanIndexing(indices, indexCount);
         }
         else
         {
-            return bufferBuilder.AddAccessor(indices, indexCount, accessorDesc).id;
+            throw GLTFException("Non-triangulated mesh mode specificed.");
         }
     }
 
@@ -628,29 +611,20 @@ namespace
         return result;
     }
 
-    template<typename T, ComponentType AccessorComponentType = std::is_same<T, uint16_t>::value ? ComponentType::COMPONENT_UNSIGNED_SHORT : ComponentType::COMPONENT_UNSIGNED_INT>
-    std::string SerializeSegmentedIndices(const T* indices, size_t indexCount, MeshMode mode, BufferBuilder& bufferBuilder)
+    template<typename T>
+    std::vector<T> ReverseSegmentIndices(const T* indices, size_t indexCount, MeshMode mode)
     {
-        static_assert(AccessorComponentType == ComponentType::COMPONENT_UNSIGNED_SHORT || AccessorComponentType == ComponentType::COMPONENT_UNSIGNED_INT,
-                      "Unsupported value of AccessorComponentType used as a template argument for SerializeSegmentedIndices");
-
-        bufferBuilder.AddBufferView(BufferViewTarget::ELEMENT_ARRAY_BUFFER);
-
-        const auto accessorDesc = AccessorDesc(AccessorType::TYPE_SCALAR, AccessorComponentType);
-
         if (mode == MeshMode::MESH_LINE_STRIP)
         {
-            auto reconstructedIndices = ReconstructLineStripIndexing(indices, indexCount);
-            return bufferBuilder.AddAccessor(reconstructedIndices.data(), reconstructedIndices.size(), accessorDesc).id;
+            return ReconstructLineStripIndexing(indices, indexCount);
         }
         else if (mode == MeshMode::MESH_LINE_LOOP)
         {
-            auto reconstructedIndices = ReconstructLineLoopIndexing(indices, indexCount);
-            return bufferBuilder.AddAccessor(reconstructedIndices.data(), reconstructedIndices.size(), accessorDesc).id;
+            return ReconstructLineLoopIndexing(indices, indexCount);
         }
         else
         {
-            return bufferBuilder.AddAccessor(indices, indexCount, accessorDesc).id;
+            throw GLTFException("Non-segmented mesh mode specificed.");
         }
     }
 }
@@ -973,42 +947,42 @@ std::vector<uint32_t> MeshPrimitiveUtils::GetJointWeights32_0(const Document& do
     return GetJointWeights32(doc, reader, accessor);
 }
 
-std::string MeshPrimitiveUtils::SerializeTriangulatedIndices16(const uint16_t* indices, size_t indexCount, MeshMode mode, BufferBuilder& bufferBuilder)
+std::vector<uint16_t> MeshPrimitiveUtils::ReverseTriangulateIndices16(const uint16_t* indices, size_t indexCount, MeshMode mode)
 {
-    return SerializeTriangulatedIndices(indices, indexCount, mode, bufferBuilder);
+    return ReverseTriangulateIndices(indices, indexCount, mode);
 }
 
-std::string MeshPrimitiveUtils::SerializeTriangulatedIndices32(const uint32_t* indices, size_t indexCount, MeshMode mode, BufferBuilder& bufferBuilder)
+std::vector<uint32_t> MeshPrimitiveUtils::ReverseTriangulateIndices32(const uint32_t* indices, size_t indexCount, MeshMode mode)
 {
-    return SerializeTriangulatedIndices(indices, indexCount, mode, bufferBuilder);
+    return ReverseTriangulateIndices(indices, indexCount, mode);
 }
 
-std::string MeshPrimitiveUtils::SerializeTriangulatedIndices16(const std::vector<uint16_t>& indices, MeshMode mode, BufferBuilder& bufferBuilder)
+std::vector<uint16_t> MeshPrimitiveUtils::ReverseTriangulateIndices16(const std::vector<uint16_t>& indices, MeshMode mode)
 {
-    return SerializeTriangulatedIndices(indices.data(), indices.size(), mode, bufferBuilder);
+    return ReverseTriangulateIndices(indices.data(), indices.size(), mode);
 }
 
-std::string MeshPrimitiveUtils::SerializeTriangulatedIndices32(const std::vector<uint32_t>& indices, MeshMode mode, BufferBuilder& bufferBuilder)
+std::vector<uint32_t> MeshPrimitiveUtils::ReverseTriangulateIndices32(const std::vector<uint32_t>& indices, MeshMode mode)
 {
-    return SerializeTriangulatedIndices(indices.data(), indices.size(), mode, bufferBuilder);
+    return ReverseTriangulateIndices(indices.data(), indices.size(), mode);
 }
 
-std::string MeshPrimitiveUtils::SerializeSegmentedIndices16(const uint16_t* indices, size_t indexCount, MeshMode mode, BufferBuilder& bufferBuilder)
+std::vector<uint16_t> MeshPrimitiveUtils::ReverseSegmentIndices16(const uint16_t* indices, size_t indexCount, MeshMode mode)
 {
-    return SerializeSegmentedIndices(indices, indexCount, mode, bufferBuilder);
+    return ReverseSegmentIndices(indices, indexCount, mode);
 }
 
-std::string MeshPrimitiveUtils::SerializeSegmentedIndices32(const uint32_t* indices, size_t indexCount, MeshMode mode, BufferBuilder& bufferBuilder)
+std::vector<uint32_t> MeshPrimitiveUtils::ReverseSegmentIndices32(const uint32_t* indices, size_t indexCount, MeshMode mode)
 {
-    return SerializeSegmentedIndices(indices, indexCount, mode, bufferBuilder);
+    return ReverseSegmentIndices(indices, indexCount, mode);
 }
 
-std::string MeshPrimitiveUtils::SerializeSegmentedIndices16(const std::vector<uint16_t>& indices, MeshMode mode, BufferBuilder& bufferBuilder)
+std::vector<uint16_t> MeshPrimitiveUtils::ReverseSegmentIndices16(const std::vector<uint16_t>& indices, MeshMode mode)
 {
-    return SerializeSegmentedIndices(indices.data(), indices.size(), mode, bufferBuilder);
+    return ReverseSegmentIndices(indices.data(), indices.size(), mode);
 }
 
-std::string MeshPrimitiveUtils::SerializeSegmentedIndices32(const std::vector<uint32_t>& indices, MeshMode mode, BufferBuilder& bufferBuilder)
+std::vector<uint32_t> MeshPrimitiveUtils::ReverseSegmentIndices32(const std::vector<uint32_t>& indices, MeshMode mode)
 {
-    return SerializeSegmentedIndices(indices.data(), indices.size(), mode, bufferBuilder);
+    return ReverseSegmentIndices(indices.data(), indices.size(), mode);
 }
