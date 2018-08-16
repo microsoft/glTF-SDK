@@ -13,7 +13,6 @@ namespace Microsoft
     {
         class Document;
         class GLTFResourceReader;
-        class BufferBuilder;
 
         namespace MeshPrimitiveUtils
         {

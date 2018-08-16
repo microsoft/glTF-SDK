@@ -525,6 +525,8 @@ namespace
         }
 
         std::vector<T> result;
+        result.reserve(2 + indexCount / 3);
+
         result.push_back(indices[0]);
         result.push_back(indices[1]);
 
@@ -557,6 +559,8 @@ namespace
         }
 
         std::vector<T> result;
+        result.reserve(2 + indexCount / 3);
+
         result.push_back(indices[0]);
         result.push_back(indices[1]);
 
@@ -593,11 +597,12 @@ namespace
             throw GLTFException("Input segmented line has non-multiple-of-2 indices.");
         }
 
-        const auto segmentCount = indexCount / 2;
-        std::vector<T> result(segmentCount);
-        for (size_t i = 0; i < segmentCount; ++i)
+        std::vector<T> result;
+        result.reserve(indexCount / 2);
+
+        for (size_t i = 0; i < indexCount; i += 2)
         {
-            result[i] = indices[2 * i];
+            result.push_back(indices[i]);
         }
 
         return result;
