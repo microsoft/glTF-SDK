@@ -5,6 +5,7 @@
 
 #include <GLTFSDK/GLTF.h>
 #include <GLTFSDK/GLTFResourceReader.h>
+#include <GLTFSDK/BufferBuilder.h>
 
 #include <cassert>
 #include <numeric>
@@ -192,7 +193,7 @@ namespace
     {
         std::vector<float> texcoordsFloat;
         texcoordsFloat.reserve(texcoords.size());
-        for(size_t i = 0; i < texcoords.size(); i++)
+        for (size_t i = 0; i < texcoords.size(); i++)
         {
             texcoordsFloat.push_back(texcoords[i] / FLOAT_UINT8_MAX);
         }
@@ -476,7 +477,7 @@ namespace
         if (doc.accessors.Has(meshPrimitive.indicesAccessorId))
         {
             const auto& indicesAccessor = doc.accessors.Get(meshPrimitive.indicesAccessorId);
-            return Microsoft::glTF::MeshPrimitiveUtils::GetIndices16(doc, reader, indicesAccessor);
+            return MeshPrimitiveUtils::GetIndices16(doc, reader, indicesAccessor);
         }
         else
         {
@@ -498,7 +499,7 @@ namespace
         if (doc.accessors.Has(meshPrimitive.indicesAccessorId))
         {
             const auto& indicesAccessor = doc.accessors.Get(meshPrimitive.indicesAccessorId);
-            return Microsoft::glTF::MeshPrimitiveUtils::GetIndices32(doc, reader, indicesAccessor);
+            return MeshPrimitiveUtils::GetIndices32(doc, reader, indicesAccessor);
         }
         else
         {
@@ -507,6 +508,128 @@ namespace
             std::vector<uint32_t> rawIndices(vertexCount);
             std::iota(rawIndices.begin(), rawIndices.end(), static_cast<uint32_t>(0U));
             return rawIndices;
+        }
+    }
+
+    template<typename T>
+    std::vector<T> ReconstructTriangleStripIndexing(const T* indices, size_t indexCount)
+    {
+        if (indexCount % 3 != 0)
+        {
+            throw GLTFException("Input triangulated triangle strip has non-multiple-of-3 indices.");
+        }
+
+        if (indexCount < 3)
+        {
+            throw GLTFException("Input triangulated triangle strip has fewer than 3 indices.");
+        }
+
+        std::vector<T> result;
+        result.reserve(2 + indexCount / 3);
+
+        result.push_back(indices[0]);
+        result.push_back(indices[1]);
+
+        for (size_t i = 2; i < indexCount; i += 3)
+        {
+            if (i % 2 == 0)
+            {
+                result.push_back(indices[i]);
+            }
+            else
+            {
+                result.push_back(indices[i - 1]);
+            }
+        }
+
+        return result;
+    }
+
+    template<typename T>
+    std::vector<T> ReconstructTriangleFanIndexing(const T* indices, size_t indexCount)
+    {
+        if (indexCount % 3 != 0)
+        {
+            throw GLTFException("Input triangulated triangle fan has non-multiple-of-3 indices.");
+        }
+
+        if (indexCount < 3)
+        {
+            throw GLTFException("Input triangulated triangle fan has fewer than 3 indices.");
+        }
+
+        std::vector<T> result;
+        result.reserve(2 + indexCount / 3);
+
+        result.push_back(indices[0]);
+        result.push_back(indices[1]);
+
+        for (size_t i = 2; i < indexCount; i += 3)
+        {
+            result.push_back(indices[i]);
+        }
+
+        return result;
+    }
+
+    template<typename T>
+    std::vector<T> ReverseTriangulateIndices(const T* indices, size_t indexCount, MeshMode mode)
+    {
+        if (mode == MeshMode::MESH_TRIANGLE_STRIP)
+        {
+            return ReconstructTriangleStripIndexing(indices, indexCount);
+        }
+        else if (mode == MeshMode::MESH_TRIANGLE_FAN)
+        {
+            return ReconstructTriangleFanIndexing(indices, indexCount);
+        }
+        else
+        {
+            throw GLTFException("Non-triangulated mesh mode specificed.");
+        }
+    }
+
+    template<typename T>
+    std::vector<T> ReconstructLineLoopIndexing(const T* indices, size_t indexCount)
+    {
+        if (indexCount % 2 != 0)
+        {
+            throw GLTFException("Input segmented line has non-multiple-of-2 indices.");
+        }
+
+        std::vector<T> result;
+        result.reserve(indexCount / 2);
+
+        for (size_t i = 0; i < indexCount; i += 2)
+        {
+            result.push_back(indices[i]);
+        }
+
+        return result;
+    }
+
+    template<typename T>
+    std::vector<T> ReconstructLineStripIndexing(const T* indices, size_t indexCount)
+    {
+        auto result = ReconstructLineLoopIndexing(indices, indexCount);
+        result.push_back(indices[indexCount - 1]);
+        return result;
+    }
+
+    template<typename T>
+    std::vector<T> ReverseSegmentIndices(const T* indices, size_t indexCount, MeshMode mode)
+    {
+        if (mode == MeshMode::MESH_LINE_STRIP)
+        {
+            return ReconstructLineStripIndexing(indices, indexCount);
+        }
+        else if (mode == MeshMode::MESH_LINE_LOOP)
+        {
+            return ReconstructLineLoopIndexing(indices, indexCount);
+        }
+        else
+        {
+            throw GLTFException("Non-segmented mesh mode specificed.");
         }
     }
 }
@@ -827,4 +950,44 @@ std::vector<uint32_t> MeshPrimitiveUtils::GetJointWeights32_0(const Document& do
 {
     const auto& accessor = doc.accessors.Get(meshPrimitive.GetAttributeAccessorId(ACCESSOR_WEIGHTS_0));
     return GetJointWeights32(doc, reader, accessor);
+}
+
+std::vector<uint16_t> MeshPrimitiveUtils::ReverseTriangulateIndices16(const uint16_t* indices, size_t indexCount, MeshMode mode)
+{
+    return ReverseTriangulateIndices(indices, indexCount, mode);
+}
+
+std::vector<uint32_t> MeshPrimitiveUtils::ReverseTriangulateIndices32(const uint32_t* indices, size_t indexCount, MeshMode mode)
+{
+    return ReverseTriangulateIndices(indices, indexCount, mode);
+}
+
+std::vector<uint16_t> MeshPrimitiveUtils::ReverseTriangulateIndices16(const std::vector<uint16_t>& indices, MeshMode mode)
+{
+    return ReverseTriangulateIndices(indices.data(), indices.size(), mode);
+}
+
+std::vector<uint32_t> MeshPrimitiveUtils::ReverseTriangulateIndices32(const std::vector<uint32_t>& indices, MeshMode mode)
+{
+    return ReverseTriangulateIndices(indices.data(), indices.size(), mode);
+}
+
+std::vector<uint16_t> MeshPrimitiveUtils::ReverseSegmentIndices16(const uint16_t* indices, size_t indexCount, MeshMode mode)
+{
+    return ReverseSegmentIndices(indices, indexCount, mode);
+}
+
+std::vector<uint32_t> MeshPrimitiveUtils::ReverseSegmentIndices32(const uint32_t* indices, size_t indexCount, MeshMode mode)
+{
+    return ReverseSegmentIndices(indices, indexCount, mode);
+}
+
+std::vector<uint16_t> MeshPrimitiveUtils::ReverseSegmentIndices16(const std::vector<uint16_t>& indices, MeshMode mode)
+{
+    return ReverseSegmentIndices(indices.data(), indices.size(), mode);
+}
+
+std::vector<uint32_t> MeshPrimitiveUtils::ReverseSegmentIndices32(const std::vector<uint32_t>& indices, MeshMode mode)
+{
+    return ReverseSegmentIndices(indices.data(), indices.size(), mode);
 }

@@ -1323,6 +1323,392 @@ namespace Microsoft
                     Assert::AreEqual(outputIndices[262138], 131069U);
                     Assert::AreEqual(outputIndices[262139], 0U);
                 }
+
+                GLTFSDK_TEST_METHOD(MeshPrimitiveUtilsTests, MeshPrimitiveUtils_Test_SerializeTriangulatedIndices16_TriangleStrip)
+                {
+                    std::vector<uint16_t> triangulatedIndices =
+                    {
+                        0, 3, 1,
+                        3, 2, 1,
+                        1, 2, 4,
+                        2, 5, 4
+                    };
+
+                    auto outputIndices = MeshPrimitiveUtils::ReverseTriangulateIndices16(triangulatedIndices, MESH_TRIANGLE_STRIP);
+
+                    std::vector<uint16_t> expectedIndices =
+                    {
+                        0, 3, 1, 2, 4, 5
+                    };
+
+                    AreEqual(expectedIndices, outputIndices);
+                }
+
+                GLTFSDK_TEST_METHOD(MeshPrimitiveUtilsTests, MeshPrimitiveUtils_Test_SerializeTriangulatedIndices16_TriangleFan)
+                {
+                    std::vector<uint16_t> triangulatedIndices =
+                    {
+                        5, 2, 0,
+                        5, 0, 1,
+                        5, 1, 4,
+                        5, 4, 3
+                    };
+
+                    auto outputIndices = MeshPrimitiveUtils::ReverseTriangulateIndices16(triangulatedIndices, MESH_TRIANGLE_FAN);
+
+                    std::vector<uint16_t> expectedIndices =
+                    {
+                        5, 2, 0, 1, 4, 3
+                    };
+
+                    AreEqual(expectedIndices, outputIndices);
+                }
+
+                GLTFSDK_TEST_METHOD(MeshPrimitiveUtilsTests, MeshPrimitiveUtils_Test_SerializeTriangulatedIndices32_TriangleStrip)
+                {
+                    std::vector<uint32_t> triangulatedIndices =
+                    {
+                        0, 3, 1,
+                        3, 2, 1,
+                        1, 2, 4,
+                        2, 5, 4
+                    };
+
+                    auto outputIndices = MeshPrimitiveUtils::ReverseTriangulateIndices32(triangulatedIndices, MESH_TRIANGLE_STRIP);
+
+                    std::vector<uint32_t> expectedIndices =
+                    {
+                        0, 3, 1, 2, 4, 5
+                    };
+
+                    AreEqual(expectedIndices, outputIndices);
+                }
+
+                GLTFSDK_TEST_METHOD(MeshPrimitiveUtilsTests, MeshPrimitiveUtils_Test_SerializeTriangulatedIndices32_TriangleFan)
+                {
+                    std::vector<uint32_t> triangulatedIndices =
+                    {
+                        5, 2, 0,
+                        5, 0, 1,
+                        5, 1, 4,
+                        5, 4, 3
+                    };
+
+                    auto outputIndices = MeshPrimitiveUtils::ReverseTriangulateIndices32(triangulatedIndices, MESH_TRIANGLE_FAN);
+
+                    std::vector<uint32_t> expectedIndices =
+                    {
+                        5, 2, 0, 1, 4, 3
+                    };
+
+                    AreEqual(expectedIndices, outputIndices);
+                }
+
+                GLTFSDK_TEST_METHOD(MeshPrimitiveUtilsTests, MeshPrimitiveUtils_Test_SerializeSegmentedIndices16_LineStrip)
+                {
+                    std::vector<uint16_t> segmentedIndices =
+                    {
+                        4, 2,
+                        2, 1,
+                        1, 3,
+                        3, 0
+                    };
+
+                    auto outputIndices = MeshPrimitiveUtils::ReverseSegmentIndices16(segmentedIndices, MESH_LINE_STRIP);
+
+                    std::vector<uint16_t> expectedIndices =
+                    {
+                        4, 2, 1, 3, 0
+                    };
+
+                    AreEqual(expectedIndices, outputIndices);
+                }
+
+                GLTFSDK_TEST_METHOD(MeshPrimitiveUtilsTests, MeshPrimitiveUtils_Test_SerializeSegmentedIndices16_LineLoop)
+                {
+                    std::vector<uint16_t> segmentedIndices =
+                    {
+                        4, 2,
+                        2, 1,
+                        1, 3,
+                        3, 0,
+                        0, 4
+                    };
+
+                    auto outputIndices = MeshPrimitiveUtils::ReverseSegmentIndices16(segmentedIndices, MESH_LINE_LOOP);
+
+                    std::vector<uint16_t> expectedIndices =
+                    {
+                        4, 2, 1, 3, 0
+                    };
+
+                    AreEqual(expectedIndices, outputIndices);
+                }
+
+                GLTFSDK_TEST_METHOD(MeshPrimitiveUtilsTests, MeshPrimitiveUtils_Test_SerializeSegmentedIndices32_LineStrip)
+                {
+                    std::vector<uint32_t> segmentedIndices =
+                    {
+                        4, 2,
+                        2, 1,
+                        1, 3,
+                        3, 0
+                    };
+
+                    auto outputIndices = MeshPrimitiveUtils::ReverseSegmentIndices32(segmentedIndices, MESH_LINE_STRIP);
+
+                    std::vector<uint32_t> expectedIndices =
+                    {
+                        4, 2, 1, 3, 0
+                    };
+
+                    AreEqual(expectedIndices, outputIndices);
+                }
+
+                GLTFSDK_TEST_METHOD(MeshPrimitiveUtilsTests, MeshPrimitiveUtils_Test_SerializeSegmentedIndices32_LineLoop)
+                {
+                    std::vector<uint32_t> segmentedIndices =
+                    {
+                        4, 2,
+                        2, 1,
+                        1, 3,
+                        3, 0,
+                        0, 4
+                    };
+
+                    auto outputIndices = MeshPrimitiveUtils::ReverseSegmentIndices32(segmentedIndices, MESH_LINE_LOOP);
+
+                    std::vector<uint32_t> expectedIndices =
+                    {
+                        4, 2, 1, 3, 0
+                    };
+
+                    AreEqual(expectedIndices, outputIndices);
+                }
+
+                GLTFSDK_TEST_METHOD(MeshPrimitiveUtilsTests, MeshPrimitiveUtils_Test_TriangulatedIndices16Roundtrip_TriangleStrip)
+                {
+                    auto readerWriter = std::make_shared<const StreamReaderWriter>();
+                    auto bufferBuilder = BufferBuilder(std::make_unique<GLTFResourceWriter>(readerWriter));
+
+                    bufferBuilder.AddBuffer();
+                    bufferBuilder.AddBufferView(BufferViewTarget::ARRAY_BUFFER);
+
+                    std::vector<uint16_t> indices = {
+                        0U, 3U, 1U, 2U
+                    };
+                    auto indicesAccessor = bufferBuilder.AddAccessor(indices, { TYPE_SCALAR, COMPONENT_UNSIGNED_SHORT });
+
+                    Document doc;
+                    bufferBuilder.Output(doc);
+
+                    MeshPrimitive meshPrimitive;
+                    meshPrimitive.indicesAccessorId = indicesAccessor.id;
+                    meshPrimitive.mode = MESH_TRIANGLE_STRIP;
+
+                    GLTFResourceReader reader(readerWriter);
+
+                    auto triangulatedIndices = MeshPrimitiveUtils::GetTriangulatedIndices16(doc, reader, meshPrimitive);
+                    auto outputIndices = MeshPrimitiveUtils::ReverseTriangulateIndices16(triangulatedIndices, meshPrimitive.mode);
+
+                    AreEqual(outputIndices, indices);
+                }
+
+                GLTFSDK_TEST_METHOD(MeshPrimitiveUtilsTests, MeshPrimitiveUtils_Test_TriangulatedIndices16Roundtrip_TriangleFan)
+                {
+                    auto readerWriter = std::make_shared<const StreamReaderWriter>();
+                    auto bufferBuilder = BufferBuilder(std::make_unique<GLTFResourceWriter>(readerWriter));
+
+                    bufferBuilder.AddBuffer();
+                    bufferBuilder.AddBufferView(BufferViewTarget::ARRAY_BUFFER);
+
+                    std::vector<uint16_t> indices = {
+                        0U, 3U, 1U, 2U
+                    };
+                    auto indicesAccessor = bufferBuilder.AddAccessor(indices, { TYPE_SCALAR, COMPONENT_UNSIGNED_SHORT });
+
+                    Document doc;
+                    bufferBuilder.Output(doc);
+
+                    MeshPrimitive meshPrimitive;
+                    meshPrimitive.indicesAccessorId = indicesAccessor.id;
+                    meshPrimitive.mode = MESH_TRIANGLE_FAN;
+
+                    GLTFResourceReader reader(readerWriter);
+
+                    auto triangulatedIndices = MeshPrimitiveUtils::GetTriangulatedIndices16(doc, reader, meshPrimitive);
+                    auto outputIndices = MeshPrimitiveUtils::ReverseTriangulateIndices16(triangulatedIndices, meshPrimitive.mode);
+
+                    AreEqual(outputIndices, indices);
+                }
+
+                GLTFSDK_TEST_METHOD(MeshPrimitiveUtilsTests, MeshPrimitiveUtils_Test_TriangulatedIndices32Roundtrip_TriangleStrip)
+                {
+                    auto readerWriter = std::make_shared<const StreamReaderWriter>();
+                    auto bufferBuilder = BufferBuilder(std::make_unique<GLTFResourceWriter>(readerWriter));
+
+                    bufferBuilder.AddBuffer();
+                    bufferBuilder.AddBufferView(BufferViewTarget::ARRAY_BUFFER);
+
+                    std::vector<uint32_t> indices = {
+                        0U, 3U, 1U, 2U
+                    };
+                    auto indicesAccessor = bufferBuilder.AddAccessor(indices, { TYPE_SCALAR, COMPONENT_UNSIGNED_INT });
+
+                    Document doc;
+                    bufferBuilder.Output(doc);
+
+                    MeshPrimitive meshPrimitive;
+                    meshPrimitive.indicesAccessorId = indicesAccessor.id;
+                    meshPrimitive.mode = MESH_TRIANGLE_STRIP;
+
+                    GLTFResourceReader reader(readerWriter);
+
+                    auto triangulatedIndices = MeshPrimitiveUtils::GetTriangulatedIndices32(doc, reader, meshPrimitive);
+                    auto outputIndices = MeshPrimitiveUtils::ReverseTriangulateIndices32(triangulatedIndices, meshPrimitive.mode);
+
+                    AreEqual(outputIndices, indices);
+                }
+
+                GLTFSDK_TEST_METHOD(MeshPrimitiveUtilsTests, MeshPrimitiveUtils_Test_TriangulatedIndices32Roundtrip_TriangleFan)
+                {
+                    auto readerWriter = std::make_shared<const StreamReaderWriter>();
+                    auto bufferBuilder = BufferBuilder(std::make_unique<GLTFResourceWriter>(readerWriter));
+
+                    bufferBuilder.AddBuffer();
+                    bufferBuilder.AddBufferView(BufferViewTarget::ARRAY_BUFFER);
+
+                    std::vector<uint32_t> indices = {
+                        0U, 3U, 1U, 2U
+                    };
+                    auto indicesAccessor = bufferBuilder.AddAccessor(indices, { TYPE_SCALAR, COMPONENT_UNSIGNED_INT });
+
+                    Document doc;
+                    bufferBuilder.Output(doc);
+
+                    MeshPrimitive meshPrimitive;
+                    meshPrimitive.indicesAccessorId = indicesAccessor.id;
+                    meshPrimitive.mode = MESH_TRIANGLE_FAN;
+
+                    GLTFResourceReader reader(readerWriter);
+
+                    auto triangulatedIndices = MeshPrimitiveUtils::GetTriangulatedIndices32(doc, reader, meshPrimitive);
+                    auto outputIndices = MeshPrimitiveUtils::ReverseTriangulateIndices32(triangulatedIndices, meshPrimitive.mode);
+
+                    AreEqual(outputIndices, indices);
+                }
+
+                GLTFSDK_TEST_METHOD(MeshPrimitiveUtilsTests, MeshPrimitiveUtils_Test_SegmentedIndices16Roundtrip_LineStrip)
+                {
+                    auto readerWriter = std::make_shared<const StreamReaderWriter>();
+                    auto bufferBuilder = BufferBuilder(std::make_unique<GLTFResourceWriter>(readerWriter));
+
+                    bufferBuilder.AddBuffer();
+                    bufferBuilder.AddBufferView(BufferViewTarget::ARRAY_BUFFER);
+
+                    std::vector<uint16_t> indices = {
+                        0U, 3U, 1U, 2U
+                    };
+                    auto indicesAccessor = bufferBuilder.AddAccessor(indices, { TYPE_SCALAR, COMPONENT_UNSIGNED_SHORT });
+
+                    Document doc;
+                    bufferBuilder.Output(doc);
+
+                    MeshPrimitive meshPrimitive;
+                    meshPrimitive.indicesAccessorId = indicesAccessor.id;
+                    meshPrimitive.mode = MESH_LINE_STRIP;
+
+                    GLTFResourceReader reader(readerWriter);
+
+                    auto segmentedIndices = MeshPrimitiveUtils::GetSegmentedIndices16(doc, reader, meshPrimitive);
+                    auto outputIndices = MeshPrimitiveUtils::ReverseSegmentIndices16(segmentedIndices, meshPrimitive.mode);
+
+                    AreEqual(outputIndices, indices);
+                }
+
+                GLTFSDK_TEST_METHOD(MeshPrimitiveUtilsTests, MeshPrimitiveUtils_Test_SegmentedIndices16Roundtrip_LineLoop)
+                {
+                    auto readerWriter = std::make_shared<const StreamReaderWriter>();
+                    auto bufferBuilder = BufferBuilder(std::make_unique<GLTFResourceWriter>(readerWriter));
+
+                    bufferBuilder.AddBuffer();
+                    bufferBuilder.AddBufferView(BufferViewTarget::ARRAY_BUFFER);
+
+                    std::vector<uint16_t> indices = {
+                        0U, 3U, 1U, 2U
+                    };
+                    auto indicesAccessor = bufferBuilder.AddAccessor(indices, { TYPE_SCALAR, COMPONENT_UNSIGNED_SHORT });
+
+                    Document doc;
+                    bufferBuilder.Output(doc);
+
+                    MeshPrimitive meshPrimitive;
+                    meshPrimitive.indicesAccessorId = indicesAccessor.id;
+                    meshPrimitive.mode = MESH_LINE_LOOP;
+
+                    GLTFResourceReader reader(readerWriter);
+
+                    auto segmentedIndices = MeshPrimitiveUtils::GetSegmentedIndices16(doc, reader, meshPrimitive);
+                    auto outputIndices = MeshPrimitiveUtils::ReverseSegmentIndices16(segmentedIndices, meshPrimitive.mode);
+
+                    AreEqual(outputIndices, indices);
+                }
+
+                GLTFSDK_TEST_METHOD(MeshPrimitiveUtilsTests, MeshPrimitiveUtils_Test_SegmentedIndices32Roundtrip_LineStrip)
+                {
+                    auto readerWriter = std::make_shared<const StreamReaderWriter>();
+                    auto bufferBuilder = BufferBuilder(std::make_unique<GLTFResourceWriter>(readerWriter));
+
+                    bufferBuilder.AddBuffer();
+                    bufferBuilder.AddBufferView(BufferViewTarget::ARRAY_BUFFER);
+
+                    std::vector<uint32_t> indices = {
+                        0U, 3U, 1U, 2U
+                    };
+                    auto indicesAccessor = bufferBuilder.AddAccessor(indices, { TYPE_SCALAR, COMPONENT_UNSIGNED_INT });
+
+                    Document doc;
+                    bufferBuilder.Output(doc);
+
+                    MeshPrimitive meshPrimitive;
+                    meshPrimitive.indicesAccessorId = indicesAccessor.id;
+                    meshPrimitive.mode = MESH_LINE_STRIP;
+
+                    GLTFResourceReader reader(readerWriter);
+
+                    auto segmentedIndices = MeshPrimitiveUtils::GetSegmentedIndices32(doc, reader, meshPrimitive);
+                    auto outputIndices = MeshPrimitiveUtils::ReverseSegmentIndices32(segmentedIndices, meshPrimitive.mode);
+
+                    AreEqual(outputIndices, indices);
+                }
+
+                GLTFSDK_TEST_METHOD(MeshPrimitiveUtilsTests, MeshPrimitiveUtils_Test_SegmentedIndices32Roundtrip_LineLoop)
+                {
+                    auto readerWriter = std::make_shared<const StreamReaderWriter>();
+                    auto bufferBuilder = BufferBuilder(std::make_unique<GLTFResourceWriter>(readerWriter));
+
+                    bufferBuilder.AddBuffer();
+                    bufferBuilder.AddBufferView(BufferViewTarget::ARRAY_BUFFER);
+
+                    std::vector<uint32_t> indices = {
+                        0U, 3U, 1U, 2U
+                    };
+                    auto indicesAccessor = bufferBuilder.AddAccessor(indices, { TYPE_SCALAR, COMPONENT_UNSIGNED_INT });
+
+                    Document doc;
+                    bufferBuilder.Output(doc);
+
+                    MeshPrimitive meshPrimitive;
+                    meshPrimitive.indicesAccessorId = indicesAccessor.id;
+                    meshPrimitive.mode = MESH_LINE_LOOP;
+
+                    GLTFResourceReader reader(readerWriter);
+
+                    auto segmentedIndices = MeshPrimitiveUtils::GetSegmentedIndices32(doc, reader, meshPrimitive);
+                    auto outputIndices = MeshPrimitiveUtils::ReverseSegmentIndices32(segmentedIndices, meshPrimitive.mode);
+
+                    AreEqual(outputIndices, indices);
+                }
             };
         }
     }
