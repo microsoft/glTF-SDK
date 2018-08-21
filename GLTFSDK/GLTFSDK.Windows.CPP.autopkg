@@ -21,7 +21,7 @@ nuget {
             // This is a list of other NuGet packages required to use this package.
             // Each item follows the format "<pkg_name>/<version>"
             // Note that this specifies the minimum required version, not the exact version.
-            rapidjson.tempRelease/0.0.2.20
+            rapidjson.temprelease/0.0.2.20
         };
     }
 

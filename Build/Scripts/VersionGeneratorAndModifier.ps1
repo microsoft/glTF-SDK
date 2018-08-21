@@ -13,7 +13,6 @@ param(
     [string]$BranchName = $env:BUILD_SOURCEBRANCH,
     [string]$VersionOverride,
     [string]$GenerateReleaseVersion = $false,
-    [string]$PackageSource,
     [string]$ModifyWindowsStoreApps = $true, 
     [string]$ModifyCoAppPackages = $true,
     [string]$ModifyNuGetPackages = $true, 
@@ -25,7 +24,7 @@ $ErrorActionPreference = "Stop"
 
 function Main
 {
-    $versionString = . "$PSScriptRoot\VersionGenerator.ps1" -SourceDirectory $SourceDirectory -VersionOverride $VersionOverride -GenerateReleaseVersion $GenerateReleaseVersion -PackageSource $PackageSource -Verbose
+    $versionString = . "$PSScriptRoot\VersionGenerator.ps1" -SourceDirectory $SourceDirectory -VersionOverride $VersionOverride -GenerateReleaseVersion $GenerateReleaseVersion -Verbose
     . "$PSScriptRoot\VersionModifier.ps1" -SourceDirectory $SourceDirectory -CommitId $CommitId -BranchName $BranchName -ExcludeFolders $ExcludeFolders -VersionString $versionString -ModifyWindowsStoreApps $ModifyWindowsStoreApps -ModifyCoAppPackages $ModifyCoAppPackages -ModifyNuGetPackages $ModifyNuGetPackages -WriteVersionHeader $WriteVersionHeader -Verbose
 }
 

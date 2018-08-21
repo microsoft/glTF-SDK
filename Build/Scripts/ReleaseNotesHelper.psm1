@@ -163,25 +163,6 @@ function GetCommitInfoObject
     }
 }
 
-function ReadOverrideFile
-{
-    [CmdletBinding()]
-    Param(
-        [Parameter()]
-        [String]$overrideFileName = "\\bp-fs1\CANVAS\Builds\Native\ReleaseNotes\ReleaseNotesOverrides.json"
-    )
-    $overrides = @{}
-    Write-Host "Getting overrides from $overrideFileName"
-    if (Test-Path $overrideFileName)
-    {
-        $psObjOverrides = Get-Content -Path $overrideFileName | ConvertFrom-Json
-        $psObjOverrides.psobject.properties | Foreach {$overrides[$_.Name] = $_.Value }
-    }
-    # Later: fail if no overrides file found
-    return $overrides
-}
-
 Export-ModuleMember -Function 'GetDefinedTags'
 Export-ModuleMember -Function 'CheckTextForReleaseNotesTags'
 Export-ModuleMember -Function 'GetCommitInfoObject'
-Export-ModuleMember -Function 'ReadOverrideFile'

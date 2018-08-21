@@ -46,7 +46,7 @@ namespace Microsoft
             {
                 // create the schema and cache it in map
                 rapidjson::Document sd = FetchSchemaDocument(schemaToFind);
-                std::shared_ptr<rapidjson::SchemaDocument> schema(new rapidjson::SchemaDocument(sd, this));
+                auto schema = std::make_shared<rapidjson::SchemaDocument>(sd, this);
                 m_schemaDocuments[schemaToFind] = schema;
                 return schema.get();
             }

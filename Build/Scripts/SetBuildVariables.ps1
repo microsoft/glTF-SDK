@@ -26,7 +26,6 @@ if (! $BuildReason) {
 function main {
     $buildConfig = getConfigForBuildReason $BuildReason
 
-    # XES_DFSDROP locations are at \\edge-svcs\release\BigPark\<definition name>\<build number>
     # We want to update <definition name> to be $base.$qualifier so e.g. PR builds go to a
     # separate path. We are actually updating the reserved variable that indicates the build
     # definition name, but it doesn't seem to have any adverse effects.
