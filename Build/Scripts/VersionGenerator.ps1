@@ -28,9 +28,6 @@ Optional. The version number to override with, in format "vMajor.vMinor.vPatch.v
 .PARAMETER GenerateReleaseVersion 
 Optional. Defaults to pre-release (false). If true, generates release version number instead
 
-.PARAMETER PackageSource 
-Optional. The path to the package source, a nuget index.json file
-
 .EXAMPLE
 VersionNumberGenerator.ps1 -SourceDirectory "D:\Build vNext\Builds\cb11432a\Infrastructure\Code" -VersionOverride "1.2.3.4" -GenerateReleaseVersion True
 
@@ -49,8 +46,7 @@ CoApp follows semver 1.0.0 so the part after <Hotfix> cannot include periods.
 param(
     [string]$SourceDirectory,
     [string]$VersionOverride,
-    [string]$GenerateReleaseVersion = $false,
-    [string]$PackageSource
+    [string]$GenerateReleaseVersion = $false
 )
 
 $ErrorActionPreference = "Stop"
@@ -72,11 +68,6 @@ $GitCommand = . (Join-Path $PSScriptRoot "GetGitCommand.ps1")
 if (!$GitCommand) 
 {
     Write-Error "Unable to find git"
-}
-
-if (!$PackageSource)
-{
-    $PackageSource = "https://microsoft.pkgs.visualstudio.com/_packaging/BigPark/nuget/v3/index.json"
 }
 
 [Boolean]$GenerateReleaseVersion = [System.Convert]::ToBoolean($GenerateReleaseVersion)

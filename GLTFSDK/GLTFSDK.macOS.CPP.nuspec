@@ -15,7 +15,7 @@
     <tags></tags>
     <releaseNotes>(Replaced by NuGet build system)</releaseNotes>
         <dependencies>
-            <dependency id="rapidjson.tempRelease" version="0.0.2.20" />
+            <dependency id="rapidjson.temprelease" version="0.0.2.20" />
         </dependencies>
     </metadata>
   <files>

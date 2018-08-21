@@ -25,15 +25,7 @@ function Install-NuGetConfig
         [String]$PATFilename
     )
 
-    $calculatedAccessToken = getAccessToken $AccessToken $PATFilename
-
     Copy-Item $NuGetConfigSource $NugetConfigDest | Out-Null
-
-    if ($calculatedAccessToken)
-    {
-        Start-NuGet Sources Update -Name "BigPark" -Source "https://microsoft.pkgs.visualstudio.com/_packaging/BigPark/nuget/v3/index.json" -UserName "ignore" -Password $calculatedAccessToken -ConfigFile $NuGetConfigDest
-        Start-NuGet Sources Add -Name "BigPark-Experimental" -Source "https://microsoft.pkgs.visualstudio.com/_packaging/BigPark-Experimental/nuget/v3/index.json" -UserName "ignore" -Password $calculatedAccessToken -ConfigFile $NuGetConfigDest
-    }
 
     return $NugetConfigDest
 }
