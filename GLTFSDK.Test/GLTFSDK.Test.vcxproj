@@ -95,6 +95,7 @@
     <ClCompile Include="Source\AnimationUtilsTests.cpp" />
     <ClCompile Include="Source\ColorTests.cpp" />
     <ClCompile Include="Source\ExtrasDocumentTests.cpp" />
+    <ClCompile Include="Source\GLBResourceWriterTests.cpp" />
     <ClCompile Include="Source\GLTFExtensionsTests.cpp" />
     <ClCompile Include="Source\glTFPropertyTests.cpp" />
     <ClCompile Include="Source\GLTFResourceReaderTests.cpp" />

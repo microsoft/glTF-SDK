@@ -84,7 +84,10 @@ void GLBResourceWriter::Flush(const std::string& manifest, const std::string& ur
     StreamUtils::WriteBinary(*stream, GLB_CHUNK_TYPE_BIN, GLB_CHUNK_TYPE_SIZE);
 
     // Write BIN contents (indeterminate length) - copy the temporary buffer's contents to the output stream
-    *stream << m_stream->rdbuf();
+    if (binaryChunkLength > 0)
+    {
+        *stream << m_stream->rdbuf();
+    }
 
     if (binaryPaddingLength > 0)
     {
