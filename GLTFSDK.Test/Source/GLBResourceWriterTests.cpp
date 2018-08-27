@@ -3,10 +3,7 @@
 
 #include "stdafx.h"
 
-#include <GLTFSDK/BufferBuilder.h>
-#include <GLTFSDK/Deserialize.h>
 #include <GLTFSDK/GLBResourceWriter.h>
-#include <GLTFSDK/Serialize.h>
 
 #include "TestUtils.h"
 
