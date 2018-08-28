@@ -17,15 +17,16 @@ namespace Microsoft
         {
             GLTFSDK_TEST_CLASS(GLBResourceWriterTests)
             {
-                GLTFSDK_TEST_METHOD(GLBResourceWriterTests, WriteBufferView_Empty)
+                GLTFSDK_TEST_METHOD(GLBResourceWriterTests, WriteBufferView_Empty_Bin)
                 {
                     auto streamWriter = std::make_shared<const StreamReaderWriter>();
                     GLBResourceWriter writer(streamWriter);
                     std::string uri = "glb";
-                    writer.Flush("", uri);
 
-                    std::vector<char> output(100);
-                    writer.WriteExternal(uri, output);
+                    writer.Flush("", uri);
+                    auto stream = streamWriter->GetOutputStream(uri);
+
+                    Assert::IsFalse(stream->fail());
                 }
             };
         }
