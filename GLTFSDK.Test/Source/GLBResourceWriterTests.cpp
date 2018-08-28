@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include <GLTFSDK/GLBResourceWriter.h>
+#include <GLTFSDK/Serialize.h>
 #include "TestUtils.h"
 
 using namespace glTF::UnitTest;
@@ -21,7 +22,10 @@ namespace Microsoft
                     GLBResourceWriter writer(streamWriter);
                     std::string uri = "foo.glb";
 
-                    writer.Flush("", uri);
+                    Document doc;
+                    const auto defaultManifest = Serialize(doc, SerializeFlags::Pretty);
+
+                    writer.Flush(defaultManifest, uri);
                     auto stream = streamWriter->GetOutputStream(uri);
 
                     Assert::IsFalse(stream->fail());
