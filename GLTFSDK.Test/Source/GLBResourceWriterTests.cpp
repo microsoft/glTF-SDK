@@ -2,9 +2,7 @@
 // Licensed under the MIT License.
 
 #include "stdafx.h"
-
 #include <GLTFSDK/GLBResourceWriter.h>
-
 #include "TestUtils.h"
 
 using namespace glTF::UnitTest;
@@ -21,7 +19,7 @@ namespace Microsoft
                 {
                     auto streamWriter = std::make_shared<const StreamReaderWriter>();
                     GLBResourceWriter writer(streamWriter);
-                    std::string uri = "glb";
+                    std::string uri = "foo.glb";
 
                     writer.Flush("", uri);
                     auto stream = streamWriter->GetOutputStream(uri);
