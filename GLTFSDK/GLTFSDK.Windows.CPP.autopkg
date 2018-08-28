@@ -8,7 +8,7 @@ nuget {
         requireLicenseAcceptance : true;
         summary : @"A C++ library for decoding and encoding glTF files.";
         description : @"A C++ library for decoding and encoding glTF files.";
-        copyright : @"(C) Microsoft Corporation. All rights reserved.";
+        copyright : @"© Microsoft Corporation. All rights reserved.";
         licenseUrl : "https://opensource.org/licenses/MIT";
         projectUrl : "https://aka.ms/Y8fymc";
         iconUrl : "https://i.imgur.com/dj5ogtZ.png";
