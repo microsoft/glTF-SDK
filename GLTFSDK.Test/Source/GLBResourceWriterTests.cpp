@@ -2,6 +2,8 @@
 // Licensed under the MIT License.
 
 #include "stdafx.h"
+#include <GLTFSDK/Deserialize.h>
+#include <GLTFSDK/GLBResourceReader.h>
 #include <GLTFSDK/GLBResourceWriter.h>
 #include <GLTFSDK/Serialize.h>
 #include "TestUtils.h"
@@ -22,13 +24,18 @@ namespace Microsoft
                     GLBResourceWriter writer(streamWriter);
                     std::string uri = "foo.glb";
 
+                    // Serialize Default Document -> Json string -> Stream
                     Document doc;
-                    const auto defaultManifest = Serialize(doc, SerializeFlags::Pretty);
+                    const auto serialiedJson = Serialize(doc, SerializeFlags::None);
+                    writer.Flush(serialiedJson, uri);
+                    auto stream = streamWriter->GetInputStream(uri);
 
-                    writer.Flush(defaultManifest, uri);
-                    auto stream = streamWriter->GetOutputStream(uri);
+                    // Deserialize Stream -> Document
+                    GLBResourceReader resourceReader(std::make_shared<const StreamReaderWriter>(), stream);
+                    Document roundTrippedDoc = Deserialize(resourceReader.GetJson());
 
                     Assert::IsFalse(stream->fail());
+                    Assert::IsTrue(doc == roundTrippedDoc);
                 }
             };
         }
