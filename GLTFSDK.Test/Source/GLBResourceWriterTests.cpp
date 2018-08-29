@@ -31,7 +31,7 @@ namespace Microsoft
                     auto stream = streamWriter->GetInputStream(uri);
 
                     // Deserialize Stream -> Document
-                    GLBResourceReader resourceReader(std::make_shared<const StreamReaderWriter>(), stream);
+                    GLBResourceReader resourceReader(streamWriter, stream);
                     Document roundTrippedDoc = Deserialize(resourceReader.GetJson());
 
                     Assert::IsFalse(stream->fail());
