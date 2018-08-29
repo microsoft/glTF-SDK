@@ -12,7 +12,7 @@ using namespace glTF::UnitTest;
 
 namespace Microsoft
 {
-    namespace  glTF
+    namespace glTF
     {
         namespace Test
         {
