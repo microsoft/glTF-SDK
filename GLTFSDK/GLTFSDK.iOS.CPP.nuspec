@@ -8,7 +8,7 @@
     <owners>Microsoft</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>A C++ library for decoding and encoding glTF files.</description>
-    <copyright>(C) Microsoft Corporation. All rights reserved.</copyright>
+    <copyright>© Microsoft Corporation. All rights reserved.</copyright>
     <tags></tags>
     <releaseNotes>(Replaced by NuGet build system)</releaseNotes>
         <dependencies>
