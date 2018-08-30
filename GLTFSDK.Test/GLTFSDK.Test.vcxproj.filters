@@ -89,6 +89,9 @@
     <ClCompile Include="Source\VersionTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\GLBResourceWriterTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\gltf\ReciprocatingSaw.gltf">
