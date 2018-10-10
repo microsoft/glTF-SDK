@@ -59,6 +59,11 @@ namespace Microsoft
             template<typename T>
             static std::vector<T> ReadBinaryFull(std::istream& stream)
             {
+                if (stream.fail())
+                {
+                    throw std::runtime_error("Cannot read the binary data");
+                }
+
                 stream.seekg(0, std::ios::end);
                 auto size = static_cast<size_t>(stream.tellg());
                 stream.seekg(0, std::ios::beg);
