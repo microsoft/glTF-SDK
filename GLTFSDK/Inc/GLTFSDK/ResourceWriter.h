@@ -58,6 +58,8 @@ namespace Microsoft
             // case the Image instance must use the uri property).
             void WriteExternal(const std::string& uri, const void* data, size_t byteLength) const;
 
+            void WriteExternal(const std::string& uri, const std::string& data) const;
+
             template<typename T>
             void WriteExternal(const std::string& uri, const std::vector<T>& data) const
             {

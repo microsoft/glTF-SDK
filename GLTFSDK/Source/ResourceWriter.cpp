@@ -56,6 +56,11 @@ void ResourceWriter::WriteExternal(const std::string& uri, const void* data, siz
     }
 }
 
+void ResourceWriter::WriteExternal(const std::string& uri, const std::string& data) const
+{
+    WriteExternal(uri, data.c_str(), data.length());
+}
+
 void ResourceWriter::WriteImpl(const BufferView& bufferView, const void* data, std::streamoff totalOffset, size_t totalByteLength)
 {
     // TODO: vertex attributes must be aligned to 4-byte boundaries inside a bufferView (accessor.byteOffset and bufferView.byteStride must be multiples of 4)

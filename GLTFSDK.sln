@@ -17,6 +17,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{86B9
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Deserialize", "GLTFSDK.Samples\Deserialize\Deserialize.vcxproj", "{DE6A7757-2DF3-4705-829B-96A77BABF0B2}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Serialize", "GLTFSDK.Samples\Serialize\Serialize.vcxproj", "{DE6A7757-2DE3-4705-829B-96A77BABF0B2}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		GLTFSDK.Shared.CPP\GLTFSDK.Shared.CPP.vcxitems*{45d41acc-2c3c-43d2-bc10-02aa73ffc7c7}*SharedItemsImports = 9
@@ -68,12 +70,25 @@ Global
 		{DE6A7757-2DF3-4705-829B-96A77BABF0B2}.Release|x64.Build.0 = Release|x64
 		{DE6A7757-2DF3-4705-829B-96A77BABF0B2}.Release|x86.ActiveCfg = Release|Win32
 		{DE6A7757-2DF3-4705-829B-96A77BABF0B2}.Release|x86.Build.0 = Release|Win32
+		{DE6A7757-2DE3-4705-829B-96A77BABF0B2}.Debug|ARM.ActiveCfg = Debug|ARM
+		{DE6A7757-2DE3-4705-829B-96A77BABF0B2}.Debug|ARM.Build.0 = Debug|ARM
+		{DE6A7757-2DE3-4705-829B-96A77BABF0B2}.Debug|x64.ActiveCfg = Debug|x64
+		{DE6A7757-2DE3-4705-829B-96A77BABF0B2}.Debug|x64.Build.0 = Debug|x64
+		{DE6A7757-2DE3-4705-829B-96A77BABF0B2}.Debug|x86.ActiveCfg = Debug|Win32
+		{DE6A7757-2DE3-4705-829B-96A77BABF0B2}.Debug|x86.Build.0 = Debug|Win32
+		{DE6A7757-2DE3-4705-829B-96A77BABF0B2}.Release|ARM.ActiveCfg = Release|ARM
+		{DE6A7757-2DE3-4705-829B-96A77BABF0B2}.Release|ARM.Build.0 = Release|ARM
+		{DE6A7757-2DE3-4705-829B-96A77BABF0B2}.Release|x64.ActiveCfg = Release|x64
+		{DE6A7757-2DE3-4705-829B-96A77BABF0B2}.Release|x64.Build.0 = Release|x64
+		{DE6A7757-2DE3-4705-829B-96A77BABF0B2}.Release|x86.ActiveCfg = Release|Win32
+		{DE6A7757-2DE3-4705-829B-96A77BABF0B2}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{DE6A7757-2DF3-4705-829B-96A77BABF0B2} = {86B90B4A-0EEE-4154-8A57-003225F65D6B}
+		{DE6A7757-2DE3-4705-829B-96A77BABF0B2} = {86B90B4A-0EEE-4154-8A57-003225F65D6B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B683866C-07F1-4E03-8D84-0A683408D980}
