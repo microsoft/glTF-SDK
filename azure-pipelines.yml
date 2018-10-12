@@ -7,20 +7,19 @@ pool:
   vmImage: 'VS2017-Win2016'
 
 variables:
-  solution: '**/*.sln'
   buildPlatform: 'x86'
   buildConfiguration: 'Release'
 
 steps:
-- task: NuGetToolInstaller@0
 
-- task: NuGetCommand@2
+- task: CMake@1
   inputs:
-    restoreSolution: '$(solution)'
+    workingDirectory: 'built\Int\cmake_win32'
+    cmakeArgs: '-G "Visual Studio 15 2017 -A Win32'
 
 - task: VSBuild@1
   inputs:
-    solution: '$(solution)'
+    solution: 'built\Int\cmake_win32\GLTFSDK.sln'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
 
