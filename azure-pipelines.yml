@@ -15,7 +15,7 @@ steps:
 - task: CMake@1
   inputs:
     workingDirectory: 'built\Int\cmake_win32'
-    cmakeArgs: '-G "Visual Studio 15 2017'
+    cmakeArgs: ['-G "Visual Studio 15 2017', ..\..\..]
 
 - task: VSBuild@1
   inputs:
