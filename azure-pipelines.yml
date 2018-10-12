@@ -7,7 +7,7 @@ pool:
   vmImage: 'VS2017-Win2016'
 
 variables:
-  buildPlatform: 'x86'
+  buildPlatform: 'Win32'
   buildConfiguration: 'Release'
 
 steps:
@@ -15,13 +15,12 @@ steps:
 - task: CMake@1
   inputs:
     workingDirectory: 'built\Int\cmake_win32'
-    cmakeArgs: '..\..\.. -G "Visual Studio 15 2017" -A "Win32"'
+    cmakeArgs: '..\..\.. -G "Visual Studio 15 2017" -A "$(buildPlatform)"'
 
-- task: VSBuild@1
+- task: CMake@1
   inputs:
-    solution: 'built\Int\cmake_win32\GLTFSDK.sln'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
+    workingDirectory: 'built\Int\cmake_win32'
+    cmakeArgs: '--build . --target install --config $(buildConfiguration)'
 
 - task: VSTest@2
   inputs:
