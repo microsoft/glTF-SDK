@@ -4,8 +4,8 @@ project(RapidJSON-download NONE)
 
 include(ExternalProject)
 ExternalProject_Add(RapidJSON
-  GIT_REPOSITORY    https://github.com/fergsatwork/rapidjson
-  GIT_TAG           631df504108378589c17ee7a1ff9b52790a537d8
+  GIT_REPOSITORY    https://github.com/Tencent/rapidjson.git
+  GIT_TAG           17ae6ffa857173c25708e61610121bc908c0a6cd
   SOURCE_DIR        "${CMAKE_BINARY_DIR}/RapidJSON-src"
   BINARY_DIR        "${CMAKE_BINARY_DIR}/RapidJSON-build"
   CONFIGURE_COMMAND ""
