@@ -1,3 +1,5 @@
+[![Build Status](https://kaokuda.visualstudio.com/gltfsdk/_apis/build/status/kokuda.glTF-SDK)](https://kaokuda.visualstudio.com/gltfsdk/_build/latest?definitionId=1)
+
 # Microsoft glTF SDK - A C++ Deserializer/Serializer for glTF
 
 * Windows/macOS/Android Compatible
