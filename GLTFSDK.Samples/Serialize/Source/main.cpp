@@ -4,6 +4,7 @@
 #include <GLTFSDK/GLTF.h>
 #include <GLTFSDK/BufferBuilder.h>
 #include <GLTFSDK/GLTFResourceWriter.h>
+#include <GLTFSDK/GLBResourceWriter.h>
 #include <GLTFSDK/IStreamWriter.h>
 #include <GLTFSDK/Serialize.h>
 
@@ -12,8 +13,8 @@
 #include <experimental/filesystem>
 
 #include <fstream>
+#include <sstream>
 #include <iostream>
-#include <ostream>
 
 #include <cassert>
 #include <cstdlib>
@@ -22,7 +23,7 @@ using namespace Microsoft::glTF;
 
 namespace
 {
-    // The glTF SDK is decoupled from all file I/O by the IStreamReader (and IStreamWriter)
+    // The glTF SDK is decoupled from all file I/O by the IStreamWriter (and IStreamReader)
     // interface(s) and the C++ stream-based I/O library. This allows the glTF SDK to be used in
     // sandboxed environments, such as WebAssembly modules and UWP apps, where any file I/O code
     // must be platform or use-case specific.
@@ -61,10 +62,106 @@ namespace
         std::experimental::filesystem::path m_pathBase;
     };
 
-    BufferBuilder GetBufferBuilder(std::experimental::filesystem::path path)
+    // First, construct the data that will be written to the binary buffer
+    void CreateTriangleResources(Document& document, BufferBuilder& bufferBuilder, std::string& accessorIdIndices, std::string& accessorIdPositions)
     {
-        auto readerWriter = std::make_shared<const StreamWriter>(path);
-        return BufferBuilder(std::make_unique<GLTFResourceWriter>(readerWriter));
+        const char* bufferId = nullptr;
+
+        // Specify the 'special' GLB buffer ID. This informs the GLBResourceWriter that it should use
+        // the GLB container's binary chunk (usually the desired buffer location when creating GLBs)
+        if (dynamic_cast<const GLBResourceWriter*>(&bufferBuilder.GetResourceWriter()))
+        {
+            bufferId = GLB_BUFFER_ID;
+        }
+
+        // Create a new Buffer - it becomes the current buffer that all new BufferViews will automatically reference
+        bufferBuilder.AddBuffer(bufferId);
+
+        // Add a BufferView with target ELEMENT_ARRAY_BUFFER, meaning it will store indices
+        bufferBuilder.AddBufferView(BufferViewTarget::ELEMENT_ARRAY_BUFFER);
+
+        // Add an Accessor for the indices and store the ID
+        std::vector<uint16_t> indices = {
+            0U, 1U, 2U
+        };
+
+        accessorIdIndices = bufferBuilder.AddAccessor(indices, { TYPE_SCALAR, COMPONENT_UNSIGNED_SHORT }).id;
+
+        // Add a BufferView with target ARRAY_BUFFER, meaning it will store vertex data
+        bufferBuilder.AddBufferView(BufferViewTarget::ARRAY_BUFFER);
+
+        // Add an Accessor for the positions
+        std::vector<float> positions = {
+            0.0f, 0.0f, 0.0f, // Vertex 0
+            1.0f, 0.0f, 0.0f, // Vertex 1
+            0.0f, 1.0f, 0.0f  // Vertex 2
+        };
+
+        std::vector<float> minValues(3U, std::numeric_limits<float>::max());
+        std::vector<float> maxValues(3U, std::numeric_limits<float>::lowest());
+
+        const size_t positionCount = positions.size();
+
+        // Accessor min/max properties must be set for vertex position data
+        for (size_t i = 0U, j = 0U; i < positionCount; ++i, j = (i % 3U))
+        {
+            minValues[j] = std::min(positions[i], minValues[j]);
+            maxValues[j] = std::max(positions[i], maxValues[j]);
+        }
+
+        accessorIdPositions = bufferBuilder.AddAccessor(positions, { TYPE_VEC3, COMPONENT_FLOAT, false, std::move(minValues), std::move(maxValues) }).id;
+
+        // Add all of the Buffers, BufferViews and Accessors that were created using BufferBuilder to the Document
+        // Note that after this point, no further calls should be made to BufferBuilder
+        bufferBuilder.Output(document);
+    }
+
+    void CreateTriangleEntities(Document& document, const std::string& accessorIdIndices, const std::string& accessorIdPositions)
+    {
+        // Now create a very simple glTF file with the following hierarchy:
+        //   Scene
+        //     Node
+        //       Mesh (Triangle)
+        //         MeshPrimitive
+        //           Material (Blue)
+        // 
+        // A Document can be constructed top-down or bottom up, however if constructed top-down then IDs of child nodes must
+        // be known in advance, which prevents using the glTF SDK's automatic ID generation.
+
+        // Construct a Material
+        Material material;
+        material.metallicRoughness.baseColorFactor = Color4(0.0f, 0.0f, 1.0f, 1.0f);
+        material.metallicRoughness.metallicFactor = 0.2f;
+        material.metallicRoughness.roughnessFactor = 0.4f;
+        material.doubleSided = true;
+
+        // Add it to the Document, and store the generated ID
+        auto materialId = document.materials.Append(std::move(material), AppendIdPolicy::GenerateOnEmpty).id;
+
+        // Construct a MeshPrimitive, unlike most types in glTF, MeshPrimitives are direct children of their parent Mesh
+        // rather than being children of the Document. This also means that they don't have any ID.
+        MeshPrimitive meshPrimitive;
+        meshPrimitive.materialId = materialId;
+        meshPrimitive.indicesAccessorId = accessorIdIndices;
+        meshPrimitive.attributes[ACCESSOR_POSITION] = accessorIdPositions;
+
+        // Construct a Mesh using the MeshPrimitive
+        Mesh mesh;
+        mesh.primitives.push_back(std::move(meshPrimitive));
+        // Add it to the document, and store the generated ID
+        auto meshId = document.meshes.Append(std::move(mesh), AppendIdPolicy::GenerateOnEmpty).id;
+
+        // Construct a Node
+        Node node;
+        node.meshId = meshId;
+        // Add it to the document, and store the generated ID
+        auto nodeId = document.nodes.Append(std::move(node), AppendIdPolicy::GenerateOnEmpty).id;
+
+        // Construct a Scene
+        Scene scene;
+        scene.nodes.push_back(nodeId);
+        // Add it to the Document, using a utility method that also sets this Scene as the Document's default
+        document.SetDefaultScene(std::move(scene), AppendIdPolicy::GenerateOnEmpty);
     }
 
     void SerializeTriangle(std::experimental::filesystem::path path)
@@ -88,87 +185,74 @@ namespace
             throw std::runtime_error("Command line argument path has no filename extension");
         }
 
-        // Use the glTF SDK's BufferBuilder as this dramatically simplifies the process of constructing the binary buffer
-        // Pass the absolute path, without the filename, to the stream reader
-        auto bufferBuilder = GetBufferBuilder(path.parent_path());
+        // Pass the absolute path, without the filename, to the stream writer
+        auto streamWriter = std::make_unique<StreamWriter>(path.parent_path());
 
-        // Now create a very simple glTF file with the following hierarchy:
-        //   Scene
-        //     Node
-        //       Mesh (Triangle)
-        //         MeshPrimitive
-        //           Material (Blue)
-        // 
-        // A Document can be constructed top-down or bottom up, however if constructed top-down then IDs of child nodes must
-        // be known in advance, which prevents using the glTF SDK's automatic ID generation.
+        std::experimental::filesystem::path pathFile = path.filename();
+        std::experimental::filesystem::path pathFileExt = pathFile.extension();
 
-
-        // First, construct the data that will be written to the binary buffer
-        // Add a Buffer
-        bufferBuilder.AddBuffer();
-
-        // Add a BufferView with target ELEMENT_ARRAY_BUFFER, meaning it will store indices
-        bufferBuilder.AddBufferView(BufferViewTarget::ELEMENT_ARRAY_BUFFER);
-
-        // Add an Accessor for the indices and store the ID
-        std::vector<uint16_t> indices = { 0U, 1U, 2U };
-        auto indicesAccessorId = bufferBuilder.AddAccessor(indices, { TYPE_SCALAR, COMPONENT_UNSIGNED_SHORT }).id;
-
-        // Add a BufferView with target ARRAY_BUFFER, meaning it will store vertex data
-        bufferBuilder.AddBufferView(BufferViewTarget::ARRAY_BUFFER);
-
-        // Add an Accessor for the positions
-        std::vector<float> positions = {
-            0.0f, 0.0f, 0.0f, // Vertex 0
-            0.0f, 1.0f, 0.0f, // Vertex 1
-            1.0f, 0.0f, 0.0f  // Vertex 2
+        auto MakePathExt = [](const std::string& ext)
+        {
+            return "." + ext;
         };
-        auto positionsAccessorId = bufferBuilder.AddAccessor(positions, { TYPE_VEC3, COMPONENT_FLOAT }).id;
 
+        std::unique_ptr<ResourceWriter> resourceWriter;
 
+        if (pathFileExt == MakePathExt(GLTF_EXTENSION))
+        {
+            resourceWriter = std::make_unique<GLTFResourceWriter>(std::move(streamWriter));
+        }
 
-        // Second, construct a document, which represents the glTF JSON part of the output
+        if (pathFileExt == MakePathExt(GLB_EXTENSION))
+        {
+            resourceWriter = std::make_unique<GLBResourceWriter>(std::move(streamWriter));
+        }
+
+        if (!resourceWriter)
+        {
+            throw std::runtime_error("Command line argument path filename extension must be .gltf or .glb");
+        }
+
+        // The Document instance represents the glTF JSON manifest
         Document document;
 
-        // Construct a Material
-        Material material;
-        material.metallicRoughness.baseColorFactor = Color4(0.0f, 0.0f, 1.0f, 1.0f);
-        // Add it to the Document, and store the generated ID
-        auto materialId = document.materials.Append(std::move(material), Microsoft::glTF::AppendIdPolicy::GenerateOnEmpty).id;
+        std::string accessorIdIndices;
+        std::string accessorIdPositions;
 
-        // Construct a MeshPrimitive, unlike most types in glTF, MeshPrimitives are direct children of their parent Mesh
-        // rather than being children of the Document. This also means that they don't have any ID.
-        MeshPrimitive meshPrimitive;
-        meshPrimitive.materialId = materialId;
-        meshPrimitive.indicesAccessorId = indicesAccessorId;
-        meshPrimitive.attributes[ACCESSOR_POSITION] = positionsAccessorId;
+        // Use the BufferBuilder helper class to simplify the process of
+        // constructing valid glTF Buffer, BufferView and Accessor entities
+        BufferBuilder bufferBuilder(std::move(resourceWriter));
 
-        // Construct a Mesh using the MeshPrimitive
-        Mesh mesh;
-        mesh.primitives.push_back(std::move(meshPrimitive));
-        // Add it to the document, and store the generated ID
-        auto meshId = document.meshes.Append(std::move(mesh), Microsoft::glTF::AppendIdPolicy::GenerateOnEmpty).id;
+        CreateTriangleResources(document, bufferBuilder, accessorIdIndices, accessorIdPositions);
+        CreateTriangleEntities(document, accessorIdIndices, accessorIdPositions);
 
-        // Construct a Node
-        Node node;
-        node.meshId = meshId;
-        // Add it to the document, and store the generated ID
-        auto nodeId = document.nodes.Append(std::move(node), Microsoft::glTF::AppendIdPolicy::GenerateOnEmpty).id;
+        std::string manifest;
 
-        // Construct a Scene
-        Scene scene;
-        scene.nodes.push_back(nodeId);
-        // Add it to the Document, using a utility method that also sets this Scene as the Document's default
-        document.SetDefaultScene(std::move(scene), Microsoft::glTF::AppendIdPolicy::GenerateOnEmpty);
+        try
+        {
+            // Serialize the glTF Document into a JSON manifest
+            manifest = Serialize(document, SerializeFlags::Pretty);
+        }
+        catch (const GLTFException& ex)
+        {
+            std::stringstream ss;
 
-        // Add all of the Buffers, BufferViews and Accessors that were created using BufferBuilder to the Document
-        // Note that after this point, no further calls should be made to BufferBuilder
-        bufferBuilder.Output(document);
+            ss << "Microsoft::glTF::Serialize failed: ";
+            ss << ex.what();
 
-        // Serialize the Document into a JSON string
-        const auto gltfJson = Serialize(document, Microsoft::glTF::SerializeFlags::Pretty);
+            throw std::runtime_error(ss.str());
+        }
 
-        bufferBuilder.GetResourceWriter().WriteExternal(path.filename().string(), gltfJson);
+        auto& gltfResourceWriter = bufferBuilder.GetResourceWriter();
+
+        if (auto glbResourceWriter = dynamic_cast<GLBResourceWriter*>(&gltfResourceWriter))
+        {
+            glbResourceWriter->Flush(manifest, pathFile.u8string()); // A GLB container isn't created until the GLBResourceWriter::Flush member function is called
+        }
+        else
+        {
+            gltfResourceWriter.WriteExternal(pathFile.u8string(), manifest); // Binary resources have already been written, just need to write the manifest
+        }
     }
 }
 
