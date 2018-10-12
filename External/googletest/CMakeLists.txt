@@ -1,3 +1,9 @@
+# Check if the gtest target has already been defined
+if (TARGET gtest)
+  message(AUTHOR_WARNING "gtest target already defined, skipping")
+  return()
+endif()
+
 # Download and unpack googletest at configure time
 configure_file(CMakeGoogleTestDownload.txt.in ${CMAKE_BINARY_DIR}/googletest-download/CMakeLists.txt)
 execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
