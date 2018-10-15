@@ -25,3 +25,8 @@ steps:
 - script: .\GLTFSDK.Test.exe --gtest_output=xml:GLTFSDK.Test.log
   workingDirectory: built\Out\windows_$(buildPlatform)\$(buildConfiguration)\GLTFSDK.Test
   displayName: Running Unit Tests
+
+- task: PublishTestResults@2
+  inputs:
+    testResultsFormat: 'xUnit'
+    testResultsFiles: built\Out\windows_$(buildPlatform)\$(buildConfiguration)\GLTFSDK.Test\GLTFSDK.Test.log
