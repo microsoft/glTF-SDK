@@ -47,19 +47,41 @@ jobs:
 
     - task: CMake@1
       inputs:
-        workingDirectory: 'built\Int\cmake_$(buildPlatform)'
-        cmakeArgs: '..\..\.. -G Xcode'
+        workingDirectory: 'built/Int/cmake_$(buildPlatform)'
+        cmakeArgs: '../../.. -G Xcode'
 
     - task: CMake@1
       inputs:
-        workingDirectory: 'built\Int\cmake_$(buildPlatform)'
+        workingDirectory: 'built/Int/cmake_$(buildPlatform)'
         cmakeArgs: '--build . --target install --config $(buildConfiguration)'
 
-    - script: .\GLTFSDK.Test --gtest_output=xml:GLTFSDK.Test.log
-      workingDirectory: built\Out\$(buildPlatform)\$(buildConfiguration)\GLTFSDK.Test
+    - script: ./GLTFSDK.Test --gtest_output=xml:GLTFSDK.Test.log
+      workingDirectory: built/Out/$(buildPlatform)/$(buildConfiguration)/GLTFSDK.Test
       displayName: Running Unit Tests
 
     - task: PublishTestResults@2
       inputs:
         testResultsFormat: 'xUnit'
-        testResultsFiles: built\Out\$(buildPlatform)\$(buildConfiguration)\GLTFSDK.Test\GLTFSDK.Test.log
+        testResultsFiles: built/Out/$(buildPlatform)/$(buildConfiguration)/GLTFSDK.Test/GLTFSDK.Test.log
+
+  - job: iOS
+
+    pool:
+      vmImage: 'macOS-10.13'
+
+    variables:
+      buildPlatform: 'iOS'
+      buildConfiguration: 'Release'
+
+    steps:
+
+    - task: CMake@1
+      inputs:
+        workingDirectory: 'built/Int/cmake_$(buildPlatform)'
+        cmakeArgs: '../../.. -G Xcode -DCMAKE_TOOLCHAIN_FILE="$(Build.SourcesDirectory)/Build/CMake/ios.toolchain.cmake" -DIOS_PLATFORM=OS -DIOS_DEPLOYMENT_TARGET="9.0" -DENABLE_UNIT_TESTS="OFF"'
+
+    - task: CMake@1
+      inputs:
+        workingDirectory: 'built/Int/cmake_$(buildPlatform)'
+        cmakeArgs: '--build . --target install --config $(buildConfiguration)'
+
