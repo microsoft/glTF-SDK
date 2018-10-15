@@ -40,7 +40,7 @@ jobs:
       vmImage: 'macOS-10.13'
 
     variables:
-      buildPlatform: 'macos'
+      buildPlatform: 'macOS'
       buildConfiguration: 'Release'
 
     steps:
@@ -55,12 +55,11 @@ jobs:
         workingDirectory: 'built\Int\cmake_$(buildPlatform)'
         cmakeArgs: '--build . --target install --config $(buildConfiguration)'
 
-    # NOT SURE ABOUT THE PATHS
-    #- script: .\GLTFSDK.Test.exe --gtest_output=xml:GLTFSDK.Test.log
-    #  workingDirectory: built\Out\$(buildPlatform)\$(buildConfiguration)\GLTFSDK.Test
-    #  displayName: Running Unit Tests
+    - script: .\GLTFSDK.Test --gtest_output=xml:GLTFSDK.Test.log
+      workingDirectory: built\Out\$(buildPlatform)\$(buildConfiguration)\GLTFSDK.Test
+      displayName: Running Unit Tests
 
-    #- task: PublishTestResults@2
-    #  inputs:
-    #    testResultsFormat: 'xUnit'
-    #    testResultsFiles: built\Out\windows_$(buildPlatform)\$(buildConfiguration)\GLTFSDK.Test\GLTFSDK.Test.log
+    - task: PublishTestResults@2
+      inputs:
+        testResultsFormat: 'xUnit'
+        testResultsFiles: built\Out\$(buildPlatform)\$(buildConfiguration)\GLTFSDK.Test\GLTFSDK.Test.log
