@@ -1,3 +1,9 @@
+# Check if the RapidJSON target has already been defined
+if (TARGET RapidJSON)
+  message(AUTHOR_WARNING "RapidJSON target already defined, skipping")
+  return()
+endif()
+
 # Download and unpack RapidJSON at configure time
 configure_file(CMakeRapidJSONDownload.txt.in ${CMAKE_BINARY_DIR}/RapidJSON-download/CMakeLists.txt)
 execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
