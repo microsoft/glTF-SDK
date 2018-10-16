@@ -23,7 +23,7 @@ jobs:
     - task: CMake@1
       inputs:
         workingDirectory: 'built\Int\cmake_$(buildPlatform)'
-        cmakeArgs: '--build . --target install --config $(buildConfiguration)'
+        cmakeArgs: '--build . --target install --config $(buildConfiguration) -- /m'
 
     - script: .\GLTFSDK.Test.exe --gtest_output=xml:GLTFSDK.Test.log
       workingDirectory: built\Out\windows_$(buildPlatform)\$(buildConfiguration)\GLTFSDK.Test
