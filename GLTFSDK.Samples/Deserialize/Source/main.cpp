@@ -37,13 +37,13 @@ namespace
         std::shared_ptr<std::istream> GetInputStream(const std::string& filename) const override
         {
             // In order to construct a valid stream:
-            //1. The filename argument will be encoded as UTF-8 so use filesystem::u8path to
-            // correctly construct a path instance.
-            //2. Generate an absolute path by concatenating m_pathBase with the specified filename
-            // path. The filesystem::operator/ uses the platform's preferred directory separator if
-            // appropriate.
-            //3. Always open the file stream in binary mode. The glTF SDK will handle any text
-            // encoding issues for us.
+            // 1. The filename argument will be encoded as UTF-8 so use filesystem::u8path to
+            //    correctly construct a path instance.
+            // 2. Generate an absolute path by concatenating m_pathBase with the specified filename
+            //    path. The filesystem::operator/ uses the platform's preferred directory separator
+            //    if appropriate.
+            // 3. Always open the file stream in binary mode. The glTF SDK will handle any text
+            //    encoding issues for us.
             auto streamPath = m_pathBase / std::experimental::filesystem::u8path(filename);
             auto stream = std::make_shared<std::ifstream>(streamPath, std::ios_base::binary);
 
@@ -185,27 +185,8 @@ namespace
         }
     }
 
-    void PrintInfo(std::experimental::filesystem::path path)
+    void PrintInfo(const std::experimental::filesystem::path& path)
     {
-        if (path.is_relative())
-        {
-            auto pathCurrent = std::experimental::filesystem::current_path();
-
-            // Convert the relative path into an absolute path by appending the command line argument to the current path
-            pathCurrent /= path;
-            pathCurrent.swap(path);
-        }
-
-        if (!path.has_filename())
-        {
-            throw std::runtime_error("Command line argument path has no filename");
-        }
-
-        if (!path.has_extension())
-        {
-            throw std::runtime_error("Command line argument path has no filename extension");
-        }
-
         // Pass the absolute path, without the filename, to the stream reader
         auto streamReader = std::make_unique<StreamReader>(path.parent_path());
 
@@ -290,12 +271,33 @@ int main(int argc, char* argv[])
             throw std::runtime_error("Unexpected number of command line arguments");
         }
 
-        PrintInfo(argv[1U]);
+        std::experimental::filesystem::path path = argv[1U];
+
+        if (path.is_relative())
+        {
+            auto pathCurrent = std::experimental::filesystem::current_path();
+
+            // Convert the relative path into an absolute path by appending the command line argument to the current path
+            pathCurrent /= path;
+            pathCurrent.swap(path);
+        }
+
+        if (!path.has_filename())
+        {
+            throw std::runtime_error("Command line argument path has no filename");
+        }
+
+        if (!path.has_extension())
+        {
+            throw std::runtime_error("Command line argument path has no filename extension");
+        }
+
+        PrintInfo(path);
     }
     catch (const std::runtime_error& ex)
     {
         std::cerr << "Error! - ";
-        std::cerr << ex.what();
+        std::cerr << ex.what() << "\n";
 
         return EXIT_FAILURE;
     }
