@@ -3,6 +3,14 @@ project (GLTFSDK)
 
 option(ENABLE_UNIT_TESTS "ENABLE_UNIT_TESTS" ON)
 
+# Disable the samples on macOS, iOS, and Android since the experimental features they use
+# do not yet build with XCode or clang on these platforms.
+if(APPLE OR ANDROID_OS_PLATFORM)
+    option(ENABLE_SAMPLES "ENABLE_SAMPLES" OFF)
+else()
+    option(ENABLE_SAMPLES "ENABLE_SAMPLES" ON)
+endif()
+
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG -D_DEBUG -DFEATURE_ASSERTS_ENABLED")
@@ -18,4 +26,8 @@ add_subdirectory(GLTFSDK)
 if(ENABLE_UNIT_TESTS)
     add_subdirectory(GLTFSDK.TestUtils)
     add_subdirectory(GLTFSDK.Test)
+endif()
+
+if(ENABLE_SAMPLES)
+    add_subdirectory(GLTFSDK.Samples)
 endif()
