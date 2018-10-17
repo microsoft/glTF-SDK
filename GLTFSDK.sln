@@ -1,7 +1,6 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2002
+VisualStudioVersion = 15.0.27130.2003
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GLTFSDK", "GLTFSDK\GLTFSDK.vcxproj", "{F656C078-7F2A-4753-9B92-5E959AF80E26}"
 EndProject
@@ -13,6 +12,12 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GLTFSDK.Shared.CPP", "GLTFSDK.Shared.CPP\GLTFSDK.Shared.CPP.vcxitems", "{45D41ACC-2C3C-43D2-BC10-02AA73FFC7C7}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GLTFSDK.TestUtils", "GLTFSDK.TestUtils\GLTFSDK.TestUtils.vcxitems", "{F4FD814F-0664-49AE-A41D-99F1BB24F0CE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{86B90B4A-0EEE-4154-8A57-003225F65D6B}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Deserialize", "GLTFSDK.Samples\Deserialize\Deserialize.vcxproj", "{DE6A7757-2DF3-4705-829B-96A77BABF0B2}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Serialize", "GLTFSDK.Samples\Serialize\Serialize.vcxproj", "{DE6A7757-2DE3-4705-829B-96A77BABF0B2}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -53,9 +58,37 @@ Global
 		{F170B140-6AB9-4014-97D9-D897E0493CEC}.Release|x64.Build.0 = Release|x64
 		{F170B140-6AB9-4014-97D9-D897E0493CEC}.Release|x86.ActiveCfg = Release|Win32
 		{F170B140-6AB9-4014-97D9-D897E0493CEC}.Release|x86.Build.0 = Release|Win32
+		{DE6A7757-2DF3-4705-829B-96A77BABF0B2}.Debug|ARM.ActiveCfg = Debug|ARM
+		{DE6A7757-2DF3-4705-829B-96A77BABF0B2}.Debug|ARM.Build.0 = Debug|ARM
+		{DE6A7757-2DF3-4705-829B-96A77BABF0B2}.Debug|x64.ActiveCfg = Debug|x64
+		{DE6A7757-2DF3-4705-829B-96A77BABF0B2}.Debug|x64.Build.0 = Debug|x64
+		{DE6A7757-2DF3-4705-829B-96A77BABF0B2}.Debug|x86.ActiveCfg = Debug|Win32
+		{DE6A7757-2DF3-4705-829B-96A77BABF0B2}.Debug|x86.Build.0 = Debug|Win32
+		{DE6A7757-2DF3-4705-829B-96A77BABF0B2}.Release|ARM.ActiveCfg = Release|ARM
+		{DE6A7757-2DF3-4705-829B-96A77BABF0B2}.Release|ARM.Build.0 = Release|ARM
+		{DE6A7757-2DF3-4705-829B-96A77BABF0B2}.Release|x64.ActiveCfg = Release|x64
+		{DE6A7757-2DF3-4705-829B-96A77BABF0B2}.Release|x64.Build.0 = Release|x64
+		{DE6A7757-2DF3-4705-829B-96A77BABF0B2}.Release|x86.ActiveCfg = Release|Win32
+		{DE6A7757-2DF3-4705-829B-96A77BABF0B2}.Release|x86.Build.0 = Release|Win32
+		{DE6A7757-2DE3-4705-829B-96A77BABF0B2}.Debug|ARM.ActiveCfg = Debug|ARM
+		{DE6A7757-2DE3-4705-829B-96A77BABF0B2}.Debug|ARM.Build.0 = Debug|ARM
+		{DE6A7757-2DE3-4705-829B-96A77BABF0B2}.Debug|x64.ActiveCfg = Debug|x64
+		{DE6A7757-2DE3-4705-829B-96A77BABF0B2}.Debug|x64.Build.0 = Debug|x64
+		{DE6A7757-2DE3-4705-829B-96A77BABF0B2}.Debug|x86.ActiveCfg = Debug|Win32
+		{DE6A7757-2DE3-4705-829B-96A77BABF0B2}.Debug|x86.Build.0 = Debug|Win32
+		{DE6A7757-2DE3-4705-829B-96A77BABF0B2}.Release|ARM.ActiveCfg = Release|ARM
+		{DE6A7757-2DE3-4705-829B-96A77BABF0B2}.Release|ARM.Build.0 = Release|ARM
+		{DE6A7757-2DE3-4705-829B-96A77BABF0B2}.Release|x64.ActiveCfg = Release|x64
+		{DE6A7757-2DE3-4705-829B-96A77BABF0B2}.Release|x64.Build.0 = Release|x64
+		{DE6A7757-2DE3-4705-829B-96A77BABF0B2}.Release|x86.ActiveCfg = Release|Win32
+		{DE6A7757-2DE3-4705-829B-96A77BABF0B2}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{DE6A7757-2DF3-4705-829B-96A77BABF0B2} = {86B90B4A-0EEE-4154-8A57-003225F65D6B}
+		{DE6A7757-2DE3-4705-829B-96A77BABF0B2} = {86B90B4A-0EEE-4154-8A57-003225F65D6B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B683866C-07F1-4E03-8D84-0A683408D980}
