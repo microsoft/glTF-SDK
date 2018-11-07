@@ -1,3 +1,5 @@
+[![Build Status](https://gltfsdk.visualstudio.com/build/_apis/build/status/Microsoft.glTF-SDK)](https://gltfsdk.visualstudio.com/build/_build/latest?definitionId=1)
+
 # Microsoft glTF SDK - A C++ Deserializer/Serializer for glTF
 
 * Windows/macOS/Android Compatible

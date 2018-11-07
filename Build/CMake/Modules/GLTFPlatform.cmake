@@ -44,7 +44,7 @@ elseif (MSVC)
     elseif (CMAKE_GENERATOR_PLATFORM STREQUAL "ARM")
         set(${outPlatform} windows_arm PARENT_SCOPE)
     else()
-        error ("Unknown CMAKE_GENERATOR_PLATFORM " ${CMAKE_GENERATOR_PLATFORM})
+        message(FATAL_ERROR "Unknown CMAKE_GENERATOR_PLATFORM " ${CMAKE_GENERATOR_PLATFORM})
     endif()
 else()
     # MacOS

@@ -1,0 +1,87 @@
+# .NET Desktop
+# Build and run tests for .NET Desktop or Windows classic desktop solutions.
+# Add steps that publish symbols, save build artifacts, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/apps/windows/dot-net
+
+jobs:
+  - job: Windows
+
+    pool:
+      vmImage: 'VS2017-Win2016'
+
+    variables:
+      buildPlatform: 'Win32'
+      buildConfiguration: 'Release'
+
+    steps:
+
+    - task: CMake@1
+      inputs:
+        workingDirectory: 'built\Int\cmake_$(buildPlatform)'
+        cmakeArgs: '..\..\.. -G "Visual Studio 15 2017" -A "$(buildPlatform)"'
+
+    - task: CMake@1
+      inputs:
+        workingDirectory: 'built\Int\cmake_$(buildPlatform)'
+        cmakeArgs: '--build . --target install --config $(buildConfiguration) -- /m'
+
+    - script: .\GLTFSDK.Test.exe --gtest_output=xml:GLTFSDK.Test.log
+      workingDirectory: built\Out\windows_$(buildPlatform)\$(buildConfiguration)\GLTFSDK.Test
+      displayName: Running Unit Tests
+
+    - task: PublishTestResults@2
+      inputs:
+        testResultsFormat: 'xUnit'
+        testResultsFiles: built\Out\windows_$(buildPlatform)\$(buildConfiguration)\GLTFSDK.Test\GLTFSDK.Test.log
+
+  - job: MacOS
+
+    pool:
+      vmImage: 'macOS-10.13'
+
+    variables:
+      buildPlatform: 'macOS'
+      buildConfiguration: 'Release'
+
+    steps:
+
+    - task: CMake@1
+      inputs:
+        workingDirectory: 'built/Int/cmake_$(buildPlatform)'
+        cmakeArgs: '../../.. -G Xcode'
+
+    - task: CMake@1
+      inputs:
+        workingDirectory: 'built/Int/cmake_$(buildPlatform)'
+        cmakeArgs: '--build . --target install --config $(buildConfiguration)'
+
+    - script: ./GLTFSDK.Test --gtest_output=xml:GLTFSDK.Test.log
+      workingDirectory: built/Out/$(buildPlatform)/$(buildConfiguration)/GLTFSDK.Test
+      displayName: Running Unit Tests
+
+    - task: PublishTestResults@2
+      inputs:
+        testResultsFormat: 'xUnit'
+        testResultsFiles: built/Out/$(buildPlatform)/$(buildConfiguration)/GLTFSDK.Test/GLTFSDK.Test.log
+
+  - job: iOS
+
+    pool:
+      vmImage: 'macOS-10.13'
+
+    variables:
+      buildPlatform: 'iOS'
+      buildConfiguration: 'Release'
+
+    steps:
+
+    - task: CMake@1
+      inputs:
+        workingDirectory: 'built/Int/cmake_$(buildPlatform)'
+        cmakeArgs: '../../.. -G Xcode -DCMAKE_TOOLCHAIN_FILE="$(Build.SourcesDirectory)/Build/CMake/ios.toolchain.cmake" -DIOS_PLATFORM=OS -DIOS_DEPLOYMENT_TARGET="9.0" -DENABLE_UNIT_TESTS="OFF"'
+
+    - task: CMake@1
+      inputs:
+        workingDirectory: 'built/Int/cmake_$(buildPlatform)'
+        cmakeArgs: '--build . --target install --config $(buildConfiguration)'
+
