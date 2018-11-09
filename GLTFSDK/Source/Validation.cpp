@@ -237,13 +237,6 @@ void Validation::ValidateAccessor(const Document& gltfDocument, const Accessor& 
         const Buffer& buffer = gltfDocument.buffers.Get(bufferView.bufferId);
         ValidateAccessorsImpl(accessor.count, accessor.byteOffset, accessor.componentType, accessor.type, accessor.id, bufferView, buffer);
     }
-    else
-    {
-        if (accessor.sparse.count == 0U)
-        {
-            throw ValidationException("Non-Sparse Accessor " + accessor.id + ": does not have a bufferView");
-        }
-    }
 
     if (accessor.sparse.count > 0U) 
     {
