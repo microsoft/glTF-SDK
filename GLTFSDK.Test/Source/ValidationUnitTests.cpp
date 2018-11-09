@@ -4,6 +4,10 @@
 #include "stdafx.h"
 
 #include <GLTFSDK/Validation.h>
+#include <GLTFSDK/Deserialize.h>
+
+#include "TestResources.h"
+#include "TestUtils.h"
 
 #include <cmath>
 
@@ -79,6 +83,22 @@ namespace Microsoft
                     size_t b = std::numeric_limits<size_t>::max();
                     size_t t;
                     Assert::IsFalse(Validation::SafeMultiplication(a, b, t));
+                }
+
+                GLTFSDK_TEST_METHOD(ValidationUnitTests, TestDraco_Validation)
+                {
+                    const auto inputJson = ReadLocalJson(c_dracoBox);
+                    auto doc = Deserialize(inputJson);
+
+                    Assert::AreEqual(doc.buffers.Size(), size_t(1));
+                    Assert::AreEqual(doc.bufferViews.Size(), size_t(1));
+                    Assert::AreEqual(doc.accessors.Size(), size_t(3));
+                    for (const auto& accessor : doc.accessors.Elements())
+                    {
+                        Assert::IsTrue(accessor.bufferViewId.empty());
+                    }
+
+                    Validation::Validate(doc);
                 }
             };
         }
