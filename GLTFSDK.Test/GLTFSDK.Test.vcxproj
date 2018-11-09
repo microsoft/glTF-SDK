@@ -122,6 +122,7 @@
     <None Include="Resources\glb\CubeInvalidAccessorByteOffset.glb" />
     <None Include="Resources\glb\CubeInvalidBufferViewLength.glb" />
     <None Include="Resources\glb\CubeMissingTextureRef.glb" />
+    <None Include="Resources\glb\CubeNoBuffer.glb" />
     <None Include="Resources\glb\DuckMissingMaterialRef.glb" />
     <None Include="Resources\glb\WrongBinHeaderLength.glb" />
     <None Include="Resources\glb\WrongJsonLength.glb" />

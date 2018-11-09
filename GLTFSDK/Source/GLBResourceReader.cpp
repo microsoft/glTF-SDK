@@ -125,7 +125,7 @@ void GLBResourceReader::Init()
     {
         throw InvalidGLTFException("JSON chunk should appear first");
     }
-                
+
     // validate header
     if (strncmp(magic, GLB_HEADER_MAGIC_STRING, GLB_HEADER_MAGIC_STRING_SIZE) != 0)
     {
@@ -138,7 +138,7 @@ void GLBResourceReader::Init()
     }
 
     // Length has been validated as the actual length of the file, but make sure to include the header bytes in this check
-    if (length <= (jsonChunkLength + GLB_HEADER_BYTE_SIZE))
+    if (length < (GLB_HEADER_BYTE_SIZE + jsonChunkLength))
     {
         throw InvalidGLTFException("File length " + std::to_string(length) + " less than content length " + std::to_string(jsonChunkLength) + 
             " plus header length " + std::to_string(GLB_HEADER_BYTE_SIZE));
@@ -146,6 +146,13 @@ void GLBResourceReader::Init()
 
     m_json = ReadJson(*m_buffer, jsonChunkLength);
 
+    // If length is exactly equal to the json chunk length, plus the header, it means there is no binary buffer chunk
+    if (length == (GLB_HEADER_BYTE_SIZE + jsonChunkLength))
+    {
+        return;
+    }
+
+    // Read the length of the binary buffer chunk
     const uint32_t bufferChunkLength = StreamUtils::ReadBinary<uint32_t>(*m_buffer);
 
     if (!ParseChunkType(GLB_CHUNK_TYPE_BIN, *m_buffer))

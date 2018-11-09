@@ -153,6 +153,11 @@ namespace Microsoft
                     TestDeserializeValidGLBFile(c_glbSampleBoxInterleaved);
                 }
 
+                GLTFSDK_TEST_METHOD(GLTFTests, GLB_Deserialize_Valid_NoBuffer)
+                {
+                    TestDeserializeValidGLBFile(c_glbCubeNoBuffer);
+                }
+
                 GLTFSDK_TEST_METHOD(GLTFTests, GLTF_RoundTrip_ValidCamera)
                 {
                     TestGLTFRoundTrip(ReadLocalJson(c_validCameraJson));

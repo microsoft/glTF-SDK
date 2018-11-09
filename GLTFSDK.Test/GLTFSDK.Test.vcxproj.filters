@@ -206,5 +206,6 @@
     <None Include="Resources\glb\WrongBinHeaderLength.glb" />
     <None Include="Resources\glb\WrongJsonLength.glb" />
     <None Include="Resources\glb\WrongReportedLength.glb" />
+    <None Include="Resources\glb\CubeNoBuffer.glb" />
   </ItemGroup>
 </Project>
