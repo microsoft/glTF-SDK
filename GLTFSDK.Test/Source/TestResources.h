@@ -16,6 +16,7 @@ namespace Microsoft
             constexpr const char* c_glbCubeInvalidAccessorByteOffset = "Resources\\glb\\CubeInvalidAccessorByteOffset.glb";
             constexpr const char* c_glbCubeInvalidBufferViewLength   = "Resources\\glb\\CubeInvalidBufferViewLength.glb";
             constexpr const char* c_glbCubeMissingTextureRef         = "Resources\\glb\\CubeMissingTextureRef.glb";
+            constexpr const char* c_glbCubeNoBuffer                  = "Resources\\glb\\CubeNoBuffer.glb";
             constexpr const char* c_glbDuckMissingMaterialRef        = "Resources\\glb\\DuckMissingMaterialRef.glb";
             constexpr const char* c_glbWrongBinHeaderLength          = "Resources\\glb\\WrongBinHeaderLength.glb";
             constexpr const char* c_glbWrongJsonLength               = "Resources\\glb\\WrongJsonLength.glb";
