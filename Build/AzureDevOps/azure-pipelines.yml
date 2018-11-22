@@ -31,7 +31,7 @@ jobs:
 
     - task: PublishTestResults@2
       inputs:
-        testResultsFormat: 'xUnit'
+        testResultsFormat: 'JUnit'
         testResultsFiles: built\Out\windows_$(buildPlatform)\$(buildConfiguration)\GLTFSDK.Test\GLTFSDK.Test.log
 
   - job: MacOS
@@ -61,7 +61,7 @@ jobs:
 
     - task: PublishTestResults@2
       inputs:
-        testResultsFormat: 'xUnit'
+        testResultsFormat: 'JUnit'
         testResultsFiles: built/Out/$(buildPlatform)/$(buildConfiguration)/GLTFSDK.Test/GLTFSDK.Test.log
 
   - job: iOS
