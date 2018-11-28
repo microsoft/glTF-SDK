@@ -2,8 +2,9 @@
 ###############################################################################
 # Sets the name of the platform in the variable named by 'outPlatform'
 # Possible values are "iOS", "iOSSimulator", "iOSSimulator64", "appleTV", "appleTVSimulator"
-# Android values are of the form "android_<ANDROID_ABI>". 
+# Android values are of the form "android_<ANDROID_ABI>".
 # Possible values of ANDROID_ABIs are found here : https://developer.android.com/ndk/guides/abis
+# TODO: Modify the Android and iOS logic to calculate outPlatform the same way we do on Windows.
 ###############################################################################
 
 function (GetGLTFPlatform outPlatform)
@@ -27,9 +28,9 @@ elseif (IOS_PLATFORM)
         set(${outPlatform} iOS PARENT_SCOPE)
     elseif (IOS_PLATFORM STREQUAL "SIMULATOR")
         set(${outPlatform} iOSSimulator PARENT_SCOPE)
-    elseif(IOS_PLATFORM STREQUAL "SIMULATOR64")
+    elseif (IOS_PLATFORM STREQUAL "SIMULATOR64")
         set(${outPlatform} iOSSimulator64 PARENT_SCOPE)
-    elseif (IOS_PLATFORM STREQUAL "TVOS" PARENT_SCOPE)
+    elseif (IOS_PLATFORM STREQUAL "TVOS")
         set(${outPlatform} appleTV PARENT_SCOPE)
     elseif (IOS_PLATFORM STREQUAL "SIMULATOR_TVOS")
         set(${outPlatform} appleTVSimulator PARENT_SCOPE)
@@ -37,15 +38,7 @@ elseif (IOS_PLATFORM)
         message(FATAL_ERROR "Invalid IOS_PLATFORM: ${IOS_PLATFORM}")
     endif()
 elseif (MSVC)
-    if (CMAKE_GENERATOR_PLATFORM STREQUAL "Win32")
-        set(${outPlatform} windows_win32 PARENT_SCOPE)
-    elseif (CMAKE_GENERATOR_PLATFORM STREQUAL "x64")
-        set(${outPlatform} windows_x64 PARENT_SCOPE)
-    elseif (CMAKE_GENERATOR_PLATFORM STREQUAL "ARM")
-        set(${outPlatform} windows_arm PARENT_SCOPE)
-    else()
-        message(FATAL_ERROR "Unknown CMAKE_GENERATOR_PLATFORM " ${CMAKE_GENERATOR_PLATFORM})
-    endif()
+    set(${outPlatform} "windows_${CMAKE_GENERATOR_PLATFORM}" PARENT_SCOPE)
 else()
     # MacOS
     set(${outPlatform} macOS PARENT_SCOPE)

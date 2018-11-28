@@ -19,6 +19,7 @@ winbuild.ps1
 param(
     [switch]$NoNuGet,
     [switch]$NoArm,
+    [switch]$NoArm64,
     [switch]$Nox64,
     [switch]$NoWin32,
     [switch]$NoDebug,
@@ -70,7 +71,7 @@ function Main()
 {
     if (!$NoWin32)
     {
-        BuildPlatform "cmake_win32"
+        BuildPlatform "cmake_Win32"
     }
 
     if (!$Nox64)
@@ -80,7 +81,12 @@ function Main()
 
     if (!$NoArm)
     {
-        BuildPlatform "cmake_arm"
+        BuildPlatform "cmake_ARM"
+    }
+
+    if (!$NoArm64)
+    {
+        BuildPlatform "cmake_ARM64"
     }
 
     if (!$NoNuGet)

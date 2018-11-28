@@ -1,7 +1,18 @@
+configurations {
+    Platform {
+        key : "Platform";
+        choices: { Win32, x64, ARM, ARM64, AnyCPU };
+        Win32.aliases : { x86, win32, ia32, 386 };
+        x64.aliases : { x64, amd64, em64t, intel64, x86-64, x86_64 };
+        ARM.aliases : { arm, woa };
+        ARM64.aliases : { arm64 };
+        AnyCPU.aliases : { anycpu, any };
+    };
+}
 nuget {
     nuspec {
         id = Microsoft.glTF.CPP;
-        version : 1.2.16.0;
+        version : 0.0.0.0;
         title : Microsoft.glTF.CPP;
         authors : { Microsoft };
         owners : { Microsoft };
@@ -61,10 +72,10 @@ nuget {
             dll: {};
 
             lib: {
-                    ${BASE}\Built\Out\windows_win32\Debug\GLTFSDK\GLTFSDK.lib,
+                    ${BASE}\Built\Out\windows_Win32\Debug\GLTFSDK\GLTFSDK.lib,
             };
             symbols: {
-                ${BASE}\Built\Out\windows_win32\Debug\GLTFSDK\GLTFSDK.pdb
+                ${BASE}\Built\Out\windows_Win32\Debug\GLTFSDK\GLTFSDK.pdb
             };
         };
 
@@ -72,10 +83,10 @@ nuget {
             dll: {};
 
             lib: {
-                    ${BASE}\Built\Out\windows_win32\Release\GLTFSDK\GLTFSDK.lib,
+                    ${BASE}\Built\Out\windows_Win32\Release\GLTFSDK\GLTFSDK.lib,
             };
             symbols: {
-                ${BASE}\Built\Out\windows_win32\Release\GLTFSDK\GLTFSDK.pdb
+                ${BASE}\Built\Out\windows_Win32\Release\GLTFSDK\GLTFSDK.pdb
             };
         };
 
@@ -105,10 +116,10 @@ nuget {
             dll: {};
 
             lib: {
-                    ${BASE}\Built\Out\windows_arm\Debug\GLTFSDK\GLTFSDK.lib,
+                    ${BASE}\Built\Out\windows_ARM\Debug\GLTFSDK\GLTFSDK.lib,
             };
             symbols: {
-                    ${BASE}\Built\Out\windows_arm\Debug\GLTFSDK\GLTFSDK.pdb
+                    ${BASE}\Built\Out\windows_ARM\Debug\GLTFSDK\GLTFSDK.pdb
             };
         };
 
@@ -116,10 +127,32 @@ nuget {
             dll: {};
 
             lib: {
-                    ${BASE}\Built\Out\windows_arm\Release\GLTFSDK\GLTFSDK.lib,
+                    ${BASE}\Built\Out\windows_ARM\Release\GLTFSDK\GLTFSDK.lib,
             };
             symbols: {
-                    ${BASE}\Built\Out\windows_arm\Release\GLTFSDK\GLTFSDK.pdb
+                    ${BASE}\Built\Out\windows_ARM\Release\GLTFSDK\GLTFSDK.pdb
+            };
+        };
+
+        [arm64,debug] {
+            dll: {};
+
+            lib: {
+                    ${BASE}\Built\Out\windows_ARM64\Debug\GLTFSDK\GLTFSDK.lib,
+            };
+            symbols: {
+                    ${BASE}\Built\Out\windows_ARM64\Debug\GLTFSDK\GLTFSDK.pdb
+            };
+        };
+
+        [arm64,release] {
+            dll: {};
+
+            lib: {
+                    ${BASE}\Built\Out\windows_ARM64\Release\GLTFSDK\GLTFSDK.lib,
+            };
+            symbols: {
+                    ${BASE}\Built\Out\windows_ARM64\Release\GLTFSDK\GLTFSDK.pdb
             };
         };
     };

@@ -21,6 +21,7 @@ wininit.ps1
 param(
     [switch]$Clean,
     [switch]$NoArm,
+    [switch]$NoArm64,
     [switch]$Nox64,
     [switch]$NoWin32
 )
@@ -62,7 +63,7 @@ function Main()
 
     if (!$NoWin32)
     {
-        GeneratePlatform "Win32" "cmake_win32"
+        GeneratePlatform "Win32" "cmake_Win32"
     }
 
     if (!$Nox64)
@@ -72,7 +73,12 @@ function Main()
     
     if (!$NoArm)
     {
-        GeneratePlatform "ARM" "cmake_arm"
+        GeneratePlatform "ARM" "cmake_ARM"
+    }
+    
+    if (!$NoArm64)
+    {
+        GeneratePlatform "ARM64" "cmake_ARM64"
     }
 }
 
