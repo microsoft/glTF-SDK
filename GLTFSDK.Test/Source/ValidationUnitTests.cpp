@@ -19,6 +19,29 @@ namespace Microsoft
     {
         namespace Test
         {
+            namespace
+            {
+                Document ReadAsset(const char* path)
+                {
+                    const auto inputJson = ReadLocalJson(path);
+                    auto doc = Deserialize(inputJson);
+                    return doc;
+                }
+
+                void ReadAndValidate(const char* path)
+                {
+                    auto doc = ReadAsset(path);
+                    Validation::Validate(doc);
+                }
+
+                void ExpectValidationFail(const Document& doc)
+                {
+                    Assert::ExpectException<ValidationException>([&doc]{
+                        Validation::Validate(doc);
+                    });
+                }
+            }
+
             GLTFSDK_TEST_CLASS(ValidationUnitTests)
             {
                 GLTFSDK_TEST_METHOD(ValidationUnitTests, TestAddition_size_t_NoOverflow)
@@ -99,6 +122,154 @@ namespace Microsoft
                     }
 
                     Validation::Validate(doc);
+                }
+
+                GLTFSDK_TEST_METHOD(ValidationUnitTests, Validate_MeshPrimitive_00)
+                {
+                    ReadAndValidate(c_meshPrimitiveMode_00);
+                }
+
+                GLTFSDK_TEST_METHOD(ValidationUnitTests, Validate_MeshPrimitive_01)
+                {
+                    ReadAndValidate(c_meshPrimitiveMode_01);
+                }
+
+                GLTFSDK_TEST_METHOD(ValidationUnitTests, Validate_MeshPrimitive_02)
+                {
+                    ReadAndValidate(c_meshPrimitiveMode_02);
+                }
+
+                GLTFSDK_TEST_METHOD(ValidationUnitTests, Validate_MeshPrimitive_03)
+                {
+                    ReadAndValidate(c_meshPrimitiveMode_03);
+                }
+
+                GLTFSDK_TEST_METHOD(ValidationUnitTests, Validate_MeshPrimitive_04)
+                {
+                    ReadAndValidate(c_meshPrimitiveMode_04);
+                }
+
+                GLTFSDK_TEST_METHOD(ValidationUnitTests, Validate_MeshPrimitive_05)
+                {
+                    ReadAndValidate(c_meshPrimitiveMode_05);
+                }
+
+                GLTFSDK_TEST_METHOD(ValidationUnitTests, Validate_MeshPrimitive_06)
+                {
+                    ReadAndValidate(c_meshPrimitiveMode_06);
+                }
+
+                GLTFSDK_TEST_METHOD(ValidationUnitTests, Validate_MeshPrimitive_07)
+                {
+                    ReadAndValidate(c_meshPrimitiveMode_07);
+                }
+
+                GLTFSDK_TEST_METHOD(ValidationUnitTests, Validate_MeshPrimitive_08)
+                {
+                    ReadAndValidate(c_meshPrimitiveMode_08);
+                }
+
+                GLTFSDK_TEST_METHOD(ValidationUnitTests, Validate_MeshPrimitive_09)
+                {
+                    ReadAndValidate(c_meshPrimitiveMode_09);
+                }
+
+                GLTFSDK_TEST_METHOD(ValidationUnitTests, Validate_MeshPrimitive_10)
+                {
+                    ReadAndValidate(c_meshPrimitiveMode_10);
+                }
+
+                GLTFSDK_TEST_METHOD(ValidationUnitTests, Validate_MeshPrimitive_11)
+                {
+                    ReadAndValidate(c_meshPrimitiveMode_11);
+                }
+
+                GLTFSDK_TEST_METHOD(ValidationUnitTests, Validate_MeshPrimitive_12)
+                {
+                    ReadAndValidate(c_meshPrimitiveMode_12);
+                }
+
+                GLTFSDK_TEST_METHOD(ValidationUnitTests, Validate_MeshPrimitive_13)
+                {
+                    ReadAndValidate(c_meshPrimitiveMode_13);
+                }
+
+                GLTFSDK_TEST_METHOD(ValidationUnitTests, Validate_MeshPrimitive_14)
+                {
+                    ReadAndValidate(c_meshPrimitiveMode_14);
+                }
+
+                GLTFSDK_TEST_METHOD(ValidationUnitTests, Validate_MeshPrimitive_15)
+                {
+                    ReadAndValidate(c_meshPrimitiveMode_15);
+                }
+
+                GLTFSDK_TEST_METHOD(ValidationUnitTests, Validate_Invalid_Unindexed_Lines)
+                {
+                    auto doc = ReadAsset(c_meshPrimitiveMode_01);
+                    auto accessor = doc.accessors[doc.meshes.Front().primitives.front().GetAttributeAccessorId(ACCESSOR_POSITION)];
+
+                    accessor.count = 1;
+                    doc.accessors.Replace(accessor);
+                    ExpectValidationFail(doc);
+
+                    accessor.count = 3;
+                    doc.accessors.Replace(accessor);
+                    ExpectValidationFail(doc);
+                }
+
+                GLTFSDK_TEST_METHOD(ValidationUnitTests, Validate_Invalid_Unindexed_Line_Loop)
+                {
+                    auto doc = ReadAsset(c_meshPrimitiveMode_02);
+                    auto accessor = doc.accessors[doc.meshes.Front().primitives.front().GetAttributeAccessorId(ACCESSOR_POSITION)];
+
+                    accessor.count = 1;
+                    doc.accessors.Replace(accessor);
+                    ExpectValidationFail(doc);
+                }
+
+                GLTFSDK_TEST_METHOD(ValidationUnitTests, Validate_Invalid_Unindexed_Line_Strip)
+                {
+                    auto doc = ReadAsset(c_meshPrimitiveMode_03);
+                    auto accessor = doc.accessors[doc.meshes.Front().primitives.front().GetAttributeAccessorId(ACCESSOR_POSITION)];
+
+                    accessor.count = 1;
+                    doc.accessors.Replace(accessor);
+                    ExpectValidationFail(doc);
+                }
+
+                GLTFSDK_TEST_METHOD(ValidationUnitTests, Validate_Invalid_Indexed_Lines)
+                {
+                    auto doc = ReadAsset(c_meshPrimitiveMode_08);
+                    auto accessor = doc.accessors[doc.meshes.Front().primitives.front().indicesAccessorId];
+
+                    accessor.count = 1;
+                    doc.accessors.Replace(accessor);
+                    ExpectValidationFail(doc);
+
+                    accessor.count = 3;
+                    doc.accessors.Replace(accessor);
+                    ExpectValidationFail(doc);
+                }
+
+                GLTFSDK_TEST_METHOD(ValidationUnitTests, Validate_Invalid_Indexed_Line_Loop)
+                {
+                    auto doc = ReadAsset(c_meshPrimitiveMode_09);
+                    auto accessor = doc.accessors[doc.meshes.Front().primitives.front().indicesAccessorId];
+
+                    accessor.count = 1;
+                    doc.accessors.Replace(accessor);
+                    ExpectValidationFail(doc);
+                }
+
+                GLTFSDK_TEST_METHOD(ValidationUnitTests, Validate_Invalid_Indexed_Line_Strip)
+                {
+                    auto doc = ReadAsset(c_meshPrimitiveMode_10);
+                    auto accessor = doc.accessors[doc.meshes.Front().primitives.front().indicesAccessorId];
+
+                    accessor.count = 1;
+                    doc.accessors.Replace(accessor);
+                    ExpectValidationFail(doc);
                 }
             };
         }

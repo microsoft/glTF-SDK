@@ -50,6 +50,23 @@ namespace Microsoft
             constexpr const char* c_validTriangleTRS                 = "Resources\\gltf\\TriangleWithoutIndices_TRS.gltf";
             constexpr const char* c_validCameraJson                  = "Resources\\gltf\\ValidCamera.gltf";
             constexpr const char* c_cameraWithExtensions             = "Resources\\gltf\\ValidCameraWithExtensions.gltf";
+
+            constexpr const char* c_meshPrimitiveMode_00             = "Resources\\glTF-Asset-Generator\\Mesh_PrimitiveMode\\Mesh_PrimitiveMode_00.gltf";
+            constexpr const char* c_meshPrimitiveMode_01             = "Resources\\glTF-Asset-Generator\\Mesh_PrimitiveMode\\Mesh_PrimitiveMode_01.gltf";
+            constexpr const char* c_meshPrimitiveMode_02             = "Resources\\glTF-Asset-Generator\\Mesh_PrimitiveMode\\Mesh_PrimitiveMode_02.gltf";
+            constexpr const char* c_meshPrimitiveMode_03             = "Resources\\glTF-Asset-Generator\\Mesh_PrimitiveMode\\Mesh_PrimitiveMode_03.gltf";
+            constexpr const char* c_meshPrimitiveMode_04             = "Resources\\glTF-Asset-Generator\\Mesh_PrimitiveMode\\Mesh_PrimitiveMode_04.gltf";
+            constexpr const char* c_meshPrimitiveMode_05             = "Resources\\glTF-Asset-Generator\\Mesh_PrimitiveMode\\Mesh_PrimitiveMode_05.gltf";
+            constexpr const char* c_meshPrimitiveMode_06             = "Resources\\glTF-Asset-Generator\\Mesh_PrimitiveMode\\Mesh_PrimitiveMode_06.gltf";
+            constexpr const char* c_meshPrimitiveMode_07             = "Resources\\glTF-Asset-Generator\\Mesh_PrimitiveMode\\Mesh_PrimitiveMode_07.gltf";
+            constexpr const char* c_meshPrimitiveMode_08             = "Resources\\glTF-Asset-Generator\\Mesh_PrimitiveMode\\Mesh_PrimitiveMode_08.gltf";
+            constexpr const char* c_meshPrimitiveMode_09             = "Resources\\glTF-Asset-Generator\\Mesh_PrimitiveMode\\Mesh_PrimitiveMode_09.gltf";
+            constexpr const char* c_meshPrimitiveMode_10             = "Resources\\glTF-Asset-Generator\\Mesh_PrimitiveMode\\Mesh_PrimitiveMode_10.gltf";
+            constexpr const char* c_meshPrimitiveMode_11             = "Resources\\glTF-Asset-Generator\\Mesh_PrimitiveMode\\Mesh_PrimitiveMode_11.gltf";
+            constexpr const char* c_meshPrimitiveMode_12             = "Resources\\glTF-Asset-Generator\\Mesh_PrimitiveMode\\Mesh_PrimitiveMode_12.gltf";
+            constexpr const char* c_meshPrimitiveMode_13             = "Resources\\glTF-Asset-Generator\\Mesh_PrimitiveMode\\Mesh_PrimitiveMode_13.gltf";
+            constexpr const char* c_meshPrimitiveMode_14             = "Resources\\glTF-Asset-Generator\\Mesh_PrimitiveMode\\Mesh_PrimitiveMode_14.gltf";
+            constexpr const char* c_meshPrimitiveMode_15             = "Resources\\glTF-Asset-Generator\\Mesh_PrimitiveMode\\Mesh_PrimitiveMode_15.gltf";
         }
     }
 }
