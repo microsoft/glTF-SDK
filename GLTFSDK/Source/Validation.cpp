@@ -88,10 +88,33 @@ namespace
         Validation::ValidateBufferView(bufferView, buffer);
     }
 
-    void ValidateTriangleVertexCount(const MeshMode mode, const size_t count, const std::string& type)
+    void ValidateVertexCount(const MeshMode mode, const size_t count, const std::string& type)
     {
         switch (mode)
         {
+        case MESH_POINTS:
+            break;
+
+        case MESH_LINES:
+            if (count < 2)
+            {
+                throw ValidationException(type + " count must be at least 2.");
+            }
+
+            if (count % 2 != 0)
+            {
+                throw ValidationException(type + " count for MESH_LINES must be a multiple of 2.");
+            }
+            break;
+
+        case MESH_LINE_LOOP:
+        case MESH_LINE_STRIP:
+            if (count < 2)
+            {
+                throw ValidationException(type + " count must be at least 2.");
+            }
+            break;
+
         case MESH_TRIANGLES:
             if (count < 3)
             {
@@ -103,6 +126,7 @@ namespace
                 throw ValidationException(type + " count for MESH_TRIANGLES must be a multiple of 3.");
             }
             break;
+
         case MESH_TRIANGLE_FAN:
         case MESH_TRIANGLE_STRIP:
             if (count < 3)
@@ -110,6 +134,7 @@ namespace
                 throw ValidationException(type + " count must be at least 3.");
             }
             break;
+
         default:
             throw ValidationException(type + " invalid mesh mode for validation " + std::to_string(mode));
             break;
@@ -156,11 +181,11 @@ void Validation::ValidateMeshPrimitive(const Document& doc, const MeshPrimitive&
     {
         const auto& indicesAccessor = doc.accessors.Get(indicesAccessorId);
         ValidateAccessorTypes(indicesAccessor, "indices", { TYPE_SCALAR }, { COMPONENT_UNSIGNED_BYTE, COMPONENT_UNSIGNED_SHORT, COMPONENT_UNSIGNED_INT });
-        ValidateTriangleVertexCount(primitive.mode, indicesAccessor.count, "Index");
+        ValidateVertexCount(primitive.mode, indicesAccessor.count, "Index");
     }
     else
     {
-        ValidateTriangleVertexCount(primitive.mode, vertexCount, "Position");
+        ValidateVertexCount(primitive.mode, vertexCount, "Position");
     }
 
     ValidateMeshPrimitiveAttributeAccessors(doc, primitive.attributes, vertexCount);

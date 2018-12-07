@@ -207,5 +207,53 @@
     <None Include="Resources\glb\WrongJsonLength.glb" />
     <None Include="Resources\glb\WrongReportedLength.glb" />
     <None Include="Resources\glb\CubeNoBuffer.glb" />
+    <None Include="Resources\glTF-Asset-Generator\Mesh_PrimitiveMode\Mesh_PrimitiveMode_00.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Resources\glTF-Asset-Generator\Mesh_PrimitiveMode\Mesh_PrimitiveMode_01.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Resources\glTF-Asset-Generator\Mesh_PrimitiveMode\Mesh_PrimitiveMode_02.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Resources\glTF-Asset-Generator\Mesh_PrimitiveMode\Mesh_PrimitiveMode_03.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Resources\glTF-Asset-Generator\Mesh_PrimitiveMode\Mesh_PrimitiveMode_04.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Resources\glTF-Asset-Generator\Mesh_PrimitiveMode\Mesh_PrimitiveMode_05.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Resources\glTF-Asset-Generator\Mesh_PrimitiveMode\Mesh_PrimitiveMode_06.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Resources\glTF-Asset-Generator\Mesh_PrimitiveMode\Mesh_PrimitiveMode_07.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Resources\glTF-Asset-Generator\Mesh_PrimitiveMode\Mesh_PrimitiveMode_08.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Resources\glTF-Asset-Generator\Mesh_PrimitiveMode\Mesh_PrimitiveMode_09.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Resources\glTF-Asset-Generator\Mesh_PrimitiveMode\Mesh_PrimitiveMode_10.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Resources\glTF-Asset-Generator\Mesh_PrimitiveMode\Mesh_PrimitiveMode_11.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Resources\glTF-Asset-Generator\Mesh_PrimitiveMode\Mesh_PrimitiveMode_12.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Resources\glTF-Asset-Generator\Mesh_PrimitiveMode\Mesh_PrimitiveMode_13.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Resources\glTF-Asset-Generator\Mesh_PrimitiveMode\Mesh_PrimitiveMode_14.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Resources\glTF-Asset-Generator\Mesh_PrimitiveMode\Mesh_PrimitiveMode_15.bin">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
