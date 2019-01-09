@@ -9,9 +9,32 @@ jobs:
     pool:
       vmImage: 'VS2017-Win2016'
 
-    variables:
-      buildPlatform: 'Win32'
-      buildConfiguration: 'Release'
+    strategy:
+      matrix:
+        Win32-Release:
+          buildPlatform: Win32
+          buildConfiguration: Release
+        Win32-Debug:
+          buildPlatform: Win32
+          buildConfiguration: Debug
+        x64-Release:
+          buildPlatform: x64
+          buildConfiguration: Release
+        x64-Debug:
+          buildPlatform: x64
+          buildConfiguration: Debug
+        ARM-Release:
+          buildPlatform: ARM
+          buildConfiguration: Release
+        ARM-Debug:
+          buildPlatform: ARM
+          buildConfiguration: Debug
+        ARM64-Release:
+          buildPlatform: ARM64
+          buildConfiguration: Release
+        ARM64-Debug:
+          buildPlatform: ARM64
+          buildConfiguration: Debug
 
     steps:
 
@@ -28,11 +51,13 @@ jobs:
     - script: .\GLTFSDK.Test.exe --gtest_output=xml:GLTFSDK.Test.log
       workingDirectory: built\Out\windows_$(buildPlatform)\$(buildConfiguration)\GLTFSDK.Test
       displayName: Running Unit Tests
+      condition: and(succeeded(), in(variables['buildPlatform'], 'Win32', 'x64'))
 
     - task: PublishTestResults@2
       inputs:
         testResultsFormat: 'JUnit'
         testResultsFiles: built\Out\windows_$(buildPlatform)\$(buildConfiguration)\GLTFSDK.Test\GLTFSDK.Test.log
+      condition: and(succeeded(), in(variables['buildPlatform'], 'Win32', 'x64'))
 
   - job: MacOS
 
