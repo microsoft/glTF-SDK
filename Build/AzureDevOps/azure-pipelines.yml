@@ -115,7 +115,7 @@ jobs:
     pool:
       vmImage: 'VS2017-Win2016'
 
-     strategy:
+    strategy:
       matrix:
         ARM32-Release:
           ABI: armeabi-v7a
@@ -135,16 +135,13 @@ jobs:
         x86_64-Debug:
           ABI: x86_64
           buildConfiguration: Debug
-       
-    variables:
-      buildPlatform: 'android-19'
-
+          
     steps:
 
     - task: CMake@1
       inputs:
         workingDirectory: 'built/Int/cmake_$(buildPlatform)'
-        cmakeArgs: '../../.. -G "Visual Studio 15 2017" -DANDROID_ABI="$(ABI)" -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=intermediates -DCMAKE_BUILD_TYPE="$(buildConfiguration)" 
+        cmakeArgs: '../../.. -G "Visual Studio 15 2017" -DANDROID_ABI="$(ABI)" -DANDROID_PLATFORM="android-19" -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=intermediates -DCMAKE_BUILD_TYPE="$(buildConfiguration)" 
 				-DANDROID_NDK="C:\Program Files (x86)\Android\android-sdk\build-tools\28.0.0" -DCMAKE_TOOLCHAIN_FILE="$(Build.SourcesDirectory)/Build/CMake/android.toolchain.cmake" -DCMAKE_CXX_FLAGS=-fexceptions -DANDROID_STL=c++_static -GNinja -DANDROID_OS_PLATFORM=ANDROID -DENABLE_UNIT_TESTS="OFF"'
 
     - task: CMake@1
