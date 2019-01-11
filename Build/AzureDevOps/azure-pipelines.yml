@@ -63,10 +63,15 @@ jobs:
 
     pool:
       vmImage: 'macOS-10.13'
-
-    variables:
-      buildPlatform: 'macOS'
-      buildConfiguration: 'Release'
+    
+    strategy:
+      matrix:
+        macOS-Release:
+          buildPlatform: macOS
+          buildConfiguration: Release
+        macOS-Debug:
+          buildPlatform: macOS
+          buildConfiguration: Debug
 
     steps:
 
@@ -93,10 +98,15 @@ jobs:
 
     pool:
       vmImage: 'macOS-10.13'
-
-    variables:
-      buildPlatform: 'iOS'
-      buildConfiguration: 'Release'
+    
+    strategy:
+      matrix:
+        iOS-Release:
+          buildPlatform: iOS
+          buildConfiguration: Release
+        iOS-Debug:
+          buildPlatform: iOS
+          buildConfiguration: Debug
 
     steps:
 
