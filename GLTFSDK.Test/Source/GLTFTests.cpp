@@ -133,6 +133,15 @@ namespace
         Validation::Validate(doc);
         return doc;
     }
+
+    // This minimal manifest violates the schema as the version number has three parts
+    constexpr static const char asset_invalid_version[] = R"(
+{
+    "asset": {
+        "version": "2.0.0",
+        "generator": "glTF SDK Unit Tests"
+    }
+})";
 }
 
 namespace Microsoft
@@ -630,6 +639,30 @@ namespace Microsoft
                         Deserialize(ss, DeserializeFlags::None);
                     });
                 }
+
+                GLTFSDK_TEST_METHOD(GLTFTests, SchemaFlagsNone)
+                {
+                    Assert::ExpectException<ValidationException>([json = asset_invalid_version]()
+                    {
+                        Deserialize(json, DeserializeFlags::None, SchemaLocator(), SchemaFlags::None);
+                    });
+                }
+
+                /*GLTFSDK_TEST_METHOD(GLTFTests, SchemaFlagsDisableSchemaRoot)
+                {
+                    auto document = Deserialize(asset_invalid_version, DeserializeFlags::None, Schema::SchemaLocator(), Schema::SchemaFlags::DisableSchemaRoot);
+
+                    Assert::AreEqual(document.asset.minVersion.c_str(), "2.0.0");
+                }*/
+
+                GLTFSDK_TEST_METHOD(GLTFTests, SchemaFlagsDisableSchemaAsset)
+                {
+                    auto document = Deserialize(asset_invalid_version, DeserializeFlags::None, SchemaLocator(), SchemaFlags::DisableSchemaAsset);
+
+                    Assert::AreEqual(document.asset.version.c_str(), "2.0.0");
+                }
+
+                //TODO: unit test that shows schema validation with an extension via an overloaded SchemaLocator
             };
         }
     }

@@ -19,9 +19,6 @@
     <Filter Include="Schema\Extension">
       <UniqueIdentifier>{f49e18b0-39bc-4049-8304-ab9683888d6f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Private">
-      <UniqueIdentifier>{816bea1d-efce-4079-b7cf-2b5d838c9149}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\GLTFSDK\Source\AnimationUtils.cpp">
@@ -79,6 +76,12 @@
       <Filter>Source Files\GLTFSDK</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\GLTFSDK\Source\Version.cpp">
+      <Filter>Source Files\GLTFSDK</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\GLTFSDK\Source\SchemaValidation.cpp">
+      <Filter>Source Files\GLTFSDK</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\GLTFSDK\Source\Schema.cpp">
       <Filter>Source Files\GLTFSDK</Filter>
     </ClCompile>
   </ItemGroup>
@@ -188,10 +191,10 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\GLTFSDK\Inc\GLTFSDK\Validation.h">
       <Filter>Header Files\GLTFSDK</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\GLTFSDK\Source\SchemaValidation.h">
-      <Filter>Header Files\Private</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\GLTFSDK\Inc\GLTFSDK\Version.h">
+      <Filter>Header Files\GLTFSDK</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\GLTFSDK\Inc\GLTFSDK\SchemaValidation.h">
       <Filter>Header Files\GLTFSDK</Filter>
     </ClInclude>
   </ItemGroup>

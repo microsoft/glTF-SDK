@@ -8,8 +8,7 @@
 #include <GLTFSDK/GLTF.h>
 #include <GLTFSDK/RapidJsonUtils.h>
 #include <GLTFSDK/Serialize.h>
-
-#include "SchemaValidation.h"
+#include <GLTFSDK/SchemaValidation.h>
 
 #include <iostream>
 
@@ -759,9 +758,9 @@ namespace
         return image;
     }
 
-    Document DeserializeInternal(const rapidjson::Document& document, const ExtensionDeserializer& extensionDeserializer)
+    Document DeserializeInternal(const rapidjson::Document& document, const ExtensionDeserializer& extensionDeserializer, SchemaLocator schemaLocator, SchemaFlags schemaFlags)
     {
-        ValidateDocument(document);
+        Schema::ValidateDocument(document, schemaLocator, schemaFlags);
 
         Document gltfDocument;
 
@@ -804,52 +803,32 @@ namespace
     }
 }
 
-Document Microsoft::glTF::Deserialize(const std::string& json)
+Document Microsoft::glTF::Deserialize(const std::string& json, DeserializeFlags flags, SchemaLocator schemaLocator, SchemaFlags schemaFlags)
 {
-    return Deserialize(json, DeserializeFlags::None);
+    return Deserialize(json, ExtensionDeserializer(), flags, schemaLocator, schemaFlags);
 }
 
-Document Microsoft::glTF::Deserialize(const std::string& json, DeserializeFlags flags)
-{
-    return Deserialize(json, ExtensionDeserializer(), flags);
-}
-
-Document Microsoft::glTF::Deserialize(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
-{
-    return Deserialize(json, extensionDeserializer, DeserializeFlags::None);
-}
-
-Document Microsoft::glTF::Deserialize(const std::string& json, const ExtensionDeserializer& extensionDeserializer, DeserializeFlags flags)
+Document Microsoft::glTF::Deserialize(const std::string& json, const ExtensionDeserializer& extensionDeserializer, DeserializeFlags flags, SchemaLocator schemaLocator, SchemaFlags schemaFlags)
 {
     const auto document = HasFlag(flags, DeserializeFlags::IgnoreByteOrderMark) ?
         RapidJsonUtils::CreateDocumentFromEncodedString(json) :
         RapidJsonUtils::CreateDocumentFromString(json);
 
-    return DeserializeInternal(document, extensionDeserializer);
+    return DeserializeInternal(document, extensionDeserializer, schemaLocator, schemaFlags);
 }
 
-Document Microsoft::glTF::Deserialize(std::istream& jsonStream)
+Document Microsoft::glTF::Deserialize(std::istream& jsonStream, DeserializeFlags flags, SchemaLocator schemaLocator, SchemaFlags schemaFlags)
 {
-    return Deserialize(jsonStream, ExtensionDeserializer(), DeserializeFlags::None);
+    return Deserialize(jsonStream, ExtensionDeserializer(), flags, schemaLocator, schemaFlags);
 }
 
-Document Microsoft::glTF::Deserialize(std::istream& jsonStream, DeserializeFlags flags)
-{
-    return Deserialize(jsonStream, ExtensionDeserializer(), flags);
-}
-
-Document Microsoft::glTF::Deserialize(std::istream& jsonStream, const ExtensionDeserializer& extensionDeserializer)
-{
-    return Deserialize(jsonStream, extensionDeserializer, DeserializeFlags::None);
-}
-
-Document Microsoft::glTF::Deserialize(std::istream& jsonStream, const ExtensionDeserializer& extensionDeserializer, DeserializeFlags flags)
+Document Microsoft::glTF::Deserialize(std::istream& jsonStream, const ExtensionDeserializer& extensionDeserializer, DeserializeFlags flags, SchemaLocator schemaLocator, SchemaFlags schemaFlags)
 {
     const auto document = HasFlag(flags, DeserializeFlags::IgnoreByteOrderMark) ?
         RapidJsonUtils::CreateDocumentFromEncodedStream(jsonStream) :
         RapidJsonUtils::CreateDocumentFromStream(jsonStream);
 
-    return DeserializeInternal(document, extensionDeserializer);
+    return DeserializeInternal(document, extensionDeserializer, schemaLocator, schemaFlags);
 }
 
 DeserializeFlags Microsoft::glTF::operator|(DeserializeFlags lhs, DeserializeFlags rhs)

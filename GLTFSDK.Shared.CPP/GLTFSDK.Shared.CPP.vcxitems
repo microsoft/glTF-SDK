@@ -30,6 +30,8 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\GLTFSDK\Source\MicrosoftGeneratorVersion.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\GLTFSDK\Source\PBRUtils.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\GLTFSDK\Source\ResourceWriter.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\GLTFSDK\Source\Schema.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\GLTFSDK\Source\SchemaValidation.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\GLTFSDK\Source\Serialize.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\GLTFSDK\Source\Validation.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\GLTFSDK\Source\Version.cpp" />
@@ -63,6 +65,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\GLTFSDK\Inc\GLTFSDK\ResourceReaderUtils.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\GLTFSDK\Inc\GLTFSDK\ResourceWriter.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\GLTFSDK\Inc\GLTFSDK\Schema.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\GLTFSDK\Inc\GLTFSDK\SchemaValidation.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\GLTFSDK\Inc\GLTFSDK\Serialize.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\GLTFSDK\Inc\GLTFSDK\StreamCache.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\GLTFSDK\Inc\GLTFSDK\StreamCacheLRU.h" />
@@ -71,7 +74,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\GLTFSDK\Inc\GLTFSDK\Validation.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\GLTFSDK\Inc\GLTFSDK\Version.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\GLTFSDK\Inc\GLTFSDK\Visitor.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\GLTFSDK\Source\SchemaValidation.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)..\GLTFSDK\schema\accessor.schema.json" />

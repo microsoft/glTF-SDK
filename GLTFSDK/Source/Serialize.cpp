@@ -846,16 +846,6 @@ namespace
     }
 }
 
-std::string Microsoft::glTF::Serialize(const Document& gltfDocument)
-{
-    return Serialize(gltfDocument, ExtensionSerializer(), SerializeFlags::None);
-}
-
-std::string Microsoft::glTF::Serialize(const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
-{
-    return Serialize(gltfDocument, extensionSerializer, SerializeFlags::None);
-}
-
 std::string Microsoft::glTF::Serialize(const Document& gltfDocument, SerializeFlags flags)
 {
     return Serialize(gltfDocument, ExtensionSerializer(), flags);
