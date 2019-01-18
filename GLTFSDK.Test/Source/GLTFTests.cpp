@@ -134,13 +134,27 @@ namespace
         return doc;
     }
 
-    // This minimal manifest violates the schema as the version number has three parts
+    // Manifest violates the schema as the version number has three parts
     constexpr static const char asset_invalid_version[] = R"(
 {
     "asset": {
         "version": "2.0.0",
         "generator": "glTF SDK Unit Tests"
     }
+})";
+
+    // Manifest violates the schema as the children array is empty
+    constexpr static const char node_invalid_children[] = R"(
+{
+    "asset": {
+        "version": "2.0",
+        "generator": "glTF SDK Unit Tests"
+    },
+    "nodes": [
+        {
+            "children": []
+        }
+    ]
 })";
 }
 
@@ -646,6 +660,11 @@ namespace Microsoft
                     {
                         Deserialize(json, DeserializeFlags::None, GetDefaultSchemaLocator(), SchemaFlags::None);
                     });
+
+                    Assert::ExpectException<ValidationException>([json = node_invalid_children]()
+                    {
+                        Deserialize(json, DeserializeFlags::None, GetDefaultSchemaLocator(), SchemaFlags::None);
+                    });
                 }
 
                 GLTFSDK_TEST_METHOD(GLTFTests, SchemaFlagsDisableSchema)
@@ -664,7 +683,14 @@ namespace Microsoft
                     Assert::AreEqual(document.asset.version.c_str(), "2.0.0"); // Assert that the invalid version string was deserialized correctly
                 }
 
-                //TODO: unit test that shows schema validation with an extension via an overloaded SchemaLocator
+                GLTFSDK_TEST_METHOD(GLTFTests, SchemaFlagsDisableSchemaNode)
+                {
+                    // SchemaFlags::DisableSchemaAsset - disables asset schema validation only
+                    auto document = Deserialize(node_invalid_children, DeserializeFlags::None, GetDefaultSchemaLocator(), SchemaFlags::DisableSchemaNode);
+
+                    Assert::IsTrue(document.nodes.Size() == 1U);
+                    Assert::IsTrue(document.nodes.Front().children.empty()); // Assert that the node has no children
+                }
             };
         }
     }
