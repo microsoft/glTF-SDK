@@ -57,10 +57,11 @@ namespace
     class RemoteSchemaDocumentProvider : public rapidjson::IRemoteSchemaDocumentProvider
     {
     public:
-        RemoteSchemaDocumentProvider(SchemaLocator schemaLocator, SchemaFlags schemaFlags) :
+        RemoteSchemaDocumentProvider(SchemaLocatorPtr schemaLocator, SchemaFlags schemaFlags) :
             schemaFlags(schemaFlags),
             schemaLocator(std::move(schemaLocator))
         {
+            assert(this->schemaLocator);
         }
 
         const rapidjson::SchemaDocument* GetRemoteDocument(const std::string& uri)
@@ -83,7 +84,7 @@ namespace
             }
             else
             {
-                const char* schemaContent = schemaLocator.GetSchemaContent(uri.c_str());
+                const char* schemaContent = schemaLocator->GetSchemaContent(uri.c_str());
 
                 if (document.Parse(schemaContent).HasParseError())
                 {
@@ -111,8 +112,8 @@ namespace
         }
 
     private:
-        const SchemaFlags   schemaFlags;
-        const SchemaLocator schemaLocator;
+        const SchemaFlags      schemaFlags;
+        const SchemaLocatorPtr schemaLocator;
 
         std::unordered_map<std::string, rapidjson::SchemaDocument> schemaDocuments;
     };
@@ -120,8 +121,13 @@ namespace
 
 // Microsoft::glTF::Schema namespace function definitions
 
-void Microsoft::glTF::Schema::ValidateDocument(const rapidjson::Document& document, SchemaLocator schemaLocator, SchemaFlags schemaFlags)
+void Microsoft::glTF::Schema::ValidateDocument(const rapidjson::Document& document, SchemaLocatorPtr schemaLocator, SchemaFlags schemaFlags)
 {
+    if (schemaLocator == nullptr)
+    {
+        schemaLocator = GetDefaultSchemaLocator();
+    }
+
     RemoteSchemaDocumentProvider provider(std::move(schemaLocator), schemaFlags);
 
     if (auto* schemaDocument = provider.GetRemoteDocument(SCHEMA_URI_GLTF))

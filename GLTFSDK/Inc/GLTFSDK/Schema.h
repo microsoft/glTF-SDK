@@ -4,6 +4,7 @@
 #pragma once
 
 #include <string>
+#include <memory>
 #include <unordered_map>
 
 namespace Microsoft
@@ -58,17 +59,15 @@ namespace Microsoft
 
         const std::unordered_map<std::string, std::string>& GetSchemaUriMap();
 
-        //TODO: create an interface + owning and non-owning versions of this class?
-        class SchemaLocator
+        class ISchemaLocator
         {
         public:
-            SchemaLocator(std::unordered_map<std::string, std::string/*const char**/> schemaUriMap = GetSchemaUriMap());
-
-            const char* GetSchemaContent(const char* uri) const;
-
-        private:
-            //TODO: ideally this wouldn't own the strings as it is needlessly expensive
-            std::unordered_map<std::string, std::string/*const char**/> schemaUriMap;
+            virtual ~ISchemaLocator() = default;
+            virtual const char* GetSchemaContent(const std::string& uri) const = 0;
         };
+
+        using SchemaLocatorPtr = std::unique_ptr<const ISchemaLocator>;
+
+        SchemaLocatorPtr GetDefaultSchemaLocator();
     }
 }

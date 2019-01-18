@@ -8,6 +8,25 @@
 
 using namespace Microsoft::glTF;
 
+namespace
+{
+    class DefaultSchemaLocator : public ISchemaLocator
+    {
+    public:
+        const char* GetSchemaContent(const std::string& uri) const override
+        {
+            auto it = SchemaJson::GLTF_SCHEMA_MAP.find(uri);
+
+            if (it == SchemaJson::GLTF_SCHEMA_MAP.end())
+            {
+                throw GLTFException("Unknown Schema uri: " + uri);
+            }
+
+            return it->second.c_str();
+        }
+    };
+}
+
 // Microsoft::glTF namespace function definitions
 
 const std::unordered_map<std::string, std::string>& Microsoft::glTF::GetSchemaUriMap()
@@ -15,22 +34,9 @@ const std::unordered_map<std::string, std::string>& Microsoft::glTF::GetSchemaUr
     return SchemaJson::GLTF_SCHEMA_MAP;
 }
 
-// SchemaLocator class definitions
-
-SchemaLocator::SchemaLocator(std::unordered_map<std::string, std::string> schemaUriMap) : schemaUriMap(std::move(schemaUriMap))
+SchemaLocatorPtr Microsoft::glTF::GetDefaultSchemaLocator()
 {
-}
-
-const char* SchemaLocator::GetSchemaContent(const char* uri) const
-{
-    auto it = schemaUriMap.find(uri);
-
-    if (it == schemaUriMap.end())
-    {
-        throw ValidationException("Unknown schema uri");
-    }
-
-    return it->second.c_str();
+    return std::make_unique<const DefaultSchemaLocator>();
 }
 
 // SchemaFlags operator definitions

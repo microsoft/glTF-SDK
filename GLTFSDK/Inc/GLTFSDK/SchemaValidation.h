@@ -10,7 +10,7 @@ namespace Microsoft
     {
         namespace Schema
         {
-            void ValidateDocument(const rapidjson::Document& d, SchemaLocator schemaLocator = {}, SchemaFlags schemaFlags = SchemaFlags::None);
+            void ValidateDocument(const rapidjson::Document& d, SchemaLocatorPtr schemaLocator = {}, SchemaFlags schemaFlags = SchemaFlags::None);
         }
     }
 }

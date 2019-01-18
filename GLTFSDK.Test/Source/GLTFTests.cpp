@@ -644,22 +644,24 @@ namespace Microsoft
                 {
                     Assert::ExpectException<ValidationException>([json = asset_invalid_version]()
                     {
-                        Deserialize(json, DeserializeFlags::None, SchemaLocator(), SchemaFlags::None);
+                        Deserialize(json, DeserializeFlags::None, GetDefaultSchemaLocator(), SchemaFlags::None);
                     });
                 }
 
-                /*GLTFSDK_TEST_METHOD(GLTFTests, SchemaFlagsDisableSchemaRoot)
+                GLTFSDK_TEST_METHOD(GLTFTests, SchemaFlagsDisableSchema)
                 {
-                    auto document = Deserialize(asset_invalid_version, DeserializeFlags::None, Schema::SchemaLocator(), Schema::SchemaFlags::DisableSchemaRoot);
+                    // SchemaFlags::DisableSchemaRoot - disables all schema validation
+                    auto document = Deserialize(asset_invalid_version, DeserializeFlags::None, GetDefaultSchemaLocator(), SchemaFlags::DisableSchemaRoot);
 
-                    Assert::AreEqual(document.asset.minVersion.c_str(), "2.0.0");
-                }*/
+                    Assert::AreEqual(document.asset.version.c_str(), "2.0.0"); // Assert that the invalid version string was deserialized correctly
+                }
 
                 GLTFSDK_TEST_METHOD(GLTFTests, SchemaFlagsDisableSchemaAsset)
                 {
-                    auto document = Deserialize(asset_invalid_version, DeserializeFlags::None, SchemaLocator(), SchemaFlags::DisableSchemaAsset);
+                    // SchemaFlags::DisableSchemaAsset - disables asset schema validation only
+                    auto document = Deserialize(asset_invalid_version, DeserializeFlags::None, GetDefaultSchemaLocator(), SchemaFlags::DisableSchemaAsset);
 
-                    Assert::AreEqual(document.asset.version.c_str(), "2.0.0");
+                    Assert::AreEqual(document.asset.version.c_str(), "2.0.0"); // Assert that the invalid version string was deserialized correctly
                 }
 
                 //TODO: unit test that shows schema validation with an extension via an overloaded SchemaLocator
