@@ -14,39 +14,39 @@ using namespace Microsoft::glTF::Schema;
 namespace
 {
     const std::unordered_map<std::string, SchemaFlags> schemaFlagMap = {
-        { "glTF.schema.json", SchemaFlags::DisableSchemaRoot },
-        { "glTFid.schema.json", SchemaFlags::DisableSchemaId },
-        { "glTFChildOfRootProperty.schema.json", SchemaFlags::DisableSchemaChildOfRoot },
-        { "glTFProperty.schema.json", SchemaFlags::DisableSchemaProperty },
-        { "buffer.schema.json", SchemaFlags::DisableSchemaBuffer },
-        { "bufferView.schema.json", SchemaFlags::DisableSchemaBufferView },
-        { "accessor.schema.json", SchemaFlags::DisableSchemaAccessor },
-        { "accessor.sparse.schema.json", SchemaFlags::DisableSchemaAccessorSparse },
-        { "accessor.sparse.values.schema.json", SchemaFlags::DisableSchemaAccessorSparseValues },
-        { "accessor.sparse.indices.schema.json", SchemaFlags::DisableSchemaAccessorSparseIndices },
-        { "asset.schema.json", SchemaFlags::DisableSchemaAsset },
-        { "scene.schema.json", SchemaFlags::DisableSchemaScene },
-        { "node.schema.json", SchemaFlags::DisableSchemaNode },
-        { "mesh.schema.json", SchemaFlags::DisableSchemaMesh },
-        { "mesh.primitive.schema.json", SchemaFlags::DisableSchemaMeshPrimitive },
-        { "skin.schema.json", SchemaFlags::DisableSchemaSkin },
-        { "camera.schema.json", SchemaFlags::DisableSchemaCamera },
-        { "camera.orthographic.schema.json", SchemaFlags::DisableSchemaCameraOrthographic },
-        { "camera.perspective.schema.json", SchemaFlags::DisableSchemaCameraPerspective },
-        { "material.schema.json", SchemaFlags::DisableSchemaMaterial },
-        { "material.normalTextureInfo.schema.json", SchemaFlags::DisableSchemaMaterialNormalTextureInfo },
-        { "material.occlusionTextureInfo.schema.json", SchemaFlags::DisableSchemaMaterialOcclusionTextureInfo },
-        { "material.pbrMetallicRoughness.schema.json", SchemaFlags::DisableSchemaMaterialPBRMetallicRoughness },
-        { "texture.schema.json", SchemaFlags::DisableSchemaTexture },
-        { "textureInfo.schema.json", SchemaFlags::DisableSchemaTextureInfo },
-        { "image.schema.json", SchemaFlags::DisableSchemaImage },
-        { "sampler.schema.json", SchemaFlags::DisableSchemaSampler },
-        { "animation.schema.json", SchemaFlags::DisableSchemaAnimation },
-        { "animation.sampler.schema.json", SchemaFlags::DisableSchemaAnimationSampler },
-        { "animation.channel.schema.json", SchemaFlags::DisableSchemaAnimationChannel },
-        { "animation.channel.target.schema.json", SchemaFlags::DisableSchemaAnimationChannelTarget },
-        { "extensions.schema.json", SchemaFlags::DisableSchemaExtensions },
-        { "extras.schema.json", SchemaFlags::DisableSchemaExtras }
+        { SCHEMA_URI_GLTF, SchemaFlags::DisableSchemaRoot },
+        { SCHEMA_URI_GLTFID, SchemaFlags::DisableSchemaId },
+        { SCHEMA_URI_GLTFCHILDOFROOTPROPERTY, SchemaFlags::DisableSchemaChildOfRoot },
+        { SCHEMA_URI_GLTFPROPERTY, SchemaFlags::DisableSchemaProperty },
+        { SCHEMA_URI_BUFFER, SchemaFlags::DisableSchemaBuffer },
+        { SCHEMA_URI_BUFFERVIEW, SchemaFlags::DisableSchemaBufferView },
+        { SCHEMA_URI_ACCESSOR, SchemaFlags::DisableSchemaAccessor },
+        { SCHEMA_URI_ACCESSORSPARSE, SchemaFlags::DisableSchemaAccessorSparse },
+        { SCHEMA_URI_ACCESSORSPARSEVALUES, SchemaFlags::DisableSchemaAccessorSparseValues },
+        { SCHEMA_URI_ACCESSORSPARSEINDICES, SchemaFlags::DisableSchemaAccessorSparseIndices },
+        { SCHEMA_URI_ASSET, SchemaFlags::DisableSchemaAsset },
+        { SCHEMA_URI_SCENE, SchemaFlags::DisableSchemaScene },
+        { SCHEMA_URI_NODE, SchemaFlags::DisableSchemaNode },
+        { SCHEMA_URI_MESH, SchemaFlags::DisableSchemaMesh },
+        { SCHEMA_URI_MESHPRIMITIVE, SchemaFlags::DisableSchemaMeshPrimitive },
+        { SCHEMA_URI_SKIN, SchemaFlags::DisableSchemaSkin },
+        { SCHEMA_URI_CAMERA, SchemaFlags::DisableSchemaCamera },
+        { SCHEMA_URI_CAMERAORTHOGRAPHIC, SchemaFlags::DisableSchemaCameraOrthographic },
+        { SCHEMA_URI_CAMERAPERSPECTIVE, SchemaFlags::DisableSchemaCameraPerspective },
+        { SCHEMA_URI_MATERIAL, SchemaFlags::DisableSchemaMaterial },
+        { SCHEMA_URI_MATERIALNORMALTEXTUREINFO, SchemaFlags::DisableSchemaMaterialNormalTextureInfo },
+        { SCHEMA_URI_MATERIALOCCLUSIONTEXTUREINFO, SchemaFlags::DisableSchemaMaterialOcclusionTextureInfo },
+        { SCHEMA_URI_MATERIALPBRMETALLICROUGHNESS, SchemaFlags::DisableSchemaMaterialPBRMetallicRoughness },
+        { SCHEMA_URI_TEXTURE, SchemaFlags::DisableSchemaTexture },
+        { SCHEMA_URI_TEXTUREINFO, SchemaFlags::DisableSchemaTextureInfo },
+        { SCHEMA_URI_IMAGE, SchemaFlags::DisableSchemaImage },
+        { SCHEMA_URI_SAMPLER, SchemaFlags::DisableSchemaSampler },
+        { SCHEMA_URI_ANIMATION, SchemaFlags::DisableSchemaAnimation },
+        { SCHEMA_URI_ANIMATIONSAMPLER, SchemaFlags::DisableSchemaAnimationSampler },
+        { SCHEMA_URI_ANIMATIONCHANNEL, SchemaFlags::DisableSchemaAnimationChannel },
+        { SCHEMA_URI_ANIMATIONCHANNELTARGET, SchemaFlags::DisableSchemaAnimationChannelTarget },
+        { SCHEMA_URI_EXTENSION, SchemaFlags::DisableSchemaExtension },
+        { SCHEMA_URI_EXTRAS, SchemaFlags::DisableSchemaExtras }
     };
 
     bool HasSchemaFlag(SchemaFlags flag, SchemaFlags flags)
@@ -84,7 +84,7 @@ namespace
             }
             else
             {
-                const char* schemaContent = schemaLocator->GetSchemaContent(uri.c_str());
+                const char* schemaContent = schemaLocator->GetSchemaContent(uri);
 
                 if (document.Parse(schemaContent).HasParseError())
                 {
@@ -94,7 +94,7 @@ namespace
                     ss << uri;
                     ss << ") is not valid JSON";
 
-                    throw ValidationException(ss.str());
+                    throw GLTFException(ss.str());
                 }
             }
 
@@ -121,7 +121,7 @@ namespace
 
 // Microsoft::glTF::Schema namespace function definitions
 
-void Microsoft::glTF::Schema::ValidateDocument(const rapidjson::Document& document, SchemaLocatorPtr schemaLocator, SchemaFlags schemaFlags)
+void Microsoft::glTF::Schema::ValidateDocument(const rapidjson::Document& document, const std::string& schemaUri, SchemaLocatorPtr schemaLocator, SchemaFlags schemaFlags)
 {
     if (schemaLocator == nullptr)
     {
@@ -130,7 +130,7 @@ void Microsoft::glTF::Schema::ValidateDocument(const rapidjson::Document& docume
 
     RemoteSchemaDocumentProvider provider(std::move(schemaLocator), schemaFlags);
 
-    if (auto* schemaDocument = provider.GetRemoteDocument(SCHEMA_URI_GLTF))
+    if (auto* schemaDocument = provider.GetRemoteDocument(schemaUri))
     {
         rapidjson::SchemaValidator schemaValidator(*schemaDocument);
 

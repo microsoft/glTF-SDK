@@ -760,7 +760,7 @@ namespace
 
     Document DeserializeInternal(const rapidjson::Document& document, const ExtensionDeserializer& extensionDeserializer, SchemaLocatorPtr schemaLocator, SchemaFlags schemaFlags)
     {
-        Schema::ValidateDocument(document, std::move(schemaLocator), schemaFlags);
+        Schema::ValidateDocument(document, SCHEMA_URI_GLTF, std::move(schemaLocator), schemaFlags);
 
         Document gltfDocument;
 
