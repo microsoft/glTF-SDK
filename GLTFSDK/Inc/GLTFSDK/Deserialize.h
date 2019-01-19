@@ -13,7 +13,8 @@ namespace Microsoft
         enum class DeserializeFlags
         {
             None = 0x0,
-            IgnoreByteOrderMark = 0x1
+            IgnoreByteOrderMark = 0x1,
+            DisableSchemaValidation = 0x2
         };
 
         DeserializeFlags  operator| (DeserializeFlags lhs,  DeserializeFlags rhs);

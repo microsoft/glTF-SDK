@@ -133,6 +133,15 @@ namespace
         Validation::Validate(doc);
         return doc;
     }
+
+    // This minimal manifest violates the schema as the version number has three parts
+    constexpr static const char asset_invalid_version[] = R"(
+{
+    "asset": {
+        "version": "2.0.0",
+        "generator": "glTF SDK Unit Tests"
+    }
+})";
 }
 
 namespace Microsoft
@@ -629,6 +638,22 @@ namespace Microsoft
                         // If the IgnoreByteOrderMark flag isn't specified then a BOM should result in Deserialize throwing an exception
                         Deserialize(ss, DeserializeFlags::None);
                     });
+                }
+
+                GLTFSDK_TEST_METHOD(GLTFTests, SchemaFlagsNone)
+                {
+                    Assert::ExpectException<ValidationException>([json = asset_invalid_version]()
+                    {
+                        Deserialize(json);
+                    });
+                }
+
+                GLTFSDK_TEST_METHOD(GLTFTests, SchemaFlagsDisableSchema)
+                {
+                    // DeserializeFlags::DisableSchemaValidation - disables all schema validation
+                    auto document = Deserialize(asset_invalid_version, DeserializeFlags::DisableSchemaValidation);
+
+                    Assert::AreEqual(document.asset.version.c_str(), "2.0.0"); // Assert that the invalid version string was deserialized correctly
                 }
             };
         }

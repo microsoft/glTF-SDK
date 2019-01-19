@@ -17,6 +17,11 @@ using namespace Microsoft::glTF;
 
 namespace
 {
+    bool HasFlag(DeserializeFlags flags, DeserializeFlags flag)
+    {
+        return ((flags & flag) == flag);
+    }
+
     void ParseExtensions(const rapidjson::Value& v, glTFProperty& node, const ExtensionDeserializer& extensionDeserializer)
     {
         const auto& extensionsIt = v.FindMember("extensions");
@@ -759,9 +764,12 @@ namespace
         return image;
     }
 
-    Document DeserializeInternal(const rapidjson::Document& document, const ExtensionDeserializer& extensionDeserializer)
+    Document DeserializeInternal(const rapidjson::Document& document, const ExtensionDeserializer& extensionDeserializer, DeserializeFlags flags)
     {
-        ValidateDocument(document);
+        if (!HasFlag(flags, DeserializeFlags::DisableSchemaValidation))
+        {
+            ValidateDocument(document);
+        }
 
         Document gltfDocument;
 
@@ -797,11 +805,6 @@ namespace
 
         return gltfDocument;
     }
-
-    bool HasFlag(DeserializeFlags flags, DeserializeFlags flag)
-    {
-        return ((flags & flag) == flag);
-    }
 }
 
 Document Microsoft::glTF::Deserialize(const std::string& json)
@@ -825,7 +828,7 @@ Document Microsoft::glTF::Deserialize(const std::string& json, const ExtensionDe
         RapidJsonUtils::CreateDocumentFromEncodedString(json) :
         RapidJsonUtils::CreateDocumentFromString(json);
 
-    return DeserializeInternal(document, extensionDeserializer);
+    return DeserializeInternal(document, extensionDeserializer, flags);
 }
 
 Document Microsoft::glTF::Deserialize(std::istream& jsonStream)
@@ -849,7 +852,7 @@ Document Microsoft::glTF::Deserialize(std::istream& jsonStream, const ExtensionD
         RapidJsonUtils::CreateDocumentFromEncodedStream(jsonStream) :
         RapidJsonUtils::CreateDocumentFromStream(jsonStream);
 
-    return DeserializeInternal(document, extensionDeserializer);
+    return DeserializeInternal(document, extensionDeserializer, flags);
 }
 
 DeserializeFlags Microsoft::glTF::operator|(DeserializeFlags lhs, DeserializeFlags rhs)
