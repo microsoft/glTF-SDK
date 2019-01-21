@@ -14,7 +14,7 @@ namespace Microsoft
         class GLTFException : public std::runtime_error
         {
         public:
-            GLTFException(const char* msg) : std::runtime_error(msg) {}
+            //GLTFException(const char* msg) : std::runtime_error(msg) {}
             GLTFException(const std::string& msg) : std::runtime_error(msg) {}
         };
 
@@ -22,7 +22,7 @@ namespace Microsoft
         class InvalidGLTFException : public GLTFException
         {
         public:
-            InvalidGLTFException(const char* msg) : GLTFException(msg) {}
+            //InvalidGLTFException(const char* msg) : GLTFException(msg) {}
             InvalidGLTFException(const std::string& msg) : GLTFException(msg) {}
         };
 
@@ -30,7 +30,7 @@ namespace Microsoft
         class DocumentException : public GLTFException
         {
         public:
-            DocumentException(const char* msg) : GLTFException(msg) {}
+            //DocumentException(const char* msg) : GLTFException(msg) {}
             DocumentException(const std::string& msg) : GLTFException(msg) {}
         };
 
@@ -38,7 +38,7 @@ namespace Microsoft
         class ValidationException : public GLTFException
         {
         public:
-            ValidationException(const char* msg) : GLTFException(msg) {}
+            //ValidationException(const char* msg) : GLTFException(msg) {}
             ValidationException(const std::string& msg) : GLTFException(msg) {}
         };
     }
