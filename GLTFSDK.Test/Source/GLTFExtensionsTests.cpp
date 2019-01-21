@@ -121,7 +121,7 @@ R"({
 
         if (isValidationRequired)
         {
-            ValidateSchema(documentExtension, TestExtensionSchemaUri, TextExtensionSchemaLocator::Create());
+            ValidateDocumentAgainstSchema(documentExtension, TestExtensionSchemaUri, TextExtensionSchemaLocator::Create());
         }
 
         return std::make_unique<TestExtension>(documentExtension["flag"].GetBool());

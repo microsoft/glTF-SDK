@@ -74,7 +74,7 @@ namespace
 
             if (itSchema == SchemaJson::GLTF_SCHEMA_MAP.end())
             {
-                throw GLTFException("Unknown Schema uri: " + uri);
+                throw GLTFException("Unknown Schema uri " + uri);
             }
 
             return itSchema->second.c_str();

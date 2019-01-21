@@ -4,7 +4,6 @@
 #include <GLTFSDK/SchemaValidation.h>
 #include <GLTFSDK/Exceptions.h>
 
-#include <sstream>
 #include <unordered_map>
 
 using namespace Microsoft::glTF;
@@ -32,13 +31,7 @@ namespace
 
             if (document.Parse(schemaLocator->GetSchemaContent(uri)).HasParseError())
             {
-                std::stringstream ss;
-
-                ss << "Schema document (";
-                ss << uri;
-                ss << ") is not valid JSON";
-
-                throw GLTFException(ss.str());
+                throw GLTFException("Schema document at " + uri + " is not valid JSON");
             }
 
             auto result = schemaDocuments.emplace(uri, rapidjson::SchemaDocument(document, this));
@@ -61,7 +54,7 @@ namespace
     };
 }
 
-void Microsoft::glTF::ValidateSchema(const rapidjson::Document& document, const std::string& schemaUri, std::unique_ptr<const ISchemaLocator> schemaLocator)
+void Microsoft::glTF::ValidateDocumentAgainstSchema(const rapidjson::Document& document, const std::string& schemaUri, std::unique_ptr<const ISchemaLocator> schemaLocator)
 {
     if (!schemaLocator)
     {
@@ -78,20 +71,15 @@ void Microsoft::glTF::ValidateSchema(const rapidjson::Document& document, const 
         {
             rapidjson::StringBuffer sb;
 
-            const char* schemaKeyword = schemaValidator.GetInvalidSchemaKeyword();
+            const std::string schemaKeyword = schemaValidator.GetInvalidSchemaKeyword();
             schemaValidator.GetInvalidDocumentPointer().StringifyUriFragment(sb);
-            const char* schemaInvalid = sb.GetString();
+            const std::string schemaInvalid = sb.GetString();
 
-            std::stringstream ss;
-
-            ss << "Schema violation at " << schemaInvalid << " ";
-            ss << "due to " << schemaKeyword;
-
-            throw ValidationException(ss.str());
+            throw ValidationException("Schema violation at " + schemaInvalid + " due to " + schemaKeyword);
         }
     }
     else
     {
-        throw GLTFException("Schema document could not be located");
+        throw GLTFException("Schema document at " + schemaUri + " could not be located");
     }
 }

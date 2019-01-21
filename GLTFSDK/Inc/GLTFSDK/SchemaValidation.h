@@ -16,6 +16,6 @@ namespace Microsoft
             virtual const char* GetSchemaContent(const std::string& uri) const = 0;
         };
 
-        void ValidateSchema(const rapidjson::Document& d, const std::string& schemaUri, std::unique_ptr<const ISchemaLocator> schemaLocator);
+        void ValidateDocumentAgainstSchema(const rapidjson::Document& d, const std::string& schemaUri, std::unique_ptr<const ISchemaLocator> schemaLocator);
     }
 }
