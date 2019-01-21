@@ -45,6 +45,8 @@ namespace Microsoft
         constexpr const char SCHEMA_URI_EXTENSION[] = "extension.schema.json";
         constexpr const char SCHEMA_URI_EXTRAS[] = "extras.schema.json";
 
+        const std::unordered_map<std::string, std::string>& GetDefaultSchemaUriMap();
+
         enum class SchemaFlags : uint64_t
         {
             None = 0x0,
@@ -88,17 +90,6 @@ namespace Microsoft
         SchemaFlags  operator& (SchemaFlags lhs,  SchemaFlags rhs);
         SchemaFlags& operator&=(SchemaFlags& lhs, SchemaFlags rhs);
 
-        const std::unordered_map<std::string, std::string>& GetSchemaUriMap();
-
-        class ISchemaLocator
-        {
-        public:
-            virtual ~ISchemaLocator() = default;
-            virtual const char* GetSchemaContent(const std::string& uri) const = 0;
-        };
-
-        using SchemaLocatorPtr = std::unique_ptr<const ISchemaLocator>;
-
-        SchemaLocatorPtr GetDefaultSchemaLocator();
+        std::unique_ptr<const class ISchemaLocator> GetDefaultSchemaLocator(SchemaFlags schemaFlags);
     }
 }

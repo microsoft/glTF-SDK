@@ -24,10 +24,10 @@ namespace Microsoft
 
         class ExtensionDeserializer;
 
-        Document Deserialize(const std::string& json, DeserializeFlags flags = DeserializeFlags::None, SchemaLocatorPtr schemaLocator = {}, SchemaFlags schemaFlags = SchemaFlags::None);
-        Document Deserialize(const std::string& json, const ExtensionDeserializer& extensions, DeserializeFlags flags = DeserializeFlags::None, SchemaLocatorPtr schemaLocator = {}, SchemaFlags schemaFlags = SchemaFlags::None);
+        Document Deserialize(const std::string& json, DeserializeFlags flags = DeserializeFlags::None, SchemaFlags schemaFlags = SchemaFlags::None);
+        Document Deserialize(const std::string& json, const ExtensionDeserializer& extensions, DeserializeFlags flags = DeserializeFlags::None, SchemaFlags schemaFlags = SchemaFlags::None);
 
-        Document Deserialize(std::istream& jsonStream, DeserializeFlags flags = DeserializeFlags::None, SchemaLocatorPtr schemaLocator = {}, SchemaFlags schemaFlags = SchemaFlags::None);
-        Document Deserialize(std::istream& jsonStream, const ExtensionDeserializer& extensions, DeserializeFlags flags = DeserializeFlags::None, SchemaLocatorPtr schemaLocator = {}, SchemaFlags schemaFlags = SchemaFlags::None);
+        Document Deserialize(std::istream& jsonStream, DeserializeFlags flags = DeserializeFlags::None, SchemaFlags schemaFlags = SchemaFlags::None);
+        Document Deserialize(std::istream& jsonStream, const ExtensionDeserializer& extensions, DeserializeFlags flags = DeserializeFlags::None, SchemaFlags schemaFlags = SchemaFlags::None);
     }
 }

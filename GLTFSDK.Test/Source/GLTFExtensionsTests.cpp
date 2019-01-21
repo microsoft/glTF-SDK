@@ -83,15 +83,15 @@ R"({
 
         static std::unique_ptr<const TextExtensionSchemaLocator> Create()
         {
-            std::unordered_map<std::string, std::string> schemaUriMap;
+            const auto& defaultSchemaUriMap = GetDefaultSchemaUriMap();
 
-            // Insert schemas for TextExtension schema dependencies (i.e. glTFProperty.schema.json, extension.schema.json and extras.schema.json)
-            schemaUriMap.insert(*GetSchemaUriMap().find(SCHEMA_URI_GLTFPROPERTY));
-            schemaUriMap.insert(*GetSchemaUriMap().find(SCHEMA_URI_EXTENSION));
-            schemaUriMap.insert(*GetSchemaUriMap().find(SCHEMA_URI_EXTRAS));
-
-            // Insert schema for TextExtension
-            schemaUriMap.emplace(TestExtensionSchemaUri, TestExtensionSchema);
+            // Insert schema(s) for TextExtension and its schema dependencies (i.e. glTFProperty.schema.json, extension.schema.json and extras.schema.json)
+            std::unordered_map<std::string, std::string> schemaUriMap = {
+                { TestExtensionSchemaUri, TestExtensionSchema },
+                *defaultSchemaUriMap.find(SCHEMA_URI_GLTFPROPERTY),
+                *defaultSchemaUriMap.find(SCHEMA_URI_EXTENSION),
+                *defaultSchemaUriMap.find(SCHEMA_URI_EXTRAS)
+            };
 
             return std::make_unique<TextExtensionSchemaLocator>(std::move(schemaUriMap));
         }
@@ -121,7 +121,7 @@ R"({
 
         if (isValidationRequired)
         {
-            Schema::ValidateDocument(documentExtension, TestExtensionSchemaUri, TextExtensionSchemaLocator::Create());
+            ValidateSchema(documentExtension, TestExtensionSchemaUri, TextExtensionSchemaLocator::Create());
         }
 
         return std::make_unique<TestExtension>(documentExtension["flag"].GetBool());

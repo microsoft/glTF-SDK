@@ -658,19 +658,19 @@ namespace Microsoft
                 {
                     Assert::ExpectException<ValidationException>([json = asset_invalid_version]()
                     {
-                        Deserialize(json, DeserializeFlags::None, GetDefaultSchemaLocator(), SchemaFlags::None);
+                        Deserialize(json, DeserializeFlags::None, SchemaFlags::None);
                     });
 
                     Assert::ExpectException<ValidationException>([json = node_invalid_children]()
                     {
-                        Deserialize(json, DeserializeFlags::None, GetDefaultSchemaLocator(), SchemaFlags::None);
+                        Deserialize(json, DeserializeFlags::None, SchemaFlags::None);
                     });
                 }
 
                 GLTFSDK_TEST_METHOD(GLTFTests, SchemaFlagsDisableSchema)
                 {
                     // SchemaFlags::DisableSchemaRoot - disables all schema validation
-                    auto document = Deserialize(asset_invalid_version, DeserializeFlags::None, GetDefaultSchemaLocator(), SchemaFlags::DisableSchemaRoot);
+                    auto document = Deserialize(asset_invalid_version, DeserializeFlags::None, SchemaFlags::DisableSchemaRoot);
 
                     Assert::AreEqual(document.asset.version.c_str(), "2.0.0"); // Assert that the invalid version string was deserialized correctly
                 }
@@ -678,7 +678,7 @@ namespace Microsoft
                 GLTFSDK_TEST_METHOD(GLTFTests, SchemaFlagsDisableSchemaAsset)
                 {
                     // SchemaFlags::DisableSchemaAsset - disables asset schema validation only
-                    auto document = Deserialize(asset_invalid_version, DeserializeFlags::None, GetDefaultSchemaLocator(), SchemaFlags::DisableSchemaAsset);
+                    auto document = Deserialize(asset_invalid_version, DeserializeFlags::None, SchemaFlags::DisableSchemaAsset);
 
                     Assert::AreEqual(document.asset.version.c_str(), "2.0.0"); // Assert that the invalid version string was deserialized correctly
                 }
@@ -686,7 +686,7 @@ namespace Microsoft
                 GLTFSDK_TEST_METHOD(GLTFTests, SchemaFlagsDisableSchemaNode)
                 {
                     // SchemaFlags::DisableSchemaAsset - disables asset schema validation only
-                    auto document = Deserialize(node_invalid_children, DeserializeFlags::None, GetDefaultSchemaLocator(), SchemaFlags::DisableSchemaNode);
+                    auto document = Deserialize(node_invalid_children, DeserializeFlags::None, SchemaFlags::DisableSchemaNode);
 
                     Assert::IsTrue(document.nodes.Size() == 1U);
                     Assert::IsTrue(document.nodes.Front().children.empty()); // Assert that the node has no children
