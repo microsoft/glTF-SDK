@@ -48,13 +48,11 @@ nuget {
             "${BASE}\readme.md"
         };
 
-        symbols += {
+        side-by-side-symbols += {
             #output {
-                package = symbols;
+                package = default;
             };
-            #add-each-file : ::nuget.[symbols]targets.[${condition}].CopyToOutput;
             #destination : ${d_bin};
-            #flatten = false;
         };
 
         nestedIncludePluginManager:{
@@ -62,97 +60,75 @@ nuget {
             "${BASE}\GLTFSDK\Inc\GLTFSDK\*.h",
         };
 
-
-        dll += {
-            #flatten = false;
-            #destination = ${d_lib};
-        };
-
         [win32,debug] {
-            dll: {};
-
             lib: {
-                    ${BASE}\Built\Out\windows_Win32\Debug\GLTFSDK\GLTFSDK.lib,
+                ${BASE}\Built\Out\windows_Win32\Debug\GLTFSDK\GLTFSDK.lib,
             };
-            symbols: {
+            side-by-side-symbols: {
                 ${BASE}\Built\Out\windows_Win32\Debug\GLTFSDK\GLTFSDK.pdb
             };
         };
 
         [win32,release] {
-            dll: {};
-
             lib: {
-                    ${BASE}\Built\Out\windows_Win32\Release\GLTFSDK\GLTFSDK.lib,
+                ${BASE}\Built\Out\windows_Win32\Release\GLTFSDK\GLTFSDK.lib,
             };
-            symbols: {
+            side-by-side-symbols: {
                 ${BASE}\Built\Out\windows_Win32\Release\GLTFSDK\GLTFSDK.pdb
             };
         };
 
         [x64,debug] {
-            dll: {};
-
             lib: {
-                    ${BASE}\Built\Out\windows_x64\Debug\GLTFSDK\GLTFSDK.lib,
+                ${BASE}\Built\Out\windows_x64\Debug\GLTFSDK\GLTFSDK.lib,
             };
-            symbols: {
-                    ${BASE}\Built\Out\windows_x64\Debug\GLTFSDK\GLTFSDK.pdb
+            side-by-side-symbols: {
+                ${BASE}\Built\Out\windows_x64\Debug\GLTFSDK\GLTFSDK.pdb
             };
         };
 
         [x64,release] {
-            dll: {};
-
             lib: {
-                    ${BASE}\Built\Out\windows_x64\Release\GLTFSDK\GLTFSDK.lib,
+                ${BASE}\Built\Out\windows_x64\Release\GLTFSDK\GLTFSDK.lib,
             };
-            symbols: {
+            side-by-side-symbols: {
                 ${BASE}\Built\Out\windows_x64\Release\GLTFSDK\GLTFSDK.pdb
             };
         };
 
         [arm,debug] {
-            dll: {};
-
             lib: {
-                    ${BASE}\Built\Out\windows_ARM\Debug\GLTFSDK\GLTFSDK.lib,
+                ${BASE}\Built\Out\windows_ARM\Debug\GLTFSDK\GLTFSDK.lib,
             };
-            symbols: {
-                    ${BASE}\Built\Out\windows_ARM\Debug\GLTFSDK\GLTFSDK.pdb
+            side-by-side-symbols: {
+                ${BASE}\Built\Out\windows_ARM\Debug\GLTFSDK\GLTFSDK.pdb
             };
         };
 
         [arm,release] {
-            dll: {};
-
             lib: {
-                    ${BASE}\Built\Out\windows_ARM\Release\GLTFSDK\GLTFSDK.lib,
+                ${BASE}\Built\Out\windows_ARM\Release\GLTFSDK\GLTFSDK.lib,
             };
-            symbols: {
-                    ${BASE}\Built\Out\windows_ARM\Release\GLTFSDK\GLTFSDK.pdb
+            side-by-side-symbols: {
+                ${BASE}\Built\Out\windows_ARM\Release\GLTFSDK\GLTFSDK.pdb
             };
         };
 
         [arm64,debug] {
-            dll: {};
-
             lib: {
-                    ${BASE}\Built\Out\windows_ARM64\Debug\GLTFSDK\GLTFSDK.lib,
+                ${BASE}\Built\Out\windows_ARM64\Debug\GLTFSDK\GLTFSDK.lib,
             };
-            symbols: {
-                    ${BASE}\Built\Out\windows_ARM64\Debug\GLTFSDK\GLTFSDK.pdb
+            side-by-side-symbols: {
+                ${BASE}\Built\Out\windows_ARM64\Debug\GLTFSDK\GLTFSDK.pdb
             };
         };
 
         [arm64,release] {
-            dll: {};
-
             lib: {
-                    ${BASE}\Built\Out\windows_ARM64\Release\GLTFSDK\GLTFSDK.lib,
+                ${BASE}\Built\Out\windows_ARM64\Release\GLTFSDK\GLTFSDK.lib,
             };
-            symbols: {
-                    ${BASE}\Built\Out\windows_ARM64\Release\GLTFSDK\GLTFSDK.pdb
+            side-by-side-symbols: {
+                ${BASE}\Built\Out\windows_ARM64\Release\GLTFSDK\GLTFSDK.pdb
             };
         };
     };
