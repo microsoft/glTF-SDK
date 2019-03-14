@@ -70,6 +70,28 @@ namespace Microsoft
                 std::string SerializeDracoMeshCompression(const DracoMeshCompression& dracoMeshCompression, const Document& gltfDocument);
                 std::unique_ptr<Extension> DeserializeDracoMeshCompression(const std::string& json);
             }
+
+            namespace TextureInfos
+            {
+                constexpr const char* TEXTURETRANSFORM_NAME = "KHR_texture_transform";
+
+                // KHR_texture_transform
+                struct TextureTransform : Extension, glTFProperty
+                {
+                    TextureTransform();
+
+                    Vector2 offset;
+                    float rotation;
+                    Vector2 scale;
+                    unsigned int texCoord;
+
+                    std::unique_ptr<Extension> Clone() const override;
+                    bool IsEqual(const Extension& rhs) const override;
+                };
+
+                std::string SerializeTextureTransform(const TextureTransform& textureTransform, const Document& gltfDocument);
+                std::unique_ptr<Extension> DeserializeTextureTransform(const std::string& json);
+            }
         }
     }
 }

@@ -100,11 +100,13 @@ ExtensionSerializer KHR::GetKHRExtensionSerializer()
 {
     using namespace Materials;
     using namespace MeshPrimitives;
+    using namespace TextureInfos;
 
     ExtensionSerializer extensionSerializer;
     extensionSerializer.AddHandler<PBRSpecularGlossiness, Material>(PBRSPECULARGLOSSINESS_NAME, SerializePBRSpecGloss);
     extensionSerializer.AddHandler<Unlit, Material>(UNLIT_NAME, SerializeUnlit);
     extensionSerializer.AddHandler<DracoMeshCompression, MeshPrimitive>(DRACOMESHCOMPRESSION_NAME, SerializeDracoMeshCompression);
+    extensionSerializer.AddHandler<TextureTransform, TextureInfo>(TEXTURETRANSFORM_NAME, SerializeTextureTransform);
     return extensionSerializer;
 }
 
@@ -112,11 +114,13 @@ ExtensionDeserializer KHR::GetKHRExtensionDeserializer()
 {
     using namespace Materials;
     using namespace MeshPrimitives;
+    using namespace TextureInfos;
 
     ExtensionDeserializer extensionDeserializer;
     extensionDeserializer.AddHandler<PBRSpecularGlossiness, Material>(PBRSPECULARGLOSSINESS_NAME, DeserializePBRSpecGloss);
     extensionDeserializer.AddHandler<Unlit, Material>(UNLIT_NAME, DeserializeUnlit);
     extensionDeserializer.AddHandler<DracoMeshCompression, MeshPrimitive>(DRACOMESHCOMPRESSION_NAME, DeserializeDracoMeshCompression);
+    extensionDeserializer.AddHandler<TextureTransform, TextureInfo>(TEXTURETRANSFORM_NAME, DeserializeTextureTransform);
     return extensionDeserializer;
 }
 
@@ -366,4 +370,111 @@ std::unique_ptr<Extension> KHR::MeshPrimitives::DeserializeDracoMeshCompression(
     ParseProperty(v, *extension);
 
     return extension;
+}
+
+// KHR::TextureInfos::TextureTransform
+
+KHR::TextureInfos::TextureTransform::TextureTransform() :
+    offset(0.0f, 0.0f),
+    rotation(0.0f),
+    scale(1.0f, 1.0f),
+    texCoord(0)
+{
+}
+
+std::unique_ptr<Extension> KHR::TextureInfos::TextureTransform::Clone() const
+{
+    return std::make_unique<TextureTransform>(*this);
+}
+
+bool KHR::TextureInfos::TextureTransform::IsEqual(const Extension& rhs) const
+{
+    const auto other = dynamic_cast<const TextureTransform*>(&rhs);
+
+    return other != nullptr
+        && glTFProperty::Equals(*this, *other)
+        && this->offset == other->offset
+        && this->rotation == other->rotation
+        && this->scale == other->scale
+        && this->texCoord == other->texCoord;
+}
+
+std::string KHR::TextureInfos::SerializeTextureTransform(const TextureTransform& textureTransform, const Document& /*gltfDocument*/)
+{
+    rapidjson::Document doc;
+    auto& a = doc.GetAllocator();
+    rapidjson::Value KHR_textureTransform(rapidjson::kObjectType);
+    {
+        if (textureTransform.offset != Vector2(0.0f, 0.0f))
+        {
+            KHR_textureTransform.AddMember("offset", RapidJsonUtils::ToJsonArray(textureTransform.offset, a), a);
+        }
+
+        if (textureTransform.rotation != 0.0f)
+        {
+            KHR_textureTransform.AddMember("rotation", textureTransform.rotation, a);
+        }
+
+        if (textureTransform.scale != Vector2(1.0f, 1.0f))
+        {
+            KHR_textureTransform.AddMember("scale", RapidJsonUtils::ToJsonArray(textureTransform.scale, a), a);
+        }
+
+        if (textureTransform.texCoord != 0)
+        {
+            KHR_textureTransform.AddMember("texCoord", textureTransform.texCoord, a);
+        }
+
+        SerializeProperty(textureTransform, KHR_textureTransform, a);
+    }
+
+    glTF::rapidjson::StringBuffer buffer;
+    glTF::rapidjson::Writer<glTF::rapidjson::StringBuffer> writer(buffer);
+    KHR_textureTransform.Accept(writer);
+
+    return buffer.GetString();
+}
+
+std::unique_ptr<Extension> KHR::TextureInfos::DeserializeTextureTransform(const std::string& json)
+{
+    TextureTransform textureTransform;
+
+    auto doc = RapidJsonUtils::CreateDocumentFromString(json);
+    const rapidjson::Value sit = doc.GetObject();
+
+    // Offset
+    auto offsetIt = sit.FindMember("offset");
+    if (offsetIt != sit.MemberEnd())
+    {
+        std::vector<float> offset;
+        for (rapidjson::Value::ConstValueIterator ait = offsetIt->value.Begin(); ait != offsetIt->value.End(); ++ait)
+        {
+            offset.push_back(static_cast<float>(ait->GetDouble()));
+        }
+        // NOTE: Schema validation will handle this once the extension is added to the GLTF SDK
+        textureTransform.offset = (offset.size() == 2) ? Vector2(offset[0], offset[1]) : Vector2(0.0f, 0.0f);
+    }
+
+    // Rotation
+    textureTransform.rotation = GetMemberValueOrDefault<float>(sit, "rotation", 0.0f);
+
+    // Scale
+    auto scaleIt = sit.FindMember("scale");
+    if (scaleIt != sit.MemberEnd())
+    {
+        std::vector<float> scale;
+        for (rapidjson::Value::ConstValueIterator ait = scaleIt->value.Begin(); ait != scaleIt->value.End(); ++ait)
+        {
+            scale.push_back(static_cast<float>(ait->GetDouble()));
+        }
+        // NOTE: Schema validation will handle this once the extension is added to the GLTF SDK
+        textureTransform.scale = (scale.size() == 2) ? Vector2(scale[0], scale[1]) : Vector2(1.0f, 1.0f);
+    }
+
+    // TexCoord
+    textureTransform.texCoord = glTF::GetMemberValueOrDefault<unsigned int>(sit, "texCoord", 0);
+
+    ParseProperty(sit, textureTransform);
+
+    return std::make_unique<TextureTransform>(textureTransform);
 }
