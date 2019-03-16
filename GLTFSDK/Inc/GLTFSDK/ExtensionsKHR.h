@@ -83,7 +83,7 @@ namespace Microsoft
                     Vector2 offset;
                     float rotation;
                     Vector2 scale;
-                    unsigned int texCoord;
+                    size_t texCoord;
 
                     std::unique_ptr<Extension> Clone() const override;
                     bool IsEqual(const Extension& rhs) const override;

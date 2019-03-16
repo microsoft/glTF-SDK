@@ -360,7 +360,7 @@ namespace Microsoft
                     const auto extensionDeserializer = KHR::GetKHRExtensionDeserializer();
                     auto doc = Deserialize(inputJson, extensionDeserializer);
 
-                    auto checkTextureInfo = [&doc](
+                    auto checkTextureInfo = [](
                         const Material& material, 
                         const Vector2& offset, float rotation, const Vector2& scale, unsigned int texCoord)
                     {
