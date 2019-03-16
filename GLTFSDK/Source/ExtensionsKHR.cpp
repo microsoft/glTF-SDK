@@ -422,7 +422,7 @@ std::string KHR::TextureInfos::SerializeTextureTransform(const TextureTransform&
 
         if (textureTransform.texCoord != 0)
         {
-            KHR_textureTransform.AddMember("texCoord", textureTransform.texCoord, a);
+            KHR_textureTransform.AddMember("texCoord", ToKnownSizeType(textureTransform.texCoord), a);
         }
 
         SerializeProperty(textureTransform, KHR_textureTransform, a);
