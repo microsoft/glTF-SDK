@@ -22,6 +22,21 @@ namespace Microsoft
             static const Matrix4 IDENTITY;
         };
 
+        struct Vector2
+        {
+            Vector2();
+            Vector2(float x, float y);
+
+            bool operator==(const Vector2& other) const;
+            bool operator!=(const Vector2& other) const;
+
+            float x;
+            float y;
+
+            static const Vector2 ZERO;
+            static const Vector2 ONE;
+        };
+
         struct Vector3
         {
             Vector3();

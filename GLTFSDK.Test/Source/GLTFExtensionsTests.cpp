@@ -353,6 +353,74 @@ namespace Microsoft
                     Assert::IsTrue(specGloss.specularFactor == Color3(.0f, .0f, .0f));
                 }
 
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_HasTextureTransformExtension)
+                {
+                    const auto inputJson = ReadLocalJson(c_textureTransformTestJson);
+
+                    const auto extensionDeserializer = KHR::GetKHRExtensionDeserializer();
+                    auto doc = Deserialize(inputJson, extensionDeserializer);
+
+                    auto checkTextureInfo = [](
+                        const Material& material, 
+                        const Vector2& offset, float rotation, const Vector2& scale, unsigned int texCoord)
+                    {
+                        auto& textureInfo = material.metallicRoughness.baseColorTexture;
+
+                        Assert::IsTrue(textureInfo.HasExtension<KHR::TextureInfos::TextureTransform>());
+
+                        auto& textureTransform = textureInfo.GetExtension<KHR::TextureInfos::TextureTransform>();
+
+                        Assert::IsTrue(textureTransform.offset == offset);
+                        Assert::IsTrue(textureTransform.rotation == rotation);
+                        Assert::IsTrue(textureTransform.scale == scale);
+                        Assert::IsTrue(textureTransform.texCoord == texCoord);
+                    };
+
+                    Assert::IsTrue(doc.materials.Size() == 9);
+
+                    checkTextureInfo(doc.materials[0], Vector2(0.5f, 0.0f), 0.0f, Vector2(1.0f, 1.0f), 0);
+                    checkTextureInfo(doc.materials[1], Vector2(0.0f, 0.5f), 0.0f, Vector2(1.0f, 1.0f), 0);
+                    checkTextureInfo(doc.materials[2], Vector2(0.5f, 0.5f), 0.0f, Vector2(1.0f, 1.0f), 0);
+                    checkTextureInfo(doc.materials[3], Vector2(0.0f, 0.0f), 0.39269908169872415480783042290994f, Vector2(1.0f, 1.0f), 0);
+                    checkTextureInfo(doc.materials[4], Vector2(0.0f, 0.0f), 0.0f, Vector2(1.5f, 1.5f), 0);
+                    checkTextureInfo(doc.materials[5], Vector2(-0.2f, -0.1f), 0.3f, Vector2(1.5f, 1.5f), 0);
+                }
+
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_RoundTrip_And_Equality_TextureTransform)
+                {
+                    const auto inputJson = ReadLocalJson(c_textureTransformTestJson);
+
+                    const auto extensionDeserializer = KHR::GetKHRExtensionDeserializer();
+                    const auto extensionSerializer = KHR::GetKHRExtensionSerializer();
+
+                    auto doc = Deserialize(inputJson, extensionDeserializer);
+
+                    // Serialize GLTFDocument back to json
+                    auto outputJson = Serialize(doc, extensionSerializer);
+                    auto outputDoc = Deserialize(outputJson, extensionDeserializer);
+
+                    // Compare input and output GLTFDocuments
+                    Assert::IsTrue(doc == outputDoc, L"Input gltf and output gltf are not equal");
+                }
+
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_RoundTrip_And_Equality_TextureTransform_SGOnly)
+                {
+                    // Test document has TextureInfo extensions embedded in SpecGloss extension
+                    const auto inputJson = ReadLocalJson(c_textureTransformTestSGOnlyJson);
+
+                    const auto extensionDeserializer = KHR::GetKHRExtensionDeserializer();
+                    const auto extensionSerializer = KHR::GetKHRExtensionSerializer();
+
+                    auto doc = Deserialize(inputJson, extensionDeserializer);
+
+                    // Serialize GLTFDocument back to json
+                    auto outputJson = Serialize(doc, extensionSerializer);
+                    auto outputDoc = Deserialize(outputJson, extensionDeserializer);
+
+                    // Compare input and output GLTFDocuments
+                    Assert::IsTrue(doc == outputDoc, L"Input gltf and output gltf are not equal");
+                }
+
                 GLTFSDK_TEST_METHOD(ExtensionsTests, ExtensionSerializerAddHandler)
                 {
                     Node node;
@@ -379,14 +447,14 @@ namespace Microsoft
                     size_t handlerCountAll = 0;
 
                     extensionSerializer.AddHandler<TestExtension, Document>(TestExtensionName,
-                        [&handlerCountDocument](const TestExtension& extension, const Document&)
+                        [&handlerCountDocument](const TestExtension& extension, const Document&, const ExtensionSerializer& /*extensionSerializer*/)
                     {
                         ++handlerCountDocument;
                         return SerializeTestExtension(extension);
                     });
 
                     extensionSerializer.AddHandler<TestExtension, Scene>(TestExtensionName,
-                        [&handlerCountScene](const TestExtension& extension, const Document&)
+                        [&handlerCountScene](const TestExtension& extension, const Document&, const ExtensionSerializer& /*extensionSerializer*/)
                     {
                         ++handlerCountScene;
                         return SerializeTestExtension(extension);
@@ -394,7 +462,7 @@ namespace Microsoft
 
                     // The 'all properties' handler will process the Node's extension
                     extensionSerializer.AddHandler<TestExtension>(TestExtensionName,
-                        [&handlerCountAll](const TestExtension& extension, const Document&)
+                        [&handlerCountAll](const TestExtension& extension, const Document&, const ExtensionSerializer& /*extensionSerializer*/)
                     {
                         ++handlerCountAll;
                         return SerializeTestExtension(extension);
@@ -422,14 +490,14 @@ namespace Microsoft
                     size_t handlerCountAll = 0;
 
                     extensionDeserializer.AddHandler<TestExtension, Document>(TestExtensionName,
-                        [&handlerCountDocument](const std::string& json)
+                        [&handlerCountDocument](const std::string& json, const ExtensionDeserializer& /*extensionDeserializer*/)
                     {
                         ++handlerCountDocument;
                         return DeserializeTestExtension(json, false);
                     });
 
                     extensionDeserializer.AddHandler<TestExtension, Scene>(TestExtensionName,
-                        [&handlerCountScene](const std::string& json)
+                        [&handlerCountScene](const std::string& json, const ExtensionDeserializer& /*extensionDeserializer*/)
                     {
                         ++handlerCountScene;
                         return DeserializeTestExtension(json, false);
@@ -437,7 +505,7 @@ namespace Microsoft
 
                     // The 'all properties' handler will process the Node's extension
                     extensionDeserializer.AddHandler<TestExtension>(TestExtensionName,
-                        [&handlerCountAll](const std::string& json)
+                        [&handlerCountAll](const std::string& json, const ExtensionDeserializer& /*extensionDeserializer*/)
                     {
                         ++handlerCountAll;
                         return DeserializeTestExtension(json, false);
@@ -472,7 +540,7 @@ namespace Microsoft
                     ExtensionDeserializer extensionDeserializer;
 
                     extensionDeserializer.AddHandler<TestExtension>(TestExtensionName,
-                        [](const std::string& json)
+                        [](const std::string& json, const ExtensionDeserializer& /*extensionDeserializer*/)
                     {
                         return DeserializeTestExtension(json, true); // Enable schema validation
                     });
@@ -491,7 +559,7 @@ namespace Microsoft
                     ExtensionDeserializer extensionDeserializer;
 
                     extensionDeserializer.AddHandler<TestExtension>(TestExtensionName,
-                        [](const std::string& json)
+                        [](const std::string& json, const ExtensionDeserializer& /*extensionDeserializer*/)
                     {
                         return DeserializeTestExtension(json, true); // Enable schema validation
                     });

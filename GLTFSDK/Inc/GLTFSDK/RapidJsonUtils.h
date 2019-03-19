@@ -237,6 +237,14 @@ namespace Microsoft
                 return vArray;
             }
 
+            inline glTF::rapidjson::Value ToJsonArray(const Vector2& v, rapidjson::Document::AllocatorType& a)
+            {
+                rapidjson::Value vArray(rapidjson::kArrayType);
+                vArray.PushBack(v.x, a);
+                vArray.PushBack(v.y, a);
+                return vArray;
+            }
+
             inline rapidjson::Value ToJsonArray(const Vector3& v, rapidjson::Document::AllocatorType& a)
             {
                 rapidjson::Value vArray(rapidjson::kArrayType);

@@ -36,8 +36,8 @@ namespace Microsoft
                     bool IsEqual(const Extension& rhs) const override;
                 };
 
-                std::string SerializePBRSpecGloss(const PBRSpecularGlossiness& specGloss, const Document& gltfDocument);
-                std::unique_ptr<Extension> DeserializePBRSpecGloss(const std::string& json);
+                std::string SerializePBRSpecGloss(const PBRSpecularGlossiness& specGloss, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer);
+                std::unique_ptr<Extension> DeserializePBRSpecGloss(const std::string& json, const ExtensionDeserializer& extensionDeserializer);
 
                 constexpr const char* UNLIT_NAME = "KHR_materials_unlit";
 
@@ -48,8 +48,8 @@ namespace Microsoft
                     bool IsEqual(const Extension& rhs) const override;
                 };
 
-                std::string SerializeUnlit(const Unlit& unlit, const Document& gltfDocument);
-                std::unique_ptr<Extension> DeserializeUnlit(const std::string& json);
+                std::string SerializeUnlit(const Unlit& unlit, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer);
+                std::unique_ptr<Extension> DeserializeUnlit(const std::string& json, const ExtensionDeserializer& extensionDeserializer);
             }
 
             namespace MeshPrimitives
@@ -67,8 +67,30 @@ namespace Microsoft
                     bool IsEqual(const Extension& rhs) const override;
                 };
 
-                std::string SerializeDracoMeshCompression(const DracoMeshCompression& dracoMeshCompression, const Document& gltfDocument);
-                std::unique_ptr<Extension> DeserializeDracoMeshCompression(const std::string& json);
+                std::string SerializeDracoMeshCompression(const DracoMeshCompression& dracoMeshCompression, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer);
+                std::unique_ptr<Extension> DeserializeDracoMeshCompression(const std::string& json, const ExtensionDeserializer& extensionDeserializer);
+            }
+
+            namespace TextureInfos
+            {
+                constexpr const char* TEXTURETRANSFORM_NAME = "KHR_texture_transform";
+
+                // KHR_texture_transform
+                struct TextureTransform : Extension, glTFProperty
+                {
+                    TextureTransform();
+
+                    Vector2 offset;
+                    float rotation;
+                    Vector2 scale;
+                    size_t texCoord;
+
+                    std::unique_ptr<Extension> Clone() const override;
+                    bool IsEqual(const Extension& rhs) const override;
+                };
+
+                std::string SerializeTextureTransform(const TextureTransform& textureTransform, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer);
+                std::unique_ptr<Extension> DeserializeTextureTransform(const std::string& json, const ExtensionDeserializer& extensionDeserializer);
             }
         }
     }

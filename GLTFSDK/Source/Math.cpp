@@ -6,6 +6,8 @@
 using namespace Microsoft::glTF;
 
 const Matrix4 Matrix4::IDENTITY = Matrix4();
+const Vector2 Vector2::ZERO = { 0.0f, 0.0f };
+const Vector2 Vector2::ONE = { 1.0f, 1.0f };
 const Vector3 Vector3::ZERO = { 0.0f, 0.0f, 0.0f };
 const Vector3 Vector3::ONE = { 1.0f, 1.0f, 1.0f };
 const Quaternion Quaternion::IDENTITY = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -28,6 +30,26 @@ bool Matrix4::operator==(const Matrix4& other) const
 bool Matrix4::operator!=(const Matrix4& other) const
 {
     return !(*this == other);
+}
+
+Vector2::Vector2()
+    : x(0.0f), y(0.0f)
+{
+}
+
+Vector2::Vector2(float x, float y)
+    : x(x), y(y)
+{
+}
+
+bool Vector2::operator==(const Vector2& other) const
+{
+    return std::tie(x, y) == std::tie(other.x, other.y);
+}
+
+bool Vector2::operator!=(const Vector2& other) const
+{
+    return !operator==(other);
 }
 
 Vector3::Vector3()
