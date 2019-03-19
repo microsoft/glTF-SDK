@@ -260,7 +260,7 @@ namespace Microsoft
                     Assert::AreEqual(doc.meshes[0].primitives.size(), size_t(1));
                     Assert::AreEqual(doc.meshes[0].primitives[0].GetExtensions().size(), size_t(1));
 
-                    auto draco = doc.meshes[0].primitives[0].GetExtension<KHR::MeshPrimitiveExtension::DracoMeshCompression>();
+                    auto draco = doc.meshes[0].primitives[0].GetExtension<KHR::MeshPrimitives::DracoMeshCompression>();
 
                     Assert::AreEqual<std::string>(draco.bufferViewId, "0");
                     Assert::AreEqual<size_t>(draco.attributes.size(), 2);
@@ -286,7 +286,7 @@ namespace Microsoft
                     Assert::AreEqual(doc.materials[0].extensions.size(), size_t(0));
                     Assert::AreEqual(doc.materials[0].GetExtensions().size(), size_t(1));
 
-                    auto specGloss = doc.materials[0].GetExtension<KHR::MaterialExtension::PBRSpecularGlossiness>();
+                    auto specGloss = doc.materials[0].GetExtension<KHR::Materials::PBRSpecularGlossiness>();
 
                     Assert::IsTrue(specGloss.specularFactor == Color3(.0f, .0f, .0f));
                     Assert::IsTrue(specGloss.diffuseFactor == Color4(.49803921580314639f, .49803921580314639f, .49803921580314639f, 1.0f));
@@ -305,7 +305,7 @@ namespace Microsoft
                     Material mat = doc.materials[0];
                     Assert::AreEqual(mat.GetExtensions().size(), size_t(1));
 
-                    mat.RemoveExtension<KHR::MaterialExtension::PBRSpecularGlossiness>();
+                    mat.RemoveExtension<KHR::Materials::PBRSpecularGlossiness>();
                     doc.materials.Replace(mat);
                     Assert::AreEqual(doc.materials[0].GetExtensions().size(), size_t(0));
                 }
@@ -334,7 +334,7 @@ namespace Microsoft
                     Assert::AreEqual(doc.materials[0].extensions.size(), size_t(0));
                     Assert::AreEqual(doc.materials[0].GetExtensions().size(), size_t(1));
 
-                    Assert::IsTrue(doc.materials[0].HasExtension<KHR::MaterialExtension::PBRSpecularGlossiness>());
+                    Assert::IsTrue(doc.materials[0].HasExtension<KHR::Materials::PBRSpecularGlossiness>());
                     Assert::IsFalse(doc.materials[0].HasExtension<NonExistentExtension>());
                 }
 
@@ -345,9 +345,9 @@ namespace Microsoft
                     const auto extensionDeserializer = KHR::GetKHRExtensionDeserializer();
                     auto doc = Deserialize(inputJson, extensionDeserializer);
 
-                    Assert::IsTrue(doc.materials[0].HasExtension<KHR::MaterialExtension::PBRSpecularGlossiness>());
+                    Assert::IsTrue(doc.materials[0].HasExtension<KHR::Materials::PBRSpecularGlossiness>());
 
-                    auto& specGloss = doc.materials[0].GetExtension<KHR::MaterialExtension::PBRSpecularGlossiness>();
+                    auto& specGloss = doc.materials[0].GetExtension<KHR::Materials::PBRSpecularGlossiness>();
 
                     Assert::AreEqual(specGloss.diffuseTexture.textureId.c_str(), "0");
                     Assert::IsTrue(specGloss.specularFactor == Color3(.0f, .0f, .0f));
@@ -366,9 +366,9 @@ namespace Microsoft
                     {
                         auto& textureInfo = material.metallicRoughness.baseColorTexture;
 
-                        Assert::IsTrue(textureInfo.HasExtension<KHR::TextureInfoExtension::TextureTransform>());
+                        Assert::IsTrue(textureInfo.HasExtension<KHR::TextureInfos::TextureTransform>());
 
-                        auto& textureTransform = textureInfo.GetExtension<KHR::TextureInfoExtension::TextureTransform>();
+                        auto& textureTransform = textureInfo.GetExtension<KHR::TextureInfos::TextureTransform>();
 
                         Assert::IsTrue(textureTransform.offset == offset);
                         Assert::IsTrue(textureTransform.rotation == rotation);

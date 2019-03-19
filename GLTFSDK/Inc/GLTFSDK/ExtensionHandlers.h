@@ -183,13 +183,13 @@ namespace Microsoft
 
         class Document;
 
-        class ExtensionSerializer : public ExtensionHandlers<std::string, Extension, Document, ExtensionSerializer>
+        class ExtensionSerializer final : public ExtensionHandlers<std::string, Extension, Document, ExtensionSerializer>
         {
         public:
             ExtensionPair Serialize(const Extension& extension, const glTFProperty& property, const Document& document) const;
         };
 
-        class ExtensionDeserializer : public ExtensionHandlers<std::unique_ptr<Extension>, std::string, ExtensionDeserializer>
+        class ExtensionDeserializer final : public ExtensionHandlers<std::unique_ptr<Extension>, std::string, ExtensionDeserializer>
         {
         public:
             std::unique_ptr<Extension> Deserialize(const ExtensionPair& extensionPair, const glTFProperty& property) const;

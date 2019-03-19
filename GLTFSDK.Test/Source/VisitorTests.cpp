@@ -298,9 +298,9 @@ namespace Microsoft
                     {
                         if (visitState == VisitState::New)
                         {
-                            if (material.HasExtension<KHR::MaterialExtension::PBRSpecularGlossiness>())
+                            if (material.HasExtension<KHR::Materials::PBRSpecularGlossiness>())
                             {
-                                const auto& specGloss = material.GetExtension<KHR::MaterialExtension::PBRSpecularGlossiness>();
+                                const auto& specGloss = material.GetExtension<KHR::Materials::PBRSpecularGlossiness>();
 
                                 if (!specGloss.diffuseTexture.textureId.empty())
                                 {

@@ -62,7 +62,7 @@ namespace Microsoft
             {
             }
 
-            explicit SpecularGlossinessValueTypeless(const KHR::MaterialExtension::PBRSpecularGlossiness& sg) :
+            explicit SpecularGlossinessValueTypeless(const KHR::Materials::PBRSpecularGlossiness& sg) :
                 diffuse(sg.diffuseFactor.r, sg.diffuseFactor.g, sg.diffuseFactor.b),
                 opacity(sg.diffuseFactor.a),
                 specular(sg.specularFactor.r, sg.specularFactor.g, sg.specularFactor.b),
