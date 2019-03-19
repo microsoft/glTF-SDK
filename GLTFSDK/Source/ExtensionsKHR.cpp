@@ -127,9 +127,9 @@ namespace
 
 ExtensionSerializer KHR::GetKHRExtensionSerializer()
 {
-    using namespace Materials;
-    using namespace MeshPrimitives;
-    using namespace TextureInfos;
+    using namespace MaterialExtension;
+    using namespace MeshPrimitiveExtension;
+    using namespace TextureInfoExtension;
 
     ExtensionSerializer extensionSerializer;
     extensionSerializer.AddHandler<PBRSpecularGlossiness, Material>(PBRSPECULARGLOSSINESS_NAME, SerializePBRSpecGloss);
@@ -141,9 +141,9 @@ ExtensionSerializer KHR::GetKHRExtensionSerializer()
 
 ExtensionDeserializer KHR::GetKHRExtensionDeserializer()
 {
-    using namespace Materials;
-    using namespace MeshPrimitives;
-    using namespace TextureInfos;
+    using namespace MaterialExtension;
+    using namespace MeshPrimitiveExtension;
+    using namespace TextureInfoExtension;
 
     ExtensionDeserializer extensionDeserializer;
     extensionDeserializer.AddHandler<PBRSpecularGlossiness, Material>(PBRSPECULARGLOSSINESS_NAME, DeserializePBRSpecGloss);
@@ -153,21 +153,21 @@ ExtensionDeserializer KHR::GetKHRExtensionDeserializer()
     return extensionDeserializer;
 }
 
-// KHR::Materials::PBRSpecularGlossiness
+// KHR::MaterialExtension::PBRSpecularGlossiness
 
-KHR::Materials::PBRSpecularGlossiness::PBRSpecularGlossiness() :
+KHR::MaterialExtension::PBRSpecularGlossiness::PBRSpecularGlossiness() :
     diffuseFactor(1.0f, 1.0f, 1.0f, 1.0f),
     specularFactor(1.0f, 1.0f, 1.0f),
     glossinessFactor(1.0f)
 {
 }
 
-std::unique_ptr<Extension> KHR::Materials::PBRSpecularGlossiness::Clone() const
+std::unique_ptr<Extension> KHR::MaterialExtension::PBRSpecularGlossiness::Clone() const
 {
     return std::make_unique<PBRSpecularGlossiness>(*this);
 }
 
-bool KHR::Materials::PBRSpecularGlossiness::IsEqual(const Extension& rhs) const
+bool KHR::MaterialExtension::PBRSpecularGlossiness::IsEqual(const Extension& rhs) const
 {
     const auto other = dynamic_cast<const PBRSpecularGlossiness*>(&rhs);
 
@@ -180,7 +180,7 @@ bool KHR::Materials::PBRSpecularGlossiness::IsEqual(const Extension& rhs) const
         && this->specularGlossinessTexture == other->specularGlossinessTexture;
 }
 
-std::string KHR::Materials::SerializePBRSpecGloss(const Materials::PBRSpecularGlossiness& specGloss, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
+std::string KHR::MaterialExtension::SerializePBRSpecGloss(const MaterialExtension::PBRSpecularGlossiness& specGloss, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
 {
     rapidjson::Document doc;
     auto& a = doc.GetAllocator();
@@ -225,9 +225,9 @@ std::string KHR::Materials::SerializePBRSpecGloss(const Materials::PBRSpecularGl
     return buffer.GetString();
 }
 
-std::unique_ptr<Extension> KHR::Materials::DeserializePBRSpecGloss(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
+std::unique_ptr<Extension> KHR::MaterialExtension::DeserializePBRSpecGloss(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
 {
-    Materials::PBRSpecularGlossiness specGloss;
+    MaterialExtension::PBRSpecularGlossiness specGloss;
 
     auto doc = RapidJsonUtils::CreateDocumentFromString(json);
     const rapidjson::Value sit = doc.GetObject();
@@ -278,19 +278,19 @@ std::unique_ptr<Extension> KHR::Materials::DeserializePBRSpecGloss(const std::st
     return std::make_unique<PBRSpecularGlossiness>(specGloss);
 }
 
-// KHR::Materials::Unlit
+// KHR::MaterialExtension::Unlit
 
-std::unique_ptr<Extension> KHR::Materials::Unlit::Clone() const
+std::unique_ptr<Extension> KHR::MaterialExtension::Unlit::Clone() const
 {
     return std::make_unique<Unlit>(*this);
 }
 
-bool KHR::Materials::Unlit::IsEqual(const Extension& rhs) const
+bool KHR::MaterialExtension::Unlit::IsEqual(const Extension& rhs) const
 {
     return dynamic_cast<const Unlit*>(&rhs) != nullptr;
 }
 
-std::string KHR::Materials::SerializeUnlit(const Materials::Unlit& extension, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
+std::string KHR::MaterialExtension::SerializeUnlit(const MaterialExtension::Unlit& extension, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
 {
     rapidjson::Document doc;
     auto& a = doc.GetAllocator();
@@ -305,7 +305,7 @@ std::string KHR::Materials::SerializeUnlit(const Materials::Unlit& extension, co
     return buffer.GetString();
 }
 
-std::unique_ptr<Extension> KHR::Materials::DeserializeUnlit(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
+std::unique_ptr<Extension> KHR::MaterialExtension::DeserializeUnlit(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
 {
     Unlit unlit;
 
@@ -317,14 +317,14 @@ std::unique_ptr<Extension> KHR::Materials::DeserializeUnlit(const std::string& j
     return std::make_unique<Unlit>(unlit);
 }
 
-// KHR::MeshPrimitives::DracoMeshCompression
+// KHR::MeshPrimitiveExtension::DracoMeshCompression
 
-std::unique_ptr<Extension> KHR::MeshPrimitives::DracoMeshCompression::Clone() const
+std::unique_ptr<Extension> KHR::MeshPrimitiveExtension::DracoMeshCompression::Clone() const
 {
     return std::make_unique<DracoMeshCompression>(*this);
 }
 
-bool KHR::MeshPrimitives::DracoMeshCompression::IsEqual(const Extension& rhs) const
+bool KHR::MeshPrimitiveExtension::DracoMeshCompression::IsEqual(const Extension& rhs) const
 {
     const auto other = dynamic_cast<const DracoMeshCompression*>(&rhs);
 
@@ -334,7 +334,7 @@ bool KHR::MeshPrimitives::DracoMeshCompression::IsEqual(const Extension& rhs) co
         && this->attributes == other->attributes;
 }
 
-std::string KHR::MeshPrimitives::SerializeDracoMeshCompression(const MeshPrimitives::DracoMeshCompression& dracoMeshCompression, const Document& glTFdoc, const ExtensionSerializer& extensionSerializer)
+std::string KHR::MeshPrimitiveExtension::SerializeDracoMeshCompression(const MeshPrimitiveExtension::DracoMeshCompression& dracoMeshCompression, const Document& glTFdoc, const ExtensionSerializer& extensionSerializer)
 {
     rapidjson::Document doc;
     auto& a = doc.GetAllocator();
@@ -366,7 +366,7 @@ std::string KHR::MeshPrimitives::SerializeDracoMeshCompression(const MeshPrimiti
     return buffer.GetString();
 }
 
-std::unique_ptr<Extension> KHR::MeshPrimitives::DeserializeDracoMeshCompression(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
+std::unique_ptr<Extension> KHR::MeshPrimitiveExtension::DeserializeDracoMeshCompression(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
 {
     auto extension = std::make_unique<DracoMeshCompression>();
 
@@ -401,9 +401,9 @@ std::unique_ptr<Extension> KHR::MeshPrimitives::DeserializeDracoMeshCompression(
     return extension;
 }
 
-// KHR::TextureInfos::TextureTransform
+// KHR::TextureInfoExtension::TextureTransform
 
-KHR::TextureInfos::TextureTransform::TextureTransform() :
+KHR::TextureInfoExtension::TextureTransform::TextureTransform() :
     offset(0.0f, 0.0f),
     rotation(0.0f),
     scale(1.0f, 1.0f),
@@ -411,12 +411,12 @@ KHR::TextureInfos::TextureTransform::TextureTransform() :
 {
 }
 
-std::unique_ptr<Extension> KHR::TextureInfos::TextureTransform::Clone() const
+std::unique_ptr<Extension> KHR::TextureInfoExtension::TextureTransform::Clone() const
 {
     return std::make_unique<TextureTransform>(*this);
 }
 
-bool KHR::TextureInfos::TextureTransform::IsEqual(const Extension& rhs) const
+bool KHR::TextureInfoExtension::TextureTransform::IsEqual(const Extension& rhs) const
 {
     const auto other = dynamic_cast<const TextureTransform*>(&rhs);
 
@@ -428,13 +428,13 @@ bool KHR::TextureInfos::TextureTransform::IsEqual(const Extension& rhs) const
         && this->texCoord == other->texCoord;
 }
 
-std::string KHR::TextureInfos::SerializeTextureTransform(const TextureTransform& textureTransform, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
+std::string KHR::TextureInfoExtension::SerializeTextureTransform(const TextureTransform& textureTransform, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
 {
     rapidjson::Document doc;
     auto& a = doc.GetAllocator();
     rapidjson::Value KHR_textureTransform(rapidjson::kObjectType);
     {
-        if (textureTransform.offset != Vector2(0.0f, 0.0f))
+        if (textureTransform.offset != Vector2::ZERO)
         {
             KHR_textureTransform.AddMember("offset", RapidJsonUtils::ToJsonArray(textureTransform.offset, a), a);
         }
@@ -444,7 +444,7 @@ std::string KHR::TextureInfos::SerializeTextureTransform(const TextureTransform&
             KHR_textureTransform.AddMember("rotation", textureTransform.rotation, a);
         }
 
-        if (textureTransform.scale != Vector2(1.0f, 1.0f))
+        if (textureTransform.scale != Vector2::ONE)
         {
             KHR_textureTransform.AddMember("scale", RapidJsonUtils::ToJsonArray(textureTransform.scale, a), a);
         }
@@ -464,7 +464,7 @@ std::string KHR::TextureInfos::SerializeTextureTransform(const TextureTransform&
     return buffer.GetString();
 }
 
-std::unique_ptr<Extension> KHR::TextureInfos::DeserializeTextureTransform(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
+std::unique_ptr<Extension> KHR::TextureInfoExtension::DeserializeTextureTransform(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
 {
     TextureTransform textureTransform;
 
@@ -475,13 +475,18 @@ std::unique_ptr<Extension> KHR::TextureInfos::DeserializeTextureTransform(const 
     auto offsetIt = sit.FindMember("offset");
     if (offsetIt != sit.MemberEnd())
     {
+        if (offsetIt->value.Size() != 2)
+        {
+            throw GLTFException("Offset member of " + std::string(TEXTURETRANSFORM_NAME) + " must have two values.");
+        }
+
         std::vector<float> offset;
         for (rapidjson::Value::ConstValueIterator ait = offsetIt->value.Begin(); ait != offsetIt->value.End(); ++ait)
         {
             offset.push_back(static_cast<float>(ait->GetDouble()));
         }
-        // NOTE: Schema validation will handle this once the extension is added to the GLTF SDK
-        textureTransform.offset = (offset.size() == 2) ? Vector2(offset[0], offset[1]) : Vector2(0.0f, 0.0f);
+        textureTransform.offset.x = offset[0];
+        textureTransform.offset.y = offset[1];
     }
 
     // Rotation
@@ -491,17 +496,22 @@ std::unique_ptr<Extension> KHR::TextureInfos::DeserializeTextureTransform(const 
     auto scaleIt = sit.FindMember("scale");
     if (scaleIt != sit.MemberEnd())
     {
+        if (scaleIt->value.Size() != 2)
+        {
+            throw GLTFException("Scale member of " + std::string(TEXTURETRANSFORM_NAME) + " must have two values.");
+        }
+
         std::vector<float> scale;
         for (rapidjson::Value::ConstValueIterator ait = scaleIt->value.Begin(); ait != scaleIt->value.End(); ++ait)
         {
             scale.push_back(static_cast<float>(ait->GetDouble()));
         }
-        // NOTE: Schema validation will handle this once the extension is added to the GLTF SDK
-        textureTransform.scale = (scale.size() == 2) ? Vector2(scale[0], scale[1]) : Vector2(1.0f, 1.0f);
+        textureTransform.scale.x = scale[0];
+        textureTransform.scale.y = scale[1];
     }
 
     // TexCoord
-    textureTransform.texCoord = glTF::GetMemberValueOrDefault<unsigned int>(sit, "texCoord", 0);
+    textureTransform.texCoord = GetMemberValueOrDefault<unsigned int>(sit, "texCoord", 0);
 
     ParseProperty(sit, textureTransform, extensionDeserializer);
 

@@ -435,7 +435,7 @@ namespace Microsoft
                     auto doc = TestDeserializeValidGLTFFile(c_cubeJson);
 
                     // Check for expected values in document
-                    Assert::IsTrue(doc.IsExtensionUsed(KHR::Materials::PBRSPECULARGLOSSINESS_NAME));
+                    Assert::IsTrue(doc.IsExtensionUsed(KHR::MaterialExtension::PBRSPECULARGLOSSINESS_NAME));
                 }
 
                 GLTFSDK_TEST_METHOD(GLTFTests, GLTF_RoundTripTexCoord1)

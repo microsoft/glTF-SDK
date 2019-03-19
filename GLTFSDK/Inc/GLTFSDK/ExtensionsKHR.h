@@ -17,7 +17,7 @@ namespace Microsoft
             ExtensionSerializer   GetKHRExtensionSerializer();
             ExtensionDeserializer GetKHRExtensionDeserializer();
 
-            namespace Materials
+            namespace MaterialExtension
             {
                 constexpr const char* PBRSPECULARGLOSSINESS_NAME = "KHR_materials_pbrSpecularGlossiness";
 
@@ -52,7 +52,7 @@ namespace Microsoft
                 std::unique_ptr<Extension> DeserializeUnlit(const std::string& json, const ExtensionDeserializer& extensionDeserializer);
             }
 
-            namespace MeshPrimitives
+            namespace MeshPrimitiveExtension
             {
                 constexpr const char* DRACOMESHCOMPRESSION_NAME = "KHR_draco_mesh_compression";
 
@@ -71,7 +71,7 @@ namespace Microsoft
                 std::unique_ptr<Extension> DeserializeDracoMeshCompression(const std::string& json, const ExtensionDeserializer& extensionDeserializer);
             }
 
-            namespace TextureInfos
+            namespace TextureInfoExtension
             {
                 constexpr const char* TEXTURETRANSFORM_NAME = "KHR_texture_transform";
 
