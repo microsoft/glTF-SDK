@@ -32,7 +32,7 @@ ExtensionPair ExtensionSerializer::Serialize(const Extension& extension, const g
         throw GLTFException("No handler registered to serialize the passed extension type");
     }
 
-    return { it->second, Process(it->first, extension, document) };
+    return { it->second, Process(it->first, extension, document, *this) };
 }
 
 std::unique_ptr<Extension> ExtensionDeserializer::Deserialize(const ExtensionPair& extensionPair, const glTFProperty& property) const
@@ -49,5 +49,5 @@ std::unique_ptr<Extension> ExtensionDeserializer::Deserialize(const ExtensionPai
         throw GLTFException("No handler registered to deserialize the specified extension name");
     }
 
-    return Process({ it->second, it->first.second }, extensionPair.value);
+    return Process({ it->second, it->first.second }, extensionPair.value, *this);
 }

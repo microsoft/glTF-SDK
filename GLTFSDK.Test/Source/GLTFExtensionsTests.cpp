@@ -429,14 +429,14 @@ namespace Microsoft
                     size_t handlerCountAll = 0;
 
                     extensionSerializer.AddHandler<TestExtension, Document>(TestExtensionName,
-                        [&handlerCountDocument](const TestExtension& extension, const Document&)
+                        [&handlerCountDocument](const TestExtension& extension, const Document&, const ExtensionSerializer& /*extensionSerializer*/)
                     {
                         ++handlerCountDocument;
                         return SerializeTestExtension(extension);
                     });
 
                     extensionSerializer.AddHandler<TestExtension, Scene>(TestExtensionName,
-                        [&handlerCountScene](const TestExtension& extension, const Document&)
+                        [&handlerCountScene](const TestExtension& extension, const Document&, const ExtensionSerializer& /*extensionSerializer*/)
                     {
                         ++handlerCountScene;
                         return SerializeTestExtension(extension);
@@ -444,7 +444,7 @@ namespace Microsoft
 
                     // The 'all properties' handler will process the Node's extension
                     extensionSerializer.AddHandler<TestExtension>(TestExtensionName,
-                        [&handlerCountAll](const TestExtension& extension, const Document&)
+                        [&handlerCountAll](const TestExtension& extension, const Document&, const ExtensionSerializer& /*extensionSerializer*/)
                     {
                         ++handlerCountAll;
                         return SerializeTestExtension(extension);
@@ -472,14 +472,14 @@ namespace Microsoft
                     size_t handlerCountAll = 0;
 
                     extensionDeserializer.AddHandler<TestExtension, Document>(TestExtensionName,
-                        [&handlerCountDocument](const std::string& json)
+                        [&handlerCountDocument](const std::string& json, const ExtensionDeserializer& /*extensionDeserializer*/)
                     {
                         ++handlerCountDocument;
                         return DeserializeTestExtension(json, false);
                     });
 
                     extensionDeserializer.AddHandler<TestExtension, Scene>(TestExtensionName,
-                        [&handlerCountScene](const std::string& json)
+                        [&handlerCountScene](const std::string& json, const ExtensionDeserializer& /*extensionDeserializer*/)
                     {
                         ++handlerCountScene;
                         return DeserializeTestExtension(json, false);
@@ -487,7 +487,7 @@ namespace Microsoft
 
                     // The 'all properties' handler will process the Node's extension
                     extensionDeserializer.AddHandler<TestExtension>(TestExtensionName,
-                        [&handlerCountAll](const std::string& json)
+                        [&handlerCountAll](const std::string& json, const ExtensionDeserializer& /*extensionDeserializer*/)
                     {
                         ++handlerCountAll;
                         return DeserializeTestExtension(json, false);
@@ -522,7 +522,7 @@ namespace Microsoft
                     ExtensionDeserializer extensionDeserializer;
 
                     extensionDeserializer.AddHandler<TestExtension>(TestExtensionName,
-                        [](const std::string& json)
+                        [](const std::string& json, const ExtensionDeserializer& /*extensionDeserializer*/)
                     {
                         return DeserializeTestExtension(json, true); // Enable schema validation
                     });
@@ -541,7 +541,7 @@ namespace Microsoft
                     ExtensionDeserializer extensionDeserializer;
 
                     extensionDeserializer.AddHandler<TestExtension>(TestExtensionName,
-                        [](const std::string& json)
+                        [](const std::string& json, const ExtensionDeserializer& /*extensionDeserializer*/)
                     {
                         return DeserializeTestExtension(json, true); // Enable schema validation
                     });
