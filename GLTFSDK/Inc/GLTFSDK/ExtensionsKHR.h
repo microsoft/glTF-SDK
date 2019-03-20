@@ -79,11 +79,13 @@ namespace Microsoft
                 struct TextureTransform : Extension, glTFProperty
                 {
                     TextureTransform();
+                    TextureTransform(const TextureTransform&);
 
                     Vector2 offset;
                     float rotation;
                     Vector2 scale;
-                    size_t texCoord;
+                    // TexCoord is optional
+                    std::unique_ptr<size_t> texCoord;
 
                     std::unique_ptr<Extension> Clone() const override;
                     bool IsEqual(const Extension& rhs) const override;
