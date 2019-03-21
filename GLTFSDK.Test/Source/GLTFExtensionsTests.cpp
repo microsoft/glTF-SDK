@@ -437,13 +437,13 @@ namespace Microsoft
 
                         auto& textureTransform = textureInfo.GetExtension<KHR::TextureInfos::TextureTransform>();
 
-                        Assert::IsTrue(textureTransform.offset == offset);
-                        Assert::IsTrue(textureTransform.rotation == rotation);
-                        Assert::IsTrue(textureTransform.scale == scale);
-                        Assert::IsTrue(
-                            (!textureTransform.texCoord && !texCoord) ||
-                            ((textureTransform.texCoord && texCoord) &&
-                                *textureTransform.texCoord == *texCoord));
+                        KHR::TextureInfos::TextureTransform expectedTextureTransform;
+                        expectedTextureTransform.offset = offset;
+                        expectedTextureTransform.scale = scale;
+                        expectedTextureTransform.rotation = rotation;
+                        expectedTextureTransform.texCoord = std::move(texCoord);
+
+                        Assert::IsTrue(textureTransform == expectedTextureTransform);
                     };
 
                     Assert::IsTrue(doc.materials.Size() == 9);
@@ -472,13 +472,13 @@ namespace Microsoft
 
                         auto& textureTransform = textureInfo.GetExtension<KHR::TextureInfos::TextureTransform>();
 
-                        Assert::IsTrue(textureTransform.offset == offset);
-                        Assert::IsTrue(textureTransform.rotation == rotation);
-                        Assert::IsTrue(textureTransform.scale == scale);
-                        Assert::IsTrue(
-                            (!textureTransform.texCoord && !texCoord) ||
-                            ((textureTransform.texCoord && texCoord) &&
-                                *textureTransform.texCoord == *texCoord));
+                        KHR::TextureInfos::TextureTransform expectedTextureTransform;
+                        expectedTextureTransform.offset = offset;
+                        expectedTextureTransform.scale = scale;
+                        expectedTextureTransform.rotation = rotation;
+                        expectedTextureTransform.texCoord = std::move(texCoord);
+
+                        Assert::IsTrue(textureTransform == expectedTextureTransform);
                     };
 
                     Assert::IsTrue(doc.materials.Size() == 2);
