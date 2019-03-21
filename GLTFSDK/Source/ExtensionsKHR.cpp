@@ -410,11 +410,11 @@ KHR::TextureInfos::TextureTransform::TextureTransform() :
 {
 }
 
-KHR::TextureInfos::TextureTransform::TextureTransform(const TextureTransform& textureTransform)
+KHR::TextureInfos::TextureTransform::TextureTransform(const TextureTransform& textureTransform) :
+    offset(textureTransform.offset),
+    rotation(textureTransform.rotation),
+    scale(textureTransform.scale)
 {
-    offset = textureTransform.offset;
-    rotation = textureTransform.rotation;
-    scale = textureTransform.scale;
     if (textureTransform.texCoord)
     {
         texCoord = std::make_unique<size_t>(*textureTransform.texCoord);
@@ -526,7 +526,7 @@ std::unique_ptr<Extension> KHR::TextureInfos::DeserializeTextureTransform(const 
     auto texCoordIt = sit.FindMember("texCoord");
     if (texCoordIt != sit.MemberEnd())
     {
-        textureTransform.texCoord = std::make_unique<size_t>(static_cast<size_t>(texCoordIt->value.GetInt()));
+        textureTransform.texCoord = std::make_unique<size_t>(static_cast<size_t>(texCoordIt->value.GetUint()));
     }
 
     ParseProperty(sit, textureTransform, extensionDeserializer);

@@ -220,6 +220,73 @@ R"({
         "TestExtension"
     ]
 })";
+
+    constexpr const char extensionSchemaKHRTextureTransform_TexCoord[] =
+R"({
+    "asset": {
+        "version": "2.0"
+    },
+  "materials": [
+    {
+      "name": "HasTexCoord",
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 0,
+          "extensions": {
+            "KHR_texture_transform": {
+              "offset": [
+                -0.2,
+                -0.1
+              ],
+              "rotation": 0.3,
+              "scale": [
+                1.5,
+                1.5
+              ],
+              "texCoord": 1234
+            }
+          }
+        },
+        "metallicFactor": 0
+      }
+    },
+    {
+      "name": "DoesNotHaveTexCoord",
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 0,
+          "extensions": {
+            "KHR_texture_transform": {
+              "offset": [
+                -0.2,
+                -0.1
+              ],
+              "rotation": 0.3,
+              "scale": [
+                1.5,
+                1.5
+              ]
+            }
+          }
+        },
+        "metallicFactor": 0
+      }
+    }
+  ],
+  "extensionsUsed": [
+    "KHR_texture_transform"
+  ],
+  "textures": [
+    {
+      "source": 0
+    }
+  ],
+  "images": [
+    {
+      "uri": "placeholder.png"
+    }
+  ]
+})";
 }
 
 namespace Microsoft
@@ -387,6 +454,43 @@ namespace Microsoft
                     checkTextureInfo(doc.materials[3], Vector2(0.0f, 0.0f), 0.39269908169872415480783042290994f, Vector2(1.0f, 1.0f), {});
                     checkTextureInfo(doc.materials[4], Vector2(0.0f, 0.0f), 0.0f, Vector2(1.5f, 1.5f), {});
                     checkTextureInfo(doc.materials[5], Vector2(-0.2f, -0.1f), 0.3f, Vector2(1.5f, 1.5f), {});
+                }
+
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_HasTextureTransformExtension_TexCoord)
+                {
+                    // Ensure the optionality of the texCoord property is preserved
+                    const auto extensionDeserializer = KHR::GetKHRExtensionDeserializer();
+                    auto doc = Deserialize(extensionSchemaKHRTextureTransform_TexCoord, extensionDeserializer);
+
+                    auto checkTextureInfo = [](
+                        const Material& material,
+                        const Vector2& offset, float rotation, const Vector2& scale, std::unique_ptr<size_t> texCoord)
+                    {
+                        auto& textureInfo = material.metallicRoughness.baseColorTexture;
+
+                        Assert::IsTrue(textureInfo.HasExtension<KHR::TextureInfos::TextureTransform>());
+
+                        auto& textureTransform = textureInfo.GetExtension<KHR::TextureInfos::TextureTransform>();
+
+                        Assert::IsTrue(textureTransform.offset == offset);
+                        Assert::IsTrue(textureTransform.rotation == rotation);
+                        Assert::IsTrue(textureTransform.scale == scale);
+                        Assert::IsTrue(
+                            (!textureTransform.texCoord && !texCoord) ||
+                            ((textureTransform.texCoord && texCoord) &&
+                                *textureTransform.texCoord == *texCoord));
+                    };
+
+                    Assert::IsTrue(doc.materials.Size() == 2);
+
+                    checkTextureInfo(doc.materials[0], Vector2(-0.2f, -0.1f), 0.3f, Vector2(1.5f, 1.5f), std::make_unique<size_t>(1234));
+                    checkTextureInfo(doc.materials[1], Vector2(-0.2f, -0.1f), 0.3f, Vector2(1.5f, 1.5f), {});
+
+                    const auto extensionSerializer = KHR::GetKHRExtensionSerializer();
+                    auto tt = Serialize(doc, extensionSerializer);
+
+                    auto roundTrippedDoc = Deserialize(tt, extensionDeserializer);
+                    Assert::IsTrue(doc == roundTrippedDoc, L"Input gltf and output gltf are not equal");
                 }
 
                 GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_RoundTrip_And_Equality_TextureTransform)
