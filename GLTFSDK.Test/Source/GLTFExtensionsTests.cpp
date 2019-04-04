@@ -429,7 +429,7 @@ namespace Microsoft
 
                     auto checkTextureInfo = [](
                         const Material& material, 
-                        const Vector2& offset, float rotation, const Vector2& scale, std::unique_ptr<size_t> texCoord)
+                        const Vector2& offset, float rotation, const Vector2& scale, Detail::Optional<size_t> texCoord = {})
                     {
                         auto& textureInfo = material.metallicRoughness.baseColorTexture;
 
@@ -441,19 +441,19 @@ namespace Microsoft
                         expectedTextureTransform.offset = offset;
                         expectedTextureTransform.scale = scale;
                         expectedTextureTransform.rotation = rotation;
-                        expectedTextureTransform.texCoord = std::move(texCoord);
+                        expectedTextureTransform.texCoord = texCoord;
 
                         Assert::IsTrue(textureTransform == expectedTextureTransform);
                     };
 
                     Assert::IsTrue(doc.materials.Size() == 9);
 
-                    checkTextureInfo(doc.materials[0], Vector2(0.5f, 0.0f), 0.0f, Vector2(1.0f, 1.0f), {}); // Note: texCoord not specified
-                    checkTextureInfo(doc.materials[1], Vector2(0.0f, 0.5f), 0.0f, Vector2(1.0f, 1.0f), {});
-                    checkTextureInfo(doc.materials[2], Vector2(0.5f, 0.5f), 0.0f, Vector2(1.0f, 1.0f), {});
-                    checkTextureInfo(doc.materials[3], Vector2(0.0f, 0.0f), 0.39269908169872415480783042290994f, Vector2(1.0f, 1.0f), {});
-                    checkTextureInfo(doc.materials[4], Vector2(0.0f, 0.0f), 0.0f, Vector2(1.5f, 1.5f), {});
-                    checkTextureInfo(doc.materials[5], Vector2(-0.2f, -0.1f), 0.3f, Vector2(1.5f, 1.5f), {});
+                    checkTextureInfo(doc.materials[0], Vector2(0.5f, 0.0f), 0.0f, Vector2(1.0f, 1.0f)); // Note: texCoord not specified
+                    checkTextureInfo(doc.materials[1], Vector2(0.0f, 0.5f), 0.0f, Vector2(1.0f, 1.0f));
+                    checkTextureInfo(doc.materials[2], Vector2(0.5f, 0.5f), 0.0f, Vector2(1.0f, 1.0f));
+                    checkTextureInfo(doc.materials[3], Vector2(0.0f, 0.0f), 0.39269908169872415480783042290994f, Vector2(1.0f, 1.0f));
+                    checkTextureInfo(doc.materials[4], Vector2(0.0f, 0.0f), 0.0f, Vector2(1.5f, 1.5f));
+                    checkTextureInfo(doc.materials[5], Vector2(-0.2f, -0.1f), 0.3f, Vector2(1.5f, 1.5f));
                 }
 
                 GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_HasTextureTransformExtension_TexCoord)
@@ -464,7 +464,7 @@ namespace Microsoft
 
                     auto checkTextureInfo = [](
                         const Material& material,
-                        const Vector2& offset, float rotation, const Vector2& scale, std::unique_ptr<size_t> texCoord)
+                        const Vector2& offset, float rotation, const Vector2& scale, Detail::Optional<size_t> texCoord = {})
                     {
                         auto& textureInfo = material.metallicRoughness.baseColorTexture;
 
@@ -476,15 +476,15 @@ namespace Microsoft
                         expectedTextureTransform.offset = offset;
                         expectedTextureTransform.scale = scale;
                         expectedTextureTransform.rotation = rotation;
-                        expectedTextureTransform.texCoord = std::move(texCoord);
+                        expectedTextureTransform.texCoord = texCoord;
 
                         Assert::IsTrue(textureTransform == expectedTextureTransform);
                     };
 
                     Assert::IsTrue(doc.materials.Size() == 2);
 
-                    checkTextureInfo(doc.materials[0], Vector2(-0.2f, -0.1f), 0.3f, Vector2(1.5f, 1.5f), std::make_unique<size_t>(1234));
-                    checkTextureInfo(doc.materials[1], Vector2(-0.2f, -0.1f), 0.3f, Vector2(1.5f, 1.5f), {});
+                    checkTextureInfo(doc.materials[0], Vector2(-0.2f, -0.1f), 0.3f, Vector2(1.5f, 1.5f), 1234);
+                    checkTextureInfo(doc.materials[1], Vector2(-0.2f, -0.1f), 0.3f, Vector2(1.5f, 1.5f));
 
                     const auto extensionSerializer = KHR::GetKHRExtensionSerializer();
                     auto tt = Serialize(doc, extensionSerializer);

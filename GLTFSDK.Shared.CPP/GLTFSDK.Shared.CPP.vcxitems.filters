@@ -197,6 +197,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\GLTFSDK\Inc\GLTFSDK\SchemaValidation.h">
       <Filter>Header Files\GLTFSDK</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\GLTFSDK\Inc\GLTFSDK\Optional.h">
+      <Filter>Header Files\GLTFSDK</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)..\GLTFSDK\schema\accessor.schema.json">

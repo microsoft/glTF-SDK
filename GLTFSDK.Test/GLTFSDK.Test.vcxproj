@@ -105,6 +105,7 @@
     <ClCompile Include="Source\IndexedContainerTests.cpp" />
     <ClCompile Include="Source\MeshPrimitiveUtilsTests.cpp" />
     <ClCompile Include="Source\MicrosoftGeneratorVersionTests.cpp" />
+    <ClCompile Include="Source\OptionalTests.cpp" />
     <ClCompile Include="Source\PBRUtilsTests.cpp" />
     <ClCompile Include="Source\ResourceReaderUtilsTests.cpp" />
     <ClCompile Include="Source\SerializeTests.cpp" />

@@ -406,19 +406,17 @@ std::unique_ptr<Extension> KHR::MeshPrimitives::DeserializeDracoMeshCompression(
 KHR::TextureInfos::TextureTransform::TextureTransform() :
     offset(Vector2::ZERO),
     rotation(0.0f),
-    scale(Vector2::ONE)
+    scale(Vector2::ONE),
+    texCoord()
 {
 }
 
 KHR::TextureInfos::TextureTransform::TextureTransform(const TextureTransform& textureTransform) :
     offset(textureTransform.offset),
     rotation(textureTransform.rotation),
-    scale(textureTransform.scale)
+    scale(textureTransform.scale),
+    texCoord(textureTransform.texCoord)
 {
-    if (textureTransform.texCoord)
-    {
-        texCoord = std::make_unique<size_t>(*textureTransform.texCoord);
-    }
 }
 
 std::unique_ptr<Extension> KHR::TextureInfos::TextureTransform::Clone() const
@@ -435,9 +433,7 @@ bool KHR::TextureInfos::TextureTransform::IsEqual(const Extension& rhs) const
         && this->offset == other->offset
         && this->rotation == other->rotation
         && this->scale == other->scale
-        && ((!this->texCoord && !other->texCoord) ||
-            ((this->texCoord && other->texCoord) && 
-                *this->texCoord == *other->texCoord));
+        && this->texCoord == other->texCoord;
 }
 
 std::string KHR::TextureInfos::SerializeTextureTransform(const TextureTransform& textureTransform, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
@@ -463,7 +459,7 @@ std::string KHR::TextureInfos::SerializeTextureTransform(const TextureTransform&
 
         if (textureTransform.texCoord)
         {
-            KHR_textureTransform.AddMember("texCoord", ToKnownSizeType(*textureTransform.texCoord), a);
+            KHR_textureTransform.AddMember("texCoord", ToKnownSizeType(textureTransform.texCoord.Get()), a);
         }
 
         SerializeProperty(gltfDocument, textureTransform, KHR_textureTransform, a, extensionSerializer);
@@ -526,7 +522,7 @@ std::unique_ptr<Extension> KHR::TextureInfos::DeserializeTextureTransform(const 
     auto texCoordIt = sit.FindMember("texCoord");
     if (texCoordIt != sit.MemberEnd())
     {
-        textureTransform.texCoord = std::make_unique<size_t>(static_cast<size_t>(texCoordIt->value.GetUint()));
+        textureTransform.texCoord = static_cast<size_t>(texCoordIt->value.GetUint());
     }
 
     ParseProperty(sit, textureTransform, extensionDeserializer);
