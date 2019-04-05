@@ -17,6 +17,19 @@
 #include <utility>
 #include <vector>
 
+//TODO: use Detail::Optional for:
+
+// gltf.scene(i.e. default scene)
+
+// bufferView.byteStride
+// bufferView.target
+
+// perspective.aspectRatio -> if not defined use the aspect ratio of the 'canvas'
+// perspective.zfar -> if undefined runtime must use an infinite projection matrix
+
+// sampler.magFilter->runtime can select a suitable value if not defined
+// sampler.minFilter->runtime can select a suitable value if not defined
+
 namespace Microsoft
 {
     namespace glTF

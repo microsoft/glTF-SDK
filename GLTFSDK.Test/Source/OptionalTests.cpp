@@ -5,6 +5,8 @@
 
 #include <GLTFSDK/Optional.h>
 
+using namespace glTF::UnitTest;
+
 namespace Microsoft
 {
     namespace glTF
@@ -375,6 +377,92 @@ namespace Microsoft
                         Assert::IsTrue(opt.HasValue());
 
                         Assert::AreEqual("Init", opt.Get().c_str());
+                    }
+                }
+
+                GLTFSDK_TEST_METHOD(OptionalTests, EqualTo)
+                {
+                    // lhs and rhs have no value
+                    {
+                        Detail::Optional<long> opt1;
+                        Detail::Optional<long> opt2;
+
+                        Assert::IsTrue(opt1 == opt2);
+                    }
+
+                    // only lhs has a value
+                    {
+                        Detail::Optional<long> opt1(1L);
+                        Detail::Optional<long> opt2;
+
+                        Assert::IsFalse(opt1 == opt2);
+                    }
+
+                    // only rhs has a value
+                    {
+                        Detail::Optional<long> opt1;
+                        Detail::Optional<long> opt2(1L);
+
+                        Assert::IsFalse(opt1 == opt2);
+                    }
+
+                    // lhs and rhs have the same value
+                    {
+                        Detail::Optional<long> opt1(1L);
+                        Detail::Optional<long> opt2(1L);
+
+                        Assert::IsTrue(opt1 == opt2);
+                    }
+
+                    // lhs and rhs have different values
+                    {
+                        Detail::Optional<long> opt1(1L);
+                        Detail::Optional<long> opt2(2L);
+
+                        Assert::IsFalse(opt1 == opt2);
+                    }
+                }
+
+                GLTFSDK_TEST_METHOD(OptionalTests, NotEqualTo)
+                {
+                    // lhs and rhs have no value
+                    {
+                        Detail::Optional<long> opt1;
+                        Detail::Optional<long> opt2;
+
+                        Assert::IsFalse(opt1 != opt2);
+                    }
+
+                    // only lhs has a value
+                    {
+                        Detail::Optional<long> opt1(1L);
+                        Detail::Optional<long> opt2;
+
+                        Assert::IsTrue(opt1 != opt2);
+                    }
+
+                    // only rhs has a value
+                    {
+                        Detail::Optional<long> opt1;
+                        Detail::Optional<long> opt2(1L);
+
+                        Assert::IsTrue(opt1 != opt2);
+                    }
+
+                    // lhs and rhs have the same value
+                    {
+                        Detail::Optional<long> opt1(1L);
+                        Detail::Optional<long> opt2(1L);
+
+                        Assert::IsFalse(opt1 != opt2);
+                    }
+
+                    // lhs and rhs have different values
+                    {
+                        Detail::Optional<long> opt1(1L);
+                        Detail::Optional<long> opt2(2L);
+
+                        Assert::IsTrue(opt1 != opt2);
                     }
                 }
             };
