@@ -17,16 +17,16 @@ namespace Microsoft
             public:
                 void* GetStorage()
                 {
-                    return data;
+                    return storage;
                 }
 
                 const void* GetStorage() const
                 {
-                    return data;
+                    return storage;
                 }
 
             protected:
-                alignas(A) unsigned char data[N];
+                alignas(A) unsigned char storage[N];
             };
 
             template<typename T>

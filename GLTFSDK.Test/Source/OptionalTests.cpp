@@ -359,6 +359,10 @@ namespace Microsoft
                         Assert::AreEqual("Assign", opt1.Get().c_str());
                     }
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wself-move"
+#endif
                     // Test self-assignment with no existing value
                     {
                         Detail::Optional<std::string> opt;
@@ -378,6 +382,9 @@ namespace Microsoft
 
                         Assert::AreEqual("Init", opt.Get().c_str());
                     }
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
                 }
 
                 GLTFSDK_TEST_METHOD(OptionalTests, EqualTo)

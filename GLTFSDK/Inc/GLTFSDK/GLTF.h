@@ -9,6 +9,7 @@
 #include <GLTFSDK/Extension.h>
 #include <GLTFSDK/IndexedContainer.h>
 #include <GLTFSDK/Math.h>
+#include <GLTFSDK/Optional.h>
 
 #include <memory>
 #include <string>
@@ -17,26 +18,12 @@
 #include <utility>
 #include <vector>
 
-//TODO: use Detail::Optional for:
-
-// gltf.scene(i.e. default scene)
-
-// bufferView.byteStride
-// bufferView.target
-
-// perspective.aspectRatio -> if not defined use the aspect ratio of the 'canvas'
-// perspective.zfar -> if undefined runtime must use an infinite projection matrix
-
-// sampler.magFilter->runtime can select a suitable value if not defined
-// sampler.minFilter->runtime can select a suitable value if not defined
-
 namespace Microsoft
 {
     namespace glTF
     {
         enum BufferViewTarget
         {
-            UNKNOWN_BUFFER = 0,
             ARRAY_BUFFER = 34962,
             ELEMENT_ARRAY_BUFFER = 34963
         };
@@ -345,8 +332,8 @@ namespace Microsoft
             std::string bufferId;
             size_t byteOffset = 0U;
             size_t byteLength = 0U;
-            size_t byteStride = 0U; // 0 = tight packing
-            BufferViewTarget target = UNKNOWN_BUFFER;
+            Detail::Optional<size_t> byteStride;
+            Detail::Optional<BufferViewTarget> target;
 
             bool operator==(const BufferView& rhs) const
             {
@@ -893,16 +880,12 @@ namespace Microsoft
 
         struct Projection : glTFProperty
         {
-            float zfar;
             float znear;
 
             virtual ProjectionType GetProjectionType() const = 0;
             virtual std::unique_ptr<Projection> Clone() const = 0;
             
-            virtual bool IsValid() const
-            {
-                return zfar > znear;
-            }
+            virtual bool IsValid() const = 0;
 
             bool operator==(const Projection& rhs) const
             {
@@ -915,16 +898,13 @@ namespace Microsoft
             }
 
         protected:
-            Projection(float zfar, float znear) :
-                zfar(zfar),
-                znear(znear)
+            Projection(float znear) : znear(znear)
             {
             }
 
             virtual bool IsEqual(const Projection& rhs) const
             {
                 return glTFProperty::Equals(*this, rhs)
-                    && this->zfar == rhs.zfar
                     && this->znear == rhs.znear;
             }
         };
@@ -933,37 +913,41 @@ namespace Microsoft
         {
             float xmag;
             float ymag;
+            float zfar;
+
             Orthographic(float zfar, float znear, float xmag, float ymag) :
-                Projection(zfar, znear),
+                Projection(znear),
                 xmag(xmag),
-                ymag(ymag)
+                ymag(ymag),
+                zfar(zfar)
             {
             }
 
-            virtual bool IsValid() const
+            bool IsValid() const override
             {
-                return Projection::IsValid()
-                    && ymag != 0.0
-                    && xmag != 0.0;
+                return (zfar > znear)
+                    && (ymag != 0.0)
+                    && (xmag != 0.0);
             }
 
-            virtual ProjectionType GetProjectionType() const
+            ProjectionType GetProjectionType() const override
             {
                 return ProjectionType::ORTHOGRAPHIC;
             }
 
-            virtual std::unique_ptr<Projection> Clone() const
+            std::unique_ptr<Projection> Clone() const override
             {
                 return std::make_unique<Orthographic>(*this);
             }
 
-            virtual bool IsEqual(const Projection& rhs) const
+            bool IsEqual(const Projection& rhs) const override
             {
                 if (const auto other = dynamic_cast<const Orthographic*>(&rhs))
                 {
                     return Projection::IsEqual(rhs)
                         && xmag == other->xmag
-                        && ymag == other->ymag;
+                        && ymag == other->ymag
+                        && zfar == other->zfar;
                 }
 
                 return false;
@@ -972,43 +956,59 @@ namespace Microsoft
 
         struct Perspective : Projection
         {
-            float aspectRatio;
+            Detail::Optional<float> aspectRatio;
             float yfov;
+            Detail::Optional<float> zfar;
+
+            Perspective(float znear, float yfov) :
+                Projection(znear),
+                aspectRatio(),
+                yfov(yfov),
+                zfar()
+            {
+            }
 
             Perspective(float zfar, float znear, float aspectRatio, float yfov) :
-                Projection(zfar, znear),
+                Projection(znear),
                 aspectRatio(aspectRatio),
-                yfov(yfov)
+                yfov(yfov),
+                zfar(zfar)
             {
+            }
+
+            bool IsValid() const override
+            {
+                return !zfar.HasValue() || (zfar.Get() > znear);
             }
 
             bool IsFinite() const
             {
-                return zfar != std::numeric_limits<float>::infinity();
+                return zfar.HasValue(); // If zfar is undefined the runtime must use an infinite projection matrix
             }
 
             bool HasCustomAspectRatio() const
             {
-                return aspectRatio != 0.0f;
+                return aspectRatio.HasValue(); // When aspectRatio is undefined the aspect ratio of the 'canvas' should be used
             }
 
-            virtual ProjectionType GetProjectionType() const
+            ProjectionType GetProjectionType() const override
             {
                 return ProjectionType::PERSPECTIVE;
             }
 
-            virtual std::unique_ptr<Projection> Clone() const
+            std::unique_ptr<Projection> Clone() const override
             {
                 return std::make_unique<Perspective>(*this);
             }
 
-            virtual bool IsEqual(const Projection& rhs) const
+            bool IsEqual(const Projection& rhs) const override
             {
                 if (const auto other = dynamic_cast<const Perspective*>(&rhs))
                 {
                     return Projection::IsEqual(rhs)
                         && aspectRatio == other->aspectRatio
-                        && yfov == other->yfov;
+                        && yfov == other->yfov
+                        && zfar == other->zfar;
                 }
 
                 return false;
@@ -1051,6 +1051,7 @@ namespace Microsoft
                 {
                     return *ret;
                 }
+
                 throw GLTFException("Failed to cast projection to orthographic");
             }
 
@@ -1060,6 +1061,7 @@ namespace Microsoft
                 {
                     return *ret;
                 }
+
                 throw GLTFException("Failed to cast projection to orthographic");
             }
 
@@ -1074,6 +1076,7 @@ namespace Microsoft
                 {
                     return !projection && !rhs.projection;
                 }
+
                 return *projection == *(rhs.projection);
             }
 
@@ -1191,15 +1194,12 @@ namespace Microsoft
 
         struct Sampler : glTFChildOfRootProperty
         {
-            static const MagFilterMode kMagFilterDefault = MagFilter_LINEAR;
-            static const MinFilterMode kMinFilterDefault = MinFilter_NEAREST_MIPMAP_LINEAR;
-            static const WrapMode kWrapSDefault = Wrap_REPEAT;
-            static const WrapMode kWrapTDefault = Wrap_REPEAT;
-
-            MagFilterMode magFilter = kMagFilterDefault;
-            MinFilterMode minFilter = kMinFilterDefault;
-            WrapMode wrapS = kWrapSDefault;
-            WrapMode wrapT = kWrapTDefault;
+            // The glTF spec doesn't define default values for magFilter and minFilter members. When
+            // filtering options are not defined implementations are free to select a suitable value
+            Detail::Optional<MagFilterMode> magFilter;
+            Detail::Optional<MinFilterMode> minFilter;
+            WrapMode wrapS = Wrap_REPEAT;
+            WrapMode wrapT = Wrap_REPEAT;
 
             static MinFilterMode GetSamplerMinFilterMode(size_t readValue)
             {

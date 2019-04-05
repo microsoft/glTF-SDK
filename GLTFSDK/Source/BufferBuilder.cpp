@@ -62,7 +62,7 @@ const Buffer& BufferBuilder::AddBuffer(const char* bufferId)
     return bufferRef;
 }
 
-const BufferView& BufferBuilder::AddBufferView(BufferViewTarget target)
+const BufferView& BufferBuilder::AddBufferView(Detail::Optional<BufferViewTarget> target)
 {
     Buffer& buffer = m_buffers.Back();
     BufferView bufferView;
@@ -80,7 +80,7 @@ const BufferView& BufferBuilder::AddBufferView(BufferViewTarget target)
     return m_bufferViews.Append(std::move(bufferView), AppendIdPolicy::GenerateOnEmpty);
 }
 
-const BufferView& BufferBuilder::AddBufferView(const void* data, size_t byteLength, size_t byteStride, BufferViewTarget target)
+const BufferView& BufferBuilder::AddBufferView(const void* data, size_t byteLength, Detail::Optional<size_t> byteStride, Detail::Optional<BufferViewTarget> target)
 {
     Buffer& buffer = m_buffers.Back();
     BufferView bufferView;
@@ -170,7 +170,8 @@ void BufferBuilder::AddAccessors(const void* data, size_t count, size_t byteStri
         extent = count * byteStride;
 
         // Ensure all accessors fit within the buffer view's extent.
-        const size_t lastElement = (count - 1) * bufferView.byteStride;
+        const size_t lastElement = (count - 1) * (bufferView.byteStride ? bufferView.byteStride.Get() : 0U);
+
         for (size_t i = 0; i < descCount; ++i)
         {
             const size_t accessorSize = Accessor::GetTypeCount(pDescs[i].accessorType) * Accessor::GetComponentTypeSize(pDescs[i].componentType);
