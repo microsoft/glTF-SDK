@@ -429,7 +429,7 @@ namespace Microsoft
 
                     auto checkTextureInfo = [](
                         const Material& material, 
-                        const Vector2& offset, float rotation, const Vector2& scale, Detail::Optional<size_t> texCoord = {})
+                        const Vector2& offset, float rotation, const Vector2& scale, Optional<size_t> texCoord = {})
                     {
                         auto& textureInfo = material.metallicRoughness.baseColorTexture;
 
@@ -464,7 +464,7 @@ namespace Microsoft
 
                     auto checkTextureInfo = [](
                         const Material& material,
-                        const Vector2& offset, float rotation, const Vector2& scale, Detail::Optional<size_t> texCoord = {})
+                        const Vector2& offset, float rotation, const Vector2& scale, Optional<size_t> texCoord = {})
                     {
                         auto& textureInfo = material.metallicRoughness.baseColorTexture;
 

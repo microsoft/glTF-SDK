@@ -62,7 +62,7 @@ const Buffer& BufferBuilder::AddBuffer(const char* bufferId)
     return bufferRef;
 }
 
-const BufferView& BufferBuilder::AddBufferView(Detail::Optional<BufferViewTarget> target)
+const BufferView& BufferBuilder::AddBufferView(Optional<BufferViewTarget> target)
 {
     Buffer& buffer = m_buffers.Back();
     BufferView bufferView;
@@ -80,7 +80,7 @@ const BufferView& BufferBuilder::AddBufferView(Detail::Optional<BufferViewTarget
     return m_bufferViews.Append(std::move(bufferView), AppendIdPolicy::GenerateOnEmpty);
 }
 
-const BufferView& BufferBuilder::AddBufferView(const void* data, size_t byteLength, Detail::Optional<size_t> byteStride, Detail::Optional<BufferViewTarget> target)
+const BufferView& BufferBuilder::AddBufferView(const void* data, size_t byteLength, Optional<size_t> byteStride, Optional<BufferViewTarget> target)
 {
     Buffer& buffer = m_buffers.Back();
     BufferView bufferView;

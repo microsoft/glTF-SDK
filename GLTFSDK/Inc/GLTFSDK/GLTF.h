@@ -332,8 +332,8 @@ namespace Microsoft
             std::string bufferId;
             size_t byteOffset = 0U;
             size_t byteLength = 0U;
-            Detail::Optional<size_t> byteStride;
-            Detail::Optional<BufferViewTarget> target;
+            Optional<size_t> byteStride;
+            Optional<BufferViewTarget> target;
 
             bool operator==(const BufferView& rhs) const
             {
@@ -956,9 +956,9 @@ namespace Microsoft
 
         struct Perspective : Projection
         {
-            Detail::Optional<float> aspectRatio;
+            Optional<float> aspectRatio;
             float yfov;
-            Detail::Optional<float> zfar;
+            Optional<float> zfar;
 
             Perspective(float znear, float yfov) :
                 Projection(znear),
@@ -1196,8 +1196,8 @@ namespace Microsoft
         {
             // The glTF spec doesn't define default values for magFilter and minFilter members. When
             // filtering options are not defined implementations are free to select a suitable value
-            Detail::Optional<MagFilterMode> magFilter;
-            Detail::Optional<MinFilterMode> minFilter;
+            Optional<MagFilterMode> magFilter;
+            Optional<MinFilterMode> minFilter;
             WrapMode wrapS = Wrap_REPEAT;
             WrapMode wrapT = Wrap_REPEAT;
 

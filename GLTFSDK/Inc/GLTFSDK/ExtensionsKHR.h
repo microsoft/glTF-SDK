@@ -85,7 +85,7 @@ namespace Microsoft
                     Vector2 offset;
                     float rotation;
                     Vector2 scale;
-                    Detail::Optional<size_t> texCoord; // TexCoord is a optional property
+                    Optional<size_t> texCoord; // TexCoord is a optional property
 
                     std::unique_ptr<Extension> Clone() const override;
                     bool IsEqual(const Extension& rhs) const override;

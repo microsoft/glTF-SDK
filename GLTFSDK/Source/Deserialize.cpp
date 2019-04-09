@@ -183,7 +183,6 @@ namespace
         bv.byteLength = GetValue<size_t>(FindRequiredMember("byteLength", v)->value);
 
         auto itByteStride = v.FindMember("byteStride");
-
         if (itByteStride != v.MemberEnd())
         {
             bv.byteStride = itByteStride->value.GetUint();
@@ -191,7 +190,6 @@ namespace
 
         // When target is not provided, the bufferView contains animation or skin data
         auto itTarget = v.FindMember("target");
-
         if (itTarget != v.MemberEnd())
         {
             bv.target = static_cast<BufferViewTarget>(itTarget->value.GetUint());
@@ -410,16 +408,14 @@ namespace
         if (projectionType == "perspective")
         {
             auto perspectiveIt = v.FindMember("perspective");
-
             if (perspectiveIt == v.MemberEnd())
             {
                 throw InvalidGLTFException("Camera perspective projection undefined");
             }
 
-            Detail::Optional<float> aspectRatio;
+            Optional<float> aspectRatio;
 
             auto itAspectRatio = perspectiveIt->value.FindMember("target");
-
             if (itAspectRatio != perspectiveIt->value.MemberEnd())
             {
                 aspectRatio = itAspectRatio->value.GetFloat();
@@ -428,10 +424,9 @@ namespace
             float yfov = GetValue<float>(FindRequiredMember("yfov", perspectiveIt->value)->value);
             float znear = GetValue<float>(FindRequiredMember("znear", perspectiveIt->value)->value);
 
-            Detail::Optional<float> zfar;
+            Optional<float> zfar;
 
             auto itZFar = perspectiveIt->value.FindMember("zfar");
-
             if (itZFar != perspectiveIt->value.MemberEnd())
             {
                 zfar = itZFar->value.GetFloat();
@@ -514,14 +509,12 @@ namespace
         sampler.wrapS = Sampler::GetSamplerWrapMode(GetMemberValueOrDefault<unsigned int>(v, "wrapS", static_cast<unsigned int>(WrapMode::Wrap_REPEAT)));
 
         auto itMin = v.FindMember("minFilter");
-
         if (itMin != v.MemberEnd())
         {
             sampler.minFilter = Sampler::GetSamplerMinFilterMode(itMin->value.GetUint());
         }
 
         auto itMax = v.FindMember("maxFilter");
-
         if (itMax != v.MemberEnd())
         {
             sampler.magFilter = Sampler::GetSamplerMagFilterMode(itMax->value.GetUint());
