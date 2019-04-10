@@ -514,10 +514,10 @@ namespace
             sampler.minFilter = Sampler::GetSamplerMinFilterMode(itMin->value.GetUint());
         }
 
-        auto itMax = v.FindMember("maxFilter");
-        if (itMax != v.MemberEnd())
+        auto itMag = v.FindMember("magFilter");
+        if (itMag != v.MemberEnd())
         {
-            sampler.magFilter = Sampler::GetSamplerMagFilterMode(itMax->value.GetUint());
+            sampler.magFilter = Sampler::GetSamplerMagFilterMode(itMag->value.GetUint());
         }
 
         ParseProperty(v, sampler, extensionDeserializer);
