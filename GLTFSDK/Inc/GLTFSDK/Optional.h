@@ -9,29 +9,8 @@ namespace Microsoft
 {
     namespace glTF
     {
-        namespace Detail
-        {
-            template<size_t N, size_t A>
-            class OptionalStorage
-            {
-            public:
-                void* GetStorage()
-                {
-                    return storage;
-                }
-
-                const void* GetStorage() const
-                {
-                    return storage;
-                }
-
-            protected:
-                alignas(A) unsigned char storage[N];
-            };
-        }
-
         template<typename T>
-        class Optional final : private Detail::OptionalStorage<sizeof(T), alignof(T)>
+        class Optional final
         {
         public:
             Optional() : isConstructed(false)
@@ -123,15 +102,13 @@ namespace Microsoft
                 {
                     new (rhs.GetStorage()) T(std::move(lhs.Get()));
                     rhs.isConstructed = true;
-                    lhs.Get().~T(); // In-place delete;
-                    lhs.isConstructed = false;
+                    lhs.Reset();
                 }
                 else if (rhs)
                 {
                     new (lhs.GetStorage()) T(std::move(rhs.Get()));
                     lhs.isConstructed = true;
-                    rhs.Get().~T(); // In-place delete;
-                    rhs.isConstructed = false;
+                    rhs.Reset();
                 }
             }
 
@@ -191,6 +168,18 @@ namespace Microsoft
             }
 
         private:
+            void* GetStorage()
+            {
+                return storage;
+            }
+
+            const void* GetStorage() const
+            {
+                return storage;
+            }
+
+            alignas(alignof(T)) unsigned char storage[sizeof(T)];
+
             bool isConstructed;
         };
 

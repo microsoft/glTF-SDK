@@ -359,6 +359,8 @@ namespace Microsoft
                         Assert::AreEqual("Assign", opt1.Get().c_str());
                     }
 
+
+// Disable warnings (clang only) about self move-assignment so it is possible to test that the Optional type works as expected in this situation
 #ifdef __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wself-move"
