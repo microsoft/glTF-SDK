@@ -336,16 +336,14 @@ namespace
         bufferViewValue.AddMember("byteOffset", ToKnownSizeType(bufferView.byteOffset), a);
         bufferViewValue.AddMember("byteLength", ToKnownSizeType(bufferView.byteLength), a);
 
-        // byteStride of 0U (default) means that data is tightly packed, so omit byteStride
-        if (bufferView.byteStride != 0U)
+        if (bufferView.byteStride)
         {
-            bufferViewValue.AddMember("byteStride", ToKnownSizeType(bufferView.byteStride), a);
+            bufferViewValue.AddMember("byteStride", ToKnownSizeType(bufferView.byteStride.Get()), a);
         }
 
-        // Do not write default/invalid values
-        if (bufferView.target != UNKNOWN_BUFFER)
+        if (bufferView.target)
         {
-            bufferViewValue.AddMember("target", bufferView.target, a);
+            bufferViewValue.AddMember("target", bufferView.target.Get(), a);
         }
 
         SerializeProperty(gltfDocument, bufferView, bufferViewValue, a, extensionSerializer);
@@ -636,33 +634,39 @@ namespace
 
         if (camera.projection->GetProjectionType() == ProjectionType::PERSPECTIVE)
         {
-            projectionValue.AddMember("znear", RapidJsonUtils::ToFloatValue(camera.GetPerspective().znear), a);
-            projectionValue.AddMember("yfov", RapidJsonUtils::ToFloatValue(camera.GetPerspective().yfov), a);
-            if (camera.GetPerspective().zfar != std::numeric_limits<float>::infinity())
+            const auto& perspective = camera.GetPerspective();
+
+            projectionValue.AddMember("znear", RapidJsonUtils::ToFloatValue(perspective.znear), a);
+            projectionValue.AddMember("yfov", RapidJsonUtils::ToFloatValue(perspective.yfov), a);
+
+            if (perspective.zfar)
             {
-                projectionValue.AddMember("zfar", RapidJsonUtils::ToFloatValue(camera.projection->zfar), a);
-            }
-            if (camera.GetPerspective().HasCustomAspectRatio())
-            {
-                projectionValue.AddMember("aspectRatio", RapidJsonUtils::ToFloatValue(camera.GetPerspective().aspectRatio), a);
+                projectionValue.AddMember("zfar", RapidJsonUtils::ToFloatValue(perspective.zfar.Get()), a);
             }
 
-            SerializeProperty(gltfDocument, *camera.projection, projectionValue, a, extensionSerializer);
+            if (perspective.aspectRatio)
+            {
+                projectionValue.AddMember("aspectRatio", RapidJsonUtils::ToFloatValue(perspective.aspectRatio.Get()), a);
+            }
+
+            SerializeProperty(gltfDocument, perspective, projectionValue, a, extensionSerializer);
 
             cameraValue.AddMember("perspective", projectionValue, a);
             cameraValue.AddMember("type", RapidJsonUtils::ToStringValue("perspective", a), a);
         }
         else if (camera.projection->GetProjectionType() == ProjectionType::ORTHOGRAPHIC)
         {
-            projectionValue.AddMember("xmag", RapidJsonUtils::ToFloatValue(camera.GetOrthographic().xmag), a);
-            projectionValue.AddMember("ymag", RapidJsonUtils::ToFloatValue(camera.GetOrthographic().ymag), a);
-            projectionValue.AddMember("znear", RapidJsonUtils::ToFloatValue(camera.GetOrthographic().znear), a);
-            projectionValue.AddMember("zfar", RapidJsonUtils::ToFloatValue(camera.GetOrthographic().zfar), a);
+            const auto& orthographic = camera.GetOrthographic();
 
-            SerializeProperty(gltfDocument, *camera.projection, projectionValue, a, extensionSerializer);
+            projectionValue.AddMember("xmag", RapidJsonUtils::ToFloatValue(orthographic.xmag), a);
+            projectionValue.AddMember("ymag", RapidJsonUtils::ToFloatValue(orthographic.ymag), a);
+            projectionValue.AddMember("znear", RapidJsonUtils::ToFloatValue(orthographic.znear), a);
+            projectionValue.AddMember("zfar", RapidJsonUtils::ToFloatValue(orthographic.zfar), a);
 
-            cameraValue.AddMember("type", RapidJsonUtils::ToStringValue("orthographic", a), a);
+            SerializeProperty(gltfDocument, orthographic, projectionValue, a, extensionSerializer);
+
             cameraValue.AddMember("orthographic", projectionValue, a);
+            cameraValue.AddMember("type", RapidJsonUtils::ToStringValue("orthographic", a), a);
         }
 
         SerializeProperty(gltfDocument, camera, cameraValue, a, extensionSerializer);
@@ -676,28 +680,33 @@ namespace
     {
         rapidjson::Document::AllocatorType& a = document.GetAllocator();
         rapidjson::Value samplerValue(rapidjson::kObjectType);
+
         {
             RapidJsonUtils::AddOptionalMember("name", samplerValue, sampler.name, a);
 
-            if (sampler.magFilter != Sampler::kMagFilterDefault)
+            if (sampler.magFilter)
             {
-                samplerValue.AddMember("magFilter", sampler.magFilter, a);
+                samplerValue.AddMember("magFilter", sampler.magFilter.Get(), a);
             }
-            if (sampler.minFilter != Sampler::kMinFilterDefault)
+
+            if (sampler.minFilter)
             {
-                samplerValue.AddMember("minFilter", sampler.minFilter, a);
+                samplerValue.AddMember("minFilter", sampler.minFilter.Get(), a);
             }
-            if (sampler.wrapS != Sampler::kWrapSDefault)
+
+            if (sampler.wrapS != WrapMode::Wrap_REPEAT)
             {
                 samplerValue.AddMember("wrapS", sampler.wrapS, a);
             }
-            if (sampler.wrapT != Sampler::kWrapTDefault)
+
+            if (sampler.wrapT != WrapMode::Wrap_REPEAT)
             {
                 samplerValue.AddMember("wrapT", sampler.wrapT, a);
             }
 
             SerializeProperty(gltfDocument, sampler, samplerValue, a, extensionSerializer);
         }
+
         return samplerValue;
     }
 

@@ -4,6 +4,7 @@
 #pragma once
 
 #include <GLTFSDK/ExtensionHandlers.h>
+#include <GLTFSDK/Optional.h>
 
 #include <memory>
 #include <string>
@@ -84,8 +85,7 @@ namespace Microsoft
                     Vector2 offset;
                     float rotation;
                     Vector2 scale;
-                    // TexCoord is optional
-                    std::unique_ptr<size_t> texCoord;
+                    Optional<size_t> texCoord; // TexCoord is an optional property
 
                     std::unique_ptr<Extension> Clone() const override;
                     bool IsEqual(const Extension& rhs) const override;

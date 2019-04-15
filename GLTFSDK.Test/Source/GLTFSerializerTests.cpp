@@ -18,26 +18,26 @@ namespace
     void TestBadGLTFSerializeToJson(const Document& doc)
     {
         Assert::ExpectException<GLTFException>([&doc]
-        {
-            Serialize(doc);
-        }, L"Expected exception was not thrown");
+            {
+                Serialize(doc);
+            }, L"Expected exception was not thrown");
     }
 
     void TestBadGLTFDeserializeToDocument(const char* data)
     {
         Assert::ExpectException<GLTFException>([&data]
-        {
-            Deserialize(data);
-        }, L"Expected exception was not thrown");
+            {
+                Deserialize(data);
+            }, L"Expected exception was not thrown");
     }
 
     void TestDocumentValidationFail(const char* data)
     {
         Assert::ExpectException<ValidationException>([&data]
-        {
-            auto doc = Deserialize(data);
-            Validation::Validate(doc);
-        }, L"Expected exception was not thrown");
+            {
+                auto doc = Deserialize(data);
+                Validation::Validate(doc);
+            }, L"Expected exception was not thrown");
     }
 
     const char* c_invalidPrimitiveAccessorComponentType = R"({
@@ -294,12 +294,77 @@ namespace
     ],
     "scene": 0
 })";
+
+    const char* c_validSamplerDocument = R"({
+    "asset": {
+        "version": "2.0"
+    },
+    "samplers": [
+        {
+            "minFilter": 9728,
+            "magFilter": 9729
+        },
+        {
+            "wrapS": 33648,
+            "wrapT": 33071
+        }
+    ]
+})";
 }
 
 namespace Microsoft
 {
     namespace  glTF
     {
+        std::wstring ToString(WrapMode wrapMode)
+        {
+            switch (wrapMode)
+            {
+            case Wrap_REPEAT:
+                return L"REPEAT";
+            case Wrap_CLAMP_TO_EDGE:
+                return L"CLAMP_TO_EDGE";
+            case Wrap_MIRRORED_REPEAT:
+                return L"MIRRORED_REPEAT";
+            }
+
+            return {};
+        }
+
+        std::wstring ToString(MinFilterMode minFilterMode)
+        {
+            switch (minFilterMode)
+            {
+            case MinFilter_NEAREST:
+                return L"NEAREST";
+            case MinFilter_NEAREST_MIPMAP_LINEAR:
+                return L"NEAREST_MIPMAP_LINEAR";
+            case MinFilter_NEAREST_MIPMAP_NEAREST:
+                return L"NEAREST_MIPMAP_NEAREST";
+            case MinFilter_LINEAR:
+                return L"LINEAR";
+            case MinFilter_LINEAR_MIPMAP_LINEAR:
+                return L"LINEAR_MIPMAP_LINEAR";
+            case MinFilter_LINEAR_MIPMAP_NEAREST:
+                return L"LINEAR_MIPMAP_NEAREST";
+            }
+
+            return {};
+        }
+
+        std::wstring ToString(MagFilterMode magFilterMode)
+        {
+            switch (magFilterMode)
+            {
+            case MagFilter_NEAREST:
+                return L"NEAREST";
+            case MagFilter_LINEAR:
+                return L"LINEAR";
+            }
+
+            return {};
+        }
+
         namespace Test
         {
             GLTFSDK_TEST_CLASS(SerializerGLTFTests)
@@ -422,6 +487,25 @@ namespace Microsoft
                     doc.defaultSceneId = "bar";
 
                     TestBadGLTFSerializeToJson(doc);
+                }
+
+                GLTFSDK_TEST_METHOD(SerializerGLTFTests, SerializerGLTFTests_DeserializeSampler)
+                {
+                    auto doc = Deserialize(c_validSamplerDocument);
+
+                    Assert::AreEqual(doc.samplers.Size(), size_t(2U), L"Unexpected number of samplers after deserializing manifest");
+
+                    Assert::AreEqual(doc.samplers[0].minFilter.Get(), MinFilter_NEAREST, L"Sampler minification filter was not deserialized correctly");
+                    Assert::AreEqual(doc.samplers[0].magFilter.Get(), MagFilter_LINEAR, L"Sampler magnification filter was not deserialized correctly");
+
+                    Assert::AreEqual(doc.samplers[0].wrapS, Wrap_REPEAT, L"Sampler default wrapS property was not deserialized correctly");
+                    Assert::AreEqual(doc.samplers[0].wrapT, Wrap_REPEAT, L"Sampler default wrapT property was not deserialized correctly");
+
+                    Assert::IsFalse(doc.samplers[1].minFilter.HasValue(), L"Sampler default minification filter was not unspecified");
+                    Assert::IsFalse(doc.samplers[1].magFilter.HasValue(), L"Sampler default magnification filter was not unspecified");
+
+                    Assert::AreEqual(doc.samplers[1].wrapS, Wrap_MIRRORED_REPEAT, L"Sampler wrapS property was not deserialized correctly");
+                    Assert::AreEqual(doc.samplers[1].wrapT, Wrap_CLAMP_TO_EDGE, L"Sampler wrapT property was not deserialized correctly");
                 }
             };
         }

@@ -181,18 +181,18 @@ namespace
         bv.bufferId = std::to_string(FindRequiredMember("buffer", v)->value.GetUint());
         bv.byteOffset = GetMemberValueOrDefault<size_t>(v, "byteOffset");
         bv.byteLength = GetValue<size_t>(FindRequiredMember("byteLength", v)->value);
-        bv.byteStride = GetMemberValueOrDefault<size_t>(v, "byteStride", 0U);
+
+        auto itByteStride = v.FindMember("byteStride");
+        if (itByteStride != v.MemberEnd())
+        {
+            bv.byteStride = itByteStride->value.GetUint();
+        }
 
         // When target is not provided, the bufferView contains animation or skin data
-        auto it = v.FindMember("target");
-
-        if (it != v.MemberEnd())
+        auto itTarget = v.FindMember("target");
+        if (itTarget != v.MemberEnd())
         {
-            bv.target = static_cast<BufferViewTarget>(it->value.GetUint());
-        }
-        else
-        {
-            bv.target = BufferViewTarget::UNKNOWN_BUFFER;
+            bv.target = static_cast<BufferViewTarget>(itTarget->value.GetUint());
         }
 
         ParseProperty(v, bv, extensionDeserializer);
@@ -413,13 +413,33 @@ namespace
                 throw InvalidGLTFException("Camera perspective projection undefined");
             }
 
-            float aspectRatio = GetMemberValueOrDefault<float>(perspectiveIt->value, "aspectRatio", 0.0f);
+            Optional<float> aspectRatio;
+
+            auto itAspectRatio = perspectiveIt->value.FindMember("target");
+            if (itAspectRatio != perspectiveIt->value.MemberEnd())
+            {
+                aspectRatio = itAspectRatio->value.GetFloat();
+            }
+
             float yfov = GetValue<float>(FindRequiredMember("yfov", perspectiveIt->value)->value);
             float znear = GetValue<float>(FindRequiredMember("znear", perspectiveIt->value)->value);
-            float zfar = GetMemberValueOrDefault<float>(perspectiveIt->value, "zfar", std::numeric_limits<float>::infinity());
-            projection = std::make_unique<Perspective>(zfar, znear, aspectRatio, yfov);
 
-            ParseProperty(perspectiveIt->value, *projection, extensionDeserializer);
+            Optional<float> zfar;
+
+            auto itZFar = perspectiveIt->value.FindMember("zfar");
+            if (itZFar != perspectiveIt->value.MemberEnd())
+            {
+                zfar = itZFar->value.GetFloat();
+            }
+
+            auto perspective = std::make_unique<Perspective>(znear, yfov);
+
+            perspective->zfar = zfar;
+            perspective->aspectRatio = aspectRatio;
+
+            ParseProperty(perspectiveIt->value, *perspective, extensionDeserializer);
+
+            projection = std::move(perspective);
         }
         else if (projectionType == "orthographic")
         {
@@ -485,10 +505,20 @@ namespace
         Sampler sampler;
 
         sampler.name = GetMemberValueOrDefault<std::string>(v, "name");
-        sampler.minFilter = Sampler::GetSamplerMinFilterMode(GetMemberValueOrDefault<int>(v, "minFilter", static_cast<int>(Sampler::kMinFilterDefault)));
-        sampler.magFilter = Sampler::GetSamplerMagFilterMode(GetMemberValueOrDefault<int>(v, "magFilter", static_cast<int>(Sampler::kMagFilterDefault)));
-        sampler.wrapT = Sampler::GetSamplerWrapMode(GetMemberValueOrDefault<int>(v, "wrapT", static_cast<int>(Sampler::kWrapTDefault)));
-        sampler.wrapS = Sampler::GetSamplerWrapMode(GetMemberValueOrDefault<int>(v, "wrapS", static_cast<int>(Sampler::kWrapSDefault)));
+        sampler.wrapT = Sampler::GetSamplerWrapMode(GetMemberValueOrDefault<unsigned int>(v, "wrapT", static_cast<unsigned int>(WrapMode::Wrap_REPEAT)));
+        sampler.wrapS = Sampler::GetSamplerWrapMode(GetMemberValueOrDefault<unsigned int>(v, "wrapS", static_cast<unsigned int>(WrapMode::Wrap_REPEAT)));
+
+        auto itMin = v.FindMember("minFilter");
+        if (itMin != v.MemberEnd())
+        {
+            sampler.minFilter = Sampler::GetSamplerMinFilterMode(itMin->value.GetUint());
+        }
+
+        auto itMag = v.FindMember("magFilter");
+        if (itMag != v.MemberEnd())
+        {
+            sampler.magFilter = Sampler::GetSamplerMagFilterMode(itMag->value.GetUint());
+        }
 
         ParseProperty(v, sampler, extensionDeserializer);
 

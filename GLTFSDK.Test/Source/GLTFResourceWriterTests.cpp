@@ -254,7 +254,6 @@ namespace Microsoft
                     bufferView.bufferId = "0";
                     bufferView.byteOffset = 0;
                     bufferView.byteLength = data.size() * sizeof(uint32_t);
-                    bufferView.target = BufferViewTarget::UNKNOWN_BUFFER;
 
                     writer.Write(bufferView, data.data());
 
@@ -280,7 +279,6 @@ namespace Microsoft
                     bufferView.bufferId = "0";
                     bufferView.byteOffset = 0;
                     bufferView.byteLength = data.size() * sizeof(uint32_t);
-                    bufferView.target = BufferViewTarget::UNKNOWN_BUFFER;
 
                     writer.Write(bufferView, data.data());
 
@@ -306,7 +304,6 @@ namespace Microsoft
                     bufferView.bufferId = "0";
                     bufferView.byteOffset = 0;
                     bufferView.byteLength = data.size() * sizeof(uint32_t);
-                    bufferView.target = BufferViewTarget::UNKNOWN_BUFFER;
 
                     writer.Write(bufferView, data.data());
 
@@ -332,7 +329,6 @@ namespace Microsoft
                     bufferView.bufferId = "0";
                     bufferView.byteOffset = 0;
                     bufferView.byteLength = data1.size() * sizeof(uint32_t);
-                    bufferView.target = BufferViewTarget::UNKNOWN_BUFFER;
 
                     writer.Write(bufferView, data1.data());
 
@@ -361,7 +357,6 @@ namespace Microsoft
                     bufferView.bufferId = "0";
                     bufferView.byteOffset = 0;
                     bufferView.byteLength = data.size() * sizeof(float);
-                    bufferView.target = BufferViewTarget::UNKNOWN_BUFFER;
 
                     Accessor accessor;
                     accessor.id = "0";
@@ -399,7 +394,6 @@ namespace Microsoft
                     bufferView.bufferId = "0";
                     bufferView.byteOffset = 0;
                     bufferView.byteLength = data.size() * sizeof(float);
-                    bufferView.target = BufferViewTarget::UNKNOWN_BUFFER;
 
                     Accessor accessor;
                     accessor.id = "0";
@@ -435,7 +429,6 @@ namespace Microsoft
                     bufferView.bufferId = "0";
                     bufferView.byteOffset = 0;
                     bufferView.byteLength = data1.size() * sizeof(uint8_t);
-                    bufferView.target = BufferViewTarget::UNKNOWN_BUFFER;
 
                     Accessor accessor;
                     accessor.id = "0";
@@ -488,7 +481,6 @@ namespace Microsoft
                     bufferView.bufferId = "0";
                     bufferView.byteOffset = 0;
                     bufferView.byteLength = data1.size() * sizeof(uint8_t);
-                    bufferView.target = BufferViewTarget::UNKNOWN_BUFFER;
 
                     Accessor accessor;
                     accessor.id = "0";
@@ -535,7 +527,6 @@ namespace Microsoft
                     bufferView.bufferId = "0";
                     bufferView.byteOffset = 0;
                     bufferView.byteLength = data.size() * sizeof(uint32_t) + 1U;// Add an additional byte as the accessor's byteOffset is 1;
-                    bufferView.target = BufferViewTarget::UNKNOWN_BUFFER;
 
                     Accessor accessor;
                     accessor.id = "0";
@@ -563,7 +554,6 @@ namespace Microsoft
                     bufferView.bufferId = "0";
                     bufferView.byteOffset = 1U;
                     bufferView.byteLength = data.size() * sizeof(uint32_t) + 5U;// Add an additional 5 bytes as the bufferView and accessor's byteOffsets are 1 and 4 respectively;
-                    bufferView.target = BufferViewTarget::UNKNOWN_BUFFER;
 
                     Accessor accessor;
                     accessor.id = "0";

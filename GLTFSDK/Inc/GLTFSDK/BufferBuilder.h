@@ -46,11 +46,11 @@ namespace Microsoft
 
             const Buffer& AddBuffer(const char* bufferId = nullptr);
 
-            const BufferView& AddBufferView(BufferViewTarget target);
-            const BufferView& AddBufferView(const void* data, size_t byteLength, size_t byteStride = 0, BufferViewTarget target = BufferViewTarget::UNKNOWN_BUFFER);
+            const BufferView& AddBufferView(Optional<BufferViewTarget> target);
+            const BufferView& AddBufferView(const void* data, size_t byteLength, Optional<size_t> byteStride = {}, Optional<BufferViewTarget> target = {});
 
             template<typename T>
-            const BufferView& AddBufferView(const std::vector<T>& data, size_t byteStride = 0, BufferViewTarget target = BufferViewTarget::UNKNOWN_BUFFER)
+            const BufferView& AddBufferView(const std::vector<T>& data, Optional<size_t> byteStride = {}, Optional<BufferViewTarget> target = {})
             {
                 return AddBufferView(data.data(), data.size() * sizeof(T), byteStride, target);
             }

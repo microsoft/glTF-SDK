@@ -92,6 +92,9 @@
     <ClCompile Include="Source\GLBResourceWriterTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\OptionalTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\gltf\ReciprocatingSaw.gltf">
@@ -253,6 +256,9 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="Resources\glTF-Asset-Generator\Mesh_PrimitiveMode\Mesh_PrimitiveMode_15.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Resources\gltf\TextureTransformTest.gltf">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

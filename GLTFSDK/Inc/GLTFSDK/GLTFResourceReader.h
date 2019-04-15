@@ -137,14 +137,13 @@ namespace Microsoft
 
                 const size_t offset = accessor.byteOffset + bufferView.byteOffset;
 
-                if (bufferView.byteStride == 0U ||
-                    bufferView.byteStride == elementSize)
+                if (!bufferView.byteStride || bufferView.byteStride.Get() == elementSize)
                 {
                     data = ReadBinaryData<T>(buffer, offset, accessor.count * typeCount);
                 }
                 else
                 {
-                    data = ReadBinaryDataInterleaved<T>(buffer, offset, accessor.count, typeCount, bufferView.byteStride);
+                    data = ReadBinaryDataInterleaved<T>(buffer, offset, accessor.count, typeCount, bufferView.byteStride.Get());
                 }
 
                 return data;
@@ -169,14 +168,13 @@ namespace Microsoft
 
                     const size_t offset = accessor.byteOffset + bufferView.byteOffset;
 
-                    if (bufferView.byteStride == 0U ||
-                        bufferView.byteStride == elementSize)
+                    if (!bufferView.byteStride || bufferView.byteStride.Get() == elementSize)
                     {
                         baseData = ReadBinaryData<T>(buffer, offset, accessor.count * typeCount);
                     }
                     else
                     {
-                        baseData = ReadBinaryDataInterleaved<T>(buffer, offset, accessor.count, typeCount, bufferView.byteStride);
+                        baseData = ReadBinaryDataInterleaved<T>(buffer, offset, accessor.count, typeCount, bufferView.byteStride.Get());
                     }
                 }
 
@@ -367,26 +365,24 @@ namespace Microsoft
 
                 std::vector<I> indices;
 
-                if (indicesBufferView.byteStride == 0U ||
-                    indicesBufferView.byteStride == sizeof(I))
+                if (!indicesBufferView.byteStride || indicesBufferView.byteStride.Get() == sizeof(I))
                 {
                     indices = ReadBinaryData<I>(indicesBuffer, indicesOffset, count);
                 }
                 else
                 {
-                    indices = ReadBinaryDataInterleaved<I>(indicesBuffer, indicesOffset, count, 1U, indicesBufferView.byteStride);
+                    indices = ReadBinaryDataInterleaved<I>(indicesBuffer, indicesOffset, count, 1U, indicesBufferView.byteStride.Get());
                 }
 
                 std::vector<T> values;
 
-                if (valuesBufferView.byteStride == 0U ||
-                    valuesBufferView.byteStride == elementSize)
+                if (!valuesBufferView.byteStride || valuesBufferView.byteStride.Get() == elementSize)
                 {
                     values = ReadBinaryData<T>(valuesBuffer, valuesOffset, count * typeCount);
                 }
                 else
                 {
-                    values = ReadBinaryDataInterleaved<T>(valuesBuffer, valuesOffset, count, typeCount, valuesBufferView.byteStride);
+                    values = ReadBinaryDataInterleaved<T>(valuesBuffer, valuesOffset, count, typeCount, valuesBufferView.byteStride.Get());
                 }
 
                 for (size_t i = 0; i < indices.size(); i++)
