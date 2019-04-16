@@ -11,39 +11,48 @@ using namespace Microsoft::glTF;
 
 namespace
 {
-    std::string Join(const std::unordered_set<std::string>& strings, const std::string& delimiter)
+    template<typename It>
+    std::string Join(It it, It itEnd, const char* const delimiter)
     {
         std::stringstream sstream;
-        auto it = strings.begin();
-        if(it != strings.end())
+
+        if(it != itEnd)
         {
             sstream << *it++;
-            for(; it != strings.end(); ++it)
+
+            while(it != itEnd)
             {
-                sstream << delimiter << *it;
+                sstream << delimiter << *it++;
             }
         }
+
         return sstream.str();
     }
 
-    std::string GetAccessorTypesAsString(const std::unordered_set<AccessorType>& accessorTypes)
+    std::string GetAccessorTypesAsString(const std::set<AccessorType>& accessorTypes)
     {
-        std::unordered_set<std::string> accessorTypeNames;
-        for(const auto type : accessorTypes)
-        {
-            accessorTypeNames.insert(Accessor::GetAccessorTypeName(type));
-        }
-        return Join(accessorTypeNames, ", ");
+        std::vector<std::string> accessorTypeNames(accessorTypes.size());
+
+        std::transform(
+            accessorTypes.begin(),
+            accessorTypes.end(),
+            accessorTypeNames.begin(),
+            Accessor::GetAccessorTypeName);
+
+        return Join(accessorTypeNames.begin(), accessorTypeNames.end(), ", ");
     }
 
-    std::string GetComponentTypesAsString(const std::unordered_set<ComponentType>& componentTypes)
+    std::string GetComponentTypesAsString(const std::set<ComponentType>& componentTypes)
     {
-        std::unordered_set<std::string> componentTypeNames;
-        for (const auto type : componentTypes)
-        {
-            componentTypeNames.insert(Accessor::GetComponentTypeName(type));
-        }
-        return Join(componentTypeNames, ", ");
+        std::vector<std::string> componentTypeNames(componentTypes.size());
+
+        std::transform(
+            componentTypes.begin(),
+            componentTypes.end(),
+            componentTypeNames.begin(),
+            Accessor::GetComponentTypeName);
+
+        return Join(componentTypeNames.begin(), componentTypeNames.end(), ", ");
     }
 
     void ValidateAccessorsImpl(const size_t count, const size_t byteOffset, const ComponentType& componentType,
@@ -198,7 +207,7 @@ void Validation::ValidateMeshPrimitiveAttributeAccessors(
 )
 {
     // https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#meshes
-    static const std::unordered_map <std::string, std::pair<std::unordered_set<AccessorType>, std::unordered_set<ComponentType>>> attributeDefinitions =
+    static const std::unordered_map <std::string, std::pair<std::set<AccessorType>, std::set<ComponentType>>> attributeDefinitions =
     {
         { ACCESSOR_POSITION,   { { TYPE_VEC3 },            { COMPONENT_FLOAT } } },
         { ACCESSOR_NORMAL,     { { TYPE_VEC3 },            { COMPONENT_FLOAT } } },
@@ -235,8 +244,8 @@ void Validation::ValidateMeshPrimitiveAttributeAccessors(
 void Validation::ValidateAccessorTypes(
     const Accessor& accessor,
     const std::string& accessorName,
-    const std::unordered_set<AccessorType>& accessorTypes,
-    const std::unordered_set<ComponentType>& componentTypes
+    const std::set<AccessorType>& accessorTypes,
+    const std::set<ComponentType>& componentTypes
 )
 {
     if (accessorTypes.find(accessor.type) == accessorTypes.end())

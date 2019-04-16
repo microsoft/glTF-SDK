@@ -361,7 +361,7 @@ namespace Microsoft
                         }
                         catch (const ValidationException& ex)
                         {
-                            Assert::AreEqual("Accessor 0 COLOR_0 componentType must be: [FLOAT, UNSIGNED_BYTE, UNSIGNED_SHORT]", ex.what());
+                            Assert::AreEqual("Accessor 0 COLOR_0 componentType must be: [UNSIGNED_BYTE, UNSIGNED_SHORT, FLOAT]", ex.what());
                             throw;
                         }
                     });
