@@ -632,7 +632,9 @@ namespace
         rapidjson::Value cameraValue(rapidjson::kObjectType);
         rapidjson::Value projectionValue(rapidjson::kObjectType);
 
-        if (camera.projection->GetProjectionType() == ProjectionType::PERSPECTIVE)
+        const ProjectionType projectionType = camera.projection->GetProjectionType();
+
+        if (projectionType == PROJECTION_PERSPECTIVE)
         {
             const auto& perspective = camera.GetPerspective();
 
@@ -654,7 +656,7 @@ namespace
             cameraValue.AddMember("perspective", projectionValue, a);
             cameraValue.AddMember("type", RapidJsonUtils::ToStringValue("perspective", a), a);
         }
-        else if (camera.projection->GetProjectionType() == ProjectionType::ORTHOGRAPHIC)
+        else if (projectionType == PROJECTION_ORTHOGRAPHIC)
         {
             const auto& orthographic = camera.GetOrthographic();
 
@@ -667,6 +669,10 @@ namespace
 
             cameraValue.AddMember("orthographic", projectionValue, a);
             cameraValue.AddMember("type", RapidJsonUtils::ToStringValue("orthographic", a), a);
+        }
+        else
+        {
+            throw DocumentException("Camera " + camera.id + " doesn't have a valid projection type");
         }
 
         SerializeProperty(gltfDocument, camera, cameraValue, a, extensionSerializer);

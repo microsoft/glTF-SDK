@@ -94,13 +94,13 @@
   <ItemGroup>
     <ClCompile Include="Source\AnimationUtilsTests.cpp" />
     <ClCompile Include="Source\ColorTests.cpp" />
+    <ClCompile Include="Source\DeserializeTests.cpp" />
     <ClCompile Include="Source\ExtrasDocumentTests.cpp" />
     <ClCompile Include="Source\GLBResourceWriterTests.cpp" />
     <ClCompile Include="Source\GLTFExtensionsTests.cpp" />
     <ClCompile Include="Source\glTFPropertyTests.cpp" />
     <ClCompile Include="Source\GLTFResourceReaderTests.cpp" />
     <ClCompile Include="Source\GLTFResourceWriterTests.cpp" />
-    <ClCompile Include="Source\GLTFSerializerTests.cpp" />
     <ClCompile Include="Source\GLTFTests.cpp" />
     <ClCompile Include="Source\IndexedContainerTests.cpp" />
     <ClCompile Include="Source\MeshPrimitiveUtilsTests.cpp" />

@@ -3,14 +3,58 @@
 
 #include "stdafx.h"
 
-#include <GLTFSDK/BufferBuilder.h>
-#include <GLTFSDK/Deserialize.h>
 #include <GLTFSDK/GLTF.h>
-#include <GLTFSDK/GLTFResourceWriter.h>
-#include <GLTFSDK/MeshPrimitiveUtils.h>
 #include <GLTFSDK/Serialize.h>
+#include <GLTFSDK/Deserialize.h>
 
 using namespace glTF::UnitTest;
+
+namespace
+{
+    const char* c_expectedDefaultDocument = R"({
+    "asset": {
+        "version": "2.0"
+    }
+})";
+
+    const char* c_expectedDefaultDocumentAndScene = R"({
+    "asset": {
+        "version": "2.0"
+    },
+    "scenes": [
+        {}
+    ]
+})";
+
+    const char* c_expectedDefaultDocumentAndSceneAsDefault = R"({
+    "asset": {
+        "version": "2.0"
+    },
+    "scenes": [
+        {}
+    ],
+    "scene": 0
+})";
+
+    const char* c_expectedDefaultDocumentAndNonDefaultScene = R"({
+    "asset": {
+        "version": "2.0"
+    },
+    "scenes": [
+        {}
+    ]
+})";
+
+    const char* c_expectedDefaultDocumentAndNonDefaultSceneAsDefault = R"({
+    "asset": {
+        "version": "2.0"
+    },
+    "scenes": [
+        {}
+    ],
+    "scene": 0
+})";
+}
 
 namespace Microsoft
 {
@@ -18,9 +62,9 @@ namespace Microsoft
     {
         namespace Test
         {
-            GLTFSDK_TEST_CLASS(SerializeUnitTest)
+            GLTFSDK_TEST_CLASS(SerializeTests)
             {
-                GLTFSDK_TEST_METHOD(SerializeUnitTest, SerializeNodeMatrixTransform)
+                GLTFSDK_TEST_METHOD(SerializeTests, SerializeNodeMatrixTransform)
                 {
                     Document originalDoc;
                     Scene sc; sc.id = "0";
@@ -36,7 +80,7 @@ namespace Microsoft
                     Assert::IsTrue(twoPassDoc == originalDoc);
                 }
 
-                GLTFSDK_TEST_METHOD(SerializeUnitTest, SerializeNodeTRSTransform)
+                GLTFSDK_TEST_METHOD(SerializeTests, SerializeNodeTRSTransform)
                 {
                     Document originalDoc;
                     Scene sc; sc.id = "0";
@@ -53,7 +97,7 @@ namespace Microsoft
                     Assert::IsTrue(twoPassDoc == originalDoc);
                 }
 
-                GLTFSDK_TEST_METHOD(SerializeUnitTest, SerializeNodeInvalidTransform)
+                GLTFSDK_TEST_METHOD(SerializeTests, SerializeNodeInvalidTransform)
                 {
                     Assert::ExpectException<DocumentException>([]()
                     {
@@ -74,7 +118,7 @@ namespace Microsoft
                     });
                 }
 
-                GLTFSDK_TEST_METHOD(SerializeUnitTest, MatrixNodeTest)
+                GLTFSDK_TEST_METHOD(SerializeTests, MatrixNodeTest)
                 {
                     Node matrixNode;
                     std::array<float, 16> matrixData; std::fill(matrixData.begin(), matrixData.end(), 1.0f);
@@ -83,13 +127,13 @@ namespace Microsoft
                     Assert::IsTrue(matrixNode.GetTransformationType() == TransformationType::TRANSFORMATION_MATRIX);
                 }
 
-                GLTFSDK_TEST_METHOD(SerializeUnitTest, NoTransformTest)
+                GLTFSDK_TEST_METHOD(SerializeTests, NoTransformTest)
                 {
                     Node defaultNode;
                     Assert::IsTrue(defaultNode.GetTransformationType() == TransformationType::TRANSFORMATION_IDENTITY);
                 }
 
-                GLTFSDK_TEST_METHOD(SerializeUnitTest, TRSNodeTest)
+                GLTFSDK_TEST_METHOD(SerializeTests, TRSNodeTest)
                 {
                     Node trsNode;
                     Vector3 scale = { 2.0f, 1.1f, 4.0f };
@@ -97,7 +141,7 @@ namespace Microsoft
                     Assert::IsTrue(trsNode.GetTransformationType() == TransformationType::TRANSFORMATION_TRS);
                 }
 
-                GLTFSDK_TEST_METHOD(SerializeUnitTest, InvalidNodeTest)
+                GLTFSDK_TEST_METHOD(SerializeTests, InvalidNodeTest)
                 {
                     Node badNode;
                     std::array<float, 16> matrixData; std::fill(matrixData.begin(), matrixData.end(), 1.0f);
@@ -108,16 +152,87 @@ namespace Microsoft
                     Assert::IsFalse(badNode.HasValidTransformType());
                 }
 
-                GLTFSDK_TEST_METHOD(SerializeUnitTest, ValidNodeTest)
+                GLTFSDK_TEST_METHOD(SerializeTests, ValidNodeTest)
                 {
                     Node node;
                     Assert::IsTrue(node.HasValidTransformType());
                 }
 
-                GLTFSDK_TEST_METHOD(SerializeUnitTest, PerspectiveCameraTest)
+                GLTFSDK_TEST_METHOD(SerializeTests, PerspectiveCameraTest)
                 {
                     Camera cam("0", "", std::make_unique<Perspective>(0.1f, 10.0f, 1.2f, 0.5f));
-                    Assert::IsTrue(cam.projection->GetProjectionType() == ProjectionType::PERSPECTIVE);
+                    Assert::IsTrue(cam.projection->GetProjectionType() == PROJECTION_PERSPECTIVE);
+                }
+
+                GLTFSDK_TEST_METHOD(SerializeTests, DefaultDocument)
+                {
+                    Document doc;
+
+                    const auto output = Serialize(doc, SerializeFlags::Pretty);
+                    Assert::AreEqual(output.c_str(), c_expectedDefaultDocument);
+                }
+
+                GLTFSDK_TEST_METHOD(SerializeTests, DefaultDocumentAndScene)
+                {
+                    Document doc;
+                    doc.scenes.Append(Scene(), AppendIdPolicy::GenerateOnEmpty);
+
+                    const auto output = Serialize(doc, SerializeFlags::Pretty);
+                    Assert::AreEqual(output.c_str(), c_expectedDefaultDocumentAndScene);
+                }
+
+                GLTFSDK_TEST_METHOD(SerializeTests, DefaultDocumentAndSceneAsDefault)
+                {
+                    Document doc;
+                    doc.SetDefaultScene(Scene(), AppendIdPolicy::GenerateOnEmpty);
+
+                    const auto output = Serialize(doc, SerializeFlags::Pretty);
+                    Assert::AreEqual(output.c_str(), c_expectedDefaultDocumentAndSceneAsDefault);
+                }
+
+                GLTFSDK_TEST_METHOD(SerializeTests, DefaultDocumentAndNonDefaultScene)
+                {
+                    Document doc;
+                    Scene scene;
+                    scene.id = "foo";
+                    doc.scenes.Append(std::move(scene));
+
+                    const auto output = Serialize(doc, SerializeFlags::Pretty);
+                    Assert::AreEqual(output.c_str(), c_expectedDefaultDocumentAndNonDefaultScene);
+                }
+
+                GLTFSDK_TEST_METHOD(SerializeTests, DefaultDocumentAndNonDefaultSceneAsDefault)
+                {
+                    Document doc;
+                    Scene scene;
+                    scene.id = "foo";
+                    doc.SetDefaultScene(std::move(scene));
+
+                    const auto output = Serialize(doc, SerializeFlags::Pretty);
+                    Assert::AreEqual(output.c_str(), c_expectedDefaultDocumentAndNonDefaultSceneAsDefault);
+                }
+
+                GLTFSDK_TEST_METHOD(SerializeTests, InvalidDefaultScene)
+                {
+                    Scene scene;
+                    scene.id = "foo";
+
+                    Document doc;
+                    doc.scenes.Append(std::move(scene));
+                    doc.defaultSceneId = "bar";
+
+                    Assert::ExpectException<GLTFException>([&doc]
+                    {
+                        try
+                        {
+                            Serialize(doc);
+                        }
+                        catch (const GLTFException& ex)
+                        {
+                            Assert::AreEqual("key bar not in container", ex.what());
+                            throw;
+                        }
+                    }, L"Expected exception was not thrown");
                 }
             };
         }
