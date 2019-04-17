@@ -109,7 +109,6 @@ namespace Microsoft
 
         enum ProjectionType
         {
-            PROJECTION_UNKNOWN = 0,
             PROJECTION_PERSPECTIVE,
             PROJECTION_ORTHOGRAPHIC
         };
