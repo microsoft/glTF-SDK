@@ -51,15 +51,6 @@ namespace Microsoft
             TYPE_MAT4
         };
 
-        // https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_s3tc/
-        enum TextureInternalFormat
-        {
-            COMPRESSED_RGB_S3TC_DXT1_EXT = 33776,
-            COMPRESSED_RGBA_S3TC_DXT1_EXT = 33777,
-            COMPRESSED_RGBA_S3TC_DXT3_EXT = 33778,
-            COMPRESSED_RGBA_S3TC_DXT5_EXT = 33779
-        };
-
         const std::unordered_map<std::string, AccessorType> AccessorTypes =
         {
             { TYPE_NAME_SCALAR, TYPE_SCALAR },
@@ -118,8 +109,8 @@ namespace Microsoft
 
         enum ProjectionType
         {
-            PERSPECTIVE,
-            ORTHOGRAPHIC
+            PROJECTION_PERSPECTIVE,
+            PROJECTION_ORTHOGRAPHIC
         };
 
         inline AlphaMode ParseAlphaMode(const std::string& alphaMode)
@@ -932,7 +923,7 @@ namespace Microsoft
 
             ProjectionType GetProjectionType() const override
             {
-                return ProjectionType::ORTHOGRAPHIC;
+                return PROJECTION_ORTHOGRAPHIC;
             }
 
             std::unique_ptr<Projection> Clone() const override
@@ -993,7 +984,7 @@ namespace Microsoft
 
             ProjectionType GetProjectionType() const override
             {
-                return ProjectionType::PERSPECTIVE;
+                return PROJECTION_PERSPECTIVE;
             }
 
             std::unique_ptr<Projection> Clone() const override

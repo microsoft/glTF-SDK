@@ -5,6 +5,8 @@
 
 #include <GLTFSDK/Document.h>
 
+#include <set>
+
 namespace Microsoft
 {
     namespace glTF
@@ -17,7 +19,7 @@ namespace Microsoft
             void ValidateMeshPrimitive(const Document& doc, const MeshPrimitive& primitive);
             void ValidateMeshPrimitiveAttributeAccessors(const Document& doc, const std::unordered_map<std::string, std::string>& attributes, const size_t vertexCount);
             void ValidateAccessorTypes(const Accessor& accessor, const std::string& accessorName,
-                const std::unordered_set<AccessorType>& accessorTypes, const std::unordered_set<ComponentType>& componentTypes);
+                const std::set<AccessorType>& accessorTypes, const std::set<ComponentType>& componentTypes);
             void ValidateAccessor(const Document& doc, const Accessor& accessor);
             void ValidateBufferView(const BufferView& buffer_view, const Buffer& buffer);
 

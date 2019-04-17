@@ -46,7 +46,7 @@ namespace Microsoft
 
             const Buffer& AddBuffer(const char* bufferId = nullptr);
 
-            const BufferView& AddBufferView(Optional<BufferViewTarget> target);
+            const BufferView& AddBufferView(Optional<BufferViewTarget> target = {});
             const BufferView& AddBufferView(const void* data, size_t byteLength, Optional<size_t> byteStride = {}, Optional<BufferViewTarget> target = {});
 
             template<typename T>

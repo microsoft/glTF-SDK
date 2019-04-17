@@ -458,6 +458,7 @@ namespace
             ParseProperty(orthographicIt->value, *projection, extensionDeserializer);
         }
 
+        // Camera constructor will throw a GLTFException when projection is null (i.e. source manifest specified an invalid projection type)
         Camera camera(std::move(projection));
         camera.name = GetMemberValueOrDefault<std::string>(v, "name");
 

@@ -44,9 +44,6 @@
     <ClCompile Include="Source\GLTFResourceWriterTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\GLTFSerializerTests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\GLTFTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -93,6 +90,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\OptionalTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\DeserializeTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
