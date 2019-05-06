@@ -12,9 +12,11 @@ file(GLOB schema_deps
     "${CMAKE_CURRENT_LIST_DIR}/schema/*"
 )
 
+find_program(POWERSHELL_PATH NAMES pwsh powershell)
+
 add_custom_command(
     OUTPUT ${CMAKE_BINARY_DIR}/GeneratedFiles/SchemaJson.h
-    COMMAND powershell -ExecutionPolicy Bypass "${CMAKE_CURRENT_LIST_DIR}/GenerateSchemaJsonHeader.ps1" -outPath "${CMAKE_BINARY_DIR}/GeneratedFiles"
+    COMMAND ${POWERSHELL_PATH} -ExecutionPolicy Bypass "${CMAKE_CURRENT_LIST_DIR}/GenerateSchemaJsonHeader.ps1" -outPath "${CMAKE_BINARY_DIR}/GeneratedFiles"
     WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
     DEPENDS "${schema_deps}"
 )
