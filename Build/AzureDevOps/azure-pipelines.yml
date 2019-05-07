@@ -36,6 +36,9 @@ jobs:
           buildPlatform: ARM64
           buildConfiguration: Debug
 
+    workspace:
+      clean: all
+
     steps:
 
     - task: CMake@1
@@ -73,6 +76,9 @@ jobs:
           buildPlatform: macOS
           buildConfiguration: Debug
 
+    workspace:
+      clean: all
+
     steps:
 
     - task: CMake@1
@@ -107,6 +113,9 @@ jobs:
         iOS-Debug:
           buildPlatform: iOS
           buildConfiguration: Debug
+
+    workspace:
+      clean: all
 
     steps:
 
