@@ -98,38 +98,6 @@ namespace Microsoft
                     AreEqual(input, output);
                 }
 
-                GLTFSDK_TEST_METHOD(AnimationUtilsTests, AnimationUtils_Test_GetRotations_Vec4_Float)
-                {
-                    auto readerWriter = std::make_shared<const StreamReaderWriter>();
-                    auto bufferBuilder = BufferBuilder(std::make_unique<GLTFResourceWriter>(readerWriter));
-
-                    bufferBuilder.AddBuffer();
-                    bufferBuilder.AddBufferView(BufferViewTarget::ARRAY_BUFFER);
-
-                    std::vector<float> input = {
-                        0.213941514f, 0.963860869f, -0.158749819f, 0.204712942f
-                    };
-                    auto accessor = bufferBuilder.AddAccessor(input, { TYPE_VEC4, COMPONENT_FLOAT });
-
-                    Document doc;
-                    bufferBuilder.Output(doc);
-
-                    // Accessor
-
-                    GLTFResourceReader reader(readerWriter);
-                    auto output = AnimationUtils::GetRotations(doc, reader, accessor);
-
-                    AreEqual(input, output);
-
-                    // Sampler
-
-                    AnimationSampler animationSampler;
-                    animationSampler.outputAccessorId = accessor.id;
-                    output = AnimationUtils::GetRotations(doc, reader, animationSampler);
-
-                    AreEqual(input, output);
-                }
-
                 GLTFSDK_TEST_METHOD(AnimationUtilsTests, AnimationUtils_Test_GetScales_Vec3_Float)
                 {
                     auto readerWriter = std::make_shared<const StreamReaderWriter>();
@@ -223,6 +191,69 @@ namespace Microsoft
                     VerifyGetMorphWeights<uint8_t>();
                     VerifyGetMorphWeights<int16_t>();
                     VerifyGetMorphWeights<uint16_t>();
+                }
+
+                // Utility for verifying GetRotations
+                template<typename T>
+                void VerifyGetRotations()
+                {
+                    std::map< std::type_index, ComponentType> componentTypeMap =
+                    {
+                        { std::type_index(typeid(float)),    COMPONENT_FLOAT },
+                        { std::type_index(typeid(int8_t)),   COMPONENT_BYTE },
+                        { std::type_index(typeid(uint8_t)),  COMPONENT_UNSIGNED_BYTE },
+                        { std::type_index(typeid(int16_t)),  COMPONENT_SHORT },
+                        { std::type_index(typeid(uint16_t)), COMPONENT_UNSIGNED_SHORT }
+                    };
+
+                    std::vector<float> testValues = { 0.213941514f, 0.963860869f, -0.158749819f, 0.204712942f };
+
+                    auto readerWriter = std::make_shared<const StreamReaderWriter>();
+                    auto bufferBuilder = BufferBuilder(std::make_unique<GLTFResourceWriter>(readerWriter));
+
+                    bufferBuilder.AddBuffer();
+                    bufferBuilder.AddBufferView(BufferViewTarget::ARRAY_BUFFER);
+
+                    std::vector<T> input;
+                    std::vector<float> expectedOutput;
+                    for (auto& v : testValues)
+                    {
+                        auto c = AnimationUtils::FloatToComponent<T>(v);
+                        input.push_back(c);
+                        expectedOutput.push_back(AnimationUtils::ComponentToFloat(c));
+                    }
+
+                    auto accessor = bufferBuilder.AddAccessor(input, { TYPE_VEC4, componentTypeMap[std::type_index(typeid(T))] });
+
+                    Document doc;
+                    bufferBuilder.Output(doc);
+
+                    // Verify that we read back what's expected
+                    std::stringstream ss;
+                    ss << "Error extracting rotations for component type " << typeid(T).name();
+                    std::string s = ss.str();
+                    std::wstring msg(s.begin(), s.end());
+
+                    // Accessor
+                    GLTFResourceReader reader(readerWriter);
+                    auto output = AnimationUtils::GetRotations(doc, reader, accessor);
+                    AreEqual(expectedOutput, output, msg.c_str());
+
+                    // Sampler
+                    AnimationSampler animationSampler;
+                    animationSampler.outputAccessorId = accessor.id;
+                    output = AnimationUtils::GetRotations(doc, reader, animationSampler);
+                    AreEqual(expectedOutput, output, msg.c_str());
+                }
+
+                // Verify GetRotations for all possible component types
+                GLTFSDK_TEST_METHOD(AnimationUtilsTests, AnimationUtils_Test_GetRotations)
+                {
+                    VerifyGetRotations<float>();
+                    VerifyGetRotations<int8_t>();
+                    VerifyGetRotations<uint8_t>();
+                    VerifyGetRotations<int16_t>();
+                    VerifyGetRotations<uint16_t>();
                 }
             };
         }
