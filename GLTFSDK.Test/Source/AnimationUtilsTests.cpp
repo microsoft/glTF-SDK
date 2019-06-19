@@ -131,18 +131,11 @@ namespace Microsoft
                 }
 
                 // Utility for verifying GetMorphWeights
-                template<typename T>
-                void VerifyGetMorphWeights()
-                {
-                    std::map< std::type_index, ComponentType> componentTypeMap =
-                    {
-                        { std::type_index(typeid(float)),    COMPONENT_FLOAT },
-                        { std::type_index(typeid(int8_t)),   COMPONENT_BYTE },
-                        { std::type_index(typeid(uint8_t)),  COMPONENT_UNSIGNED_BYTE },
-                        { std::type_index(typeid(int16_t)),  COMPONENT_SHORT },
-                        { std::type_index(typeid(uint16_t)), COMPONENT_UNSIGNED_SHORT }
-                    };
+                static std::map< std::type_index, ComponentType> kComponentTypeMap;
 
+                template<typename T>
+                void VerifyGetMorphWeights() const
+                {
                     std::vector<float> testValues = { 0.0f, 0.11f, 0.22f, 0.33f, 0.44f, 0.55f, 1.0f };
 
                     auto readerWriter = std::make_shared<const StreamReaderWriter>();
@@ -160,7 +153,7 @@ namespace Microsoft
                         expectedOutput.push_back(AnimationUtils::ComponentToFloat(c));
                     }
           
-                    auto accessor = bufferBuilder.AddAccessor(input, { TYPE_SCALAR, componentTypeMap[std::type_index(typeid(T))] });
+                    auto accessor = bufferBuilder.AddAccessor(input, { TYPE_SCALAR, kComponentTypeMap[std::type_index(typeid(T))] });
 
                     Document doc;
                     bufferBuilder.Output(doc);
@@ -195,17 +188,8 @@ namespace Microsoft
 
                 // Utility for verifying GetRotations
                 template<typename T>
-                void VerifyGetRotations()
+                void VerifyGetRotations() const
                 {
-                    std::map< std::type_index, ComponentType> componentTypeMap =
-                    {
-                        { std::type_index(typeid(float)),    COMPONENT_FLOAT },
-                        { std::type_index(typeid(int8_t)),   COMPONENT_BYTE },
-                        { std::type_index(typeid(uint8_t)),  COMPONENT_UNSIGNED_BYTE },
-                        { std::type_index(typeid(int16_t)),  COMPONENT_SHORT },
-                        { std::type_index(typeid(uint16_t)), COMPONENT_UNSIGNED_SHORT }
-                    };
-
                     std::vector<float> testValues = { 0.213941514f, 0.963860869f, -0.158749819f, 0.204712942f };
 
                     auto readerWriter = std::make_shared<const StreamReaderWriter>();
@@ -223,7 +207,7 @@ namespace Microsoft
                         expectedOutput.push_back(AnimationUtils::ComponentToFloat(c));
                     }
 
-                    auto accessor = bufferBuilder.AddAccessor(input, { TYPE_VEC4, componentTypeMap[std::type_index(typeid(T))] });
+                    auto accessor = bufferBuilder.AddAccessor(input, { TYPE_VEC4, kComponentTypeMap[std::type_index(typeid(T))] });
 
                     Document doc;
                     bufferBuilder.Output(doc);
@@ -255,6 +239,15 @@ namespace Microsoft
                     VerifyGetRotations<int16_t>();
                     VerifyGetRotations<uint16_t>();
                 }
+            };
+
+            std::map< std::type_index, ComponentType> AnimationUtilsTests::kComponentTypeMap =
+            {
+                { std::type_index(typeid(float)),    COMPONENT_FLOAT },
+                { std::type_index(typeid(int8_t)),   COMPONENT_BYTE },
+                { std::type_index(typeid(uint8_t)),  COMPONENT_UNSIGNED_BYTE },
+                { std::type_index(typeid(int16_t)),  COMPONENT_SHORT },
+                { std::type_index(typeid(uint16_t)), COMPONENT_UNSIGNED_SHORT }
             };
         }
     }
