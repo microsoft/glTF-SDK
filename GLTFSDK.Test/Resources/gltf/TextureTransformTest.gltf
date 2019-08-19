@@ -109,6 +109,28 @@
           }
         },
         "metallicFactor": 0
+      },
+      "normalTexture": {
+        "index": 0,
+        "extensions": {
+          "KHR_texture_transform": {
+            "offset": [
+              0.5,
+              0.0
+            ]
+          }
+        }
+      },
+      "occlusionTexture": {
+        "index": 0,
+        "extensions": {
+          "KHR_texture_transform": {
+            "offset": [
+              0.5,
+              0.0
+            ]
+          }
+        }
       }
     },
     {

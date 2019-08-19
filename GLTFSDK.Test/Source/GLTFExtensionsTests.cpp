@@ -456,6 +456,68 @@ namespace Microsoft
                     checkTextureInfo(doc.materials[5], Vector2(-0.2f, -0.1f), 0.3f, Vector2(1.5f, 1.5f));
                 }
 
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_HasTextureTransformExtension_Normal)
+                {
+                  const auto inputJson = ReadLocalJson(c_textureTransformTestJson);
+
+                  const auto extensionDeserializer = KHR::GetKHRExtensionDeserializer();
+                  auto doc = Deserialize(inputJson, extensionDeserializer);
+
+                  auto checkTextureInfo = [](
+                                             const Material& material,
+                                             const Vector2& offset, float rotation, const Vector2& scale, Optional<size_t> texCoord = {})
+                  {
+                    auto& textureInfo = material.normalTexture;
+
+                    Assert::IsTrue(textureInfo.HasExtension<KHR::TextureInfos::TextureTransform>());
+
+                    auto& textureTransform = textureInfo.GetExtension<KHR::TextureInfos::TextureTransform>();
+
+                    KHR::TextureInfos::TextureTransform expectedTextureTransform;
+                    expectedTextureTransform.offset = offset;
+                    expectedTextureTransform.scale = scale;
+                    expectedTextureTransform.rotation = rotation;
+                    expectedTextureTransform.texCoord = texCoord;
+
+                    Assert::IsTrue(textureTransform == expectedTextureTransform);
+                  };
+
+                  Assert::IsTrue(doc.materials.Size() == 9);
+
+                  checkTextureInfo(doc.materials[0], Vector2(0.5f, 0.0f), 0.0f, Vector2(1.0f, 1.0f));
+                }
+
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_HasTextureTransformExtension_Occlusion)
+                {
+                  const auto inputJson = ReadLocalJson(c_textureTransformTestJson);
+
+                  const auto extensionDeserializer = KHR::GetKHRExtensionDeserializer();
+                  auto doc = Deserialize(inputJson, extensionDeserializer);
+
+                  auto checkTextureInfo = [](
+                                             const Material& material,
+                                             const Vector2& offset, float rotation, const Vector2& scale, Optional<size_t> texCoord = {})
+                  {
+                    auto& textureInfo = material.occlusionTexture;
+
+                    Assert::IsTrue(textureInfo.HasExtension<KHR::TextureInfos::TextureTransform>());
+
+                    auto& textureTransform = textureInfo.GetExtension<KHR::TextureInfos::TextureTransform>();
+
+                    KHR::TextureInfos::TextureTransform expectedTextureTransform;
+                    expectedTextureTransform.offset = offset;
+                    expectedTextureTransform.scale = scale;
+                    expectedTextureTransform.rotation = rotation;
+                    expectedTextureTransform.texCoord = texCoord;
+
+                    Assert::IsTrue(textureTransform == expectedTextureTransform);
+                  };
+
+                  Assert::IsTrue(doc.materials.Size() == 9);
+
+                  checkTextureInfo(doc.materials[0], Vector2(0.5f, 0.0f), 0.0f, Vector2(1.0f, 1.0f));
+                }
+
                 GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_HasTextureTransformExtension_TexCoord)
                 {
                     // Ensure the optionality of the texCoord property is preserved
