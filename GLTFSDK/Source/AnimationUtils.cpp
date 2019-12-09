@@ -8,23 +8,6 @@
 
 using namespace Microsoft::glTF;
 
-namespace
-{
-    template<typename T>
-    std::vector<float> GetDataFloats(const Document& doc, const GLTFResourceReader& reader, const Accessor& accessor)
-    {
-        std::vector<T> rawData = reader.ReadBinaryData<T>(doc, accessor);
-
-        std::vector<float> floatData;
-        floatData.reserve(rawData.size());
-
-        std::transform(rawData.begin(), rawData.end(), std::back_inserter(floatData),
-            [](T value) -> float { return AnimationUtils::ComponentToFloat(value); });
-
-        return floatData;
-    }
-}
-
 std::vector<float> AnimationUtils::GetKeyframeTimes(const Document& doc, const GLTFResourceReader& reader, const Accessor& accessor)
 {
     if (accessor.type != TYPE_SCALAR)
@@ -95,21 +78,7 @@ std::vector<float> AnimationUtils::GetRotations(const Document& doc, const GLTFR
         throw GLTFException("Invalid type for rotations accessor " + accessor.id);
     }
 
-    switch (accessor.componentType)
-    {
-    case COMPONENT_FLOAT:
-        return reader.ReadBinaryData<float>(doc, accessor);
-    case COMPONENT_BYTE:
-        return GetDataFloats<int8_t>(doc, reader, accessor);
-    case COMPONENT_UNSIGNED_BYTE:
-        return GetDataFloats<uint8_t>(doc, reader, accessor);
-    case COMPONENT_SHORT:
-        return GetDataFloats<int16_t>(doc, reader, accessor);
-    case COMPONENT_UNSIGNED_SHORT:
-        return GetDataFloats<uint16_t>(doc, reader, accessor);
-    default:
-        throw GLTFException("Invalid componentType for rotations accessor " + accessor.id);
-    }
+    return reader.ReadFloatData(doc, accessor);
 }
 
 std::vector<float> AnimationUtils::GetRotations(const Document& doc, const GLTFResourceReader& reader, const AnimationSampler& sampler)
@@ -146,21 +115,7 @@ std::vector<float> AnimationUtils::GetMorphWeights(const Document& doc, const GL
         throw GLTFException("Invalid type for weights accessor " + accessor.id);
     }
 
-    switch (accessor.componentType)
-    {
-    case COMPONENT_FLOAT: 
-        return reader.ReadBinaryData<float>(doc, accessor);
-    case COMPONENT_BYTE:
-        return GetDataFloats<int8_t>(doc, reader, accessor);
-    case COMPONENT_UNSIGNED_BYTE:
-        return GetDataFloats<uint8_t>(doc, reader, accessor);
-    case COMPONENT_SHORT:
-        return GetDataFloats<int16_t>(doc, reader, accessor);
-    case COMPONENT_UNSIGNED_SHORT:
-        return GetDataFloats<uint16_t>(doc, reader, accessor);
-    default:
-        throw GLTFException("Invalid componentType for weights accessor " + accessor.id);
-    }
+    return reader.ReadFloatData(doc, accessor);
 }
 
 std::vector<float> AnimationUtils::GetMorphWeights(const Document& doc, const GLTFResourceReader& reader, const AnimationSampler& sampler)
