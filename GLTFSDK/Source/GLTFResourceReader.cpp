@@ -22,8 +22,15 @@ namespace
 	    std::vector<float> floatData;
 	    floatData.reserve(rawData.size());
 
-	    std::transform(rawData.begin(), rawData.end(), std::back_inserter(floatData),
-	        [](T value) -> float { return ComponentToFloat(value); });
+		if (accessor.normalized)
+		{
+			std::transform(rawData.begin(), rawData.end(), std::back_inserter(floatData),
+				[](T value) -> float { return ComponentToFloat(value); });
+		}
+		else
+		{
+			std::copy(rawData.begin(), rawData.end(), std::back_inserter(floatData));
+		}
 
 	    return floatData;
 	}
