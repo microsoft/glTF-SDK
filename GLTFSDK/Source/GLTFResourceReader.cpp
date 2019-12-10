@@ -8,7 +8,6 @@ using namespace Microsoft::glTF;
 namespace
 {
 	// Conversions of normalized component types to/from floats are explicitly defined in the 2.0 spec
-	inline float ComponentToFloat(const float w)   { return w; }
 	inline float ComponentToFloat(const int8_t w)  { return std::max(static_cast<float>(w) / 127.0f, -1.0f); }
 	inline float ComponentToFloat(const uint8_t w) { return static_cast<float>(w) / 255.0f; }
 	inline float ComponentToFloat(const int16_t w) { return std::max(static_cast<float>(w) / 32767.0f, -1.0f); }
