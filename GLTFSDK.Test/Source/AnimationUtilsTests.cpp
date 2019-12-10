@@ -53,7 +53,10 @@ namespace Microsoft
 
                     auto componentType = kComponentTypeMap.find(std::type_index(typeid(T)));
                     Assert::IsTrue(componentType != kComponentTypeMap.end(), L"ComponentType not found");
-                    auto accessor = bufferBuilder.AddAccessor(input, { TYPE_SCALAR, componentType->second });
+
+                    bool normalized = (componentType->second != COMPONENT_FLOAT);
+
+                    auto accessor = bufferBuilder.AddAccessor(input, { TYPE_SCALAR, componentType->second, normalized });
 
                     Document doc;
                     bufferBuilder.Output(doc);
@@ -99,7 +102,10 @@ namespace Microsoft
 
                     auto componentType = kComponentTypeMap.find(std::type_index(typeid(T)));
                     Assert::IsTrue(componentType != kComponentTypeMap.end(), L"ComponentType not found");
-                    auto accessor = bufferBuilder.AddAccessor(input, { TYPE_VEC4, componentType->second });
+
+                    bool normalized = (componentType->second != COMPONENT_FLOAT);
+
+                    auto accessor = bufferBuilder.AddAccessor(input, { TYPE_VEC4, componentType->second, normalized });
 
                     Document doc;
                     bufferBuilder.Output(doc);
