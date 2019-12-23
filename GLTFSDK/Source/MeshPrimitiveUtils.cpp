@@ -44,11 +44,6 @@ namespace
             static_cast<uint32_t>(byte0);
     }
 
-    uint8_t ToUint8(const uint16_t value)
-    {
-        return static_cast<uint8_t>(round((value / FLOAT_UINT16_MAX) * FLOAT_UINT8_MAX));
-    }
-
     template<typename TIn, typename TOut>
     std::vector<TOut> ReadIndices(const Document& doc, const GLTFResourceReader& reader, const Accessor& accessor)
     {
