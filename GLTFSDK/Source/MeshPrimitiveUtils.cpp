@@ -14,9 +14,6 @@ using namespace Microsoft::glTF;
 
 namespace
 {
-    const float FLOAT_UINT8_MAX = std::numeric_limits<uint8_t>::max();
-    const float FLOAT_UINT16_MAX = std::numeric_limits<uint16_t>::max();
-
     uint64_t ToUint64(const uint16_t short0, const uint16_t short1, const uint16_t short2, const uint16_t short3)
     {
         return
