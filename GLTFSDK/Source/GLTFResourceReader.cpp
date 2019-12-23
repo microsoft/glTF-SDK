@@ -8,13 +8,13 @@ using namespace Microsoft::glTF;
 namespace
 {
 	// Conversions of normalized component types to/from floats are explicitly defined in the 2.0 spec
-	inline float ComponentToFloat(const int8_t w)  { return std::max(static_cast<float>(w) / 127.0f, -1.0f); }
-	inline float ComponentToFloat(const uint8_t w) { return static_cast<float>(w) / 255.0f; }
-	inline float ComponentToFloat(const int16_t w) { return std::max(static_cast<float>(w) / 32767.0f, -1.0f); }
-	inline float ComponentToFloat(const uint16_t w){ return static_cast<float>(w) / 65535.0f; }
+	float ComponentToFloat(const int8_t w)  { return std::max(static_cast<float>(w) / 127.0f, -1.0f); }
+	float ComponentToFloat(const uint8_t w) { return static_cast<float>(w) / 255.0f; }
+	float ComponentToFloat(const int16_t w) { return std::max(static_cast<float>(w) / 32767.0f, -1.0f); }
+	float ComponentToFloat(const uint16_t w){ return static_cast<float>(w) / 65535.0f; }
 
 	template<typename T>
-	std::vector<float> DecodeFloats(const Document& doc, const GLTFResourceReader& reader, const Accessor& accessor)
+	std::vector<float> DecodeToFloats(const Document& doc, const GLTFResourceReader& reader, const Accessor& accessor)
 	{
 	    std::vector<T> rawData = reader.ReadBinaryData<T>(doc, accessor);
 
@@ -40,16 +40,16 @@ std::vector<float> GLTFResourceReader::ReadFloatData(const Document& gltfDocumen
 	switch (accessor.componentType)
 	{
 	case COMPONENT_BYTE:
-		return DecodeFloats<int8_t>(gltfDocument, *this, accessor);
+		return DecodeToFloats<int8_t>(gltfDocument, *this, accessor);
 
 	case COMPONENT_UNSIGNED_BYTE:
-		return DecodeFloats<uint8_t>(gltfDocument, *this, accessor);
+		return DecodeToFloats<uint8_t>(gltfDocument, *this, accessor);
 
 	case COMPONENT_SHORT:
-		return DecodeFloats<int16_t>(gltfDocument, *this, accessor);
+		return DecodeToFloats<int16_t>(gltfDocument, *this, accessor);
 
 	case COMPONENT_UNSIGNED_SHORT:
-		return DecodeFloats<uint16_t>(gltfDocument, *this, accessor);
+		return DecodeToFloats<uint16_t>(gltfDocument, *this, accessor);
 
 	case COMPONENT_FLOAT:
 		return ReadBinaryData<float>(gltfDocument, accessor);
