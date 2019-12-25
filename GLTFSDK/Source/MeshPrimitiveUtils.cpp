@@ -50,6 +50,36 @@ namespace
         return std::vector<TOut>(indices.begin(), indices.end());
     }
 
+    std::vector<uint32_t> PackColorsRGBA(const std::vector<float>& colors)
+    {
+        assert(colors.size() % 4 == 0);
+
+        std::vector<uint32_t> colors32;
+        colors32.reserve(colors.size() / 4);
+
+        for (size_t i = 0; i < colors.size(); i += 4)
+        {
+            colors32.push_back(Color4(colors[i], colors[i + 1], colors[i + 2], colors[i + 3]).AsUint32RGBA());
+        }
+
+        return colors32;
+    }
+
+    std::vector<uint32_t> PackColorsRGB(const std::vector<float>& colors)
+    {
+        assert(colors.size() % 3 == 0);
+
+        std::vector<uint32_t> colors32;
+        colors32.reserve(colors.size() / 3);
+
+        for (size_t i = 0; i < colors.size(); i += 3)
+        {
+            colors32.push_back(Color4(colors[i], colors[i + 1], colors[i + 2], 1.0f).AsUint32RGBA());
+        }
+
+        return colors32;
+    }
+
     std::vector<uint32_t> PackColorsRGBA(const std::vector<uint8_t>& colors)
     {
         assert(colors.size() % 4 == 0);
@@ -84,36 +114,6 @@ namespace
             uint8_t b = colors[i + 2];
             uint32_t rgba = ToUint32(r, g, b, 255);
             colors32.push_back(rgba);
-        }
-
-        return colors32;
-    }
-
-    std::vector<uint32_t> PackColorsRGBA(const std::vector<float>& colors)
-    {
-        assert(colors.size() % 4 == 0);
-
-        std::vector<uint32_t> colors32;
-        colors32.reserve(colors.size() / 4);
-
-        for (size_t i = 0; i < colors.size(); i += 4)
-        {
-            colors32.push_back(Color4(colors[i], colors[i + 1], colors[i + 2], colors[i + 3]).AsUint32RGBA());
-        }
-
-        return colors32;
-    }
-
-    std::vector<uint32_t> PackColorsRGB(const std::vector<float>& colors)
-    {
-        assert(colors.size() % 3 == 0);
-
-        std::vector<uint32_t> colors32;
-        colors32.reserve(colors.size() / 3);
-
-        for (size_t i = 0; i < colors.size(); i += 3)
-        {
-            colors32.push_back(Color4(colors[i], colors[i + 1], colors[i + 2], 1.0f).AsUint32RGBA());
         }
 
         return colors32;
