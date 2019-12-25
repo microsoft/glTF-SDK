@@ -10,6 +10,7 @@
 #include <GLTFSDK/GLTF.h>
 #include <GLTFSDK/GLTFResourceReader.h>
 #include <GLTFSDK/GLTFResourceWriter.h>
+#include <GLTFSDK/ResourceReaderUtils.h>
 
 #include "TestUtils.h"
 
@@ -46,9 +47,9 @@ namespace Microsoft
                     std::vector<float> expectedOutput;
                     for (auto& v : testValues)
                     {
-                        auto c = AnimationUtils::FloatToComponent<T>(v);
+                        auto c = FloatToComponent<T>(v);
                         input.push_back(c);
-                        expectedOutput.push_back(AnimationUtils::ComponentToFloat(c));
+                        expectedOutput.push_back(ComponentToFloat(c));
                     }
 
                     auto componentType = kComponentTypeMap.find(std::type_index(typeid(T)));
@@ -95,9 +96,9 @@ namespace Microsoft
                     std::vector<float> expectedOutput;
                     for (auto& v : testValues)
                     {
-                        auto c = AnimationUtils::FloatToComponent<T>(v);
+                        auto c = FloatToComponent<T>(v);
                         input.push_back(c);
-                        expectedOutput.push_back(AnimationUtils::ComponentToFloat(c));
+                        expectedOutput.push_back(ComponentToFloat(c));
                     }
 
                     auto componentType = kComponentTypeMap.find(std::type_index(typeid(T)));
