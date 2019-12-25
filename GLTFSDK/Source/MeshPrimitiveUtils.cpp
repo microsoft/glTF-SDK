@@ -50,6 +50,45 @@ namespace
         return std::vector<TOut>(indices.begin(), indices.end());
     }
 
+    std::vector<uint32_t> PackColorsRGBA(const std::vector<uint8_t>& colors)
+    {
+        assert(colors.size() % 4 == 0);
+
+        std::vector<uint32_t> colors32;
+        colors32.reserve(colors.size() / 4);
+
+        for (size_t i = 0; i < colors.size(); i += 4)
+        {
+            uint8_t r = colors[i];
+            uint8_t g = colors[i + 1];
+            uint8_t b = colors[i + 2];
+            uint8_t a = colors[i + 3];
+            uint32_t rgba = ToUint32(r, g, b, a);
+            colors32.push_back(rgba);
+        }
+
+        return colors32;
+    }
+
+    std::vector<uint32_t> PackColorsRGB(const std::vector<uint8_t>& colors)
+    {
+        assert(colors.size() % 3 == 0);
+
+        std::vector<uint32_t> colors32;
+        colors32.reserve(colors.size() / 3);
+
+        for (size_t i = 0; i < colors.size(); i += 3)
+        {
+            uint8_t r = colors[i];
+            uint8_t g = colors[i + 1];
+            uint8_t b = colors[i + 2];
+            uint32_t rgba = ToUint32(r, g, b, 255);
+            colors32.push_back(rgba);
+        }
+
+        return colors32;
+    }
+
     std::vector<uint32_t> PackColorsRGBA(const std::vector<float>& colors)
     {
         assert(colors.size() % 4 == 0);
@@ -133,6 +172,22 @@ namespace
                     Math::FloatToByte(weights[i + 1]),
                     Math::FloatToByte(weights[i + 2]),
                     Math::FloatToByte(weights[i + 3])));
+        }
+        return weights32;
+    }
+
+    std::vector<uint32_t> PackWeights32(const std::vector<uint8_t>& weights)
+    {
+        std::vector<uint32_t> weights32;
+        weights32.reserve(weights.size() / 4);
+        for (size_t i = 0; i < weights.size(); i += 4)
+        {
+            weights32.push_back(
+                ToUint32(
+                    weights[i],
+                    weights[i + 1],
+                    weights[i + 2],
+                    weights[i + 3]));
         }
         return weights32;
     }
@@ -642,18 +697,28 @@ std::vector<float> MeshPrimitiveUtils::GetTexCoords_1(const Document& doc, const
 // Colors
 std::vector<uint32_t> MeshPrimitiveUtils::GetColors(const Document& doc, const GLTFResourceReader& reader, const Accessor& colorsAccessor)
 {
-    std::vector<float> colorData = reader.ReadFloatData(doc, colorsAccessor);
-
-    switch (colorsAccessor.type)
+    if (colorsAccessor.type != TYPE_VEC4 && colorsAccessor.type != TYPE_VEC3)
     {
-    case TYPE_VEC4:
-        return PackColorsRGBA(colorData);
-
-    case TYPE_VEC3:
-        return PackColorsRGB(colorData);
-
-    default:
         throw GLTFException("Invalid type for color accessor " + colorsAccessor.id);
+    }
+
+    if (colorsAccessor.componentType == COMPONENT_UNSIGNED_BYTE)
+    {
+        std::vector<uint8_t> colorData = reader.ReadBinaryData<uint8_t>(doc, colorsAccessor);
+
+        if (colorsAccessor.type == TYPE_VEC4)
+            return PackColorsRGBA(colorData);
+        else
+            return PackColorsRGB(colorData);
+    }
+    else
+    {
+        std::vector<float> colorData = reader.ReadFloatData(doc, colorsAccessor);
+
+        if (colorsAccessor.type == TYPE_VEC4)
+            return PackColorsRGBA(colorData);
+        else
+            return PackColorsRGB(colorData);
     }
 }
 
@@ -724,9 +789,18 @@ std::vector<uint32_t> MeshPrimitiveUtils::GetJointWeights32(const Document& doc,
         throw GLTFException("Invalid type for weights accessor " + weightsAccessor.id);
     }
 
-    std::vector<float> weightsData = reader.ReadFloatData(doc, weightsAccessor);
+    if (weightsAccessor.componentType == COMPONENT_UNSIGNED_BYTE)
+    {
+        std::vector<uint8_t> weightsData = reader.ReadBinaryData<uint8_t>(doc, weightsAccessor);
 
-    return PackWeights32(weightsData);
+        return PackWeights32(weightsData);
+    }
+    else
+    {
+        std::vector<float> weightsData = reader.ReadFloatData(doc, weightsAccessor);
+
+        return PackWeights32(weightsData);
+    }
 }
 
 std::vector<uint32_t> MeshPrimitiveUtils::GetJointWeights32_0(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive)
