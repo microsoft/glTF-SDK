@@ -18,12 +18,13 @@ namespace
 
         if (accessor.normalized)
         {
-            std::transform(rawData.begin(), rawData.end(), std::back_inserter(floatData),
-                [](T value) -> float { return ComponentToFloat(value); });
+            for (size_t i = 0; i < rawData.size(); ++i)
+                floatData.push_back(ComponentToFloat(rawData[i]));
         }
         else
         {
-            std::copy(rawData.begin(), rawData.end(), std::back_inserter(floatData));
+            for (size_t i = 0; i < rawData.size(); ++i)
+                floatData.push_back(static_cast<float>(rawData[i]));
         }
 
         return floatData;
