@@ -599,6 +599,11 @@ std::vector<float> MeshPrimitiveUtils::GetPositions(const Document& doc, const G
         throw GLTFException("Invalid type for positions accessor " + positionsAccessor.id);
     }
 
+    if (positionsAccessor.componentType != COMPONENT_FLOAT)
+    {
+        throw GLTFException("Invalid component type for positions accessor " + positionsAccessor.id);
+    }
+
     return reader.ReadFloatData(doc, positionsAccessor);
 }
 
@@ -620,6 +625,11 @@ std::vector<float> MeshPrimitiveUtils::GetNormals(const Document& doc, const GLT
     if (normalsAccessor.type != TYPE_VEC3)
     {
         throw GLTFException("Invalid type for normals accessor " + normalsAccessor.id);
+    }
+
+    if (normalsAccessor.componentType != COMPONENT_FLOAT)
+    {
+        throw GLTFException("Invalid component type for normals accessor " + normalsAccessor.id);
     }
 
     return reader.ReadFloatData(doc, normalsAccessor);
@@ -645,6 +655,11 @@ std::vector<float> MeshPrimitiveUtils::GetTangents(const Document& doc, const GL
         throw GLTFException("Invalid type for tangents accessor " + tangentsAccessor.id);
     }
 
+    if (tangentsAccessor.componentType != COMPONENT_FLOAT)
+    {
+        throw GLTFException("Invalid component type for tangents accessor " + tangentsAccessor.id);
+    }
+
     return reader.ReadFloatData(doc, tangentsAccessor);
 }
 
@@ -662,6 +677,11 @@ std::vector<float> MeshPrimitiveUtils::GetMorphTangents(const Document& doc, con
         throw GLTFException("Invalid type for tangents accessor " + tangentsAccessor.id);
     }
 
+    if (tangentsAccessor.componentType != COMPONENT_FLOAT)
+    {
+        throw GLTFException("Invalid component type for tangents accessor " + tangentsAccessor.id);
+    }
+
     return reader.ReadFloatData(doc, tangentsAccessor);
 }
 
@@ -677,6 +697,11 @@ std::vector<float> MeshPrimitiveUtils::GetTexCoords(const Document& doc, const G
     if (accessor.type != TYPE_VEC2)
     {
         throw GLTFException("Invalid type for texcoords accessor " + accessor.id);
+    }
+
+    if (accessor.componentType != COMPONENT_FLOAT && accessor.componentType != COMPONENT_UNSIGNED_BYTE && accessor.componentType != COMPONENT_UNSIGNED_SHORT)
+    {
+        throw GLTFException("Invalid component type for texcoords accessor " + accessor.id);
     }
 
     return reader.ReadFloatData(doc, accessor);
@@ -700,6 +725,11 @@ std::vector<uint32_t> MeshPrimitiveUtils::GetColors(const Document& doc, const G
     if (colorsAccessor.type != TYPE_VEC4 && colorsAccessor.type != TYPE_VEC3)
     {
         throw GLTFException("Invalid type for color accessor " + colorsAccessor.id);
+    }
+
+    if (colorsAccessor.componentType != COMPONENT_FLOAT && colorsAccessor.componentType != COMPONENT_UNSIGNED_BYTE && colorsAccessor.componentType != COMPONENT_UNSIGNED_SHORT)
+    {
+        throw GLTFException("Invalid component type for colors accessor " + colorsAccessor.id);
     }
 
     if (colorsAccessor.componentType == COMPONENT_UNSIGNED_BYTE)
@@ -787,6 +817,11 @@ std::vector<uint32_t> MeshPrimitiveUtils::GetJointWeights32(const Document& doc,
     if (weightsAccessor.type != TYPE_VEC4)
     {
         throw GLTFException("Invalid type for weights accessor " + weightsAccessor.id);
+    }
+
+    if (weightsAccessor.componentType != COMPONENT_FLOAT && weightsAccessor.componentType != COMPONENT_UNSIGNED_BYTE && weightsAccessor.componentType != COMPONENT_UNSIGNED_SHORT)
+    {
+        throw GLTFException("Invalid component type for weights accessor " + weightsAccessor.id);
     }
 
     if (weightsAccessor.componentType == COMPONENT_UNSIGNED_BYTE)
