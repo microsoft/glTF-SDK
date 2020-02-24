@@ -14,9 +14,6 @@ using namespace Microsoft::glTF;
 
 namespace
 {
-    const float FLOAT_UINT8_MAX = std::numeric_limits<uint8_t>::max();
-    const float FLOAT_UINT16_MAX = std::numeric_limits<uint16_t>::max();
-
     uint64_t ToUint64(const uint16_t short0, const uint16_t short1, const uint16_t short2, const uint16_t short3)
     {
         return
@@ -42,11 +39,6 @@ namespace
             static_cast<uint32_t>(byte2) << 16U |
             static_cast<uint32_t>(byte1) <<  8U |
             static_cast<uint32_t>(byte0);
-    }
-
-    uint8_t ToUint8(const uint16_t value)
-    {
-        return static_cast<uint8_t>(round((value / FLOAT_UINT16_MAX) * FLOAT_UINT8_MAX));
     }
 
     template<typename TIn, typename TOut>
@@ -127,97 +119,6 @@ namespace
         return colors32;
     }
 
-    std::vector<uint32_t> PackColorsRGBA(const std::vector<uint16_t>& colors)
-    {
-        assert(colors.size() % 4 == 0);
-
-        std::vector<uint32_t> colors32;
-        colors32.reserve(colors.size() / 4);
-
-        for (size_t i = 0; i < colors.size(); i += 4)
-        {
-            uint8_t r = ToUint8(colors[i]);
-            uint8_t g = ToUint8(colors[i + 1]);
-            uint8_t b = ToUint8(colors[i + 2]);
-            uint8_t a = ToUint8(colors[i + 3]);
-            uint32_t rgba = ToUint32(r, g, b, a);
-            colors32.push_back(rgba);
-        }
-
-        return colors32;
-    }
-
-    std::vector<uint32_t> PackColorsRGB(const std::vector<uint16_t>& colors)
-    {
-        assert(colors.size() % 3 == 0);
-
-        std::vector<uint32_t> colors32;
-        colors32.reserve(colors.size() / 3);
-
-        for (size_t i = 0; i < colors.size(); i += 3)
-        {
-            uint8_t r = ToUint8(colors[i]);
-            uint8_t g = ToUint8(colors[i + 1]);
-            uint8_t b = ToUint8(colors[i + 2]);
-            uint32_t rgba = ToUint32(r, g, b, 255);
-            colors32.push_back(rgba);
-        }
-
-        return colors32;
-    }
-
-    template<typename T>
-    std::vector<uint32_t> ReadColors(const Document& doc, const GLTFResourceReader& reader, const Accessor& accessor)
-    {
-        std::vector<T> colors = reader.ReadBinaryData<T>(doc, accessor);
-
-        switch (accessor.type)
-        {
-        case TYPE_VEC4:
-            return PackColorsRGBA(colors);
-
-        case TYPE_VEC3:
-            return PackColorsRGB(colors);
-
-        default:
-            throw GLTFException("Invalid type for color accessor " + accessor.id);
-        }
-    }
-
-    std::vector<float> ReadTexCoords(const std::vector<float>&& texcoords)
-    {
-        return std::move(texcoords);
-    }
-
-    std::vector<float> ReadTexCoords(const std::vector<uint8_t>&& texcoords)
-    {
-        std::vector<float> texcoordsFloat;
-        texcoordsFloat.reserve(texcoords.size());
-        for (size_t i = 0; i < texcoords.size(); i++)
-        {
-            texcoordsFloat.push_back(texcoords[i] / FLOAT_UINT8_MAX);
-        }
-        return texcoordsFloat;
-    }
-
-    std::vector<float> ReadTexCoords(const std::vector<uint16_t>&& texcoords)
-    {
-        std::vector<float> texcoordsFloat;
-        texcoordsFloat.reserve(texcoords.size());
-        for (size_t i = 0; i < texcoords.size(); i++)
-        {
-            texcoordsFloat.push_back(texcoords[i] / FLOAT_UINT16_MAX);
-        }
-        return texcoordsFloat;
-    }
-
-    template<typename T>
-    std::vector<float> ReadTexCoords(const Document& doc, const GLTFResourceReader& reader, const Accessor& accessor)
-    {
-        std::vector<T> texcoords = reader.ReadBinaryData<T>(doc, accessor);
-        return ReadTexCoords(std::move(texcoords));
-    }
-
     std::vector<uint32_t> ReadJoints32(const Document& doc, const GLTFResourceReader& reader, const Accessor& accessor)
     {
         std::vector<uint8_t> joints = reader.ReadBinaryData<uint8_t>(doc, accessor);
@@ -259,7 +160,7 @@ namespace
         return ReadJoints64(joints);
     }
 
-    std::vector<uint32_t> ReadWeights32(const std::vector<float>&& weights)
+    std::vector<uint32_t> PackWeights32(const std::vector<float>& weights)
     {
         std::vector<uint32_t> weights32;
         weights32.reserve(weights.size() / 4);
@@ -275,7 +176,7 @@ namespace
         return weights32;
     }
 
-    std::vector<uint32_t> ReadWeights32(const std::vector<uint8_t>&& weights)
+    std::vector<uint32_t> PackWeights32(const std::vector<uint8_t>& weights)
     {
         std::vector<uint32_t> weights32;
         weights32.reserve(weights.size() / 4);
@@ -289,29 +190,6 @@ namespace
                     weights[i + 3]));
         }
         return weights32;
-    }
-
-    std::vector<uint32_t> ReadWeights32(const std::vector<uint16_t>&& weights)
-    {
-        std::vector<uint32_t> weights32;
-        weights32.reserve(weights.size() / 4);
-        for (size_t i = 0; i < weights.size(); i += 4)
-        {
-            weights32.push_back(
-                ToUint32(
-                    ToUint8(weights[i]),
-                    ToUint8(weights[i + 1]),
-                    ToUint8(weights[i + 2]),
-                    ToUint8(weights[i + 3])));
-        }
-        return weights32;
-    }
-
-    template<typename T>
-    std::vector<uint32_t> ReadWeights32(const Document& doc, const GLTFResourceReader& reader, const Accessor& accessor)
-    {
-        std::vector<T> weights = reader.ReadBinaryData<T>(doc, accessor);
-        return ReadWeights32(std::move(weights));
     }
 
     template<typename T>
@@ -726,7 +604,7 @@ std::vector<float> MeshPrimitiveUtils::GetPositions(const Document& doc, const G
         throw GLTFException("Invalid component type for positions accessor " + positionsAccessor.id);
     }
 
-    return reader.ReadBinaryData<float>(doc, positionsAccessor);
+    return reader.ReadFloatData(doc, positionsAccessor);
 }
 
 std::vector<float> MeshPrimitiveUtils::GetPositions(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive)
@@ -754,7 +632,7 @@ std::vector<float> MeshPrimitiveUtils::GetNormals(const Document& doc, const GLT
         throw GLTFException("Invalid component type for normals accessor " + normalsAccessor.id);
     }
 
-    return reader.ReadBinaryData<float>(doc, normalsAccessor);
+    return reader.ReadFloatData(doc, normalsAccessor);
 }
 
 std::vector<float> MeshPrimitiveUtils::GetNormals(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive)
@@ -782,7 +660,7 @@ std::vector<float> MeshPrimitiveUtils::GetTangents(const Document& doc, const GL
         throw GLTFException("Invalid component type for tangents accessor " + tangentsAccessor.id);
     }
 
-    return reader.ReadBinaryData<float>(doc, tangentsAccessor);
+    return reader.ReadFloatData(doc, tangentsAccessor);
 }
 
 std::vector<float> MeshPrimitiveUtils::GetTangents(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive)
@@ -804,7 +682,7 @@ std::vector<float> MeshPrimitiveUtils::GetMorphTangents(const Document& doc, con
         throw GLTFException("Invalid component type for tangents accessor " + tangentsAccessor.id);
     }
 
-    return reader.ReadBinaryData<float>(doc, tangentsAccessor);
+    return reader.ReadFloatData(doc, tangentsAccessor);
 }
 
 std::vector<float> MeshPrimitiveUtils::GetTangents(const Document& doc, const GLTFResourceReader& reader, const MorphTarget& morphTarget)
@@ -816,20 +694,17 @@ std::vector<float> MeshPrimitiveUtils::GetTangents(const Document& doc, const GL
 // Texcoords
 std::vector<float> MeshPrimitiveUtils::GetTexCoords(const Document& doc, const GLTFResourceReader& reader, const Accessor& accessor)
 {
-    switch (accessor.componentType)
+    if (accessor.type != TYPE_VEC2)
     {
-    case COMPONENT_FLOAT:
-        return ReadTexCoords<float>(doc, reader, accessor);
-
-    case COMPONENT_UNSIGNED_BYTE:
-        return ReadTexCoords<uint8_t>(doc, reader, accessor);
-
-    case COMPONENT_UNSIGNED_SHORT:
-        return ReadTexCoords<uint16_t>(doc, reader, accessor);
-
-    default:
-        throw GLTFException("Invalid componentType for texcoords accessor " + accessor.id);
+        throw GLTFException("Invalid type for texcoords accessor " + accessor.id);
     }
+
+    if (accessor.componentType != COMPONENT_FLOAT && accessor.componentType != COMPONENT_UNSIGNED_BYTE && accessor.componentType != COMPONENT_UNSIGNED_SHORT)
+    {
+        throw GLTFException("Invalid component type for texcoords accessor " + accessor.id);
+    }
+
+    return reader.ReadFloatData(doc, accessor);
 }
 
 std::vector<float> MeshPrimitiveUtils::GetTexCoords_0(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive)
@@ -847,19 +722,33 @@ std::vector<float> MeshPrimitiveUtils::GetTexCoords_1(const Document& doc, const
 // Colors
 std::vector<uint32_t> MeshPrimitiveUtils::GetColors(const Document& doc, const GLTFResourceReader& reader, const Accessor& colorsAccessor)
 {
-    switch (colorsAccessor.componentType)
+    if (colorsAccessor.type != TYPE_VEC4 && colorsAccessor.type != TYPE_VEC3)
     {
-    case COMPONENT_FLOAT:
-        return ReadColors<float>(doc, reader, colorsAccessor);
+        throw GLTFException("Invalid type for color accessor " + colorsAccessor.id);
+    }
 
-    case COMPONENT_UNSIGNED_BYTE:
-        return ReadColors<uint8_t>(doc, reader, colorsAccessor);
+    if (colorsAccessor.componentType != COMPONENT_FLOAT && colorsAccessor.componentType != COMPONENT_UNSIGNED_BYTE && colorsAccessor.componentType != COMPONENT_UNSIGNED_SHORT)
+    {
+        throw GLTFException("Invalid component type for colors accessor " + colorsAccessor.id);
+    }
 
-    case COMPONENT_UNSIGNED_SHORT:
-        return ReadColors<uint16_t>(doc, reader, colorsAccessor);
+    if (colorsAccessor.componentType == COMPONENT_UNSIGNED_BYTE)
+    {
+        std::vector<uint8_t> colorData = reader.ReadBinaryData<uint8_t>(doc, colorsAccessor);
 
-    default:
-        throw GLTFException("Invalid componentType for color accessor " + colorsAccessor.id);
+        if (colorsAccessor.type == TYPE_VEC4)
+            return PackColorsRGBA(colorData);
+        else
+            return PackColorsRGB(colorData);
+    }
+    else
+    {
+        std::vector<float> colorData = reader.ReadFloatData(doc, colorsAccessor);
+
+        if (colorsAccessor.type == TYPE_VEC4)
+            return PackColorsRGBA(colorData);
+        else
+            return PackColorsRGB(colorData);
     }
 }
 
@@ -930,19 +819,22 @@ std::vector<uint32_t> MeshPrimitiveUtils::GetJointWeights32(const Document& doc,
         throw GLTFException("Invalid type for weights accessor " + weightsAccessor.id);
     }
 
-    switch (weightsAccessor.componentType)
+    if (weightsAccessor.componentType != COMPONENT_FLOAT && weightsAccessor.componentType != COMPONENT_UNSIGNED_BYTE && weightsAccessor.componentType != COMPONENT_UNSIGNED_SHORT)
     {
-    case COMPONENT_FLOAT:
-        return ReadWeights32<float>(doc, reader, weightsAccessor);
+        throw GLTFException("Invalid component type for weights accessor " + weightsAccessor.id);
+    }
 
-    case COMPONENT_UNSIGNED_BYTE:
-        return ReadWeights32<uint8_t>(doc, reader, weightsAccessor);
+    if (weightsAccessor.componentType == COMPONENT_UNSIGNED_BYTE)
+    {
+        std::vector<uint8_t> weightsData = reader.ReadBinaryData<uint8_t>(doc, weightsAccessor);
 
-    case COMPONENT_UNSIGNED_SHORT:
-        return ReadWeights32<uint16_t>(doc, reader, weightsAccessor);
+        return PackWeights32(weightsData);
+    }
+    else
+    {
+        std::vector<float> weightsData = reader.ReadFloatData(doc, weightsAccessor);
 
-    default:
-        throw GLTFException("Invalid componentType for weights accessor " + weightsAccessor.id);
+        return PackWeights32(weightsData);
     }
 }
 

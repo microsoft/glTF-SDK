@@ -7,6 +7,7 @@
 
 #include <string>
 #include <vector>
+#include <cmath>
 
 namespace Microsoft
 {
@@ -216,5 +217,23 @@ namespace Microsoft
 
             return IsUriBase64(uri, itBegin, itEnd);
         }
+
+        // Conversions of normalized component types to/from floats are explicitly defined in the 2.0 spec
+        inline float ComponentToFloat(const float w)   { return w; }
+        inline float ComponentToFloat(const int8_t w)  { return std::max(static_cast<float>(w) / 127.0f, -1.0f); }
+        inline float ComponentToFloat(const uint8_t w) { return static_cast<float>(w) / 255.0f; }
+        inline float ComponentToFloat(const int16_t w) { return std::max(static_cast<float>(w) / 32767.0f, -1.0f); }
+        inline float ComponentToFloat(const uint16_t w){ return static_cast<float>(w) / 65535.0f; }
+
+        template<typename T>
+        inline T FloatToComponent(const float f)
+        {
+            static_assert(std::is_same<float, T>::value, "Microsoft::glTF::FloatToComponent: expecting float template type");
+            return f;
+        }
+        template<> inline int8_t   FloatToComponent<int8_t>(const float f)  { return static_cast<int8_t>(std::round(f*127.0f)); }
+        template<> inline uint8_t  FloatToComponent<uint8_t>(const float f) { return static_cast<uint8_t>(std::round(f*255.0f)); }
+        template<> inline int16_t  FloatToComponent<int16_t>(const float f) { return static_cast<int16_t>(std::round(f*32767.0f)); }
+        template<> inline uint16_t FloatToComponent<uint16_t>(const float f){ return static_cast<uint16_t>(std::round(f*65535.0f)); }
     }
 }

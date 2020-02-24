@@ -576,6 +576,228 @@ namespace Microsoft
 
                     Assert::IsTrue(output == expectedReadOutput);
                 }
+
+                GLTFSDK_TEST_METHOD(GLTFResourceReaderTests, TestReadFloatData)
+                {
+                    auto readerWriter = std::make_shared<const StreamReaderWriter>();
+                    auto bufferBuilder = BufferBuilder(std::make_unique<GLTFResourceWriter>(readerWriter));
+
+                    bufferBuilder.AddBuffer();
+                    bufferBuilder.AddBufferView(BufferViewTarget::ARRAY_BUFFER);
+
+                    std::vector<float> values = { 0.f, 1.f, -0.125f };
+                    auto accessor = bufferBuilder.AddAccessor(values, { TYPE_SCALAR, COMPONENT_FLOAT });
+
+                    Document doc;
+                    bufferBuilder.Output(doc);
+
+                    GLTFResourceReader reader(readerWriter);
+                    auto data = reader.ReadFloatData(doc, accessor);
+
+                    Assert::AreEqual<size_t>(3U, data.size());
+                    Assert::AreEqual<float>(data[0], 0.f);
+                    Assert::AreEqual<float>(data[1], 1.f);
+                    Assert::AreEqual<float>(data[2], -0.125f);
+                }
+
+                GLTFSDK_TEST_METHOD(GLTFResourceReaderTests, TestReadFloatData_U8)
+                {
+                    auto readerWriter = std::make_shared<const StreamReaderWriter>();
+                    auto bufferBuilder = BufferBuilder(std::make_unique<GLTFResourceWriter>(readerWriter));
+
+                    bufferBuilder.AddBuffer();
+                    bufferBuilder.AddBufferView(BufferViewTarget::ARRAY_BUFFER);
+
+                    std::vector<uint8_t> values = { 0, 1, 255 };
+                    auto accessor = bufferBuilder.AddAccessor(values, { TYPE_SCALAR, COMPONENT_UNSIGNED_BYTE });
+
+                    Document doc;
+                    bufferBuilder.Output(doc);
+
+                    GLTFResourceReader reader(readerWriter);
+                    auto data = reader.ReadFloatData(doc, accessor);
+
+                    Assert::AreEqual<size_t>(3U, data.size());
+                    Assert::AreEqual<float>(data[0], 0.f);
+                    Assert::AreEqual<float>(data[1], 1.f);
+                    Assert::AreEqual<float>(data[2], 255.f);
+                }
+
+                GLTFSDK_TEST_METHOD(GLTFResourceReaderTests, TestReadFloatData_U8N)
+                {
+                    auto readerWriter = std::make_shared<const StreamReaderWriter>();
+                    auto bufferBuilder = BufferBuilder(std::make_unique<GLTFResourceWriter>(readerWriter));
+
+                    bufferBuilder.AddBuffer();
+                    bufferBuilder.AddBufferView(BufferViewTarget::ARRAY_BUFFER);
+
+                    std::vector<uint8_t> values = { 0, 1, 255 };
+                    auto accessor = bufferBuilder.AddAccessor(values, { TYPE_SCALAR, COMPONENT_UNSIGNED_BYTE, true });
+
+                    Document doc;
+                    bufferBuilder.Output(doc);
+
+                    GLTFResourceReader reader(readerWriter);
+                    auto data = reader.ReadFloatData(doc, accessor);
+
+                    Assert::AreEqual<size_t>(3U, data.size());
+                    Assert::AreEqual<float>(data[0], 0.f);
+                    Assert::AreEqual<float>(data[1], 1.f / 255.f);
+                    Assert::AreEqual<float>(data[2], 1.f);
+                }
+
+                GLTFSDK_TEST_METHOD(GLTFResourceReaderTests, TestReadFloatData_S8)
+                {
+                    auto readerWriter = std::make_shared<const StreamReaderWriter>();
+                    auto bufferBuilder = BufferBuilder(std::make_unique<GLTFResourceWriter>(readerWriter));
+
+                    bufferBuilder.AddBuffer();
+                    bufferBuilder.AddBufferView(BufferViewTarget::ARRAY_BUFFER);
+
+                    std::vector<int8_t> values = { 0, 1, -1, 127, -127, -128 };
+                    auto accessor = bufferBuilder.AddAccessor(values, { TYPE_SCALAR, COMPONENT_BYTE });
+
+                    Document doc;
+                    bufferBuilder.Output(doc);
+
+                    GLTFResourceReader reader(readerWriter);
+                    auto data = reader.ReadFloatData(doc, accessor);
+
+                    Assert::AreEqual<size_t>(6U, data.size());
+                    Assert::AreEqual<float>(data[0], 0.f);
+                    Assert::AreEqual<float>(data[1], 1.f);
+                    Assert::AreEqual<float>(data[2], -1.f);
+                    Assert::AreEqual<float>(data[3], 127.f);
+                    Assert::AreEqual<float>(data[4], -127.f);
+                    Assert::AreEqual<float>(data[5], -128.f);
+                }
+
+                GLTFSDK_TEST_METHOD(GLTFResourceReaderTests, TestReadFloatData_S8N)
+                {
+                    auto readerWriter = std::make_shared<const StreamReaderWriter>();
+                    auto bufferBuilder = BufferBuilder(std::make_unique<GLTFResourceWriter>(readerWriter));
+
+                    bufferBuilder.AddBuffer();
+                    bufferBuilder.AddBufferView(BufferViewTarget::ARRAY_BUFFER);
+
+                    std::vector<int8_t> values = { 0, 1, -1, 127, -127, -128 };
+                    auto accessor = bufferBuilder.AddAccessor(values, { TYPE_SCALAR, COMPONENT_BYTE, true });
+
+                    Document doc;
+                    bufferBuilder.Output(doc);
+
+                    GLTFResourceReader reader(readerWriter);
+                    auto data = reader.ReadFloatData(doc, accessor);
+
+                    Assert::AreEqual<size_t>(6U, data.size());
+                    Assert::AreEqual<float>(data[0], 0.f);
+                    Assert::AreEqual<float>(data[1], 1.f / 127.f);
+                    Assert::AreEqual<float>(data[2], -1.f / 127.f);
+                    Assert::AreEqual<float>(data[3], 1.f);
+                    Assert::AreEqual<float>(data[4], -1.f);
+                    Assert::AreEqual<float>(data[5], -1.f);
+                }
+
+                GLTFSDK_TEST_METHOD(GLTFResourceReaderTests, TestReadFloatData_U16)
+                {
+                    auto readerWriter = std::make_shared<const StreamReaderWriter>();
+                    auto bufferBuilder = BufferBuilder(std::make_unique<GLTFResourceWriter>(readerWriter));
+
+                    bufferBuilder.AddBuffer();
+                    bufferBuilder.AddBufferView(BufferViewTarget::ARRAY_BUFFER);
+
+                    std::vector<uint16_t> values = { 0, 1, 255, 65535 };
+                    auto accessor = bufferBuilder.AddAccessor(values, { TYPE_SCALAR, COMPONENT_UNSIGNED_SHORT });
+
+                    Document doc;
+                    bufferBuilder.Output(doc);
+
+                    GLTFResourceReader reader(readerWriter);
+                    auto data = reader.ReadFloatData(doc, accessor);
+
+                    Assert::AreEqual<size_t>(4U, data.size());
+                    Assert::AreEqual<float>(data[0], 0.f);
+                    Assert::AreEqual<float>(data[1], 1.f);
+                    Assert::AreEqual<float>(data[2], 255.f);
+                    Assert::AreEqual<float>(data[3], 65535.f);
+                }
+
+                GLTFSDK_TEST_METHOD(GLTFResourceReaderTests, TestReadFloatData_U16N)
+                {
+                    auto readerWriter = std::make_shared<const StreamReaderWriter>();
+                    auto bufferBuilder = BufferBuilder(std::make_unique<GLTFResourceWriter>(readerWriter));
+
+                    bufferBuilder.AddBuffer();
+                    bufferBuilder.AddBufferView(BufferViewTarget::ARRAY_BUFFER);
+
+                    std::vector<uint16_t> values = { 0, 1, 255, 65535 };
+                    auto accessor = bufferBuilder.AddAccessor(values, { TYPE_SCALAR, COMPONENT_UNSIGNED_SHORT, true });
+
+                    Document doc;
+                    bufferBuilder.Output(doc);
+
+                    GLTFResourceReader reader(readerWriter);
+                    auto data = reader.ReadFloatData(doc, accessor);
+
+                    Assert::AreEqual<size_t>(4U, data.size());
+                    Assert::AreEqual<float>(data[0], 0.f);
+                    Assert::AreEqual<float>(data[1], 1.f / 65535.f);
+                    Assert::AreEqual<float>(data[2], 255.f / 65535.f);
+                    Assert::AreEqual<float>(data[3], 1.f);
+                }
+
+                GLTFSDK_TEST_METHOD(GLTFResourceReaderTests, TestReadFloatData_S16)
+                {
+                    auto readerWriter = std::make_shared<const StreamReaderWriter>();
+                    auto bufferBuilder = BufferBuilder(std::make_unique<GLTFResourceWriter>(readerWriter));
+
+                    bufferBuilder.AddBuffer();
+                    bufferBuilder.AddBufferView(BufferViewTarget::ARRAY_BUFFER);
+
+                    std::vector<int16_t> values = { 0, 1, -1, 32767, -32767, -32768 };
+                    auto accessor = bufferBuilder.AddAccessor(values, { TYPE_SCALAR, COMPONENT_SHORT });
+
+                    Document doc;
+                    bufferBuilder.Output(doc);
+
+                    GLTFResourceReader reader(readerWriter);
+                    auto data = reader.ReadFloatData(doc, accessor);
+
+                    Assert::AreEqual<size_t>(6U, data.size());
+                    Assert::AreEqual<float>(data[0], 0.f);
+                    Assert::AreEqual<float>(data[1], 1.f);
+                    Assert::AreEqual<float>(data[2], -1.f);
+                    Assert::AreEqual<float>(data[3], 32767.f);
+                    Assert::AreEqual<float>(data[4], -32767.f);
+                    Assert::AreEqual<float>(data[5], -32768.f);
+                }
+
+                GLTFSDK_TEST_METHOD(GLTFResourceReaderTests, TestReadFloatData_S16N)
+                {
+                    auto readerWriter = std::make_shared<const StreamReaderWriter>();
+                    auto bufferBuilder = BufferBuilder(std::make_unique<GLTFResourceWriter>(readerWriter));
+
+                    bufferBuilder.AddBuffer();
+                    bufferBuilder.AddBufferView(BufferViewTarget::ARRAY_BUFFER);
+
+                    std::vector<int16_t> values = { 0, 1, -1, 32767, -32767, -32768 };
+                    auto accessor = bufferBuilder.AddAccessor(values, { TYPE_SCALAR, COMPONENT_SHORT, true });
+
+                    Document doc;
+                    bufferBuilder.Output(doc);
+
+                    GLTFResourceReader reader(readerWriter);
+                    auto data = reader.ReadFloatData(doc, accessor);
+
+                    Assert::AreEqual<size_t>(6U, data.size());
+                    Assert::AreEqual<float>(data[0], 0.f);
+                    Assert::AreEqual<float>(data[1], 1.f / 32767.f);
+                    Assert::AreEqual<float>(data[2], -1.f / 32767.f);
+                    Assert::AreEqual<float>(data[3], 1.f);
+                    Assert::AreEqual<float>(data[4], -1.f);
+                    Assert::AreEqual<float>(data[5], -1.f);
+                }
+
             };
         }
     }

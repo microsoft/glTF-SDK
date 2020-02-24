@@ -10,6 +10,7 @@
 #include <GLTFSDK/GLTF.h>
 #include <GLTFSDK/GLTFResourceReader.h>
 #include <GLTFSDK/GLTFResourceWriter.h>
+#include <GLTFSDK/ResourceReaderUtils.h>
 
 #include "TestUtils.h"
 
@@ -46,14 +47,17 @@ namespace Microsoft
                     std::vector<float> expectedOutput;
                     for (auto& v : testValues)
                     {
-                        auto c = AnimationUtils::FloatToComponent<T>(v);
+                        auto c = FloatToComponent<T>(v);
                         input.push_back(c);
-                        expectedOutput.push_back(AnimationUtils::ComponentToFloat(c));
+                        expectedOutput.push_back(ComponentToFloat(c));
                     }
 
                     auto componentType = kComponentTypeMap.find(std::type_index(typeid(T)));
                     Assert::IsTrue(componentType != kComponentTypeMap.end(), L"ComponentType not found");
-                    auto accessor = bufferBuilder.AddAccessor(input, { TYPE_SCALAR, componentType->second });
+
+                    bool normalized = (componentType->second != COMPONENT_FLOAT);
+
+                    auto accessor = bufferBuilder.AddAccessor(input, { TYPE_SCALAR, componentType->second, normalized });
 
                     Document doc;
                     bufferBuilder.Output(doc);
@@ -92,14 +96,17 @@ namespace Microsoft
                     std::vector<float> expectedOutput;
                     for (auto& v : testValues)
                     {
-                        auto c = AnimationUtils::FloatToComponent<T>(v);
+                        auto c = FloatToComponent<T>(v);
                         input.push_back(c);
-                        expectedOutput.push_back(AnimationUtils::ComponentToFloat(c));
+                        expectedOutput.push_back(ComponentToFloat(c));
                     }
 
                     auto componentType = kComponentTypeMap.find(std::type_index(typeid(T)));
                     Assert::IsTrue(componentType != kComponentTypeMap.end(), L"ComponentType not found");
-                    auto accessor = bufferBuilder.AddAccessor(input, { TYPE_VEC4, componentType->second });
+
+                    bool normalized = (componentType->second != COMPONENT_FLOAT);
+
+                    auto accessor = bufferBuilder.AddAccessor(input, { TYPE_VEC4, componentType->second, normalized });
 
                     Document doc;
                     bufferBuilder.Output(doc);

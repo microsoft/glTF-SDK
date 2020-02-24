@@ -24,6 +24,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\GLTFSDK\Source\ExtensionsKHR.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\GLTFSDK\Source\GLBResourceReader.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\GLTFSDK\Source\GLBResourceWriter.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\GLTFSDK\Source\GLTFResourceReader.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\GLTFSDK\Source\GLTFResourceWriter.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\GLTFSDK\Source\Math.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\GLTFSDK\Source\MeshPrimitiveUtils.cpp" />

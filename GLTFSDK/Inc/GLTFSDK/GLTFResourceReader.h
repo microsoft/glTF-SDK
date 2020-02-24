@@ -123,6 +123,8 @@ namespace Microsoft
                 return ReadBinaryData<T>(buffer, bufferView.byteOffset, count);
             }
 
+            std::vector<float> ReadFloatData(const Document& gltfDocument, const Accessor& accessor) const;
+
         protected:
             template<typename T>
             std::vector<T> ReadAccessor(const Document& gltfDocument, const Accessor& accessor) const

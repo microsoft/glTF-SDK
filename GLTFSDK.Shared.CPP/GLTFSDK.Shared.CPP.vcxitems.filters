@@ -51,6 +51,9 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\GLTFSDK\Source\GLBResourceWriter.cpp">
       <Filter>Source Files\GLTFSDK</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\GLTFSDK\Source\GLTFResourceReader.cpp">
+      <Filter>Source Files\GLTFSDK</Filter>
+    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\GLTFSDK\Source\GLTFResourceWriter.cpp">
       <Filter>Source Files\GLTFSDK</Filter>
     </ClCompile>
