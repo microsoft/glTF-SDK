@@ -11,6 +11,7 @@
 #include <GLTFSDK/Math.h>
 #include <GLTFSDK/Optional.h>
 
+#include <algorithm>
 #include <memory>
 #include <string>
 #include <typeindex>

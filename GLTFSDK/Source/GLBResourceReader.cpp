@@ -6,6 +6,7 @@
 #include <GLTFSDK/Constants.h>
 
 #include <memory>
+#include <string.h>
 
 using namespace Microsoft::glTF;
 
