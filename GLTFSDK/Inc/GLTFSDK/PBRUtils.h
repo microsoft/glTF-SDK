@@ -26,7 +26,7 @@ namespace Microsoft
                 const auto g = G(color);
                 const auto b = B(color);
 
-                return std::max(std::max(r, g), b);
+                return (std::max)((std::max)(r, g), b);
             }
 
             // http://www.itu.int/rec/R-REC-BT.601
@@ -119,8 +119,8 @@ namespace Microsoft
             const float metallic = SolveMetallic(dielectricSpecularRed, brightnessDiffuse, brightnessSpecular, oneMinusSpecularStrength);
             const float oneMinusMetallic = 1.0f - metallic;
 
-            const TColor baseColorFromDiffuse = sg.diffuse * (oneMinusSpecularStrength / (1.0f - dielectricSpecularRed) / std::max((oneMinusMetallic), std::numeric_limits<float>::epsilon()));
-            const TColor baseColorFromSpecular = (sg.specular - (DIELECTRIC_SPECULAR<TColor> * (oneMinusMetallic))) * (1.0f / std::max(metallic, std::numeric_limits<float>::epsilon()));
+            const TColor baseColorFromDiffuse = sg.diffuse * (oneMinusSpecularStrength / (1.0f - dielectricSpecularRed) / (std::max)((oneMinusMetallic), std::numeric_limits<float>::epsilon()));
+            const TColor baseColorFromSpecular = (sg.specular - (DIELECTRIC_SPECULAR<TColor> * (oneMinusMetallic))) * (1.0f / (std::max)(metallic, std::numeric_limits<float>::epsilon()));
             const TColor baseColor = TColor::Clamp(TColor::Lerp(baseColorFromDiffuse, baseColorFromSpecular, metallic * metallic), 0.0f, 1.0f);
 
             MetallicRoughnessValueTypeless<TColor> mr;

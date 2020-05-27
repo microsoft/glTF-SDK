@@ -188,7 +188,7 @@ void BufferBuilder::AddAccessors(const void* data, size_t count, size_t byteStri
     size_t alignment = 1;
     for (size_t i = 0; i < descCount; ++i)
     {
-        alignment = std::max(alignment, GetAlignment(pDescs[i]));
+        alignment = (std::max)(alignment, GetAlignment(pDescs[i]));
     }
 
     bufferView.byteStride = byteStride;
