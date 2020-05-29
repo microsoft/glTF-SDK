@@ -3,6 +3,8 @@
 
 #include <GLTFSDK/Math.h>
 
+#include <tuple>
+
 using namespace Microsoft::glTF;
 
 const Matrix4 Matrix4::IDENTITY = Matrix4();

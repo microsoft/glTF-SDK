@@ -295,7 +295,7 @@ namespace Microsoft
                         Optional<std::string> opt;
 
                         Assert::IsFalse(opt.HasValue());
-                        opt = opt;
+                        opt = *&opt;
                         Assert::IsFalse(opt.HasValue());
                     }
 
@@ -304,7 +304,7 @@ namespace Microsoft
                         Optional<std::string> opt("Init");
 
                         Assert::IsTrue(opt.HasValue());
-                        opt = opt;
+                        opt = *&opt;
                         Assert::IsTrue(opt.HasValue());
 
                         Assert::AreEqual("Init", opt.Get().c_str());
