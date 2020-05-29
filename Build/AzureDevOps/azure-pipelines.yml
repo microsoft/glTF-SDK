@@ -122,7 +122,7 @@ jobs:
     - task: CMake@1
       inputs:
         workingDirectory: 'built/Int/cmake_$(buildPlatform)'
-        cmakeArgs: '../../.. -G Xcode -DCMAKE_TOOLCHAIN_FILE="$(Build.SourcesDirectory)/Build/CMake/ios.toolchain.cmake" -DIOS_PLATFORM=OS -DENABLE_UNIT_TESTS="OFF"'
+        cmakeArgs: '../../.. -G Xcode -DCMAKE_TOOLCHAIN_FILE="$(Build.SourcesDirectory)/Build/CMake/ios.toolchain.cmake" -DIOS_PLATFORM=OS -DIOS_DEPLOYMENT_TARGET="10.11" -DENABLE_UNIT_TESTS="OFF"'
 
     - task: CMake@1
       inputs:
