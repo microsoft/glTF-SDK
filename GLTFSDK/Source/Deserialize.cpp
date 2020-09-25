@@ -415,7 +415,7 @@ namespace
 
             Optional<float> aspectRatio;
 
-            auto itAspectRatio = perspectiveIt->value.FindMember("target");
+            auto itAspectRatio = perspectiveIt->value.FindMember("aspectRatio");
             if (itAspectRatio != perspectiveIt->value.MemberEnd())
             {
                 aspectRatio = itAspectRatio->value.GetFloat();
