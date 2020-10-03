@@ -4,6 +4,7 @@
 #include <GLTFSDK/Color.h>
 
 #include <GLTFSDK/Math.h>
+#include <limits>
 
 using namespace Microsoft::glTF;
 
