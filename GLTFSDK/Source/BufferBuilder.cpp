@@ -277,6 +277,15 @@ const ResourceWriter& BufferBuilder::GetResourceWriter() const
     return *m_resourceWriter;
 }
 
+bool BufferBuilder::setCurrentBufferURI ( const std::string &data )
+{
+    assert ( m_buffers.size() > 0 );
+    size_t index = m_buffers.size() - 1;
+    m_buffers [ index ].uri = data;
+    m_buffers [ index ].length = data.length();
+    return true;
+}
+
 const Accessor& BufferBuilder::AddAccessor(size_t count, AccessorDesc desc)
 {
     Buffer& buffer = m_buffers.Back();

@@ -35,6 +35,11 @@ namespace Microsoft
         class IndexedContainer<const T, true>
         {
         public:
+
+            const size_t size() const
+            {
+                return m_elements.size();
+            }
             const T& Front() const
             {
                 return m_elements.front();
@@ -201,6 +206,11 @@ namespace Microsoft
             // T). This means all inherited members must be qualified with 'this->' or 'IndexedContainer<const T>::'
 
         public:
+            size_t size()
+            {
+                return (IndexedContainer::size());
+            }
+
             T& Front()
             {
                 return const_cast<T&>(IndexedContainer<const T>::Front());
@@ -259,6 +269,7 @@ namespace Microsoft
             // No using declaration for Append, operator== or operator!= as we don't
             // want to make the base class versions of these functions publically
             // accessible (the mutable versions replace rather than complement them)
+            using IndexedContainer::size;
             using IndexedContainer<const T>::Front;
             using IndexedContainer<const T>::Back;
             using IndexedContainer<const T>::Clear;

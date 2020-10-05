@@ -84,6 +84,15 @@ namespace Microsoft
 
             ResourceWriter& GetResourceWriter();
             const ResourceWriter& GetResourceWriter() const;
+            bool setCurrentBufferURI ( const std::string &data )
+            Buffer getBuffer ( size_t index ) {
+                assert ( index < m_buffers.Size() );
+                return m_buffers [ index ];
+            }
+            Accessor getAccessor ( size_t index ) {
+                assert ( index < m_accessors.Size() );
+                return m_accessors [ index ];
+            }
 
         private:
             const Accessor& AddAccessor(size_t count, AccessorDesc desc);

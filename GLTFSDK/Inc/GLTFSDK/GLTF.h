@@ -317,6 +317,9 @@ namespace Microsoft
                     && lhs.name == rhs.name
                     && glTFProperty::Equals(lhs, rhs);
             }
+
+        public:
+            void setName ( std::string newName ) { name = newName; }
         };
 
         struct BufferView : glTFChildOfRootProperty
