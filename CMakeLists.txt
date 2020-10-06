@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.5)
 project (GLTFSDK)
 
 option(ENABLE_UNIT_TESTS "ENABLE_UNIT_TESTS" ON)
+if(ENABLE_UNIT_TESTS)
+    enable_testing()
+endif()
 
 # Disable the samples on macOS, iOS, and Android since the experimental features they use
 # do not yet build with XCode or clang on these platforms.
@@ -27,14 +30,30 @@ endif()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/Build/CMake/Modules")
 
-
-add_subdirectory(External/RapidJSON)
-add_subdirectory(External/googletest)
+find_package(RapidJSON CONFIG)
+if(NOT RapidJSON_FOUND)
+    add_subdirectory(External/RapidJSON)
+endif()
 add_subdirectory(GLTFSDK)
 
+if(RapidJSON_FOUND)
+    target_include_directories(GLTFSDK
+    PUBLIC
+        ${RAPIDJSON_INCLUDE_DIRS}
+    )
+else()
+    target_link_libraries(GLTFSDK
+    PRIVATE
+        RapidJSON
+    )
+endif()
+
 if(ENABLE_UNIT_TESTS)
+    find_package(GTest CONFIG REQUIRED)
+    # add_subdirectory(External/googletest)
     add_subdirectory(GLTFSDK.TestUtils)
     add_subdirectory(GLTFSDK.Test)
+
 endif()
 
 if(ENABLE_SAMPLES)

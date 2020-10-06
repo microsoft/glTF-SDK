@@ -36,8 +36,7 @@ target_include_directories(GLTFSDK.Test
 
 target_link_libraries(GLTFSDK.Test
     GLTFSDK
-    gtest_main
-    RapidJSON
+    GTest::gtest_main
     GLTFSDK.TestUtils
 )
 
