@@ -269,7 +269,7 @@ namespace Microsoft
             // No using declaration for Append, operator== or operator!= as we don't
             // want to make the base class versions of these functions publically
             // accessible (the mutable versions replace rather than complement them)
-            using IndexedContainer::size;
+            using IndexedContainer<const T>::size;
             using IndexedContainer<const T>::Front;
             using IndexedContainer<const T>::Back;
             using IndexedContainer<const T>::Clear;
