@@ -22,7 +22,7 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET 10.11)
 if (WIN32)
     # Define _SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING to disable the warnings in the current version of Google Test (1.8.0)
     # TODO: Newer versions shouldn't have this problem.  Re-evaluate this when upgrading.
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING /D_SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING")
 
     # Multithreaded Build
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
@@ -53,7 +53,6 @@ if(ENABLE_UNIT_TESTS)
     # add_subdirectory(External/googletest)
     add_subdirectory(GLTFSDK.TestUtils)
     add_subdirectory(GLTFSDK.Test)
-
 endif()
 
 if(ENABLE_SAMPLES)
