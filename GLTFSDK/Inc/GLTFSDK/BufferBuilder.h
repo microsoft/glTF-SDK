@@ -84,7 +84,7 @@ namespace Microsoft
 
             ResourceWriter& GetResourceWriter();
             const ResourceWriter& GetResourceWriter() const;
-            bool setCurrentBufferURI ( const std::string &data )
+            bool setCurrentBufferURI ( const std::string &data );
             Buffer getBuffer ( size_t index ) {
                 assert ( index < m_buffers.Size() );
                 return m_buffers [ index ];
