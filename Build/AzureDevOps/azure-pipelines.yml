@@ -39,12 +39,17 @@ jobs:
     workspace:
       clean: all
 
+    variables:
+      vcpkgRoot: "C:/vcpkg/scripts/buildsystems/vcpkg.cmake"
+
     steps:
+    - powershell: vcpkg install --triplet "$(buildPlatform)-windows" rapidjson gtest
+      displayName: Install packages with VcPkg
 
     - task: CMake@1
       inputs:
         workingDirectory: 'built\Int\cmake_$(buildPlatform)'
-        cmakeArgs: '..\..\.. -G "Visual Studio 15 2017" -A "$(buildPlatform)"'
+        cmakeArgs: '..\..\.. -G "Visual Studio 15 2017" -A "$(buildPlatform)" -DCMAKE_TOOLCHAIN_FILE="$(vcpkgRoot)" -DVCPKG_TARGET_TRIPLET="$(buildPlatform)-windows"'
 
     - task: CMake@1
       inputs:
@@ -80,7 +85,6 @@ jobs:
       clean: all
 
     steps:
-
     - task: CMake@1
       inputs:
         workingDirectory: 'built/Int/cmake_$(buildPlatform)'
