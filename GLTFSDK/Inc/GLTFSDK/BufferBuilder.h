@@ -6,6 +6,7 @@
 #include <GLTFSDK/GLTF.h>
 
 #include <functional>
+#include <cassert>
 
 namespace Microsoft
 {

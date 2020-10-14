@@ -8,16 +8,23 @@
 #include <GLTFSDK/IStreamWriter.h>
 #include <GLTFSDK/Serialize.h>
 
-// Replace this with <filesystem> (and use std::filesystem rather than
-// std::experimental::filesystem) if your toolchain fully supports C++17
-#include <experimental/filesystem>
-
 #include <fstream>
 #include <sstream>
 #include <iostream>
 
 #include <cassert>
 #include <cstdlib>
+
+//If c++17 is supported
+#if ( __cplusplus >= 201701L )
+    #include <filesystem>
+    namespace FILE_SYSTEM = std::filesystem;
+    using namespace FILE_SYSTEM;
+#else
+    #include <experimental/filesystem>
+    namespace FILE_SYSTEM = std::experimental::filesystem;
+    using namespace FILE_SYSTEM;
+#endif
 
 using namespace Microsoft::glTF;
 
@@ -30,7 +37,7 @@ namespace
     class StreamWriter : public IStreamWriter
     {
     public:
-        StreamWriter(std::experimental::filesystem::path pathBase) : m_pathBase(std::move(pathBase))
+        StreamWriter(FILE_SYSTEM::path pathBase) : m_pathBase(std::move(pathBase))
         {
             assert(m_pathBase.has_root_path());
         }
@@ -46,7 +53,7 @@ namespace
             //    if appropriate.
             // 3. Always open the file stream in binary mode. The glTF SDK will handle any text
             //    encoding issues for us.
-            auto streamPath = m_pathBase / std::experimental::filesystem::u8path(filename);
+            auto streamPath = m_pathBase / FILE_SYSTEM::u8path(filename);
             auto stream = std::make_shared<std::ofstream>(streamPath, std::ios_base::binary);
 
             // Check if the stream has no errors and is ready for I/O operations
@@ -59,7 +66,7 @@ namespace
         }
 
     private:
-        std::experimental::filesystem::path m_pathBase;
+        FILE_SYSTEM::path m_pathBase;
     };
 
     void CreateTriangleResources(Document& document, BufferBuilder& bufferBuilder, std::string& accessorIdIndices, std::string& accessorIdPositions)
@@ -171,13 +178,13 @@ namespace
         document.SetDefaultScene(std::move(scene), AppendIdPolicy::GenerateOnEmpty);
     }
 
-    void SerializeTriangle(const std::experimental::filesystem::path& path)
+    void SerializeTriangle(const FILE_SYSTEM::path& path)
     {
         // Pass the absolute path, without the filename, to the stream writer
         auto streamWriter = std::make_unique<StreamWriter>(path.parent_path());
 
-        std::experimental::filesystem::path pathFile = path.filename();
-        std::experimental::filesystem::path pathFileExt = pathFile.extension();
+        FILE_SYSTEM::path pathFile = path.filename();
+        FILE_SYSTEM::path pathFileExt = pathFile.extension();
 
         auto MakePathExt = [](const std::string& ext)
         {
@@ -261,11 +268,11 @@ int main(int argc, char* argv[])
             throw std::runtime_error("Unexpected number of command line arguments");
         }
 
-        std::experimental::filesystem::path path = argv[1U];
+        FILE_SYSTEM::path path = argv[1U];
 
         if (path.is_relative())
         {
-            auto pathCurrent = std::experimental::filesystem::current_path();
+            auto pathCurrent = FILE_SYSTEM::current_path();
 
             // Convert the relative path into an absolute path by appending the command line argument to the current path
             pathCurrent /= path;

@@ -1,4 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
+INCLUDE( CheckCXXCompilerFlag )
+
 project (Deserialize)
 
 include(GLTFPlatform)
@@ -7,6 +9,16 @@ GetGLTFPlatform(Platform)
 file(GLOB source_files
     "${CMAKE_CURRENT_LIST_DIR}/Source/main.cpp"
 )
+
+# Check if the compiler supports c++17 and add flags (to avoid using std::experimental::filesystem)
+CHECK_CXX_COMPILER_FLAG( "-std=c++11" COMPILER_SUPPORTS_CXX17 )
+if (COMPILER_SUPPORTS_CXX17)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+    set(CMAKE_CXX_STANDARD 17)
+    set(CMAKE_CXX_STANDARD_REQUIRED ON)
+endif()
+
+set(STD_FILESYSTEM "stdc++fs")
 
 add_executable(Deserialize ${source_files})
 
@@ -29,6 +41,7 @@ endif()
 
 target_link_libraries(Deserialize
     GLTFSDK
+    ${STD_FILESYSTEM}
 )
 
 CreateGLTFInstallTargets(Deserialize ${Platform})

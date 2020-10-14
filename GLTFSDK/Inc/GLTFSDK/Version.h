@@ -8,6 +8,12 @@
 
 #include <cstdint>
 
+#ifdef linux
+    //g++ adds -D_GNU_SOURCE and major() is a macro in _GNU_SOURCE (or _BSD_SOURCE)
+    #undef major
+    #undef minor
+#endif
+
 namespace Microsoft
 {
     namespace glTF

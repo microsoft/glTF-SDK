@@ -5,6 +5,7 @@
 
 #include <array>
 #include <cmath>
+#include <limits>
 
 namespace Microsoft
 {
@@ -84,7 +85,7 @@ namespace Microsoft
                     return value / 12.92f;
                 }
 
-                return std::powf((value + 0.055f) / 1.055f, 2.4f);
+                return powf((value + 0.055f) / 1.055f, 2.4f);
             }
 
             // https://en.wikipedia.org/wiki/SRGB#The_forward_transformation_.28CIE_XYZ_to_sRGB.29
@@ -95,7 +96,7 @@ namespace Microsoft
                     return value * 12.92f;
                 }
 
-                return 1.055f * std::powf(value, 1.0f / 2.4f) - 0.055f;
+                return 1.055f * powf(value, 1.0f / 2.4f) - 0.055f;
             }
 
             inline float ByteToFloat(uint8_t value)
