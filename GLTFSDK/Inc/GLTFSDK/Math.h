@@ -6,6 +6,7 @@
 #include <array>
 #include <cmath>
 #include <limits>
+#include <cstdint>
 
 namespace Microsoft
 {
