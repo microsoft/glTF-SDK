@@ -17,6 +17,8 @@ Please do not include their headers and this header in the same cpp file.
 #define RAPIDJSON_NAMESPACE_BEGIN  namespace Microsoft { namespace glTF { namespace rapidjson {
 #define RAPIDJSON_NAMESPACE_END }}}
 
+// Adding iterative parse flag to prevent stack overflow issue
+#define RAPIDJSON_PARSE_DEFAULT_FLAGS RAPIDJSON_NAMESPACE::ParseFlag::kParseIterativeFlag
 
 // RapidJSON uses constant if expressions to support multiple platforms
 #pragma warning(push)
