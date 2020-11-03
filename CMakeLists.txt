@@ -38,19 +38,22 @@ add_subdirectory(GLTFSDK)
 
 if(RapidJSON_FOUND)
     target_include_directories(GLTFSDK
-    PUBLIC
-        $<BUILD_INTERFACE:${RAPIDJSON_INCLUDE_DIRS}>
+        PUBLIC $<BUILD_INTERFACE:${RAPIDJSON_INCLUDE_DIRS}>
     )
 else()
+    # see External/RapidJSON/CMakeLists.txt
     target_link_libraries(GLTFSDK
-    PRIVATE
-        RapidJSON
+        PRIVATE RapidJSON
     )
 endif()
 
 if(ENABLE_UNIT_TESTS)
-    find_package(GTest CONFIG REQUIRED)
-    # add_subdirectory(External/googletest)
+    find_package(GTest CONFIG)
+    if(NOT GTest_FOUND)
+        # import and alias just like it is already installed via VcPkg
+        add_subdirectory(External/googletest)
+        add_library(GTest::gtest_main ALIAS gtest_main)
+    endif()
     add_subdirectory(GLTFSDK.TestUtils)
     add_subdirectory(GLTFSDK.Test)
 endif()

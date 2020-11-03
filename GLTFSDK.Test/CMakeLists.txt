@@ -35,9 +35,7 @@ target_include_directories(GLTFSDK.Test
 )
 
 target_link_libraries(GLTFSDK.Test
-    GLTFSDK
-    GTest::gtest_main
-    GLTFSDK.TestUtils
+    PRIVATE     GLTFSDK GLTFSDK.TestUtils GTest::gtest_main
 )
 
 add_custom_command(TARGET GLTFSDK.Test

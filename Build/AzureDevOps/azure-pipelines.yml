@@ -64,6 +64,15 @@ jobs:
         workingDirectory: 'built\Int\cmake_$(buildPlatform)'
         cmakeArgs: '--build . --target install --config $(buildConfiguration) -- /m'
 
+    # copy googletest related dll files
+    - task: CopyFiles@2
+      inputs:
+        sourceFolder: 'built\Int\cmake_$(buildPlatform)\GLTFSDK.Test\$(buildConfiguration)'
+        contents: 'gtest*.dll'
+        targetFolder: 'built\Out\windows_$(buildPlatform)\$(buildConfiguration)'
+        overWrite: true
+      condition: in(variables['buildPlatform'], 'Win32', 'x64')
+
     - script: .\GLTFSDK.Test.exe --gtest_output=xml:GLTFSDK.Test.log
       workingDirectory: built\Out\windows_$(buildPlatform)\$(buildConfiguration)\GLTFSDK.Test
       displayName: Running Unit Tests
@@ -93,6 +102,7 @@ jobs:
       clean: all
 
     steps:
+
     - task: CMake@1
       inputs:
         workingDirectory: 'built/Int/cmake_$(buildPlatform)'
@@ -140,4 +150,3 @@ jobs:
       inputs:
         workingDirectory: 'built/Int/cmake_$(buildPlatform)'
         cmakeArgs: '--build . --target install --config $(buildConfiguration)'
-
