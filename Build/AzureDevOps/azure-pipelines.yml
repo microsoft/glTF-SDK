@@ -14,27 +14,35 @@ jobs:
         Win32-Release:
           buildPlatform: Win32
           buildConfiguration: Release
+          vcpkgTriplet: x86-windows
         Win32-Debug:
           buildPlatform: Win32
           buildConfiguration: Debug
+          vcpkgTriplet: x86-windows
         x64-Release:
           buildPlatform: x64
           buildConfiguration: Release
+          vcpkgTriplet: x64-windows
         x64-Debug:
           buildPlatform: x64
           buildConfiguration: Debug
+          vcpkgTriplet: x64-windows
         ARM-Release:
           buildPlatform: ARM
           buildConfiguration: Release
+          vcpkgTriplet: arm-windows
         ARM-Debug:
           buildPlatform: ARM
           buildConfiguration: Debug
+          vcpkgTriplet: arm-windows
         ARM64-Release:
           buildPlatform: ARM64
           buildConfiguration: Release
+          vcpkgTriplet: arm64-windows
         ARM64-Debug:
           buildPlatform: ARM64
           buildConfiguration: Debug
+          vcpkgTriplet: arm64-windows
 
     workspace:
       clean: all
@@ -43,13 +51,13 @@ jobs:
       vcpkgRoot: "C:/vcpkg/scripts/buildsystems/vcpkg.cmake"
 
     steps:
-    - powershell: vcpkg install --triplet "$(buildPlatform)-windows" rapidjson gtest
+    - powershell: vcpkg install --triplet "$(vcpkgTriplet)" rapidjson gtest
       displayName: Install packages with VcPkg
 
     - task: CMake@1
       inputs:
         workingDirectory: 'built\Int\cmake_$(buildPlatform)'
-        cmakeArgs: '..\..\.. -G "Visual Studio 15 2017" -A "$(buildPlatform)" -DCMAKE_TOOLCHAIN_FILE="$(vcpkgRoot)" -DVCPKG_TARGET_TRIPLET="$(buildPlatform)-windows"'
+        cmakeArgs: '..\..\.. -G "Visual Studio 15 2017" -A "$(buildPlatform)" -DCMAKE_TOOLCHAIN_FILE="$(vcpkgRoot)" -DVCPKG_TARGET_TRIPLET="$(vcpkgTriplet)"'
 
     - task: CMake@1
       inputs:

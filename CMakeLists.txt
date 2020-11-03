@@ -39,7 +39,7 @@ add_subdirectory(GLTFSDK)
 if(RapidJSON_FOUND)
     target_include_directories(GLTFSDK
     PUBLIC
-        ${RAPIDJSON_INCLUDE_DIRS}
+        $<BUILD_INTERFACE:${RAPIDJSON_INCLUDE_DIRS}>
     )
 else()
     target_link_libraries(GLTFSDK
