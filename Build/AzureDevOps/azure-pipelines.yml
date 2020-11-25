@@ -14,6 +14,9 @@ jobs:
         Win32-Release:
           buildPlatform: Win32
           buildConfiguration: Release
+        Win32-Release-VcPkg:
+          buildPlatform: Win32
+          buildConfiguration: Release
           vcpkgTriplet: x86-windows
         Win32-Debug:
           buildPlatform: Win32
