@@ -180,6 +180,51 @@ jobs:
         testResultsFormat: 'JUnit'
         testResultsFiles: built/Out/$(buildPlatform)/$(buildConfiguration)/GLTFSDK.Test/GLTFSDK.Test.log
 
+  - job: MacOSVcPkg
+
+    pool:
+      vmImage: 'macOS-10.14'
+    
+    strategy:
+      matrix:
+        macOS-Release:
+          buildPlatform: macOS
+          buildConfiguration: Release
+          vcpkgTriplet: x64-osx
+        macOS-Debug:
+          buildPlatform: macOS
+          buildConfiguration: Debug
+          vcpkgTriplet: x64-osx
+
+    workspace:
+      clean: all
+
+    steps:
+    - task: Bash@3
+      inputs:
+        targetType: 'inline'
+        script: vcpkg install --triplet "$(vcpkgTriplet)" rapidjson gtest
+      displayName: Install packages with VcPkg
+
+    - task: CMake@1
+      inputs:
+        workingDirectory: 'built/Int/cmake_$(buildPlatform)'
+        cmakeArgs: '../../.. -G Xcode -DCMAKE_TOOLCHAIN_FILE=/Users/$(whoami)/vcpkg/scripts/buildsystems/vcpkg.cmake'
+
+    - task: CMake@1
+      inputs:
+        workingDirectory: 'built/Int/cmake_$(buildPlatform)'
+        cmakeArgs: '--build . --target install --config $(buildConfiguration)'
+
+    - script: ./GLTFSDK.Test --gtest_output=xml:GLTFSDK.Test.log
+      workingDirectory: built/Out/$(buildPlatform)/$(buildConfiguration)/GLTFSDK.Test
+      displayName: Running Unit Tests
+
+    - task: PublishTestResults@2
+      inputs:
+        testResultsFormat: 'JUnit'
+        testResultsFiles: built/Out/$(buildPlatform)/$(buildConfiguration)/GLTFSDK.Test/GLTFSDK.Test.log
+
   - job: iOS
 
     pool:
