@@ -14,6 +14,64 @@ jobs:
         Win32-Release:
           buildPlatform: Win32
           buildConfiguration: Release
+        Win32-Debug:
+          buildPlatform: Win32
+          buildConfiguration: Debug
+        x64-Release:
+          buildPlatform: x64
+          buildConfiguration: Release
+        x64-Debug:
+          buildPlatform: x64
+          buildConfiguration: Debug
+        ARM-Release:
+          buildPlatform: ARM
+          buildConfiguration: Release
+        ARM-Debug:
+          buildPlatform: ARM
+          buildConfiguration: Debug
+        ARM64-Release:
+          buildPlatform: ARM64
+          buildConfiguration: Release
+        ARM64-Debug:
+          buildPlatform: ARM64
+          buildConfiguration: Debug
+
+    workspace:
+      clean: all
+
+    steps:
+
+    - task: CMake@1
+      inputs:
+        workingDirectory: 'built\Int\cmake_$(buildPlatform)'
+        cmakeArgs: '..\..\.. -G "Visual Studio 15 2017" -A "$(buildPlatform)"'
+
+    - task: CMake@1
+      inputs:
+        workingDirectory: 'built\Int\cmake_$(buildPlatform)'
+        cmakeArgs: '--build . --target install --config $(buildConfiguration) -- /m'
+
+    - script: .\GLTFSDK.Test.exe --gtest_output=xml:GLTFSDK.Test.log
+      workingDirectory: built\Out\windows_$(buildPlatform)\$(buildConfiguration)\GLTFSDK.Test
+      displayName: Running Unit Tests
+      condition: and(succeeded(), in(variables['buildPlatform'], 'Win32', 'x64'))
+
+    - task: PublishTestResults@2
+      inputs:
+        testResultsFormat: 'JUnit'
+        testResultsFiles: built\Out\windows_$(buildPlatform)\$(buildConfiguration)\GLTFSDK.Test\GLTFSDK.Test.log
+      condition: and(succeeded(), in(variables['buildPlatform'], 'Win32', 'x64'))
+
+  - job: WindowsVcPkg
+
+    pool:
+      vmImage: 'VS2017-Win2016'
+
+    strategy:
+      matrix:
+        Win32-Release:
+          buildPlatform: Win32
+          buildConfiguration: Release
           vcpkgTriplet: x86-windows
         Win32-Debug:
           buildPlatform: Win32
@@ -107,6 +165,51 @@ jobs:
       inputs:
         workingDirectory: 'built/Int/cmake_$(buildPlatform)'
         cmakeArgs: '../../.. -G Xcode'
+
+    - task: CMake@1
+      inputs:
+        workingDirectory: 'built/Int/cmake_$(buildPlatform)'
+        cmakeArgs: '--build . --target install --config $(buildConfiguration)'
+
+    - script: ./GLTFSDK.Test --gtest_output=xml:GLTFSDK.Test.log
+      workingDirectory: built/Out/$(buildPlatform)/$(buildConfiguration)/GLTFSDK.Test
+      displayName: Running Unit Tests
+
+    - task: PublishTestResults@2
+      inputs:
+        testResultsFormat: 'JUnit'
+        testResultsFiles: built/Out/$(buildPlatform)/$(buildConfiguration)/GLTFSDK.Test/GLTFSDK.Test.log
+
+  - job: MacOSVcPkg
+
+    pool:
+      vmImage: 'macOS-10.15'
+    
+    strategy:
+      matrix:
+        macOS-Release:
+          buildPlatform: macOS
+          buildConfiguration: Release
+          vcpkgTriplet: x64-osx
+        macOS-Debug:
+          buildPlatform: macOS
+          buildConfiguration: Debug
+          vcpkgTriplet: x64-osx
+
+    workspace:
+      clean: all
+
+    steps:
+    - task: Bash@3
+      inputs:
+        targetType: 'inline'
+        script: vcpkg install --triplet "$(vcpkgTriplet)" rapidjson gtest
+      displayName: Install packages with VcPkg
+
+    - task: CMake@1
+      inputs:
+        workingDirectory: 'built/Int/cmake_$(buildPlatform)'
+        cmakeArgs: '../../.. -G Xcode -DCMAKE_TOOLCHAIN_FILE=/usr/local/share/vcpkg/scripts/buildsystems/vcpkg.cmake'
 
     - task: CMake@1
       inputs:
