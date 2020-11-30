@@ -209,7 +209,7 @@ jobs:
     - task: CMake@1
       inputs:
         workingDirectory: 'built/Int/cmake_$(buildPlatform)'
-        cmakeArgs: '../../.. -G Xcode -DCMAKE_TOOLCHAIN_FILE=/Users/$(whoami)/vcpkg/scripts/buildsystems/vcpkg.cmake'
+        cmakeArgs: '../../.. -G Xcode -DCMAKE_TOOLCHAIN_FILE=/usr/local/share/vcpkg/scripts/buildsystems/vcpkg.cmake'
 
     - task: CMake@1
       inputs:
