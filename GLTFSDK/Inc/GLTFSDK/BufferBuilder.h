@@ -73,6 +73,12 @@ namespace Microsoft
 
             void AddAccessors(const void* data, size_t count, size_t byteStride, const AccessorDesc* pDescs, size_t descCount, std::string* pOutIds = nullptr);
 
+            // This method moved from the .cpp to the header because
+            // When this library is built with VS107 and used in an executable built with VS2019
+            // an unordered_map issue ( see https://docs.microsoft.com/en-us/cpp/overview/cpp-conformance-improvements?view=msvc-160 )
+            // makes the destruction to perform an underflow.
+            // To fix the issue, the code here is inlined so it gets compiled and linked with VS2019.
+            // So only 1 version of std::unordered_map binary code is generated.
             void Output(Document& gltfDocument)
             {
                 for (auto& buffer : m_buffers.Elements())
