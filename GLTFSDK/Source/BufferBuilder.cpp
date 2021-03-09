@@ -213,30 +213,6 @@ void BufferBuilder::AddAccessors(const void* data, size_t count, size_t byteStri
     }
 }
 
-void BufferBuilder::Output(Document& gltfDocument)
-{
-    for (auto& buffer : m_buffers.Elements())
-    {
-        gltfDocument.buffers.Append(std::move(buffer), AppendIdPolicy::ThrowOnEmpty);
-    }
-
-    m_buffers.Clear();
-
-    for (auto& bufferView : m_bufferViews.Elements())
-    {
-        gltfDocument.bufferViews.Append(std::move(bufferView), AppendIdPolicy::ThrowOnEmpty);
-    }
-
-    m_bufferViews.Clear();
-
-    for (auto& accessor : m_accessors.Elements())
-    {
-        gltfDocument.accessors.Append(std::move(accessor), AppendIdPolicy::ThrowOnEmpty);
-    }
-
-    m_accessors.Clear();
-}
-
 const Buffer& BufferBuilder::GetCurrentBuffer() const
 {
     return m_buffers.Back();
