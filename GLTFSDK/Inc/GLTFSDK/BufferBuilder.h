@@ -4,6 +4,7 @@
 #pragma once
 
 #include <GLTFSDK/GLTF.h>
+#include <GLTFSDK/Document.h>
 
 #include <functional>
 
@@ -72,7 +73,35 @@ namespace Microsoft
 
             void AddAccessors(const void* data, size_t count, size_t byteStride, const AccessorDesc* pDescs, size_t descCount, std::string* pOutIds = nullptr);
 
-            void Output(Document& gltfDocument);
+            // This method moved from the .cpp to the header because
+            // When this library is built with VS2017 and used in an executable built with VS2019
+            // an unordered_map issue ( see https://docs.microsoft.com/en-us/cpp/overview/cpp-conformance-improvements?view=msvc-160 )
+            // makes the destruction to perform an underflow.
+            // To fix the issue, the code here is inlined so it gets compiled and linked with VS2019.
+            // So only 1 version of std::unordered_map binary code is generated.
+            void Output(Document& gltfDocument)
+            {
+                for (auto& buffer : m_buffers.Elements())
+                {
+                    gltfDocument.buffers.Append(std::move(buffer), AppendIdPolicy::ThrowOnEmpty);
+                }
+
+                m_buffers.Clear();
+
+                for (auto& bufferView : m_bufferViews.Elements())
+                {
+                    gltfDocument.bufferViews.Append(std::move(bufferView), AppendIdPolicy::ThrowOnEmpty);
+                }
+
+                m_bufferViews.Clear();
+
+                for (auto& accessor : m_accessors.Elements())
+                {
+                    gltfDocument.accessors.Append(std::move(accessor), AppendIdPolicy::ThrowOnEmpty);
+                }
+
+                m_accessors.Clear();
+            }
 
             const Buffer&     GetCurrentBuffer() const;
             const BufferView& GetCurrentBufferView() const;
