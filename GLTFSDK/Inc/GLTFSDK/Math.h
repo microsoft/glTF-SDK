@@ -85,7 +85,7 @@ namespace Microsoft
                     return value / 12.92f;
                 }
 
-                return pow((value + 0.055f) / 1.055f, 2.4f);
+                return std::pow((value + 0.055f) / 1.055f, 2.4f);
             }
 
             // https://en.wikipedia.org/wiki/SRGB#The_forward_transformation_.28CIE_XYZ_to_sRGB.29
