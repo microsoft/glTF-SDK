@@ -96,7 +96,7 @@ namespace Microsoft
                     return value * 12.92f;
                 }
 
-                return 1.055f * pow(value, 1.0f / 2.4f) - 0.055f;
+                return 1.055f * std::pow(value, 1.0f / 2.4f) - 0.055f;
             }
 
             inline float ByteToFloat(uint8_t value)
