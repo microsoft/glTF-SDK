@@ -46,8 +46,4 @@ target_include_directories(GLTFSDK
     PRIVATE "${CMAKE_BINARY_DIR}/GeneratedFiles"
 )
 
-target_link_libraries(GLTFSDK
-    RapidJSON
-)
-
 CreateGLTFInstallTargets(GLTFSDK ${Platform})
