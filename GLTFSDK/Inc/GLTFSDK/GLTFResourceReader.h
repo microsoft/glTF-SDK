@@ -391,7 +391,10 @@ namespace Microsoft
                 {
                     for (size_t j = 0; j < typeCount; j++)
                     {
-                        baseData[indices[i] * typeCount + j] = values[i * typeCount + j];
+                        // Verify provided index is valid before storing value
+                        if ((indices[i] * typeCount + j) < baseData.size()) {
+                            baseData[indices[i] * typeCount + j] = values[i * typeCount + j];
+                        }
                     }
                 }
             }
