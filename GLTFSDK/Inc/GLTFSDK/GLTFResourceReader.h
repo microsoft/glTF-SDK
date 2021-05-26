@@ -390,8 +390,8 @@ namespace Microsoft
                 for (size_t i = 0; i < indices.size(); i++)
                 {
                     // Verify provided index is valid before storing value
-                    if ((indices[i] * typeCount + (typeCount - 1)) < baseData.size())
-                    {
+                    uint8_t indexCheck = ((uint8_t)indices[i]) * typeCount + (typeCount - 1);
+                    if (indexCheck < baseData.size()) {
                         for (size_t j = 0; j < typeCount; j++)
                         {
                             baseData[indices[i] * typeCount + j] = values[i * typeCount + j];
