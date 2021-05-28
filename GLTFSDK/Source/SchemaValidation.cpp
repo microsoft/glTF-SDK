@@ -34,7 +34,7 @@ namespace
                 throw GLTFException("Schema document at " + uri + " is not valid JSON");
             }
 
-            auto result = schemaDocuments.emplace(uri, rapidjson::SchemaDocument(document, this));
+            auto result = schemaDocuments.emplace(uri, rapidjson::SchemaDocument(document));
             assert(result.second);
             auto resultSchemaDoc = &(result.first->second);
             assert(resultSchemaDoc);
