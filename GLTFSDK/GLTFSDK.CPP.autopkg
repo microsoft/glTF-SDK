@@ -128,7 +128,7 @@ nuget {
                 ${BASE}\Built\Out\windows_ARM64\Release\GLTFSDK\GLTFSDK.lib,
             };
             side-by-side-symbols: {
-                ${BASE}\Built\Out\windows_\ARM64\Release\GLTFSDK\GLTFSDK.pdb
+                ${BASE}\Built\Out\windows_ARM64\Release\GLTFSDK\GLTFSDK.pdb
             };
         };
     };
