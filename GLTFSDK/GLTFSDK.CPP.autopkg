@@ -62,73 +62,73 @@ nuget {
 
         [win32,debug] {
             lib: {
-                ${BASE}\Built\Out\v141\Win32\Debug\GLTFSDK\GLTFSDK.lib,
+                ${BASE}\Built\Out\windows_Win32\Debug\GLTFSDK\GLTFSDK.lib,
             };
             side-by-side-symbols: {
-                ${BASE}\Built\Int\v141\Win32\Debug\GLTFSDK\GLTFSDK.pdb
+                ${BASE}\Built\Out\windows_Win32\Debug\GLTFSDK\GLTFSDK.pdb
             };
         };
 
         [win32,release] {
             lib: {
-                ${BASE}\Built\Out\v141\Win32\Release\GLTFSDK\GLTFSDK.lib,
+                ${BASE}\Built\Out\windows_Release\GLTFSDK\GLTFSDK.lib,
             };
             side-by-side-symbols: {
-                ${BASE}\Built\Int\v141\Win32\Release\GLTFSDK\GLTFSDK.pdb
+                ${BASE}\Built\Out\windows_Win32\Release\GLTFSDK\GLTFSDK.pdb
             };
         };
 
         [x64,debug] {
             lib: {
-                ${BASE}\Built\Out\v141\x64\Debug\GLTFSDK\GLTFSDK.lib,
+                ${BASE}\Built\Out\windows_x64\Debug\GLTFSDK\GLTFSDK.lib,
             };
             side-by-side-symbols: {
-                ${BASE}\Built\Int\v141\x64\Debug\GLTFSDK\GLTFSDK.pdb
+                ${BASE}\Built\Out\windows_x64\Debug\GLTFSDK\GLTFSDK.pdb
             };
         };
 
         [x64,release] {
             lib: {
-                ${BASE}\Built\Out\v141\x64\Release\GLTFSDK\GLTFSDK.lib,
+                ${BASE}\Built\Out\windows_x64\Release\GLTFSDK\GLTFSDK.lib,
             };
             side-by-side-symbols: {
-                ${BASE}\Built\Int\v141\x64\Release\GLTFSDK\GLTFSDK.pdb
+                ${BASE}\Built\Out\windows_x64\Release\GLTFSDK\GLTFSDK.pdb
             };
         };
 
         [arm,debug] {
             lib: {
-                ${BASE}\Built\Out\v141\ARM\Debug\GLTFSDK\GLTFSDK.lib,
+                ${BASE}\Built\Out\windows_ARM\Debug\GLTFSDK\GLTFSDK.lib,
             };
             side-by-side-symbols: {
-                ${BASE}\Built\Int\v141\ARM\Debug\GLTFSDK\GLTFSDK.pdb
+                ${BASE}\Built\Out\windows_ARM\Debug\GLTFSDK\GLTFSDK.pdb
             };
         };
 
         [arm,release] {
             lib: {
-                ${BASE}\Built\Out\v141\ARM\Release\GLTFSDK\GLTFSDK.lib,
+                ${BASE}\Built\Out\windows_ARM\Release\GLTFSDK\GLTFSDK.lib,
             };
             side-by-side-symbols: {
-                ${BASE}\Built\Int\v141\ARM\Release\GLTFSDK\GLTFSDK.pdb
+                ${BASE}\Built\Out\windows_ARM\Release\GLTFSDK\GLTFSDK.pdb
             };
         };
 
         [arm64,debug] {
             lib: {
-                ${BASE}\Built\Out\v141\ARM64\Debug\GLTFSDK\GLTFSDK.lib,
+                ${BASE}\Built\Out\windows_ARM64\Debug\GLTFSDK\GLTFSDK.lib,
             };
             side-by-side-symbols: {
-                ${BASE}\Built\Int\v141\ARM64\Debug\GLTFSDK\GLTFSDK.pdb
+                ${BASE}\Built\Out\windows_ARM64\Debug\GLTFSDK\GLTFSDK.pdb
             };
         };
 
         [arm64,release] {
             lib: {
-                ${BASE}\Built\Out\v141\ARM64\Release\GLTFSDK\GLTFSDK.lib,
+                ${BASE}\Built\Out\windows_ARM64\Release\GLTFSDK\GLTFSDK.lib,
             };
             side-by-side-symbols: {
-                ${BASE}\Built\Int\v141\ARM64\Release\GLTFSDK\GLTFSDK.pdb
+                ${BASE}\Built\Out\windows_\ARM64\Release\GLTFSDK\GLTFSDK.pdb
             };
         };
     };
