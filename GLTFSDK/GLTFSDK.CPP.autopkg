@@ -71,7 +71,7 @@ nuget {
 
         [win32,release] {
             lib: {
-                ${BASE}\Built\Out\windows_Release\GLTFSDK\GLTFSDK.lib,
+                ${BASE}\Built\Out\windows_Win32\Release\GLTFSDK\GLTFSDK.lib,
             };
             side-by-side-symbols: {
                 ${BASE}\Built\Out\windows_Win32\Release\GLTFSDK\GLTFSDK.pdb
