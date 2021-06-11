@@ -27,7 +27,7 @@ add_subdirectory(${CMAKE_BINARY_DIR}/RapidJSON-src
                  EXCLUDE_FROM_ALL)
 
 # Set the RapidJSONConfig.cmake path and make find_package to work in config mode explicitly.
-set(RapidJSON_DIR "${CMAKE_BINARY_DIR}/RapidJSON-build" CACHE LOCATION "Specific configuration file location")
+set(RapidJSON_DIR "${CMAKE_BINARY_DIR}/RapidJSON-build" CACHE LOCATION "Specific configuration file location" FORCE)
 find_package(RapidJSON REQUIRED CONFIG)
 
 add_library(RapidJSON INTERFACE IMPORTED GLOBAL)
