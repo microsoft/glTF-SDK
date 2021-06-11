@@ -53,12 +53,12 @@ add_subdirectory(GLTFSDK)
 
 if(RapidJSON_FOUND)
     target_include_directories(GLTFSDK
-        PUBLIC $<BUILD_INTERFACE:${RAPIDJSON_INCLUDE_DIRS}>
+        PUBLIC $<BUILD_INTERFACE:${RapidJSON_INCLUDE_DIRS}>
     )
 elseif(TARGET RapidJSON)
-    get_target_property(RAPIDJSON_INCLUDE_DIRS RapidJSON INTERFACE_INCLUDE_DIRECTORIES)
+    get_target_property(RapidJSON_INCLUDE_DIRS RapidJSON INTERFACE_INCLUDE_DIRECTORIES)
     target_include_directories(GLTFSDK
-        PUBLIC $<BUILD_INTERFACE:${RAPIDJSON_INCLUDE_DIRS}>
+        PUBLIC $<BUILD_INTERFACE:${RapidJSON_INCLUDE_DIRS}>
     )
 endif()
 
