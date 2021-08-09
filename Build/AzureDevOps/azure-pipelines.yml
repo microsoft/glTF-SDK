@@ -4,7 +4,7 @@
 # https://docs.microsoft.com/azure/devops/pipelines/apps/windows/dot-net
 
 jobs:
-  - job: Windows
+  - job: Windows_VS2017
 
     pool:
       vmImage: 'VS2017-Win2016'
@@ -62,7 +62,65 @@ jobs:
         testResultsFiles: built\Out\windows_$(buildPlatform)\$(buildConfiguration)\GLTFSDK.Test\GLTFSDK.Test.log
       condition: and(succeeded(), in(variables['buildPlatform'], 'Win32', 'x64'))
 
-  - job: WindowsVcPkg
+  - job: Windows_VS2019
+
+    pool:
+      vmImage: 'windows-2019'
+
+    strategy:
+      matrix:
+        Win32-Release:
+          buildPlatform: Win32
+          buildConfiguration: Release
+        Win32-Debug:
+          buildPlatform: Win32
+          buildConfiguration: Debug
+        x64-Release:
+          buildPlatform: x64
+          buildConfiguration: Release
+        x64-Debug:
+          buildPlatform: x64
+          buildConfiguration: Debug
+        ARM-Release:
+          buildPlatform: ARM
+          buildConfiguration: Release
+        ARM-Debug:
+          buildPlatform: ARM
+          buildConfiguration: Debug
+        ARM64-Release:
+          buildPlatform: ARM64
+          buildConfiguration: Release
+        ARM64-Debug:
+          buildPlatform: ARM64
+          buildConfiguration: Debug
+
+    workspace:
+      clean: all
+
+    steps:
+
+    - task: CMake@1
+      inputs:
+        workingDirectory: 'built\Int\cmake_$(buildPlatform)'
+        cmakeArgs: '..\..\.. -G "Visual Studio 16 2019" -A "$(buildPlatform)"'
+
+    - task: CMake@1
+      inputs:
+        workingDirectory: 'built\Int\cmake_$(buildPlatform)'
+        cmakeArgs: '--build . --target install --config $(buildConfiguration) -- /m'
+
+    - script: .\GLTFSDK.Test.exe --gtest_output=xml:GLTFSDK.Test.log
+      workingDirectory: built\Out\windows_$(buildPlatform)\$(buildConfiguration)\GLTFSDK.Test
+      displayName: Running Unit Tests
+      condition: and(succeeded(), in(variables['buildPlatform'], 'Win32', 'x64'))
+
+    - task: PublishTestResults@2
+      inputs:
+        testResultsFormat: 'JUnit'
+        testResultsFiles: built\Out\windows_$(buildPlatform)\$(buildConfiguration)\GLTFSDK.Test\GLTFSDK.Test.log
+      condition: and(succeeded(), in(variables['buildPlatform'], 'Win32', 'x64'))
+
+  - job: WindowsVcPkg_VS2017
 
     pool:
       vmImage: 'VS2017-Win2016'
@@ -116,6 +174,86 @@ jobs:
       inputs:
         workingDirectory: 'built\Int\cmake_$(buildPlatform)'
         cmakeArgs: '..\..\.. -G "Visual Studio 15 2017" -A "$(buildPlatform)" -DCMAKE_TOOLCHAIN_FILE="$(vcpkgRoot)" -DVCPKG_TARGET_TRIPLET="$(vcpkgTriplet)"'
+
+    - task: CMake@1
+      inputs:
+        workingDirectory: 'built\Int\cmake_$(buildPlatform)'
+        cmakeArgs: '--build . --target install --config $(buildConfiguration) -- /m'
+
+    # copy googletest related dll files
+    - task: CopyFiles@2
+      inputs:
+        sourceFolder: 'built\Int\cmake_$(buildPlatform)\GLTFSDK.Test\$(buildConfiguration)'
+        contents: 'gtest*.dll'
+        targetFolder: 'built\Out\windows_$(buildPlatform)\$(buildConfiguration)\GLTFSDK.Test'
+        overWrite: true
+      condition: in(variables['buildPlatform'], 'Win32', 'x64')
+
+    - script: .\GLTFSDK.Test.exe --gtest_output=xml:GLTFSDK.Test.log
+      workingDirectory: built\Out\windows_$(buildPlatform)\$(buildConfiguration)\GLTFSDK.Test
+      displayName: Running Unit Tests
+      condition: and(succeeded(), in(variables['buildPlatform'], 'Win32', 'x64'))
+
+    - task: PublishTestResults@2
+      inputs:
+        testResultsFormat: 'JUnit'
+        testResultsFiles: built\Out\windows_$(buildPlatform)\$(buildConfiguration)\GLTFSDK.Test\GLTFSDK.Test.log
+      condition: and(succeeded(), in(variables['buildPlatform'], 'Win32', 'x64'))
+
+  - job: WindowsVcPkg_VS2019
+
+    pool:
+      vmImage: 'windows-2019'
+
+    strategy:
+      matrix:
+        Win32-Release:
+          buildPlatform: Win32
+          buildConfiguration: Release
+          vcpkgTriplet: x86-windows
+        Win32-Debug:
+          buildPlatform: Win32
+          buildConfiguration: Debug
+          vcpkgTriplet: x86-windows
+        x64-Release:
+          buildPlatform: x64
+          buildConfiguration: Release
+          vcpkgTriplet: x64-windows
+        x64-Debug:
+          buildPlatform: x64
+          buildConfiguration: Debug
+          vcpkgTriplet: x64-windows
+        ARM-Release:
+          buildPlatform: ARM
+          buildConfiguration: Release
+          vcpkgTriplet: arm-windows
+        ARM-Debug:
+          buildPlatform: ARM
+          buildConfiguration: Debug
+          vcpkgTriplet: arm-windows
+        ARM64-Release:
+          buildPlatform: ARM64
+          buildConfiguration: Release
+          vcpkgTriplet: arm64-windows
+        ARM64-Debug:
+          buildPlatform: ARM64
+          buildConfiguration: Debug
+          vcpkgTriplet: arm64-windows
+
+    workspace:
+      clean: all
+
+    variables:
+      vcpkgRoot: "C:/vcpkg/scripts/buildsystems/vcpkg.cmake"
+
+    steps:
+    - powershell: vcpkg install --triplet "$(vcpkgTriplet)" rapidjson gtest
+      displayName: Install packages with VcPkg
+
+    - task: CMake@1
+      inputs:
+        workingDirectory: 'built\Int\cmake_$(buildPlatform)'
+        cmakeArgs: '..\..\.. -G "Visual Studio 16 2019" -A "$(buildPlatform)" -DCMAKE_TOOLCHAIN_FILE="$(vcpkgRoot)" -DVCPKG_TARGET_TRIPLET="$(vcpkgTriplet)"'
 
     - task: CMake@1
       inputs:
