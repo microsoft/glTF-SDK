@@ -17,7 +17,7 @@ namespace Microsoft
             uint32_t major;
             uint32_t minor;
 
-            constexpr Version(uint32_t major, uint32_t minor) : major(major), minor(minor)
+            constexpr Version(uint32_t major, uint32_t minor) : major{major}, minor{minor}
             {
             }
 
