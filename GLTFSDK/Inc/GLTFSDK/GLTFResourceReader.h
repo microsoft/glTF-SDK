@@ -393,7 +393,7 @@ namespace Microsoft
                     auto currentIndex = indices[i] * typeCount + (typeCount - 1);
 
                     // Verify provided index is valid before storing value
-                    if (currentIndex >= indices[i] && currentIndex < static_cast<I>(baseData.size())) {
+                    if (currentIndex >= indices[i] && currentIndex < static_cast<I>(baseData.size()))
                     {
                         for (size_t j = 0; j < typeCount; j++)
                         {
