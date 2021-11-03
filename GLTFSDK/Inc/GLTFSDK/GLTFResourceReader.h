@@ -389,8 +389,11 @@ namespace Microsoft
 
                 for (size_t i = 0; i < indices.size(); i++)
                 {
+                    // Calculate current index
+                    auto currentIndex = indices[i] * typeCount + (typeCount - 1);
+
                     // Verify provided index is valid before storing value
-                    if ((indices[i] * typeCount + (typeCount - 1)) < static_cast<I>(baseData.size()))
+                    if (currentIndex >= indices[i] && currentIndex < static_cast<I>(baseData.size())) {
                     {
                         for (size_t j = 0; j < typeCount; j++)
                         {
