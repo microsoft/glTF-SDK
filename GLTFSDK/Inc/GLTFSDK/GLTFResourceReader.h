@@ -391,9 +391,14 @@ namespace Microsoft
 
                 for (size_t i = 0; i < indices.size(); i++)
                 {
-                    for (size_t j = 0; j < typeCount; j++)
+                    assert(baseData.size() == accessor.count * typeCount);
+                    static_assert(sizeof(I) <= sizeof(size_t), "sizeof(I) < sizeof(size_t)");
+                    if (0 <= indices[i] && static_cast<size_t>(indices[i]) < accessor.count)
                     {
-                        baseData[indices[i] * typeCount + j] = values[i * typeCount + j];
+                        for (size_t j = 0; j < typeCount; j++)
+                        {
+                            baseData[indices[i] * typeCount + j] = values[i * typeCount + j];
+                        }
                     }
                 }
             }
