@@ -389,8 +389,9 @@ namespace Microsoft
 
                 for (size_t i = 0; i < indices.size(); i++)
                 {
-                    // Verify provided index is valid before storing value
-                    if ((indices[i] * typeCount + (typeCount - 1)) < static_cast<I>(baseData.size()))
+                    assert(baseData.size() == accessor.count * typeCount);
+                    static_assert(sizeof(I) <= sizeof(size_t), "sizeof(I) < sizeof(size_t)");
+                    if (0 <= indices[i] && static_cast<size_t>(indices[i]) < accessor.count)
                     {
                         for (size_t j = 0; j < typeCount; j++)
                         {
