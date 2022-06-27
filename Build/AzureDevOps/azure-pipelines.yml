@@ -283,7 +283,7 @@ jobs:
   - job: MacOS
 
     pool:
-      vmImage: 'macOS-10.14'
+      vmImage: 'macOS-10.15'
     
     strategy:
       matrix:
@@ -366,7 +366,7 @@ jobs:
   - job: iOS
 
     pool:
-      vmImage: 'macOS-10.14'
+      vmImage: 'macOS-10.15'
     
     strategy:
       matrix:
