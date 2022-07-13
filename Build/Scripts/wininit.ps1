@@ -42,7 +42,7 @@ function GeneratePlatform($platform, $path)
     try
     {
         $argList = @(
-            "-G", "Visual Studio 15 2017",
+            "-G", "Visual Studio 16 2019",
             "-A", "$platform"
         )
 
