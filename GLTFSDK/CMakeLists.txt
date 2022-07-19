@@ -28,6 +28,11 @@ if (MSVC)
     # Set warning level to 4 (/W4)
     target_compile_options(GLTFSDK PRIVATE "/Zi;/W4;/EHsc")
 
+    if((MSVC_VERSION GREATER 1920) AND (CMAKE_SIZEOF_VOID_P EQUAL 8))
+        target_compile_options(GLTFSDK PRIVATE "$<$<CONFIG:RELEASE>:/guard:ehcont>")
+        target_link_options(GLTFSDK PRIVATE "$<$<CONFIG:RELEASE>:/guard:ehcont>")
+    endif()
+
     # Make sure that all PDB files on Windows are installed to the output folder with the libraries. By default, only the debug build does this.
     set_target_properties(GLTFSDK PROPERTIES COMPILE_PDB_NAME "GLTFSDK" COMPILE_PDB_OUTPUT_DIRECTORY "${LIBRARY_OUTPUT_DIRECTORY}")
 endif()
