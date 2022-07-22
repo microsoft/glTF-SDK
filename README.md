@@ -45,6 +45,7 @@ cmake --build . --target install --config "${Debug || Release}"
 # VCPKG
 
 To add glTF-SDK with vcpkg run the following.
+Note: vcpkg will not install glTF-SDK on linux systems yet.
 
 ```
 ./vcpkg install ms-gltf
