@@ -10,6 +10,46 @@
 * Low memory overhead
 * Utilities for converting input data of any type (e.g. float/uint8/uint16 RGB/RGBA color) into a single type such as float RGBA color
 
+# Building
+
+Navigate to the root of the repository.
+Note: This folder name is more of a guideline but is useful if you're using cmake to build for multiple platforms. You can also name the path something more meaningful, as long as it's in the Built folder because git ignores that folder.
+
+```
+mkdir Built && cd Built
+```
+Pick one of the following depending on your environment.
+
+```
+# Windows - remove the curly braces and pick one the architures.
+# This will create a .sln in the current directory for Visual Studio that you can open on the IDE and build or edit.
+cmake ../ -G "Visual Studio 16 2019" -A "{x64 || Win32 || ARM || ARM64}"
+#or
+cmake ../ -G "Visual Studio 17 2022" -A "{x64 || Win32 || ARM || ARM64}"
+
+# MacOs
+# This will create necessary xcode files in the current directory that you can open on the IDE and build or edit.
+cmake ../ -G Xcode
+
+# Ubuntu
+cmake ../ -G "Unix Makefiles"
+# or
+cmake ../ -G Ninja
+```
+Install - Pick either Debug or Release.
+Install files will to written to the `Built\Out` directory located at the root.
+```
+cmake --build . --target install --config "${Debug || Release}" 
+```
+
+# VCPKG
+
+To add glTF-SDK with vcpkg run the following.
+
+```
+./vcpkg install ms-gltf
+```
+
 # Nuget Packages
 
 * [Microsoft.glTF.CPP](https://www.nuget.org/packages/Microsoft.glTF.CPP/)
