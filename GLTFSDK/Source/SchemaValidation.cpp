@@ -18,7 +18,7 @@ namespace
             assert(this->schemaLocator);
         }
 
-        const rapidjson::SchemaDocument* GetRemoteDocumentStr(const std::string& uri)
+        const rapidjson::SchemaDocument* GetRemoteDocument(const std::string& uri)
         {
             auto itDoc = schemaDocuments.find(uri);
 
@@ -44,7 +44,7 @@ namespace
 
         const rapidjson::SchemaDocument* GetRemoteDocument(const char* uri, rapidjson::SizeType length) override
         {
-            return GetRemoteDocumentStr(std::string(uri, length));
+            return GetRemoteDocument({ uri, length });
         }
 
         const std::unique_ptr<const ISchemaLocator> schemaLocator;
@@ -63,7 +63,7 @@ void Microsoft::glTF::ValidateDocumentAgainstSchema(const rapidjson::Document& d
 
     RemoteSchemaDocumentProvider provider(std::move(schemaLocator));
 
-    if (auto* schemaDocument = provider.GetRemoteDocumentStr(schemaUri))
+    if (auto* schemaDocument = provider.GetRemoteDocument(schemaUri))
     {
         rapidjson::SchemaValidator schemaValidator(*schemaDocument);
 

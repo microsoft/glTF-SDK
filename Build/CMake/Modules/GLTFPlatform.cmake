@@ -85,11 +85,11 @@ function(AddGLTFIOSAppProperties target)
         find_library(SYSTEMCONFIGURATION SystemConfiguration)
 
         # link the frameworks located above
-        target_link_libraries(${target} PRIVATE ${UIKIT})
-        target_link_libraries(${target} PRIVATE ${FOUNDATION})
-        target_link_libraries(${target} PRIVATE ${MOBILECORESERVICES})
-        target_link_libraries(${target} PRIVATE ${CFNETWORK})
-        target_link_libraries(${target} PRIVATE ${SYSTEMCONFIGURATION})
+        target_link_libraries(${target} ${UIKIT})
+        target_link_libraries(${target} ${FOUNDATION})
+        target_link_libraries(${target} ${MOBILECORESERVICES})
+        target_link_libraries(${target} ${CFNETWORK})
+        target_link_libraries(${target} ${SYSTEMCONFIGURATION})
 
         set_target_properties(${target} PROPERTIES
             MACOSX_BUNDLE true
