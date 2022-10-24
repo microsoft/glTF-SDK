@@ -234,7 +234,7 @@ std::unique_ptr<Extension> KHR::Materials::DeserializePBRSpecGloss(const std::st
     Materials::PBRSpecularGlossiness specGloss;
 
     auto doc = RapidJsonUtils::CreateDocumentFromString(json);
-    const auto sit = doc.GetObject();
+    const rapidjson::Value sit = doc.GetObject();
 
     // Diffuse Factor
     auto diffuseFactIt = sit.FindMember("diffuseFactor");
@@ -314,7 +314,7 @@ std::unique_ptr<Extension> KHR::Materials::DeserializeUnlit(const std::string& j
     Unlit unlit;
 
     auto doc = RapidJsonUtils::CreateDocumentFromString(json);
-    const auto objValue = doc.GetObject();
+    const rapidjson::Value objValue = doc.GetObject();
 
     ParseProperty(objValue, unlit, extensionDeserializer);
 
@@ -375,7 +375,7 @@ std::unique_ptr<Extension> KHR::MeshPrimitives::DeserializeDracoMeshCompression(
     auto extension = std::make_unique<DracoMeshCompression>();
 
     auto doc = RapidJsonUtils::CreateDocumentFromString(json);
-    const auto v = doc.GetObject();
+    const rapidjson::Value v = doc.GetObject();
 
     extension->bufferViewId = GetMemberValueAsString<uint32_t>(v, "bufferView");
 
@@ -481,7 +481,7 @@ std::unique_ptr<Extension> KHR::TextureInfos::DeserializeTextureTransform(const 
     TextureTransform textureTransform;
 
     auto doc = RapidJsonUtils::CreateDocumentFromString(json);
-    const auto sit = doc.GetObject();
+    const rapidjson::Value sit = doc.GetObject();
 
     // Offset
     auto offsetIt = sit.FindMember("offset");
