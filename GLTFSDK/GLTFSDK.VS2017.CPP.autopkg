@@ -11,9 +11,9 @@ configurations {
 }
 nuget {
     nuspec {
-        id = Microsoft.glTF.CPP;
+        id = Microsoft.glTF.VS2017.CPP;
         version : 0.0.0.0;
-        title : Microsoft.glTF.CPP;
+        title : Microsoft.glTF.VS2017.CPP;
         authors : { Microsoft };
         owners : { Microsoft };
         requireLicenseAcceptance : true;

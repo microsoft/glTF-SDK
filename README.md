@@ -12,7 +12,8 @@
 
 # Nuget Packages
 
-* [Microsoft.glTF.CPP](https://www.nuget.org/packages/Microsoft.glTF.CPP/)
+* [Microsoft.glTF.VS2019.CPP](https://www.nuget.org/packages/Microsoft.glTF.VS2019.CPP/)
+* [Microsoft.glTF.VS2017.CPP](https://www.nuget.org/packages/Microsoft.glTF.VS2017.CPP/)
 * [Microsoft.glTF.macOS.CPP](https://www.nuget.org/packages/Microsoft.glTF.macOS.CPP/)
 * [Microsoft.glTF.iOS.CPP](https://www.nuget.org/packages/Microsoft.glTF.iOS.CPP/)
 * [Microsoft.glTF.Android.CPP](https://www.nuget.org/packages/Microsoft.glTF.Android.CPP/)
