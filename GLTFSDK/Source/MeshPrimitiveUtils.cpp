@@ -758,6 +758,25 @@ std::vector<uint32_t> MeshPrimitiveUtils::GetColors_0(const Document& doc, const
     return GetColors(doc, reader, accessor);
 }
 
+std::vector<uint32_t> MeshPrimitiveUtils::GetColors_1(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive)
+{
+    const auto& accessor = doc.accessors.Get(meshPrimitive.GetAttributeAccessorId(ACCESSOR_COLOR_1));
+    return GetColors(doc, reader, accessor);
+}
+
+std::vector<uint32_t> MeshPrimitiveUtils::GetColors_2(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive)
+{
+    const auto& accessor = doc.accessors.Get(meshPrimitive.GetAttributeAccessorId(ACCESSOR_COLOR_2));
+    return GetColors(doc, reader, accessor);
+}
+
+std::vector<uint32_t> MeshPrimitiveUtils::GetColors_3(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive)
+{
+    const auto& accessor = doc.accessors.Get(meshPrimitive.GetAttributeAccessorId(ACCESSOR_COLOR_3));
+    return GetColors(doc, reader, accessor);
+}
+
+
 // Joints
 std::vector<uint32_t> MeshPrimitiveUtils::GetJointIndices32(const Document& doc, const GLTFResourceReader& reader, const Accessor& jointsAccessor)
 {

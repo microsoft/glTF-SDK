@@ -50,6 +50,9 @@ namespace Microsoft
         constexpr const char* ACCESSOR_TEXCOORD_0 = "TEXCOORD_0";
         constexpr const char* ACCESSOR_TEXCOORD_1 = "TEXCOORD_1";
         constexpr const char* ACCESSOR_COLOR_0 = "COLOR_0";
+        constexpr const char* ACCESSOR_COLOR_1 = "COLOR_1";
+        constexpr const char* ACCESSOR_COLOR_2 = "COLOR_2";
+        constexpr const char* ACCESSOR_COLOR_3 = "COLOR_3";
         constexpr const char* ACCESSOR_JOINTS_0 = "JOINTS_0";
         constexpr const char* ACCESSOR_WEIGHTS_0 = "WEIGHTS_0";
 

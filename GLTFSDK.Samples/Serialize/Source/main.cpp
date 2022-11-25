@@ -89,8 +89,17 @@ namespace
             0U, 1U, 2U
         };
 
+        // Warning!: When your model has more than 65536 vertices then you must store in uint32_t as follows
+        // std::vector<uint32_t> indices = {
+        //     0U, 1U, 2U  .... your indices here
+        // };
+        
+
         // Copy the Accessor's id - subsequent calls to AddAccessor may invalidate the returned reference
-        accessorIdIndices = bufferBuilder.AddAccessor(indices, { TYPE_SCALAR, COMPONENT_UNSIGNED_SHORT }).id;
+        accessorIdIndices = bufferBuilder.AddAccessor(indices, { TYPE_SCALAR, COMPONENT_UNSIGNED_SHORT }).id; 
+
+        // Warning ! : When your model has more than 65536 vertices then this number should be INT but not SHORT
+        //  accessorIdIndices = bufferBuilder.AddAccessor(indices, { Microsoft::glTF::TYPE_SCALAR, Microsoft::glTF::COMPONENT_UNSIGNED_INT}).id;
 
         // Create a BufferView with target ARRAY_BUFFER (as it will reference vertex attribute data)
         bufferBuilder.AddBufferView(BufferViewTarget::ARRAY_BUFFER);
