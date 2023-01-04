@@ -752,6 +752,52 @@ std::vector<uint32_t> MeshPrimitiveUtils::GetColors(const Document& doc, const G
     }
 }
 
+
+// Custom Attributes 
+std::vector<float> MeshPrimitiveUtils::GetFloatAttributes(const Document& doc, const GLTFResourceReader& reader, const Accessor& Accessor)
+{
+    // Vertex Attributes as Floats
+    // if (Accessor.componentType == COMPONENT_FLOAT)
+    // {
+        std::vector<float> data = reader.ReadFloatData(doc, Accessor);
+
+
+        return data;
+        // if (Accessor.type == TYPE_VEC4)
+        //     return PackColorsRGBA(colorData);
+        // else
+        //     return PackColorsRGB(colorData);
+
+    	//    throw GLTFException("Not implemented yet for Float Vertex Attributes " + Accessor.id);
+   // }
+
+    
+    // // 3. 3Bytes =  color
+    // if (Accessor.componentType == COMPONENT_UNSIGNED_BYTE )
+    // {
+    //     std::vector<uint8_t> data = reader.ReadBinaryData<uint8_t>(doc, Accessor);
+    //
+    //     if (Accessor.type == TYPE_VEC4)
+    //         return PackColorsRGBA(data);
+    //     else
+    //         return PackColorsRGB(data);
+    //
+    // 	//throw GLTFException("Not implemented yet for Byte Vertex Attributes " + colorsAccessor.id);
+    // }
+    //
+    //
+    // // 4. Unsigned Short
+    // if (Accessor.componentType != COMPONENT_UNSIGNED_SHORT)
+    // {
+    //     throw GLTFException("Not implement yet for Unsigned Shorts " + Accessor.id);
+    // }
+    //
+    
+    
+    
+}
+
+
 std::vector<uint32_t> MeshPrimitiveUtils::GetColors_0(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive)
 {
     const auto& accessor = doc.accessors.Get(meshPrimitive.GetAttributeAccessorId(ACCESSOR_COLOR_0));
@@ -775,6 +821,16 @@ std::vector<uint32_t> MeshPrimitiveUtils::GetColors_3(const Document& doc, const
     const auto& accessor = doc.accessors.Get(meshPrimitive.GetAttributeAccessorId(ACCESSOR_COLOR_3));
     return GetColors(doc, reader, accessor);
 }
+
+
+std::vector<float> MeshPrimitiveUtils::GetFloatAttributes_0(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive)
+{
+    const auto& accessor = doc.accessors.Get(meshPrimitive.GetAttributeAccessorId(ACCESSOR_ATTRIBUTE_0));
+    return GetFloatAttributes(doc, reader, accessor);
+}
+
+
+
 
 
 // Joints

@@ -39,7 +39,7 @@
     <ProjectGuid>{DE6A7757-2DF3-4705-829B-96A77BABF0B2}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Deserialize</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

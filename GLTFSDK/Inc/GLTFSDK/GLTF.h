@@ -90,7 +90,9 @@ namespace Microsoft
             TARGET_TRANSLATION,
             TARGET_ROTATION,
             TARGET_SCALE,
-            TARGET_WEIGHTS
+            TARGET_WEIGHTS,
+            TARGET_COLOR_0,
+            TARGET_ATTRIBUTE_0
         };
 
         enum InterpolationType
@@ -146,6 +148,14 @@ namespace Microsoft
             if (targetPath == TARGETPATH_NAME_WEIGHTS)
             {
                 return TARGET_WEIGHTS;
+            }
+            if (targetPath == TARGETPATH_NAME_COLOR_0)
+            {
+                return TARGET_COLOR_0;
+            }
+            if (targetPath == TARGETPATH_NAME_ATTRIBUTE_0)
+            {
+                return TARGET_ATTRIBUTE_0;
             }
 
             return TARGET_UNKNOWN;
@@ -544,11 +554,16 @@ namespace Microsoft
             std::string positionsAccessorId;
             std::string normalsAccessorId;
             std::string tangentsAccessorId;
+            std::string color0AccessorId;
+            std::string attribute0AccessorId;
+
             bool operator==(const MorphTarget& rhs) const
             {
                 return this->positionsAccessorId == rhs.positionsAccessorId
                     && this->normalsAccessorId == rhs.normalsAccessorId
-                    && this->tangentsAccessorId == rhs.tangentsAccessorId;
+                    && this->tangentsAccessorId == rhs.tangentsAccessorId
+                    && this->color0AccessorId == rhs.color0AccessorId
+                    && this->attribute0AccessorId == rhs.attribute0AccessorId;
             }
 
             bool operator!=(const MorphTarget& rhs) const

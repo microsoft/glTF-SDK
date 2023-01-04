@@ -30,7 +30,7 @@
     <ProjectGuid>{F170B140-6AB9-4014-97D9-D897E0493CEC}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>GLTFSDKTest</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
     <ProjectName>GLTFSDK.Test</ProjectName>
     <TargetPlatform>$(Platform)</TargetPlatform>
   </PropertyGroup>

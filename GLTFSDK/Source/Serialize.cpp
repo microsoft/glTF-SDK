@@ -47,6 +47,10 @@ namespace
             return TARGETPATH_NAME_SCALE;
         case TARGET_WEIGHTS:
             return TARGETPATH_NAME_WEIGHTS;
+        case TARGET_COLOR_0:
+            return TARGETPATH_NAME_COLOR_0;
+        case TARGET_ATTRIBUTE_0:
+            return TARGETPATH_NAME_ATTRIBUTE_0;
         default:
             return "";
         }
@@ -503,6 +507,8 @@ namespace
         RapidJsonUtils::AddOptionalMemberIndex(ACCESSOR_POSITION, targetValue, target.positionsAccessorId, gltfDocument.accessors, a);
         RapidJsonUtils::AddOptionalMemberIndex(ACCESSOR_NORMAL, targetValue, target.normalsAccessorId, gltfDocument.accessors, a);
         RapidJsonUtils::AddOptionalMemberIndex(ACCESSOR_TANGENT, targetValue, target.tangentsAccessorId, gltfDocument.accessors, a);
+        RapidJsonUtils::AddOptionalMemberIndex(ACCESSOR_ATTRIBUTE_0, targetValue, target.attribute0AccessorId, gltfDocument.accessors, a);
+        RapidJsonUtils::AddOptionalMemberIndex(ACCESSOR_COLOR_0, targetValue, target.color0AccessorId, gltfDocument.accessors, a);
 
         return targetValue;
     }

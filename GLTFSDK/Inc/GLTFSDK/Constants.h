@@ -53,6 +53,9 @@ namespace Microsoft
         constexpr const char* ACCESSOR_COLOR_1 = "COLOR_1";
         constexpr const char* ACCESSOR_COLOR_2 = "COLOR_2";
         constexpr const char* ACCESSOR_COLOR_3 = "COLOR_3";
+        constexpr const char* ACCESSOR_ATTRIBUTE_0 = "ATTRIBUTE_0";
+        constexpr const char* ACCESSOR_ATTRIBUTE_1 = "ATTRIBUTE_1";
+        constexpr const char* ACCESSOR_ATTRIBUTE_2 = "ATTRIBUTE_2";
         constexpr const char* ACCESSOR_JOINTS_0 = "JOINTS_0";
         constexpr const char* ACCESSOR_WEIGHTS_0 = "WEIGHTS_0";
 
@@ -79,6 +82,8 @@ namespace Microsoft
         constexpr const char* TARGETPATH_NAME_ROTATION = "rotation";
         constexpr const char* TARGETPATH_NAME_SCALE = "scale";
         constexpr const char* TARGETPATH_NAME_WEIGHTS = "weights";
+        constexpr const char* TARGETPATH_NAME_COLOR_0 = "color0";
+        constexpr const char* TARGETPATH_NAME_ATTRIBUTE_0 = "attribute0";
 
         constexpr const char* INTERPOLATIONTYPE_NAME_LINEAR = "LINEAR";
         constexpr const char* INTERPOLATIONTYPE_NAME_STEP = "STEP";

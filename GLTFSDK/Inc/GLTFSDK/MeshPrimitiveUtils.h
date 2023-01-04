@@ -51,6 +51,10 @@ namespace Microsoft
             std::vector<uint32_t> GetColors_2(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive);
             std::vector<uint32_t> GetColors_3(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive);
 
+            std::vector<float> GetFloatAttributes(const Document& doc, const GLTFResourceReader& reader, const Accessor& accessor);
+            std::vector<float> GetFloatAttributes_0(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive);
+            
+
             std::vector<uint32_t> GetJointIndices32(const Document& doc, const GLTFResourceReader& reader, const Accessor& accessor);
             std::vector<uint32_t> GetJointIndices32_0(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive);
 
