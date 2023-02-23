@@ -11,9 +11,6 @@
     <copyright>© Microsoft Corporation. All rights reserved.</copyright>
     <tags></tags>
     <releaseNotes>(Replaced by NuGet build system)</releaseNotes>
-        <dependencies>
-            <dependency id="rapidjson.temprelease" version="0.0.2.20" />
-        </dependencies>
     </metadata>
   <files>
     <!-- iOS|Debug -->
@@ -26,6 +23,8 @@
     <file src="../Built/Out/iOSSimulator64/Release/GLTFSDK/libGLTFSDK.a" target="/build/native/lib/iOSSimulator64/Release/static" />
     <!-- Build (C++) -->
     <file src="../GLTFSDK/Inc/**/*" target="/build/native/include" />
+    <!-- Build (C++) -->
+    <file src="..\Built\Out\RapidJSON\include\**\*" target="\build\native\include" />
     <!-- CMake Modules -->
     <file src="../Build/CMake/FindGLTFSDK.iOS.cmake" target="" />
     <file src="../Build/CMake/FindGLTFSDK.iOSSimulator64.cmake" target="" />
