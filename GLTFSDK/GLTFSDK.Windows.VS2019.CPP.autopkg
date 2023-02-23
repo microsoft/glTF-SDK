@@ -52,7 +52,7 @@ nuget {
 
         nested2IncludePluginManager: { 
             #destination = ${d_include}rapidjson; 
-            "${BASE}\Built\Out\RapidJSON\include\rapidjson\**\*.hpp", "${BASE}\Built\Out\RapidJSON\include\rapidjson\**\*.h"
+            "${BASE}\Built\Out\RapidJSON\include\rapidjson\**\*.h"
         };
 
         [win32,debug] {
