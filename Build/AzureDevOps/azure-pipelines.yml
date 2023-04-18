@@ -253,3 +253,41 @@ jobs:
       inputs:
         workingDirectory: 'built/Int/cmake_$(buildPlatform)'
         cmakeArgs: '--build . --target install --config $(buildConfiguration)'
+        
+  - job: Ubuntu
+
+    pool:
+      vmImage: 'ubuntu-latest'
+    
+    strategy:
+      matrix:
+        ubuntu-x64-Release:
+          buildPlatform: Linux
+          buildConfiguration: Release
+        ubuntu-x64-Debug:
+          buildPlatform: Linux
+          buildConfiguration: Debug
+
+    workspace:
+      clean: all
+
+    steps:
+
+    - task: CMake@1
+      inputs:
+        workingDirectory: 'built/Int/cmake_$(buildPlatform)'
+        cmakeArgs: '../../.. -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=$(buildConfiguration)'
+
+    - task: CMake@1
+      inputs:
+        workingDirectory: 'built/Int/cmake_$(buildPlatform)'
+        cmakeArgs: '--build . --target install'
+
+    - script: ./GLTFSDK.Test --gtest_output=xml:GLTFSDK.Test.log
+      workingDirectory: Built/Out/$(buildPlatform)/$(buildConfiguration)/GLTFSDK.Test
+      displayName: Running Unit Tests
+
+    - task: PublishTestResults@2
+      inputs:
+        testResultsFormat: 'JUnit'
+        testResultsFiles: Built/Out/$(buildPlatform)/$(buildConfiguration)/GLTFSDK.Test/GLTFSDK.Test.log
