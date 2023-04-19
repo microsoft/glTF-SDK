@@ -70,3 +70,5 @@ endif()
 if(ENABLE_SAMPLES)
     add_subdirectory(GLTFSDK.Samples)
 endif()
+
+INSTALL(DIRECTORY ${RapidJSON_INCLUDE_DIRS} DESTINATION ${CMAKE_SOURCE_DIR}/Built/Out/RapidJSON/ FILES_MATCHING PATTERN "*.h"  PATTERN "*.hpp")
