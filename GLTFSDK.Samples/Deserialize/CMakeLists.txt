@@ -17,9 +17,7 @@ if (MSVC)
 
     # Make sure that all PDB files on Windows are installed to the output folder.  By default, only the debug build does this.
     set_target_properties(Deserialize PROPERTIES COMPILE_PDB_NAME "Deserialize" COMPILE_PDB_OUTPUT_DIRECTORY "${RUNTIME_OUTPUT_DIRECTORY}")
-endif()
-
-if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     target_compile_options(Deserialize
         PRIVATE "-Wunguarded-availability"
         PRIVATE "-Wall"
