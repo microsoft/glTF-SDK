@@ -233,8 +233,7 @@ std::unique_ptr<Extension> KHR::Materials::DeserializePBRSpecGloss(const std::st
 {
     Materials::PBRSpecularGlossiness specGloss;
 
-    auto doc = RapidJsonUtils::CreateDocumentFromString(json);
-    const auto sit = doc.GetObject();
+    const auto sit = RapidJsonUtils::CreateDocumentFromString(json);
 
     // Diffuse Factor
     auto diffuseFactIt = sit.FindMember("diffuseFactor");
@@ -313,10 +312,9 @@ std::unique_ptr<Extension> KHR::Materials::DeserializeUnlit(const std::string& j
 {
     Unlit unlit;
 
-    auto doc = RapidJsonUtils::CreateDocumentFromString(json);
-    const auto objValue = doc.GetObject();
+    const auto doc = RapidJsonUtils::CreateDocumentFromString(json);
 
-    ParseProperty(objValue, unlit, extensionDeserializer);
+    ParseProperty(doc.GetObject(), unlit, extensionDeserializer);
 
     return std::make_unique<Unlit>(unlit);
 }
@@ -374,8 +372,7 @@ std::unique_ptr<Extension> KHR::MeshPrimitives::DeserializeDracoMeshCompression(
 {
     auto extension = std::make_unique<DracoMeshCompression>();
 
-    auto doc = RapidJsonUtils::CreateDocumentFromString(json);
-    const auto v = doc.GetObject();
+    const auto v = RapidJsonUtils::CreateDocumentFromString(json);
 
     extension->bufferViewId = GetMemberValueAsString<uint32_t>(v, "bufferView");
 
@@ -386,9 +383,8 @@ std::unique_ptr<Extension> KHR::MeshPrimitives::DeserializeDracoMeshCompression(
         {
             throw GLTFException("Member attributes of " + std::string(DRACOMESHCOMPRESSION_NAME) + " is not an object.");
         }
-        const auto& attributes = it->value.GetObject();
 
-        for (const auto& attribute : attributes)
+        for (const auto& attribute : it->value.GetObject())
         {
             auto name = attribute.name.GetString();
 
@@ -480,7 +476,7 @@ std::unique_ptr<Extension> KHR::TextureInfos::DeserializeTextureTransform(const 
 {
     TextureTransform textureTransform;
 
-    auto doc = RapidJsonUtils::CreateDocumentFromString(json);
+    const auto doc = RapidJsonUtils::CreateDocumentFromString(json);
     const auto sit = doc.GetObject();
 
     // Offset
