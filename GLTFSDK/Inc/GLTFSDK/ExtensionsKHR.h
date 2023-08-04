@@ -56,6 +56,7 @@ namespace Microsoft
             namespace MeshPrimitives
             {
                 constexpr const char* DRACOMESHCOMPRESSION_NAME = "KHR_draco_mesh_compression";
+                constexpr const char* MATERIALSVARIANTS_NAME = "KHR_materials_variants";
 
                 // KHR_draco_mesh_compression
                 struct DracoMeshCompression : Extension, glTFProperty
@@ -70,6 +71,30 @@ namespace Microsoft
 
                 std::string SerializeDracoMeshCompression(const DracoMeshCompression& dracoMeshCompression, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer);
                 std::unique_ptr<Extension> DeserializeDracoMeshCompression(const std::string& json, const ExtensionDeserializer& extensionDeserializer);
+
+                // KHR_materials_variants
+                struct MaterialsVariants : Extension, glTFProperty
+                {
+                    struct Mapping
+                    {
+                        std::string materialId;
+                        std::vector<std::string> variantIds;
+
+                        bool operator==(const Mapping& rhs)
+                        {
+                            return this->materialId == rhs.materialId
+                                && this->variantIds == rhs.variantIds;
+                        }
+                    };
+
+                    std::vector<Mapping> mappings;
+
+                    std::unique_ptr<Extension> Clone() const override;
+                    bool IsEqual(const Extension& rhs) const override;
+                };
+
+                std::string SerializeMaterialsVariants(const MaterialsVariants& materialsVariants, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer);
+                std::unique_ptr<Extension> DeserializeMaterialsVariants(const std::string& json, const ExtensionDeserializer& extensionDeserializer);
             }
 
             namespace TextureInfos
