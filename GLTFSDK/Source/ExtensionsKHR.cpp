@@ -134,6 +134,7 @@ ExtensionSerializer KHR::GetKHRExtensionSerializer()
     ExtensionSerializer extensionSerializer;
     extensionSerializer.AddHandler<PBRSpecularGlossiness, Material>(PBRSPECULARGLOSSINESS_NAME, SerializePBRSpecGloss);
     extensionSerializer.AddHandler<Unlit, Material>(UNLIT_NAME, SerializeUnlit);
+    extensionSerializer.AddHandler<Clearcoat, Material>(CLEARCOAT_NAME, SerializeClearcoat);
     extensionSerializer.AddHandler<DracoMeshCompression, MeshPrimitive>(DRACOMESHCOMPRESSION_NAME, SerializeDracoMeshCompression);
     extensionSerializer.AddHandler<MaterialsVariants, MeshPrimitive>(MATERIALSVARIANTS_NAME, SerializeMaterialsVariants);
     extensionSerializer.AddHandler<TextureTransform, TextureInfo>(TEXTURETRANSFORM_NAME, SerializeTextureTransform);
@@ -151,6 +152,7 @@ ExtensionDeserializer KHR::GetKHRExtensionDeserializer()
     ExtensionDeserializer extensionDeserializer;
     extensionDeserializer.AddHandler<PBRSpecularGlossiness, Material>(PBRSPECULARGLOSSINESS_NAME, DeserializePBRSpecGloss);
     extensionDeserializer.AddHandler<Unlit, Material>(UNLIT_NAME, DeserializeUnlit);
+    extensionDeserializer.AddHandler<Clearcoat, Material>(CLEARCOAT_NAME, DeserializeClearcoat);
     extensionDeserializer.AddHandler<DracoMeshCompression, MeshPrimitive>(DRACOMESHCOMPRESSION_NAME, DeserializeDracoMeshCompression);
     extensionDeserializer.AddHandler<MaterialsVariants, MeshPrimitive>(MATERIALSVARIANTS_NAME, DeserializeMaterialsVariants);
     extensionDeserializer.AddHandler<TextureTransform, TextureInfo>(TEXTURETRANSFORM_NAME, DeserializeTextureTransform);
@@ -321,6 +323,120 @@ std::unique_ptr<Extension> KHR::Materials::DeserializeUnlit(const std::string& j
     ParseProperty(objValue, unlit, extensionDeserializer);
 
     return std::make_unique<Unlit>(unlit);
+}
+
+// KHR::Materials::Clearcoat
+
+KHR::Materials::Clearcoat::Clearcoat() :
+    factor(0.0f),
+    roughnessFactor(0.0f)
+{
+}
+
+std::unique_ptr<Extension> KHR::Materials::Clearcoat::Clone() const
+{
+    return std::make_unique<Clearcoat>(*this);
+}
+
+bool KHR::Materials::Clearcoat::IsEqual(const Extension& rhs) const
+{
+    const auto other = dynamic_cast<const Clearcoat*>(&rhs);
+
+    return other != nullptr
+        && glTFProperty::Equals(*this, *other)
+        && this->factor == other->factor
+        && this->texture == other->texture
+        && this->roughnessFactor == other->roughnessFactor
+        && this->roughnessTexture == other->roughnessTexture
+        && this->normalTexture == other->normalTexture;
+}
+
+std::string KHR::Materials::SerializeClearcoat(const Materials::Clearcoat& clearcoat, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
+{
+    rapidjson::Document doc;
+    auto& a = doc.GetAllocator();
+    rapidjson::Value KHR_clearcoat(rapidjson::kObjectType);
+    {
+        if (clearcoat.factor != 0.0f)
+        {
+            KHR_clearcoat.AddMember("clearcoatFactor", RapidJsonUtils::ToFloatValue(clearcoat.factor), a);
+        }
+
+        if (!clearcoat.texture.textureId.empty())
+        {
+            rapidjson::Value texture(rapidjson::kObjectType);
+            SerializeTextureInfo(gltfDocument, clearcoat.texture, texture, a, gltfDocument.textures, extensionSerializer);
+            KHR_clearcoat.AddMember("clearcoatTexture", texture, a);
+        }
+
+        if (clearcoat.roughnessFactor != 0.0f)
+        {
+            KHR_clearcoat.AddMember("clearcoatRoughnessFactor", RapidJsonUtils::ToFloatValue(clearcoat.roughnessFactor), a);
+        }
+
+        if (!clearcoat.roughnessTexture.textureId.empty())
+        {
+            rapidjson::Value roughnessTexture(rapidjson::kObjectType);
+            SerializeTextureInfo(gltfDocument, clearcoat.roughnessTexture, roughnessTexture, a, gltfDocument.textures, extensionSerializer);
+            KHR_clearcoat.AddMember("clearcoatRoughnessTexture", roughnessTexture, a);
+        }
+
+        if (!clearcoat.normalTexture.textureId.empty())
+        {
+            rapidjson::Value normalTexture(rapidjson::kObjectType);
+            SerializeTextureInfo(gltfDocument, clearcoat.normalTexture, normalTexture, a, gltfDocument.textures, extensionSerializer);
+            KHR_clearcoat.AddMember("clearcoatNormalTexture", normalTexture, a);
+        }
+
+        SerializeProperty(gltfDocument, clearcoat, KHR_clearcoat, a, extensionSerializer);
+    }
+
+    rapidjson::StringBuffer buffer;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+    KHR_clearcoat.Accept(writer);
+
+    return buffer.GetString();
+}
+
+std::unique_ptr<Extension> KHR::Materials::DeserializeClearcoat(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
+{
+    Materials::Clearcoat clearcoat;
+
+    auto doc = RapidJsonUtils::CreateDocumentFromString(json);
+    const auto sit = doc.GetObject();
+
+    // Clearcoat Factor
+    const auto factorIt = sit.FindMember("clearcoatFactor");
+    clearcoat.factor = factorIt == sit.MemberEnd() ? 0.0f : factorIt->value.GetFloat();
+
+    // Clearcoat Texture
+    const auto textureIt = sit.FindMember("clearcoatTexture");
+    if (textureIt != sit.MemberEnd())
+    {
+        ParseTextureInfo(textureIt->value, clearcoat.texture, extensionDeserializer);
+    }
+
+    // Clearcoat Roughness Factor
+    const auto roughnessFactorIt = sit.FindMember("clearcoatRoughnessFactor");
+    clearcoat.roughnessFactor = roughnessFactorIt == sit.MemberEnd() ? 0.0f : roughnessFactorIt->value.GetFloat();
+
+    // Clearcoat Roughness Texture
+    const auto roughnessTextureIt = sit.FindMember("clearcoatRoughnessTexture");
+    if (roughnessTextureIt != sit.MemberEnd())
+    {
+        ParseTextureInfo(roughnessTextureIt->value, clearcoat.roughnessTexture, extensionDeserializer);
+    }
+
+    // Clearcoat Normal Texture
+    const auto normalTextureIt = sit.FindMember("clearcoatNormalTexture");
+    if (normalTextureIt != sit.MemberEnd())
+    {
+        ParseTextureInfo(normalTextureIt->value, clearcoat.normalTexture, extensionDeserializer);
+    }
+
+    ParseProperty(sit, clearcoat, extensionDeserializer);
+
+    return std::make_unique<Clearcoat>(clearcoat);
 }
 
 // KHR::MeshPrimitives::DracoMeshCompression

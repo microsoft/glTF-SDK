@@ -51,6 +51,26 @@ namespace Microsoft
 
                 std::string SerializeUnlit(const Unlit& unlit, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer);
                 std::unique_ptr<Extension> DeserializeUnlit(const std::string& json, const ExtensionDeserializer& extensionDeserializer);
+
+                constexpr const char* CLEARCOAT_NAME = "KHR_materials_clearcoat";
+
+                // KHR_materials_clearcoat
+                struct Clearcoat : Extension, glTFProperty
+                {
+                    Clearcoat();
+
+                    float factor;
+                    TextureInfo texture;
+                    float roughnessFactor;
+                    TextureInfo roughnessTexture;
+                    TextureInfo normalTexture;
+
+                    std::unique_ptr<Extension> Clone() const override;
+                    bool IsEqual(const Extension& rhs) const override;
+                };
+
+                std::string SerializeClearcoat(const Clearcoat& clearcoat, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer);
+                std::unique_ptr<Extension> DeserializeClearcoat(const std::string& json, const ExtensionDeserializer& extensionDeserializer);
             }
 
             namespace MeshPrimitives
