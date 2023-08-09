@@ -135,6 +135,7 @@ ExtensionSerializer KHR::GetKHRExtensionSerializer()
     extensionSerializer.AddHandler<PBRSpecularGlossiness, Material>(PBRSPECULARGLOSSINESS_NAME, SerializePBRSpecGloss);
     extensionSerializer.AddHandler<Unlit, Material>(UNLIT_NAME, SerializeUnlit);
     extensionSerializer.AddHandler<Clearcoat, Material>(CLEARCOAT_NAME, SerializeClearcoat);
+    extensionSerializer.AddHandler<Volume, Material>(VOLUME_NAME, SerializeVolume);
     extensionSerializer.AddHandler<DracoMeshCompression, MeshPrimitive>(DRACOMESHCOMPRESSION_NAME, SerializeDracoMeshCompression);
     extensionSerializer.AddHandler<MaterialsVariants, MeshPrimitive>(MATERIALSVARIANTS_NAME, SerializeMaterialsVariants);
     extensionSerializer.AddHandler<TextureTransform, TextureInfo>(TEXTURETRANSFORM_NAME, SerializeTextureTransform);
@@ -153,6 +154,7 @@ ExtensionDeserializer KHR::GetKHRExtensionDeserializer()
     extensionDeserializer.AddHandler<PBRSpecularGlossiness, Material>(PBRSPECULARGLOSSINESS_NAME, DeserializePBRSpecGloss);
     extensionDeserializer.AddHandler<Unlit, Material>(UNLIT_NAME, DeserializeUnlit);
     extensionDeserializer.AddHandler<Clearcoat, Material>(CLEARCOAT_NAME, DeserializeClearcoat);
+    extensionDeserializer.AddHandler<Volume, Material>(VOLUME_NAME, DeserializeVolume);
     extensionDeserializer.AddHandler<DracoMeshCompression, MeshPrimitive>(DRACOMESHCOMPRESSION_NAME, DeserializeDracoMeshCompression);
     extensionDeserializer.AddHandler<MaterialsVariants, MeshPrimitive>(MATERIALSVARIANTS_NAME, DeserializeMaterialsVariants);
     extensionDeserializer.AddHandler<TextureTransform, TextureInfo>(TEXTURETRANSFORM_NAME, DeserializeTextureTransform);
@@ -437,6 +439,115 @@ std::unique_ptr<Extension> KHR::Materials::DeserializeClearcoat(const std::strin
     ParseProperty(sit, clearcoat, extensionDeserializer);
 
     return std::make_unique<Clearcoat>(clearcoat);
+}
+
+// KHR::Materials::Volume
+
+KHR::Materials::Volume::Volume() :
+    attenuationColor(1.0f, 1.0f, 1.0f),
+    attenuationDistance(std::numeric_limits<float>::infinity()),
+    thicknessFactor(0.0f)
+{
+}
+
+std::unique_ptr<Extension> KHR::Materials::Volume::Clone() const
+{
+    return std::make_unique<Volume>(*this);
+}
+
+bool KHR::Materials::Volume::IsEqual(const Extension& rhs) const
+{
+    const auto other = dynamic_cast<const Volume*>(&rhs);
+
+    return other != nullptr
+        && glTFProperty::Equals(*this, *other)
+        && this->attenuationColor == other->attenuationColor
+        && this->attenuationDistance == other->attenuationDistance
+        && this->thicknessFactor == other->thicknessFactor
+        && this->thicknessTexture == other->thicknessTexture;
+}
+
+std::string KHR::Materials::SerializeVolume(const Materials::Volume& volume, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
+{
+    rapidjson::Document doc;
+    auto& a = doc.GetAllocator();
+    rapidjson::Value KHR_volume(rapidjson::kObjectType);
+    {
+        if (volume.attenuationColor != Color3(1.0f, 1.0f, 1.0f))
+        {
+            KHR_volume.AddMember("attenuationColor", RapidJsonUtils::ToJsonArray(volume.attenuationColor, a), a);
+        }
+
+        if (volume.attenuationDistance != std::numeric_limits<float>::infinity())
+        {
+            KHR_volume.AddMember("attenuationDistance", RapidJsonUtils::ToFloatValue(volume.attenuationDistance), a);
+        }
+
+        if (volume.thicknessFactor != 0.0f)
+        {
+            KHR_volume.AddMember("thicknessFactor", RapidJsonUtils::ToFloatValue(volume.thicknessFactor), a);
+        }
+
+        if (!volume.thicknessTexture.textureId.empty())
+        {
+            rapidjson::Value thicknessTexture(rapidjson::kObjectType);
+            SerializeTextureInfo(gltfDocument, volume.thicknessTexture, thicknessTexture, a, gltfDocument.textures, extensionSerializer);
+            KHR_volume.AddMember("thicknessTexture", thicknessTexture, a);
+        }
+
+        SerializeProperty(gltfDocument, volume, KHR_volume, a, extensionSerializer);
+    }
+
+    rapidjson::StringBuffer buffer;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+    KHR_volume.Accept(writer);
+
+    return buffer.GetString();
+}
+
+std::unique_ptr<Extension> KHR::Materials::DeserializeVolume(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
+{
+    Materials::Volume volume;
+
+    auto doc = RapidJsonUtils::CreateDocumentFromString(json);
+    const auto sit = doc.GetObject();
+
+    // Attenuation Color
+    const auto attenuationColorIt = sit.FindMember("attenuationColor");
+    if (attenuationColorIt != sit.MemberEnd())
+    {
+        std::vector<float> attenuationColor;
+        for (rapidjson::Value::ConstValueIterator ait = attenuationColorIt->value.Begin(); ait != attenuationColorIt->value.End(); ++ait)
+        {
+            attenuationColor.push_back(static_cast<float>(ait->GetDouble()));
+        }
+        volume.attenuationColor = Color3(attenuationColor[0], attenuationColor[1], attenuationColor[2]);
+    }
+
+    // Attenuation Distance
+    const auto attenuationDistanceIt = sit.FindMember("attenuationDistance");
+    if (attenuationDistanceIt != sit.MemberEnd())
+    {
+        volume.attenuationDistance = attenuationDistanceIt->value.GetFloat();
+    }
+
+    // Thickness Factor
+    const auto thicknessFactorIt = sit.FindMember("thicknessFactor");
+    if (thicknessFactorIt != sit.MemberEnd())
+    {
+        volume.thicknessFactor = thicknessFactorIt->value.GetFloat();
+    }
+
+    // Thickness Texture
+    const auto thicknessTextureIt = sit.FindMember("thicknessTexture");
+    if (thicknessTextureIt != sit.MemberEnd())
+    {
+        ParseTextureInfo(thicknessTextureIt->value, volume.thicknessTexture, extensionDeserializer);
+    }
+
+    ParseProperty(sit, volume, extensionDeserializer);
+
+    return std::make_unique<Volume>(volume);
 }
 
 // KHR::MeshPrimitives::DracoMeshCompression
