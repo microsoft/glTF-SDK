@@ -411,7 +411,10 @@ std::unique_ptr<Extension> KHR::Materials::DeserializeClearcoat(const std::strin
 
     // Clearcoat Factor
     const auto factorIt = sit.FindMember("clearcoatFactor");
-    clearcoat.factor = factorIt == sit.MemberEnd() ? 0.0f : factorIt->value.GetFloat();
+    if (factorIt != sit.MemberEnd())
+    {
+        clearcoat.factor = factorIt->value.GetFloat();
+    }
 
     // Clearcoat Texture
     const auto textureIt = sit.FindMember("clearcoatTexture");
@@ -422,7 +425,10 @@ std::unique_ptr<Extension> KHR::Materials::DeserializeClearcoat(const std::strin
 
     // Clearcoat Roughness Factor
     const auto roughnessFactorIt = sit.FindMember("clearcoatRoughnessFactor");
-    clearcoat.roughnessFactor = roughnessFactorIt == sit.MemberEnd() ? 0.0f : roughnessFactorIt->value.GetFloat();
+    if (roughnessFactorIt != sit.MemberEnd())
+    {
+        clearcoat.roughnessFactor = roughnessFactorIt->value.GetFloat();
+    }
 
     // Clearcoat Roughness Texture
     const auto roughnessTextureIt = sit.FindMember("clearcoatRoughnessTexture");
