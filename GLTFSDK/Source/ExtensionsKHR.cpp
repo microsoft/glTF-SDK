@@ -137,6 +137,7 @@ ExtensionSerializer KHR::GetKHRExtensionSerializer()
     extensionSerializer.AddHandler<Clearcoat, Material>(CLEARCOAT_NAME, SerializeClearcoat);
     extensionSerializer.AddHandler<Volume, Material>(VOLUME_NAME, SerializeVolume);
     extensionSerializer.AddHandler<Iridescence, Material>(IRIDESCENCE_NAME, SerializeIridescence);
+    extensionSerializer.AddHandler<Transmission, Material>(TRANSMISSION_NAME, SerializeTransmission);
     extensionSerializer.AddHandler<DracoMeshCompression, MeshPrimitive>(DRACOMESHCOMPRESSION_NAME, SerializeDracoMeshCompression);
     extensionSerializer.AddHandler<MaterialsVariants, MeshPrimitive>(MATERIALSVARIANTS_NAME, SerializeMaterialsVariants);
     extensionSerializer.AddHandler<TextureTransform, TextureInfo>(TEXTURETRANSFORM_NAME, SerializeTextureTransform);
@@ -157,6 +158,7 @@ ExtensionDeserializer KHR::GetKHRExtensionDeserializer()
     extensionDeserializer.AddHandler<Clearcoat, Material>(CLEARCOAT_NAME, DeserializeClearcoat);
     extensionDeserializer.AddHandler<Volume, Material>(VOLUME_NAME, DeserializeVolume);
     extensionDeserializer.AddHandler<Iridescence, Material>(IRIDESCENCE_NAME, DeserializeIridescence);
+    extensionDeserializer.AddHandler<Transmission, Material>(TRANSMISSION_NAME, DeserializeTransmission);
     extensionDeserializer.AddHandler<DracoMeshCompression, MeshPrimitive>(DRACOMESHCOMPRESSION_NAME, DeserializeDracoMeshCompression);
     extensionDeserializer.AddHandler<MaterialsVariants, MeshPrimitive>(MATERIALSVARIANTS_NAME, DeserializeMaterialsVariants);
     extensionDeserializer.AddHandler<TextureTransform, TextureInfo>(TEXTURETRANSFORM_NAME, DeserializeTextureTransform);
@@ -689,6 +691,82 @@ std::unique_ptr<Extension> KHR::Materials::DeserializeIridescence(const std::str
     ParseProperty(sit, iridescence, extensionDeserializer);
 
     return std::make_unique<Iridescence>(iridescence);
+}
+
+// KHR::Materials::Transmission
+
+KHR::Materials::Transmission::Transmission() :
+    factor(0.0f)
+{
+}
+
+std::unique_ptr<Extension> KHR::Materials::Transmission::Clone() const
+{
+    return std::make_unique<Transmission>(*this);
+}
+
+bool KHR::Materials::Transmission::IsEqual(const Extension& rhs) const
+{
+    const auto other = dynamic_cast<const Transmission*>(&rhs);
+
+    return other != nullptr
+        && glTFProperty::Equals(*this, *other)
+        && this->factor == other->factor
+        && this->texture == other->texture;
+}
+
+std::string KHR::Materials::SerializeTransmission(const Materials::Transmission& transmission, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
+{
+    rapidjson::Document doc;
+    auto& a = doc.GetAllocator();
+    rapidjson::Value KHR_transmission(rapidjson::kObjectType);
+    {
+        if (transmission.factor != 0.0f)
+        {
+            KHR_transmission.AddMember("transmissionFactor", RapidJsonUtils::ToFloatValue(transmission.factor), a);
+        }
+
+        if (!transmission.texture.textureId.empty())
+        {
+            rapidjson::Value texture(rapidjson::kObjectType);
+            SerializeTextureInfo(gltfDocument, transmission.texture, texture, a, gltfDocument.textures, extensionSerializer);
+            KHR_transmission.AddMember("transmissionTexture", texture, a);
+        }
+
+        SerializeProperty(gltfDocument, transmission, KHR_transmission, a, extensionSerializer);
+    }
+
+    rapidjson::StringBuffer buffer;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+    KHR_transmission.Accept(writer);
+
+    return buffer.GetString();
+}
+
+std::unique_ptr<Extension> KHR::Materials::DeserializeTransmission(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
+{
+    Materials::Transmission transmission;
+
+    auto doc = RapidJsonUtils::CreateDocumentFromString(json);
+    const auto sit = doc.GetObject();
+
+    // Transmission Factor
+    const auto factorIt = sit.FindMember("transmissionFactor");
+    if (factorIt != sit.MemberEnd())
+    {
+        transmission.factor = factorIt->value.GetFloat();
+    }
+
+    // Transmission Texture
+    const auto textureIt = sit.FindMember("transmissionTexture");
+    if (textureIt != sit.MemberEnd())
+    {
+        ParseTextureInfo(textureIt->value, transmission.texture, extensionDeserializer);
+    }
+
+    ParseProperty(sit, transmission, extensionDeserializer);
+
+    return std::make_unique<Transmission>(transmission);
 }
 
 // KHR::MeshPrimitives::DracoMeshCompression
