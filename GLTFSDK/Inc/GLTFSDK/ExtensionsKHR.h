@@ -147,6 +147,25 @@ namespace Microsoft
 
                 std::string SerializeSheen(const Sheen& sheen, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer);
                 std::unique_ptr<Extension> DeserializeSheen(const std::string& json, const ExtensionDeserializer& extensionDeserializer);
+
+                constexpr const char* SPECULAR_NAME = "KHR_materials_specular";
+
+                // KHR_materials_specular
+                struct Specular : Extension, glTFProperty
+                {
+                    Specular();
+
+                    float factor;
+                    TextureInfo texture;
+                    Color3 colorFactor;
+                    TextureInfo colorTexture;
+
+                    std::unique_ptr<Extension> Clone() const override;
+                    bool IsEqual(const Extension& rhs) const override;
+                };
+
+                std::string SerializeSpecular(const Specular& specular, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer);
+                std::unique_ptr<Extension> DeserializeSpecular(const std::string& json, const ExtensionDeserializer& extensionDeserializer);
             }
 
             namespace MeshPrimitives

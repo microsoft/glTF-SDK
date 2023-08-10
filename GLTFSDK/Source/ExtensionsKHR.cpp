@@ -139,6 +139,7 @@ ExtensionSerializer KHR::GetKHRExtensionSerializer()
     extensionSerializer.AddHandler<Iridescence, Material>(IRIDESCENCE_NAME, SerializeIridescence);
     extensionSerializer.AddHandler<Transmission, Material>(TRANSMISSION_NAME, SerializeTransmission);
     extensionSerializer.AddHandler<Sheen, Material>(SHEEN_NAME, SerializeSheen);
+    extensionSerializer.AddHandler<Specular, Material>(SPECULAR_NAME, SerializeSpecular);
     extensionSerializer.AddHandler<DracoMeshCompression, MeshPrimitive>(DRACOMESHCOMPRESSION_NAME, SerializeDracoMeshCompression);
     extensionSerializer.AddHandler<MaterialsVariants, MeshPrimitive>(MATERIALSVARIANTS_NAME, SerializeMaterialsVariants);
     extensionSerializer.AddHandler<TextureTransform, TextureInfo>(TEXTURETRANSFORM_NAME, SerializeTextureTransform);
@@ -161,6 +162,7 @@ ExtensionDeserializer KHR::GetKHRExtensionDeserializer()
     extensionDeserializer.AddHandler<Iridescence, Material>(IRIDESCENCE_NAME, DeserializeIridescence);
     extensionDeserializer.AddHandler<Transmission, Material>(TRANSMISSION_NAME, DeserializeTransmission);
     extensionDeserializer.AddHandler<Sheen, Material>(SHEEN_NAME, DeserializeSheen);
+    extensionDeserializer.AddHandler<Specular, Material>(SPECULAR_NAME, DeserializeSpecular);
     extensionDeserializer.AddHandler<DracoMeshCompression, MeshPrimitive>(DRACOMESHCOMPRESSION_NAME, DeserializeDracoMeshCompression);
     extensionDeserializer.AddHandler<MaterialsVariants, MeshPrimitive>(MATERIALSVARIANTS_NAME, DeserializeMaterialsVariants);
     extensionDeserializer.AddHandler<TextureTransform, TextureInfo>(TEXTURETRANSFORM_NAME, DeserializeTextureTransform);
@@ -883,6 +885,116 @@ std::unique_ptr<Extension> KHR::Materials::DeserializeSheen(const std::string& j
     ParseProperty(sit, sheen, extensionDeserializer);
 
     return std::make_unique<Sheen>(sheen);
+}
+
+// KHR::Materials::Specular
+
+KHR::Materials::Specular::Specular() :
+    factor(0.0f),
+    colorFactor(1.0f, 1.0f, 1.0f)
+{
+}
+
+std::unique_ptr<Extension> KHR::Materials::Specular::Clone() const
+{
+    return std::make_unique<Specular>(*this);
+}
+
+bool KHR::Materials::Specular::IsEqual(const Extension& rhs) const
+{
+    const auto other = dynamic_cast<const Specular*>(&rhs);
+
+    return other != nullptr
+        && glTFProperty::Equals(*this, *other)
+        && this->colorFactor == other->colorFactor
+        && this->colorTexture == other->colorTexture
+        && this->factor == other->factor
+        && this->texture == other->texture;
+}
+
+std::string KHR::Materials::SerializeSpecular(const Materials::Specular& specular, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
+{
+    rapidjson::Document doc;
+    auto& a = doc.GetAllocator();
+    rapidjson::Value KHR_specular(rapidjson::kObjectType);
+    {
+        if (specular.factor != 0.0f)
+        {
+            KHR_specular.AddMember("specularFactor", RapidJsonUtils::ToFloatValue(specular.factor), a);
+        }
+
+        if (!specular.texture.textureId.empty())
+        {
+            rapidjson::Value texture(rapidjson::kObjectType);
+            SerializeTextureInfo(gltfDocument, specular.texture, texture, a, gltfDocument.textures, extensionSerializer);
+            KHR_specular.AddMember("specularTexture", texture, a);
+        }
+
+        if (specular.colorFactor != Color3(1.0f, 1.0f, 1.0f))
+        {
+            KHR_specular.AddMember("specularColorFactor", RapidJsonUtils::ToJsonArray(specular.colorFactor, a), a);
+        }
+
+        if (!specular.colorTexture.textureId.empty())
+        {
+            rapidjson::Value colorTexture(rapidjson::kObjectType);
+            SerializeTextureInfo(gltfDocument, specular.colorTexture, colorTexture, a, gltfDocument.textures, extensionSerializer);
+            KHR_specular.AddMember("specularColorTexture", colorTexture, a);
+        }
+
+        SerializeProperty(gltfDocument, specular, KHR_specular, a, extensionSerializer);
+    }
+
+    rapidjson::StringBuffer buffer;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+    KHR_specular.Accept(writer);
+
+    return buffer.GetString();
+}
+
+std::unique_ptr<Extension> KHR::Materials::DeserializeSpecular(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
+{
+    Materials::Specular specular;
+
+    auto doc = RapidJsonUtils::CreateDocumentFromString(json);
+    const auto sit = doc.GetObject();
+
+    // Specular Factor
+    const auto factorIt = sit.FindMember("specularFactor");
+    if (factorIt != sit.MemberEnd())
+    {
+        specular.factor = factorIt->value.GetFloat();
+    }
+
+    // Specular Texture
+    const auto textureIt = sit.FindMember("specularTexture");
+    if (textureIt != sit.MemberEnd())
+    {
+        ParseTextureInfo(textureIt->value, specular.texture, extensionDeserializer);
+    }
+
+    // Specular Color Factor
+    const auto colorFactorIt = sit.FindMember("specularColorFactor");
+    if (colorFactorIt != sit.MemberEnd())
+    {
+        std::vector<float> colorFactor;
+        for (rapidjson::Value::ConstValueIterator ait = colorFactorIt->value.Begin(); ait != colorFactorIt->value.End(); ++ait)
+        {
+            colorFactor.push_back(static_cast<float>(ait->GetDouble()));
+        }
+        specular.colorFactor = Color3(colorFactor[0], colorFactor[1], colorFactor[2]);
+    }
+
+    // Specular Color Texture
+    const auto colorTextureIt = sit.FindMember("specularColorTexture");
+    if (colorTextureIt != sit.MemberEnd())
+    {
+        ParseTextureInfo(colorTextureIt->value, specular.colorTexture, extensionDeserializer);
+    }
+
+    ParseProperty(sit, specular, extensionDeserializer);
+
+    return std::make_unique<Specular>(specular);
 }
 
 // KHR::MeshPrimitives::DracoMeshCompression
