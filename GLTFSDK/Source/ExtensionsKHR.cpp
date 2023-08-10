@@ -280,7 +280,11 @@ std::unique_ptr<Extension> KHR::Materials::DeserializePBRSpecGloss(const std::st
     }
 
     // Glossiness Factor
-    specGloss.glossinessFactor = GetMemberValueOrDefault<float>(sit, "glossinessFactor", 1.0f);
+    auto glossinessFactorIt = sit.FindMember("glossinessFactor");
+    if (glossinessFactorIt != sit.MemberEnd())
+    {
+        specGloss.glossinessFactor = glossinessFactorIt->value.GetFloat();
+    }
 
     // SpecularGlossinessTexture
     const auto specularGlossinessTextureIt = sit.FindMember("specularGlossinessTexture");
