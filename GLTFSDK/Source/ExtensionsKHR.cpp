@@ -1146,7 +1146,11 @@ std::unique_ptr<Extension> KHR::TextureInfos::DeserializeTextureTransform(const 
     }
 
     // Rotation
-    textureTransform.rotation = GetMemberValueOrDefault<float>(sit, "rotation", 0.0f);
+    auto rotationIt = sit.FindMember("rotation");
+    if (rotationIt != sit.MemberEnd())
+    {
+        textureTransform.rotation = rotationIt->value.GetFloat();
+    }
 
     // Scale
     auto scaleIt = sit.FindMember("scale");
