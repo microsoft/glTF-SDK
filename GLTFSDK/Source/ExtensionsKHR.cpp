@@ -138,6 +138,7 @@ ExtensionSerializer KHR::GetKHRExtensionSerializer()
     extensionSerializer.AddHandler<Volume, Material>(VOLUME_NAME, SerializeVolume);
     extensionSerializer.AddHandler<Iridescence, Material>(IRIDESCENCE_NAME, SerializeIridescence);
     extensionSerializer.AddHandler<Transmission, Material>(TRANSMISSION_NAME, SerializeTransmission);
+    extensionSerializer.AddHandler<Sheen, Material>(SHEEN_NAME, SerializeSheen);
     extensionSerializer.AddHandler<DracoMeshCompression, MeshPrimitive>(DRACOMESHCOMPRESSION_NAME, SerializeDracoMeshCompression);
     extensionSerializer.AddHandler<MaterialsVariants, MeshPrimitive>(MATERIALSVARIANTS_NAME, SerializeMaterialsVariants);
     extensionSerializer.AddHandler<TextureTransform, TextureInfo>(TEXTURETRANSFORM_NAME, SerializeTextureTransform);
@@ -159,6 +160,7 @@ ExtensionDeserializer KHR::GetKHRExtensionDeserializer()
     extensionDeserializer.AddHandler<Volume, Material>(VOLUME_NAME, DeserializeVolume);
     extensionDeserializer.AddHandler<Iridescence, Material>(IRIDESCENCE_NAME, DeserializeIridescence);
     extensionDeserializer.AddHandler<Transmission, Material>(TRANSMISSION_NAME, DeserializeTransmission);
+    extensionDeserializer.AddHandler<Sheen, Material>(SHEEN_NAME, DeserializeSheen);
     extensionDeserializer.AddHandler<DracoMeshCompression, MeshPrimitive>(DRACOMESHCOMPRESSION_NAME, DeserializeDracoMeshCompression);
     extensionDeserializer.AddHandler<MaterialsVariants, MeshPrimitive>(MATERIALSVARIANTS_NAME, DeserializeMaterialsVariants);
     extensionDeserializer.AddHandler<TextureTransform, TextureInfo>(TEXTURETRANSFORM_NAME, DeserializeTextureTransform);
@@ -767,6 +769,116 @@ std::unique_ptr<Extension> KHR::Materials::DeserializeTransmission(const std::st
     ParseProperty(sit, transmission, extensionDeserializer);
 
     return std::make_unique<Transmission>(transmission);
+}
+
+// KHR::Materials::Sheen
+
+KHR::Materials::Sheen::Sheen() :
+    colorFactor(0.0f, 0.0f, 0.0f),
+    roughnessFactor(0.0f)
+{
+}
+
+std::unique_ptr<Extension> KHR::Materials::Sheen::Clone() const
+{
+    return std::make_unique<Sheen>(*this);
+}
+
+bool KHR::Materials::Sheen::IsEqual(const Extension& rhs) const
+{
+    const auto other = dynamic_cast<const Sheen*>(&rhs);
+
+    return other != nullptr
+        && glTFProperty::Equals(*this, *other)
+        && this->colorFactor == other->colorFactor
+        && this->colorTexture == other->colorTexture
+        && this->roughnessFactor == other->roughnessFactor
+        && this->roughnessTexture == other->roughnessTexture;
+}
+
+std::string KHR::Materials::SerializeSheen(const Materials::Sheen& sheen, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
+{
+    rapidjson::Document doc;
+    auto& a = doc.GetAllocator();
+    rapidjson::Value KHR_sheen(rapidjson::kObjectType);
+    {
+        if (sheen.colorFactor != Color3(0.0f, 0.0f, 0.0f))
+        {
+            KHR_sheen.AddMember("sheenColorFactor", RapidJsonUtils::ToJsonArray(sheen.colorFactor, a), a);
+        }
+
+        if (!sheen.colorTexture.textureId.empty())
+        {
+            rapidjson::Value colorTexture(rapidjson::kObjectType);
+            SerializeTextureInfo(gltfDocument, sheen.colorTexture, colorTexture, a, gltfDocument.textures, extensionSerializer);
+            KHR_sheen.AddMember("sheenColorTexture", colorTexture, a);
+        }
+
+        if (sheen.roughnessFactor != 0.0f)
+        {
+            KHR_sheen.AddMember("sheenRoughnessFactor", RapidJsonUtils::ToFloatValue(sheen.roughnessFactor), a);
+        }
+
+        if (!sheen.roughnessTexture.textureId.empty())
+        {
+            rapidjson::Value roughnessTexture(rapidjson::kObjectType);
+            SerializeTextureInfo(gltfDocument, sheen.roughnessTexture, roughnessTexture, a, gltfDocument.textures, extensionSerializer);
+            KHR_sheen.AddMember("sheenRoughnessTexture", roughnessTexture, a);
+        }
+
+        SerializeProperty(gltfDocument, sheen, KHR_sheen, a, extensionSerializer);
+    }
+
+    rapidjson::StringBuffer buffer;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+    KHR_sheen.Accept(writer);
+
+    return buffer.GetString();
+}
+
+std::unique_ptr<Extension> KHR::Materials::DeserializeSheen(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
+{
+    Materials::Sheen sheen;
+
+    auto doc = RapidJsonUtils::CreateDocumentFromString(json);
+    const auto sit = doc.GetObject();
+
+    // Sheen Color Factor
+    const auto colorFactorIt = sit.FindMember("sheenColorFactor");
+    if (colorFactorIt != sit.MemberEnd())
+    {
+        std::vector<float> colorFactor;
+        for (rapidjson::Value::ConstValueIterator ait = colorFactorIt->value.Begin(); ait != colorFactorIt->value.End(); ++ait)
+        {
+            colorFactor.push_back(static_cast<float>(ait->GetDouble()));
+        }
+        sheen.colorFactor = Color3(colorFactor[0], colorFactor[1], colorFactor[2]);
+    }
+
+    // Sheen Color Texture
+    const auto colorTextureIt = sit.FindMember("sheenColorTexture");
+    if (colorTextureIt != sit.MemberEnd())
+    {
+        ParseTextureInfo(colorTextureIt->value, sheen.colorTexture, extensionDeserializer);
+    }
+
+    // Sheen Roughness Factor
+    const auto roughnessFactorIt = sit.FindMember("sheenRoughnessFactor");
+    if (roughnessFactorIt != sit.MemberEnd())
+    {
+        sheen.roughnessFactor = roughnessFactorIt->value.GetFloat();
+    }
+
+    // Sheen Roughness Texture
+    const auto roughnessTextureIt = sit.FindMember("sheenRoughnessTexture");
+    if (roughnessTextureIt != sit.MemberEnd())
+    {
+        ParseTextureInfo(roughnessTextureIt->value, sheen.roughnessTexture, extensionDeserializer);
+    }
+
+    ParseProperty(sit, sheen, extensionDeserializer);
+
+    return std::make_unique<Sheen>(sheen);
 }
 
 // KHR::MeshPrimitives::DracoMeshCompression
