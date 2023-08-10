@@ -136,6 +136,7 @@ ExtensionSerializer KHR::GetKHRExtensionSerializer()
     extensionSerializer.AddHandler<Unlit, Material>(UNLIT_NAME, SerializeUnlit);
     extensionSerializer.AddHandler<Clearcoat, Material>(CLEARCOAT_NAME, SerializeClearcoat);
     extensionSerializer.AddHandler<Volume, Material>(VOLUME_NAME, SerializeVolume);
+    extensionSerializer.AddHandler<Iridescence, Material>(IRIDESCENCE_NAME, SerializeIridescence);
     extensionSerializer.AddHandler<DracoMeshCompression, MeshPrimitive>(DRACOMESHCOMPRESSION_NAME, SerializeDracoMeshCompression);
     extensionSerializer.AddHandler<MaterialsVariants, MeshPrimitive>(MATERIALSVARIANTS_NAME, SerializeMaterialsVariants);
     extensionSerializer.AddHandler<TextureTransform, TextureInfo>(TEXTURETRANSFORM_NAME, SerializeTextureTransform);
@@ -155,6 +156,7 @@ ExtensionDeserializer KHR::GetKHRExtensionDeserializer()
     extensionDeserializer.AddHandler<Unlit, Material>(UNLIT_NAME, DeserializeUnlit);
     extensionDeserializer.AddHandler<Clearcoat, Material>(CLEARCOAT_NAME, DeserializeClearcoat);
     extensionDeserializer.AddHandler<Volume, Material>(VOLUME_NAME, DeserializeVolume);
+    extensionDeserializer.AddHandler<Iridescence, Material>(IRIDESCENCE_NAME, DeserializeIridescence);
     extensionDeserializer.AddHandler<DracoMeshCompression, MeshPrimitive>(DRACOMESHCOMPRESSION_NAME, DeserializeDracoMeshCompression);
     extensionDeserializer.AddHandler<MaterialsVariants, MeshPrimitive>(MATERIALSVARIANTS_NAME, DeserializeMaterialsVariants);
     extensionDeserializer.AddHandler<TextureTransform, TextureInfo>(TEXTURETRANSFORM_NAME, DeserializeTextureTransform);
@@ -548,6 +550,139 @@ std::unique_ptr<Extension> KHR::Materials::DeserializeVolume(const std::string& 
     ParseProperty(sit, volume, extensionDeserializer);
 
     return std::make_unique<Volume>(volume);
+}
+
+// KHR::Materials::Iridescence
+
+KHR::Materials::Iridescence::Iridescence() :
+    factor(0.0f),
+    ior(1.3f),
+    thicknessMin(100.0f),
+    thicknessMax(400.0f)
+{
+}
+
+std::unique_ptr<Extension> KHR::Materials::Iridescence::Clone() const
+{
+    return std::make_unique<Iridescence>(*this);
+}
+
+bool KHR::Materials::Iridescence::IsEqual(const Extension& rhs) const
+{
+    const auto other = dynamic_cast<const Iridescence*>(&rhs);
+
+    return other != nullptr
+        && glTFProperty::Equals(*this, *other)
+        && this->factor == other->factor
+        && this->texture == other->texture
+        && this->ior == other->ior
+        && this->thicknessMin == other->thicknessMin
+        && this->thicknessMax == other->thicknessMax
+        && this->thicknessTexture == other->thicknessTexture;
+}
+
+std::string KHR::Materials::SerializeIridescence(const Materials::Iridescence& iridescence, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
+{
+    rapidjson::Document doc;
+    auto& a = doc.GetAllocator();
+    rapidjson::Value KHR_iridescence(rapidjson::kObjectType);
+    {
+        if (iridescence.factor != 0.0f)
+        {
+            KHR_iridescence.AddMember("iridescenceFactor", RapidJsonUtils::ToFloatValue(iridescence.factor), a);
+        }
+
+        if (!iridescence.texture.textureId.empty())
+        {
+            rapidjson::Value texture(rapidjson::kObjectType);
+            SerializeTextureInfo(gltfDocument, iridescence.texture, texture, a, gltfDocument.textures, extensionSerializer);
+            KHR_iridescence.AddMember("iridescenceTexture", texture, a);
+        }
+
+        if (iridescence.ior != 1.3f)
+        {
+            KHR_iridescence.AddMember("iridescenceIor", RapidJsonUtils::ToFloatValue(iridescence.ior), a);
+        }
+
+        if (iridescence.thicknessMin != 100.0f)
+        {
+            KHR_iridescence.AddMember("iridescenceThicknessMinimum", RapidJsonUtils::ToFloatValue(iridescence.thicknessMin), a);
+        }
+
+        if (iridescence.thicknessMax != 400.0f)
+        {
+            KHR_iridescence.AddMember("iridescenceThicknessMaximum", RapidJsonUtils::ToFloatValue(iridescence.thicknessMax), a);
+        }
+
+        if (!iridescence.thicknessTexture.textureId.empty())
+        {
+            rapidjson::Value thicknessTexture(rapidjson::kObjectType);
+            SerializeTextureInfo(gltfDocument, iridescence.thicknessTexture, thicknessTexture, a, gltfDocument.textures, extensionSerializer);
+            KHR_iridescence.AddMember("iridescenceThicknessTexture", thicknessTexture, a);
+        }
+
+        SerializeProperty(gltfDocument, iridescence, KHR_iridescence, a, extensionSerializer);
+    }
+
+    rapidjson::StringBuffer buffer;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+    KHR_iridescence.Accept(writer);
+
+    return buffer.GetString();
+}
+
+std::unique_ptr<Extension> KHR::Materials::DeserializeIridescence(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
+{
+    Materials::Iridescence iridescence;
+
+    auto doc = RapidJsonUtils::CreateDocumentFromString(json);
+    const auto sit = doc.GetObject();
+
+    // Iridescence Factor
+    const auto factorIt = sit.FindMember("iridescenceFactor");
+    if (factorIt != sit.MemberEnd())
+    {
+        iridescence.factor = factorIt->value.GetFloat();
+    }
+
+    // Iridescence Texture
+    const auto textureIt = sit.FindMember("iridescenceTexture");
+    if (textureIt != sit.MemberEnd())
+    {
+        ParseTextureInfo(textureIt->value, iridescence.texture, extensionDeserializer);
+    }
+
+    // IOR
+    const auto iorIt = sit.FindMember("iridescenceIor");
+    if (iorIt != sit.MemberEnd())
+    {
+        iridescence.ior = iorIt->value.GetFloat();
+    }
+
+    // Thickness Minimum
+    const auto thicknessMinIt = sit.FindMember("iridescenceThicknessMinimum");
+    if (thicknessMinIt != sit.MemberEnd())
+    {
+        iridescence.thicknessMin = thicknessMinIt->value.GetFloat();
+    }
+
+    // Thickness Maximum
+    const auto thicknessMaxIt = sit.FindMember("iridescenceThicknessMaximum");
+    if (thicknessMaxIt != sit.MemberEnd())
+    {
+        iridescence.thicknessMax = thicknessMaxIt->value.GetFloat();
+    }
+
+    // Thickness Texture
+    const auto thicknessTextureIt = sit.FindMember("iridescenceThicknessTexture");
+    if (thicknessTextureIt != sit.MemberEnd())
+    {
+        ParseTextureInfo(thicknessTextureIt->value, iridescence.thicknessTexture, extensionDeserializer);
+    }
+
+    ParseProperty(sit, iridescence, extensionDeserializer);
+
+    return std::make_unique<Iridescence>(iridescence);
 }
 
 // KHR::MeshPrimitives::DracoMeshCompression

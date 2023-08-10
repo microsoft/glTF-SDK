@@ -90,6 +90,27 @@ namespace Microsoft
 
                 std::string SerializeVolume(const Volume& volume, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer);
                 std::unique_ptr<Extension> DeserializeVolume(const std::string& json, const ExtensionDeserializer& extensionDeserializer);
+
+                constexpr const char* IRIDESCENCE_NAME = "KHR_materials_iridescence";
+
+                // KHR_materials_iridescence
+                struct Iridescence : Extension, glTFProperty
+                {
+                    Iridescence();
+
+                    float factor;
+                    TextureInfo texture;
+                    float ior;
+                    float thicknessMin;
+                    float thicknessMax;
+                    TextureInfo thicknessTexture;
+
+                    std::unique_ptr<Extension> Clone() const override;
+                    bool IsEqual(const Extension& rhs) const override;
+                };
+
+                std::string SerializeIridescence(const Iridescence& iridescence, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer);
+                std::unique_ptr<Extension> DeserializeIridescence(const std::string& json, const ExtensionDeserializer& extensionDeserializer);
             }
 
             namespace MeshPrimitives
