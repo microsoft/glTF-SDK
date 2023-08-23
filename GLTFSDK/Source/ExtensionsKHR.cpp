@@ -129,6 +129,7 @@ ExtensionSerializer KHR::GetKHRExtensionSerializer()
 {
     using namespace Materials;
     using namespace MeshPrimitives;
+    using namespace Nodes;
     using namespace TextureInfos;
 
     ExtensionSerializer extensionSerializer;
@@ -142,6 +143,7 @@ ExtensionSerializer KHR::GetKHRExtensionSerializer()
     extensionSerializer.AddHandler<Specular, Material>(SPECULAR_NAME, SerializeSpecular);
     extensionSerializer.AddHandler<DracoMeshCompression, MeshPrimitive>(DRACOMESHCOMPRESSION_NAME, SerializeDracoMeshCompression);
     extensionSerializer.AddHandler<MaterialsVariants, MeshPrimitive>(MATERIALSVARIANTS_NAME, SerializeMaterialsVariants);
+    extensionSerializer.AddHandler<MeshGPUInstancing, Node>(MESHGPUINSTANCING_NAME, SerializeMeshGPUInstancing);
     extensionSerializer.AddHandler<TextureTransform, TextureInfo>(TEXTURETRANSFORM_NAME, SerializeTextureTransform);
     extensionSerializer.AddHandler<TextureTransform, Material::NormalTextureInfo>(TEXTURETRANSFORM_NAME, SerializeTextureTransform);
     extensionSerializer.AddHandler<TextureTransform, Material::OcclusionTextureInfo>(TEXTURETRANSFORM_NAME, SerializeTextureTransform);
@@ -152,6 +154,7 @@ ExtensionDeserializer KHR::GetKHRExtensionDeserializer()
 {
     using namespace Materials;
     using namespace MeshPrimitives;
+    using namespace Nodes;
     using namespace TextureInfos;
 
     ExtensionDeserializer extensionDeserializer;
@@ -165,6 +168,7 @@ ExtensionDeserializer KHR::GetKHRExtensionDeserializer()
     extensionDeserializer.AddHandler<Specular, Material>(SPECULAR_NAME, DeserializeSpecular);
     extensionDeserializer.AddHandler<DracoMeshCompression, MeshPrimitive>(DRACOMESHCOMPRESSION_NAME, DeserializeDracoMeshCompression);
     extensionDeserializer.AddHandler<MaterialsVariants, MeshPrimitive>(MATERIALSVARIANTS_NAME, DeserializeMaterialsVariants);
+    extensionDeserializer.AddHandler<MeshGPUInstancing, Node>(MESHGPUINSTANCING_NAME, DeserializeMeshGPUInstancing);
     extensionDeserializer.AddHandler<TextureTransform, TextureInfo>(TEXTURETRANSFORM_NAME, DeserializeTextureTransform);
     extensionDeserializer.AddHandler<TextureTransform, Material::NormalTextureInfo>(TEXTURETRANSFORM_NAME, DeserializeTextureTransform);
     extensionDeserializer.AddHandler<TextureTransform, Material::OcclusionTextureInfo>(TEXTURETRANSFORM_NAME, DeserializeTextureTransform);
@@ -1163,6 +1167,73 @@ std::unique_ptr<Extension> KHR::MeshPrimitives::DeserializeMaterialsVariants(con
     ParseProperty(v, *extension, extensionDeserializer);
 
     return extension;
+}
+
+// KHR::Nodes::MeshGPUInstancing
+
+KHR::Nodes::MeshGPUInstancing::MeshGPUInstancing()
+{
+}
+
+std::unique_ptr<Extension> KHR::Nodes::MeshGPUInstancing::Clone() const
+{
+    return std::make_unique<MeshGPUInstancing>(*this);
+}
+
+bool KHR::Nodes::MeshGPUInstancing::IsEqual(const Extension& rhs) const
+{
+    const auto other = dynamic_cast<const MeshGPUInstancing*>(&rhs);
+
+    return other != nullptr
+        && glTFProperty::Equals(*this, *other);
+}
+
+std::string KHR::Nodes::SerializeMeshGPUInstancing(const Nodes::MeshGPUInstancing& instancing, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
+{
+    rapidjson::Document doc;
+    auto& a = doc.GetAllocator();
+    rapidjson::Value EXT_instancing(rapidjson::kObjectType);
+
+    rapidjson::Value attributes(rapidjson::kObjectType);
+
+    for (const auto& attribute : instancing.attributes)
+    {
+        attributes.AddMember(RapidJsonUtils::ToStringValue(attribute.first, a), rapidjson::Value(ToKnownSizeType(gltfDocument.accessors.GetIndex(attribute.second))), a);
+    }
+
+    EXT_instancing.AddMember("attributes", attributes, a);
+
+    SerializeProperty(gltfDocument, instancing, EXT_instancing, a, extensionSerializer);
+
+    rapidjson::StringBuffer buffer;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+    EXT_instancing.Accept(writer);
+
+    return buffer.GetString();
+}
+
+std::unique_ptr<Extension> KHR::Nodes::DeserializeMeshGPUInstancing(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
+{
+    Nodes::MeshGPUInstancing instancing;
+
+    auto doc = RapidJsonUtils::CreateDocumentFromString(json);
+    const auto sit = doc.GetObject();
+
+    const auto attributesIt = sit.FindMember("attributes");
+    if (attributesIt != sit.MemberEnd())
+    {
+        const auto& attributes = attributesIt->value.GetObject();
+
+        for (const auto& attribute : attributes)
+        {
+            auto name = attribute.name.GetString();
+            instancing.attributes[name] = std::to_string(attribute.value.Get<uint32_t>());
+        }
+    }
+
+    ParseProperty(sit, instancing, extensionDeserializer);
+
+    return std::make_unique<MeshGPUInstancing>(instancing);
 }
 
 // KHR::TextureInfos::TextureTransform

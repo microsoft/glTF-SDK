@@ -213,6 +213,25 @@ namespace Microsoft
                 std::unique_ptr<Extension> DeserializeMaterialsVariants(const std::string& json, const ExtensionDeserializer& extensionDeserializer);
             }
 
+            namespace Nodes
+            {
+                constexpr const char* MESHGPUINSTANCING_NAME = "EXT_mesh_gpu_instancing";
+
+                // EXT_mesh_gpu_instancing
+                struct MeshGPUInstancing : Extension, glTFProperty
+                {
+                    MeshGPUInstancing();
+
+                    std::unordered_map<std::string, std::string> attributes;
+
+                    std::unique_ptr<Extension> Clone() const override;
+                    bool IsEqual(const Extension& rhs) const override;
+                };
+
+                std::string SerializeMeshGPUInstancing(const MeshGPUInstancing& meshGPUInstancing, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer);
+                std::unique_ptr<Extension> DeserializeMeshGPUInstancing(const std::string& json, const ExtensionDeserializer& extensionDeserializer);
+            }
+
             namespace TextureInfos
             {
                 constexpr const char* TEXTURETRANSFORM_NAME = "KHR_texture_transform";
