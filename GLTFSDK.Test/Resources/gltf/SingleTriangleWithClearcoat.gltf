@@ -79,13 +79,13 @@
 			},
 			"name": "DefaultMaterial",
 			"extensions": {
-                "KHR_materials_clearcoat": {
-                    "clearcoatFactor": 1,
-                    "clearcoatTexture": {
-                        "index": 1,
-                        "texCoord": 0
-                    }
-                }
+				"KHR_materials_clearcoat": {
+					"clearcoatFactor": 1,
+					"clearcoatTexture": {
+						"index": 1,
+						"texCoord": 0
+					}
+				}
 			}
 		}
 	],
