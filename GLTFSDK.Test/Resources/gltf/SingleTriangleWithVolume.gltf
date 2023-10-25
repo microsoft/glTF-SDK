@@ -1,0 +1,127 @@
+{
+	"asset": {
+		"version": "2.0",
+		"generator": "Microsoft GLTF Exporter 2.1.2-b21"
+	},
+	"accessors": [{
+			"bufferView": 0,
+			"byteOffset": 0,
+			"componentType": 5123,
+			"count": 3,
+			"type": "SCALAR",
+			"max": [2.0],
+			"min": [0.0]
+		}, {
+			"bufferView": 1,
+			"byteOffset": 2,
+			"componentType": 5126,
+			"count": 3,
+			"type": "VEC3",
+			"max": [1.0, 1.0, 1.0],
+			"min": [0.0, 0.0, 0.0]
+		}, {
+			"bufferView": 2,
+			"byteOffset": 0,
+			"componentType": 5126,
+			"count": 3,
+			"type": "VEC3",
+			"max": [-0.5773502588272095, -0.5773502588272095, -0.5773502588272095],
+			"min": [-0.5773502588272095, -0.5773502588272095, -0.5773502588272095]
+		}
+	],
+	"bufferViews": [{
+			"buffer": 0,
+			"byteLength": 6,
+			"byteOffset": 0,
+			"target": 34963
+		}, {
+			"buffer": 0,
+			"byteLength": 38,
+			"byteOffset": 6,
+			"target": 34962
+		}, {
+			"buffer": 0,
+			"byteLength": 36,
+			"byteOffset": 44,
+			"target": 34962
+		}, {
+			"buffer": 0,
+			"byteLength": 205,
+			"byteOffset": 80,
+			"target": 34962
+		}
+	],
+	"buffers": [{
+			"byteLength": 707
+		}
+	],
+	"images": [{
+			"bufferView": 3,
+			"mimeType": "image/png"
+		}
+	],
+	"materials": [{
+			"pbrMetallicRoughness": {
+				"metallicFactor": 0.0,
+				"roughnessFactor": 0.0
+			},
+			"name": "DefaultMaterial",
+			"extensions": {
+				"KHR_materials_transmission": {
+					"transmissionFactor": 1
+				},
+				"KHR_materials_volume": {
+					"attenuationColor": [
+						0.1,
+						0.5,
+						0.9
+					],
+					"attenuationDistance": 1,
+					"thicknessFactor": 0.5,
+					"thicknessTexture": {
+						"index": 0,
+						"texCoord": 1
+					}
+				}
+			}
+		}
+	],
+	"meshes": [{
+			"name": "triangle",
+			"primitives": [{
+					"attributes": {
+						"NORMAL": 2,
+						"POSITION": 1
+					},
+					"indices": 0,
+					"material": 0,
+					"mode": 4
+				}
+			]
+		}
+	],
+	"nodes": [{
+			"mesh": 0,
+			"name": "triangle"
+		}, {
+			"children": [0],
+			"name": "root"
+		}
+	],
+	"samplers": [{
+			"minFilter": 9985
+		}
+	],
+	"scenes": [{
+			"nodes": [1]
+		}
+	],
+	"scene": 0,
+	"textures": [{
+			"name": "DefaultTexture",
+			"sampler": 0,
+			"source": 0
+		}
+	],
+	"extensionsUsed": ["KHR_materials_transmission", "KHR_materials_volume"]
+}

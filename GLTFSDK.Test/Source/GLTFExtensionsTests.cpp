@@ -623,6 +623,41 @@ namespace Microsoft
                     Assert::IsTrue(doc == outputDoc, L"Input gltf and output gltf are not equal");
                 }
 
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_HasVolumeExtension)
+                {
+                    const auto inputJson = ReadLocalJson(c_singleTriangleWithVolumeJson);
+
+                    const auto extensionDeserializer = KHR::GetKHRExtensionDeserializer();
+                    auto doc = Deserialize(inputJson, extensionDeserializer);
+
+                    Assert::IsTrue(doc.materials[0].HasExtension<KHR::Materials::Volume>());
+
+                    auto& volume = doc.materials[0].GetExtension<KHR::Materials::Volume>();
+
+                    Assert::AreEqual(volume.attenuationColor, Color3(0.1f, 0.5f, 0.9f));
+                    Assert::AreEqual(volume.attenuationDistance, 1.0f);
+                    Assert::AreEqual(volume.thicknessFactor, 0.5f);
+                    Assert::AreEqual(volume.thicknessTexture.textureId.c_str(), "0");
+                    Assert::AreEqual(volume.thicknessTexture.texCoord, 1);
+                }
+
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_RoundTrip_and_Equality_Volume)
+                {
+                    const auto inputJson = ReadLocalJson(c_singleTriangleWithVolumeJson);
+
+                    const auto extensionDeserializer = KHR::GetKHRExtensionDeserializer();
+                    const auto extensionSerializer = KHR::GetKHRExtensionSerializer();
+
+                    auto doc = Deserialize(inputJson, extensionDeserializer);
+
+                    // Serialize GLTFDocument back to json
+                    auto outputJson = Serialize(doc, extensionSerializer);
+                    auto outputDoc = Deserialize(outputJson, extensionDeserializer);
+
+                    // Compare input and output GLTFDocuments
+                    Assert::IsTrue(doc == outputDoc, L"Input gltf and output gltf are not equal");
+                }
+
                 GLTFSDK_TEST_METHOD(ExtensionsTests, ExtensionSerializerAddHandler)
                 {
                     Node node;
