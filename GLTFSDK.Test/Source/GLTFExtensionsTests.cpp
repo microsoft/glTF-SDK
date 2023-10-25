@@ -606,6 +606,23 @@ namespace Microsoft
                     Assert::AreEqual(clearcoat.texture.texCoord, 0);
                 }
 
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_RoundTrip_and_Equality_Clearcoat)
+                {
+                    const auto inputJson = ReadLocalJson(c_singleTriangleWithClearcoatJson);
+
+                    const auto extensionDeserializer = KHR::GetKHRExtensionDeserializer();
+                    const auto extensionSerializer = KHR::GetKHRExtensionSerializer();
+
+                    auto doc = Deserialize(inputJson, extensionDeserializer);
+
+                    // Serialize GLTFDocument back to json
+                    auto outputJson = Serialize(doc, extensionSerializer);
+                    auto outputDoc = Deserialize(outputJson, extensionDeserializer);
+
+                    // Compare input and output GLTFDocuments
+                    Assert::IsTrue(doc == outputDoc, L"Input gltf and output gltf are not equal");
+                }
+
                 GLTFSDK_TEST_METHOD(ExtensionsTests, ExtensionSerializerAddHandler)
                 {
                     Node node;
