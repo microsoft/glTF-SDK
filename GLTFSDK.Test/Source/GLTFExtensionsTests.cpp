@@ -590,6 +590,22 @@ namespace Microsoft
                     Assert::IsTrue(doc == outputDoc, L"Input gltf and output gltf are not equal");
                 }
 
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_HasClearcoatExtension)
+                {
+                    const auto inputJson = ReadLocalJson(c_singleTriangleWithClearcoatJson);
+
+                    const auto extensionDeserializer = KHR::GetKHRExtensionDeserializer();
+                    auto doc = Deserialize(inputJson, extensionDeserializer);
+
+                    Assert::IsTrue(doc.materials[0].HasExtension<KHR::Materials::Clearcoat>());
+
+                    auto& clearcoat = doc.materials[0].GetExtension<KHR::Materials::Clearcoat>();
+
+                    Assert::AreEqual(clearcoat.factor, 1.0f);
+                    Assert::AreEqual(clearcoat.texture.textureId.c_str(), "1");
+                    Assert::AreEqual(clearcoat.texture.texCoord, 0);
+                }
+
                 GLTFSDK_TEST_METHOD(ExtensionsTests, ExtensionSerializerAddHandler)
                 {
                     Node node;
