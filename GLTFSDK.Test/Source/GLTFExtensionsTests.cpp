@@ -603,7 +603,9 @@ namespace Microsoft
 
                     Assert::AreEqual(clearcoat.factor, 1.0f);
                     Assert::AreEqual(clearcoat.texture.textureId.c_str(), "1");
-                    Assert::AreEqual(clearcoat.texture.texCoord, 0);
+                    Assert::AreEqual(clearcoat.roughnessFactor, 0.1f);
+                    Assert::AreEqual(clearcoat.roughnessTexture.textureId.c_str(), "0");
+                    Assert::AreEqual(clearcoat.normalTexture.textureId.c_str(), "1");
                 }
 
                 GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_RoundTrip_and_Equality_Clearcoat)

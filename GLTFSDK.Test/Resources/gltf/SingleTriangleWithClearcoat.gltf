@@ -82,8 +82,14 @@
 				"KHR_materials_clearcoat": {
 					"clearcoatFactor": 1,
 					"clearcoatTexture": {
-						"index": 1,
-						"texCoord": 0
+						"index": 1
+					},
+					"clearcoatRoughnessFactor": 0.1,
+					"clearcoatRoughnessTexture": {
+						"index": 0
+					},
+					"clearcoatNormalTexture": {
+						"index": 1
 					}
 				}
 			}
