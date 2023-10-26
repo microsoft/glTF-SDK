@@ -642,7 +642,22 @@ namespace Microsoft
                     Assert::AreEqual(volume.thicknessTexture.textureId.c_str(), "0");
                 }
 
-                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_RoundTrip_and_Equality_Volume)
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_HasTransmissionExtension)
+                {
+                    const auto inputJson = ReadLocalJson(c_singleTriangleWithVolumeJson);
+
+                    const auto extensionDeserializer = KHR::GetKHRExtensionDeserializer();
+                    auto doc = Deserialize(inputJson, extensionDeserializer);
+
+                    Assert::IsTrue(doc.materials[0].HasExtension<KHR::Materials::Transmission>());
+
+                    auto& transmission = doc.materials[0].GetExtension<KHR::Materials::Transmission>();
+
+                    Assert::AreEqual(transmission.factor, 1.0f);
+                    Assert::AreEqual(transmission.texture.textureId.c_str(), "0");
+                }
+
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_RoundTrip_and_Equality_Transmission_and_Volume)
                 {
                     const auto inputJson = ReadLocalJson(c_singleTriangleWithVolumeJson);
 

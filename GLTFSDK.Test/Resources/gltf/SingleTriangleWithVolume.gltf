@@ -68,7 +68,10 @@
 			"name": "DefaultMaterial",
 			"extensions": {
 				"KHR_materials_transmission": {
-					"transmissionFactor": 1
+					"transmissionFactor": 1,
+					"transmissionTexture": {
+						"index": 0
+					}
 				},
 				"KHR_materials_volume": {
 					"attenuationColor": [
