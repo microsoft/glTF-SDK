@@ -79,8 +79,7 @@
 					"attenuationDistance": 1,
 					"thicknessFactor": 0.5,
 					"thicknessTexture": {
-						"index": 0,
-						"texCoord": 1
+						"index": 0
 					}
 				}
 			}

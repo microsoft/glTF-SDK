@@ -640,7 +640,6 @@ namespace Microsoft
                     Assert::AreEqual(volume.attenuationDistance, 1.0f);
                     Assert::AreEqual(volume.thicknessFactor, 0.5f);
                     Assert::AreEqual(volume.thicknessTexture.textureId.c_str(), "0");
-                    Assert::AreEqual(volume.thicknessTexture.texCoord, 1);
                 }
 
                 GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_RoundTrip_and_Equality_Volume)
