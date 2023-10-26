@@ -744,6 +744,40 @@ namespace Microsoft
                     Assert::IsTrue(doc == outputDoc, L"Input gltf and output gltf are not equal");
                 }
 
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_HasSpecularExtension)
+                {
+                    const auto inputJson = ReadLocalJson(c_singleTriangleWithSpecularJson);
+
+                    const auto extensionDeserializer = KHR::GetKHRExtensionDeserializer();
+                    auto doc = Deserialize(inputJson, extensionDeserializer);
+
+                    Assert::IsTrue(doc.materials[0].HasExtension<KHR::Materials::Specular>());
+
+                    auto& specular = doc.materials[0].GetExtension<KHR::Materials::Specular>();
+
+                    Assert::AreEqual(specular.factor, 0.4f);
+                    Assert::AreEqual(specular.texture.textureId.c_str(), "0");
+                    Assert::AreEqual(specular.colorFactor, Color3(0.1f, 0.2f, 0.3f));
+                    Assert::AreEqual(specular.colorTexture.textureId.c_str(), "1");
+                }
+
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_RoundTrip_and_Equality_Specular)
+                {
+                    const auto inputJson = ReadLocalJson(c_singleTriangleWithSpecularJson);
+
+                    const auto extensionDeserializer = KHR::GetKHRExtensionDeserializer();
+                    const auto extensionSerializer = KHR::GetKHRExtensionSerializer();
+
+                    auto doc = Deserialize(inputJson, extensionDeserializer);
+
+                    // Serialize GLTFDocument back to json
+                    auto outputJson = Serialize(doc, extensionSerializer);
+                    auto outputDoc = Deserialize(outputJson, extensionDeserializer);
+
+                    // Compare input and output GLTFDocuments
+                    Assert::IsTrue(doc == outputDoc, L"Input gltf and output gltf are not equal");
+                }
+
                 GLTFSDK_TEST_METHOD(ExtensionsTests, ExtensionSerializerAddHandler)
                 {
                     Node node;
