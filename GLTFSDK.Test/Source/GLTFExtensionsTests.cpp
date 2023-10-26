@@ -658,6 +658,42 @@ namespace Microsoft
                     // Compare input and output GLTFDocuments
                     Assert::IsTrue(doc == outputDoc, L"Input gltf and output gltf are not equal");
                 }
+                
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_HasIridescenceExtension)
+                {
+                    const auto inputJson = ReadLocalJson(c_singleTriangleWithIridescenceJson);
+
+                    const auto extensionDeserializer = KHR::GetKHRExtensionDeserializer();
+                    auto doc = Deserialize(inputJson, extensionDeserializer);
+
+                    Assert::IsTrue(doc.materials[0].HasExtension<KHR::Materials::Iridescence>());
+
+                    auto& iridescence = doc.materials[0].GetExtension<KHR::Materials::Iridescence>();
+
+                    Assert::AreEqual(iridescence.factor, 0.9f);
+                    Assert::AreEqual(iridescence.ior, 1.3f);
+                    Assert::AreEqual(iridescence.thicknessMax, 400.0f);
+                    Assert::AreEqual(iridescence.thicknessMin, 150.0f);
+                    Assert::AreEqual(iridescence.texture.textureId.c_str(), "0");
+                    Assert::AreEqual(iridescence.thicknessTexture.textureId.c_str(), "1");
+                }
+
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_RoundTrip_and_Equality_Iridescence)
+                {
+                    const auto inputJson = ReadLocalJson(c_singleTriangleWithIridescenceJson);
+
+                    const auto extensionDeserializer = KHR::GetKHRExtensionDeserializer();
+                    const auto extensionSerializer = KHR::GetKHRExtensionSerializer();
+
+                    auto doc = Deserialize(inputJson, extensionDeserializer);
+
+                    // Serialize GLTFDocument back to json
+                    auto outputJson = Serialize(doc, extensionSerializer);
+                    auto outputDoc = Deserialize(outputJson, extensionDeserializer);
+
+                    // Compare input and output GLTFDocuments
+                    Assert::IsTrue(doc == outputDoc, L"Input gltf and output gltf are not equal");
+                }
 
                 GLTFSDK_TEST_METHOD(ExtensionsTests, ExtensionSerializerAddHandler)
                 {
