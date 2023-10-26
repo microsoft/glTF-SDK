@@ -44,6 +44,7 @@ namespace Microsoft
             constexpr const char* c_singlePolyWithNormalsJson         = "Resources\\gltf\\SinglePolyWithNormals.gltf";
             constexpr const char* c_singleTriangleJson                = "Resources\\gltf\\SingleTriangle.gltf";
             constexpr const char* c_singleTriangleWithClearcoatJson   = "Resources\\gltf\\SingleTriangleWithClearcoat.gltf";
+            constexpr const char* c_singleTriangleWithInstancingJson  = "Resources\\gltf\\SingleTriangleWithInstancing.gltf";
             constexpr const char* c_singleTriangleWithIridescenceJson = "Resources\\gltf\\SingleTriangleWithIridescence.gltf";
             constexpr const char* c_singleTriangleWithSheenJson       = "Resources\\gltf\\SingleTriangleWithSheen.gltf";
             constexpr const char* c_singleTriangleWithSpecularJson    = "Resources\\gltf\\SingleTriangleWithSpecular.gltf";

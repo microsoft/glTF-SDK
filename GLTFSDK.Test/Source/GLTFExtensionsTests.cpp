@@ -778,6 +778,40 @@ namespace Microsoft
                     Assert::IsTrue(doc == outputDoc, L"Input gltf and output gltf are not equal");
                 }
 
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_HasInstancing)
+                {
+                    const auto inputJson = ReadLocalJson(c_singleTriangleWithInstancingJson);
+
+                    const auto extensionDeserializer = KHR::GetKHRExtensionDeserializer();
+                    auto doc = Deserialize(inputJson, extensionDeserializer);
+
+                    Assert::IsTrue(doc.nodes[0].HasExtension<KHR::Nodes::MeshGPUInstancing>());
+
+                    auto instancing = doc.nodes[0].GetExtension<KHR::Nodes::MeshGPUInstancing>();
+
+                    Assert::AreEqual(instancing.attributes.size(), 3);
+                    Assert::AreEqual(instancing.attributes[ACCESSOR_TRANSLATION].c_str(), "0");
+                    Assert::AreEqual(instancing.attributes[ACCESSOR_ROTATION].c_str(), "1");
+                    Assert::AreEqual(instancing.attributes[ACCESSOR_SCALE].c_str(), "2");
+                }
+
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_RoundTrip_and_Equality_Instancing)
+                {
+                    const auto inputJson = ReadLocalJson(c_singleTriangleWithInstancingJson);
+
+                    const auto extensionDeserializer = KHR::GetKHRExtensionDeserializer();
+                    const auto extensionSerializer = KHR::GetKHRExtensionSerializer();
+
+                    auto doc = Deserialize(inputJson, extensionDeserializer);
+
+                    // Serialize GLTFDocument back to json
+                    auto outputJson = Serialize(doc, extensionSerializer);
+                    auto outputDoc = Deserialize(outputJson, extensionDeserializer);
+
+                    // Compare input and output GLTFDocuments
+                    Assert::IsTrue(doc == outputDoc, L"Input gltf and output gltf are not equal");
+                }
+
                 GLTFSDK_TEST_METHOD(ExtensionsTests, ExtensionSerializerAddHandler)
                 {
                     Node node;
