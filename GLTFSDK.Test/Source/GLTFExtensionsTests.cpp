@@ -310,12 +310,12 @@ namespace Microsoft
                     Assert::AreEqual(doc.meshes[0].primitives.size(), size_t(1));
                     Assert::AreEqual(doc.meshes[0].primitives[0].GetExtensions().size(), size_t(1));
 
-                    auto draco = doc.meshes[0].primitives[0].GetExtension<KHR::MeshPrimitives::DracoMeshCompression>();
+                    auto& draco = doc.meshes[0].primitives[0].GetExtension<KHR::MeshPrimitives::DracoMeshCompression>();
 
                     Assert::AreEqual<std::string>(draco.bufferViewId, "0");
                     Assert::AreEqual<size_t>(draco.attributes.size(), 2);
-                    Assert::AreEqual<size_t>(draco.attributes[ACCESSOR_POSITION], 1);
-                    Assert::AreEqual<size_t>(draco.attributes[ACCESSOR_NORMAL], 0);
+                    Assert::AreEqual<size_t>(draco.attributes.at(ACCESSOR_POSITION), 1);
+                    Assert::AreEqual<size_t>(draco.attributes.at(ACCESSOR_NORMAL), 0);
                 }
 
                 GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_GetExtension)
@@ -678,12 +678,12 @@ namespace Microsoft
 
                     Assert::IsTrue(doc.nodes[0].HasExtension<KHR::Nodes::MeshGPUInstancing>());
 
-                    auto instancing = doc.nodes[0].GetExtension<KHR::Nodes::MeshGPUInstancing>();
+                    auto& instancing = doc.nodes[0].GetExtension<KHR::Nodes::MeshGPUInstancing>();
 
                     Assert::AreEqual(instancing.attributes.size(), 3);
-                    Assert::AreEqual(instancing.attributes[ACCESSOR_TRANSLATION].c_str(), "0");
-                    Assert::AreEqual(instancing.attributes[ACCESSOR_ROTATION].c_str(), "1");
-                    Assert::AreEqual(instancing.attributes[ACCESSOR_SCALE].c_str(), "2");
+                    Assert::AreEqual(instancing.attributes.at(ACCESSOR_TRANSLATION).c_str(), "0");
+                    Assert::AreEqual(instancing.attributes.at(ACCESSOR_ROTATION).c_str(), "1");
+                    Assert::AreEqual(instancing.attributes.at(ACCESSOR_SCALE).c_str(), "2");
                 }
 
                 GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_RoundTrip_and_Equality_Instancing)
