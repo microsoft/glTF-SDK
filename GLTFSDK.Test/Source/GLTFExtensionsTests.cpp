@@ -299,29 +299,12 @@ namespace Microsoft
             {
                 GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_RoundTrip_And_Equality)
                 {
-                    const auto inputJson = ReadLocalJson(c_cubeJson);
-
-                    const auto extensionDeserializer = KHR::GetKHRExtensionDeserializer();
-                    const auto extensionSerializer = KHR::GetKHRExtensionSerializer();
-
-                    auto doc = Deserialize(inputJson, extensionDeserializer);
-
-                    // Serialize Document back to json
-                    auto outputJson = Serialize(doc, extensionSerializer);
-                    auto outputDoc = Deserialize(outputJson, extensionDeserializer);
-
-                    // Compare input and output Documents
-                    Assert::IsTrue(doc == outputDoc, L"Input gltf and output gltf are not equal");
+                    CheckExtensionRoundTripEquality(c_cubeJson);
                 }
 
                 GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_RoundTrip_And_Equality_Draco)
                 {
-                    const auto inputJson = ReadLocalJson(c_dracoBox);
-
-                    const auto extensionDeserializer = KHR::GetKHRExtensionDeserializer();
-                    const auto extensionSerializer = KHR::GetKHRExtensionSerializer();
-
-                    auto doc = Deserialize(inputJson, extensionDeserializer);
+                    auto doc = CheckExtensionRoundTripEquality(c_dracoBox);
 
                     Assert::AreEqual(doc.meshes.Size(), size_t(1));
                     Assert::AreEqual(doc.meshes[0].primitives.size(), size_t(1));
@@ -333,13 +316,6 @@ namespace Microsoft
                     Assert::AreEqual<size_t>(draco.attributes.size(), 2);
                     Assert::AreEqual<size_t>(draco.attributes[ACCESSOR_POSITION], 1);
                     Assert::AreEqual<size_t>(draco.attributes[ACCESSOR_NORMAL], 0);
-
-                    // Serialize GLTFDocument back to json
-                    auto outputJson = Serialize(doc, extensionSerializer);
-                    auto outputDoc = Deserialize(outputJson, extensionDeserializer);
-
-                    // Compare input and output GLTFDocuments
-                    Assert::IsTrue(doc == outputDoc, L"Input gltf and output gltf are not equal");
                 }
 
                 GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_GetExtension)
@@ -557,37 +533,12 @@ namespace Microsoft
 
                 GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_RoundTrip_And_Equality_TextureTransform)
                 {
-                    const auto inputJson = ReadLocalJson(c_textureTransformTestJson);
-
-                    const auto extensionDeserializer = KHR::GetKHRExtensionDeserializer();
-                    const auto extensionSerializer = KHR::GetKHRExtensionSerializer();
-
-                    auto doc = Deserialize(inputJson, extensionDeserializer);
-
-                    // Serialize GLTFDocument back to json
-                    auto outputJson = Serialize(doc, extensionSerializer);
-                    auto outputDoc = Deserialize(outputJson, extensionDeserializer);
-
-                    // Compare input and output GLTFDocuments
-                    Assert::IsTrue(doc == outputDoc, L"Input gltf and output gltf are not equal");
+                    CheckExtensionRoundTripEquality(c_textureTransformTestJson);
                 }
 
                 GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_RoundTrip_And_Equality_TextureTransform_SGOnly)
                 {
-                    // Test document has TextureInfo extensions embedded in SpecGloss extension
-                    const auto inputJson = ReadLocalJson(c_textureTransformTestSGOnlyJson);
-
-                    const auto extensionDeserializer = KHR::GetKHRExtensionDeserializer();
-                    const auto extensionSerializer = KHR::GetKHRExtensionSerializer();
-
-                    auto doc = Deserialize(inputJson, extensionDeserializer);
-
-                    // Serialize GLTFDocument back to json
-                    auto outputJson = Serialize(doc, extensionSerializer);
-                    auto outputDoc = Deserialize(outputJson, extensionDeserializer);
-
-                    // Compare input and output GLTFDocuments
-                    Assert::IsTrue(doc == outputDoc, L"Input gltf and output gltf are not equal");
+                    CheckExtensionRoundTripEquality(c_textureTransformTestSGOnlyJson);
                 }
 
                 GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_HasClearcoatExtension)
@@ -610,19 +561,7 @@ namespace Microsoft
 
                 GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_RoundTrip_and_Equality_Clearcoat)
                 {
-                    const auto inputJson = ReadLocalJson(c_singleTriangleWithClearcoatJson);
-
-                    const auto extensionDeserializer = KHR::GetKHRExtensionDeserializer();
-                    const auto extensionSerializer = KHR::GetKHRExtensionSerializer();
-
-                    auto doc = Deserialize(inputJson, extensionDeserializer);
-
-                    // Serialize GLTFDocument back to json
-                    auto outputJson = Serialize(doc, extensionSerializer);
-                    auto outputDoc = Deserialize(outputJson, extensionDeserializer);
-
-                    // Compare input and output GLTFDocuments
-                    Assert::IsTrue(doc == outputDoc, L"Input gltf and output gltf are not equal");
+                    CheckExtensionRoundTripEquality(c_singleTriangleWithClearcoatJson);
                 }
 
                 GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_HasVolumeExtension)
@@ -659,19 +598,7 @@ namespace Microsoft
 
                 GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_RoundTrip_and_Equality_Transmission_and_Volume)
                 {
-                    const auto inputJson = ReadLocalJson(c_singleTriangleWithVolumeJson);
-
-                    const auto extensionDeserializer = KHR::GetKHRExtensionDeserializer();
-                    const auto extensionSerializer = KHR::GetKHRExtensionSerializer();
-
-                    auto doc = Deserialize(inputJson, extensionDeserializer);
-
-                    // Serialize GLTFDocument back to json
-                    auto outputJson = Serialize(doc, extensionSerializer);
-                    auto outputDoc = Deserialize(outputJson, extensionDeserializer);
-
-                    // Compare input and output GLTFDocuments
-                    Assert::IsTrue(doc == outputDoc, L"Input gltf and output gltf are not equal");
+                    CheckExtensionRoundTripEquality(c_singleTriangleWithVolumeJson);
                 }
                 
                 GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_HasIridescenceExtension)
@@ -695,19 +622,7 @@ namespace Microsoft
 
                 GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_RoundTrip_and_Equality_Iridescence)
                 {
-                    const auto inputJson = ReadLocalJson(c_singleTriangleWithIridescenceJson);
-
-                    const auto extensionDeserializer = KHR::GetKHRExtensionDeserializer();
-                    const auto extensionSerializer = KHR::GetKHRExtensionSerializer();
-
-                    auto doc = Deserialize(inputJson, extensionDeserializer);
-
-                    // Serialize GLTFDocument back to json
-                    auto outputJson = Serialize(doc, extensionSerializer);
-                    auto outputDoc = Deserialize(outputJson, extensionDeserializer);
-
-                    // Compare input and output GLTFDocuments
-                    Assert::IsTrue(doc == outputDoc, L"Input gltf and output gltf are not equal");
+                    CheckExtensionRoundTripEquality(c_singleTriangleWithIridescenceJson);
                 }
 
                 GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_HasSheenExtension)
@@ -729,19 +644,7 @@ namespace Microsoft
 
                 GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_RoundTrip_and_Equality_Sheen)
                 {
-                    const auto inputJson = ReadLocalJson(c_singleTriangleWithSheenJson);
-
-                    const auto extensionDeserializer = KHR::GetKHRExtensionDeserializer();
-                    const auto extensionSerializer = KHR::GetKHRExtensionSerializer();
-
-                    auto doc = Deserialize(inputJson, extensionDeserializer);
-
-                    // Serialize GLTFDocument back to json
-                    auto outputJson = Serialize(doc, extensionSerializer);
-                    auto outputDoc = Deserialize(outputJson, extensionDeserializer);
-
-                    // Compare input and output GLTFDocuments
-                    Assert::IsTrue(doc == outputDoc, L"Input gltf and output gltf are not equal");
+                    CheckExtensionRoundTripEquality(c_singleTriangleWithSheenJson);
                 }
 
                 GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_HasSpecularExtension)
@@ -763,19 +666,7 @@ namespace Microsoft
 
                 GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_RoundTrip_and_Equality_Specular)
                 {
-                    const auto inputJson = ReadLocalJson(c_singleTriangleWithSpecularJson);
-
-                    const auto extensionDeserializer = KHR::GetKHRExtensionDeserializer();
-                    const auto extensionSerializer = KHR::GetKHRExtensionSerializer();
-
-                    auto doc = Deserialize(inputJson, extensionDeserializer);
-
-                    // Serialize GLTFDocument back to json
-                    auto outputJson = Serialize(doc, extensionSerializer);
-                    auto outputDoc = Deserialize(outputJson, extensionDeserializer);
-
-                    // Compare input and output GLTFDocuments
-                    Assert::IsTrue(doc == outputDoc, L"Input gltf and output gltf are not equal");
+                    CheckExtensionRoundTripEquality(c_singleTriangleWithSpecularJson);
                 }
 
                 GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_HasInstancing)
@@ -797,19 +688,7 @@ namespace Microsoft
 
                 GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_RoundTrip_and_Equality_Instancing)
                 {
-                    const auto inputJson = ReadLocalJson(c_singleTriangleWithInstancingJson);
-
-                    const auto extensionDeserializer = KHR::GetKHRExtensionDeserializer();
-                    const auto extensionSerializer = KHR::GetKHRExtensionSerializer();
-
-                    auto doc = Deserialize(inputJson, extensionDeserializer);
-
-                    // Serialize GLTFDocument back to json
-                    auto outputJson = Serialize(doc, extensionSerializer);
-                    auto outputDoc = Deserialize(outputJson, extensionDeserializer);
-
-                    // Compare input and output GLTFDocuments
-                    Assert::IsTrue(doc == outputDoc, L"Input gltf and output gltf are not equal");
+                    CheckExtensionRoundTripEquality(c_singleTriangleWithInstancingJson);
                 }
 
                 GLTFSDK_TEST_METHOD(ExtensionsTests, ExtensionSerializerAddHandler)
