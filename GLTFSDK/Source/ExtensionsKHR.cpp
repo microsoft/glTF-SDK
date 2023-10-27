@@ -142,7 +142,6 @@ ExtensionSerializer KHR::GetKHRExtensionSerializer()
     extensionSerializer.AddHandler<Sheen, Material>(SHEEN_NAME, SerializeSheen);
     extensionSerializer.AddHandler<Specular, Material>(SPECULAR_NAME, SerializeSpecular);
     extensionSerializer.AddHandler<DracoMeshCompression, MeshPrimitive>(DRACOMESHCOMPRESSION_NAME, SerializeDracoMeshCompression);
-    extensionSerializer.AddHandler<MaterialsVariants, MeshPrimitive>(MATERIALSVARIANTS_NAME, SerializeMaterialsVariants);
     extensionSerializer.AddHandler<MeshGPUInstancing, Node>(MESHGPUINSTANCING_NAME, SerializeMeshGPUInstancing);
     extensionSerializer.AddHandler<TextureTransform, TextureInfo>(TEXTURETRANSFORM_NAME, SerializeTextureTransform);
     extensionSerializer.AddHandler<TextureTransform, Material::NormalTextureInfo>(TEXTURETRANSFORM_NAME, SerializeTextureTransform);
@@ -167,7 +166,6 @@ ExtensionDeserializer KHR::GetKHRExtensionDeserializer()
     extensionDeserializer.AddHandler<Sheen, Material>(SHEEN_NAME, DeserializeSheen);
     extensionDeserializer.AddHandler<Specular, Material>(SPECULAR_NAME, DeserializeSpecular);
     extensionDeserializer.AddHandler<DracoMeshCompression, MeshPrimitive>(DRACOMESHCOMPRESSION_NAME, DeserializeDracoMeshCompression);
-    extensionDeserializer.AddHandler<MaterialsVariants, MeshPrimitive>(MATERIALSVARIANTS_NAME, DeserializeMaterialsVariants);
     extensionDeserializer.AddHandler<MeshGPUInstancing, Node>(MESHGPUINSTANCING_NAME, DeserializeMeshGPUInstancing);
     extensionDeserializer.AddHandler<TextureTransform, TextureInfo>(TEXTURETRANSFORM_NAME, DeserializeTextureTransform);
     extensionDeserializer.AddHandler<TextureTransform, Material::NormalTextureInfo>(TEXTURETRANSFORM_NAME, DeserializeTextureTransform);
@@ -1077,90 +1075,6 @@ std::unique_ptr<Extension> KHR::MeshPrimitives::DeserializeDracoMeshCompression(
                 throw GLTFException("Attribute " + std::string(name) + " of " + std::string(DRACOMESHCOMPRESSION_NAME) + " is not a number.");
             }
             extension->attributes.emplace(name, attribute.value.Get<uint32_t>());
-        }
-    }
-
-    ParseProperty(v, *extension, extensionDeserializer);
-
-    return extension;
-}
-
-// KHR::MeshPrimitives::MaterialsVariants
-
-std::unique_ptr<Extension> KHR::MeshPrimitives::MaterialsVariants::Clone() const
-{
-    return std::make_unique<MaterialsVariants>(*this);
-}
-
-bool KHR::MeshPrimitives::MaterialsVariants::IsEqual(const Extension& rhs) const
-{
-    const auto other = dynamic_cast<const MaterialsVariants*>(&rhs);
-
-    return other != nullptr
-        && glTFProperty::Equals(*this, *other);
-        //&& this->mappings == other->mappings;
-}
-
-std::string KHR::MeshPrimitives::SerializeMaterialsVariants(const MeshPrimitives::MaterialsVariants& materialsVariants, const Document& glTFdoc, const ExtensionSerializer& extensionSerializer)
-{
-    rapidjson::Document doc;
-    auto& a = doc.GetAllocator();
-    rapidjson::Value KHR_materials_variants(rapidjson::kObjectType);
-    {
-        if (!materialsVariants.mappings.empty())
-        {
-        }
-
-        SerializeProperty(glTFdoc, materialsVariants, KHR_materials_variants, a, extensionSerializer);
-    }
-
-    rapidjson::StringBuffer buffer;
-    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-    KHR_materials_variants.Accept(writer);
-
-    return buffer.GetString();
-}
-
-std::unique_ptr<Extension> KHR::MeshPrimitives::DeserializeMaterialsVariants(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
-{
-    auto extension = std::make_unique<MaterialsVariants>();
-
-    auto doc = RapidJsonUtils::CreateDocumentFromString(json);
-    const auto v = doc.GetObject();
-
-    const auto itMappings = v.FindMember("mappings");
-    if (itMappings != v.MemberEnd())
-    {
-        if (!itMappings->value.IsArray())
-        {
-            throw GLTFException("Member mappings of " + std::string(MATERIALSVARIANTS_NAME) + " is not an array.");
-        }
-        const auto& mappings = itMappings->value.GetArray();
-
-        auto i = 0;
-        for (const auto& mapping : mappings)
-        {
-            if (!mapping.IsObject())
-            {
-                throw GLTFException("Member mapping " + std::to_string(i) + " of " + std::string(MATERIALSVARIANTS_NAME) + " is not an object.");
-            }
-
-            MaterialsVariants::Mapping extensionMapping;
-
-            const auto itMaterial = mapping.FindMember("material");
-            if (itMaterial != mapping.MemberEnd())
-            {
-                if (!itMaterial->value.IsUint())
-                {
-                    throw GLTFException("Member mapping " + std::to_string(i) + " material of " + std::string(MATERIALSVARIANTS_NAME) + " is not an integer.");
-                }
-
-                extensionMapping.materialId = std::to_string(itMaterial->value.GetUint());
-            }
-
-            extension->mappings.push_back(extensionMapping);
-
-            i++;
         }
     }
 
