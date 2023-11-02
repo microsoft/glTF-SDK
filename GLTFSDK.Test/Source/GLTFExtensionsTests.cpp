@@ -45,6 +45,25 @@ R"({
     "required": [ "flag" ]
 })";
 
+    Document CheckExtensionRoundTripEquality(const char* relativePath)
+    {
+        const auto inputJson = Test::ReadLocalJson(relativePath);
+
+        const auto extensionDeserializer = KHR::GetKHRExtensionDeserializer();
+        const auto extensionSerializer = KHR::GetKHRExtensionSerializer();
+
+        auto doc = Deserialize(inputJson, extensionDeserializer);
+
+        // Serialize GLTFDocument back to json
+        auto outputJson = Serialize(doc, extensionSerializer);
+        auto outputDoc = Deserialize(outputJson, extensionDeserializer);
+
+        // Compare input and output GLTFDocuments
+        Assert::IsTrue(doc == outputDoc, L"Input gltf and output gltf are not equal");
+
+        return doc;
+    }
+
     struct TestExtension : Extension
     {
         TestExtension(bool flag) : flag(flag) {}
