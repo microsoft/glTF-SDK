@@ -52,6 +52,9 @@ namespace Microsoft
         constexpr const char* ACCESSOR_COLOR_0 = "COLOR_0";
         constexpr const char* ACCESSOR_JOINTS_0 = "JOINTS_0";
         constexpr const char* ACCESSOR_WEIGHTS_0 = "WEIGHTS_0";
+        constexpr const char* ACCESSOR_TRANSLATION = "TRANSLATION";
+        constexpr const char* ACCESSOR_ROTATION = "ROTATION";
+        constexpr const char* ACCESSOR_SCALE = "SCALE";
 
         constexpr const char* TYPE_NAME_SCALAR = "SCALAR";
         constexpr const char* TYPE_NAME_VEC2 = "VEC2";

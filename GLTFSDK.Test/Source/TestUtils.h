@@ -4,10 +4,13 @@
 #pragma once
 
 #include <GLTFSDK/BufferBuilder.h>
+#include <GLTFSDK/Deserialize.h>
+#include <GLTFSDK/ExtensionsKHR.h>
 #include <GLTFSDK/GLTFResourceReader.h>
 #include <GLTFSDK/GLTFResourceWriter.h>
 #include <GLTFSDK/IStreamReader.h>
 #include <GLTFSDK/IStreamWriter.h>
+#include <GLTFSDK/Serialize.h>
 
 #include <fstream>
 #include <memory>

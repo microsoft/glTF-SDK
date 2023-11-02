@@ -45,6 +45,25 @@ R"({
     "required": [ "flag" ]
 })";
 
+    Document CheckExtensionRoundTripEquality(const char* relativePath)
+    {
+        const auto inputJson = Test::ReadLocalJson(relativePath);
+
+        const auto extensionDeserializer = KHR::GetKHRExtensionDeserializer();
+        const auto extensionSerializer = KHR::GetKHRExtensionSerializer();
+
+        auto doc = Deserialize(inputJson, extensionDeserializer);
+
+        // Serialize GLTFDocument back to json
+        auto outputJson = Serialize(doc, extensionSerializer);
+        auto outputDoc = Deserialize(outputJson, extensionDeserializer);
+
+        // Compare input and output GLTFDocuments
+        Assert::IsTrue(doc == outputDoc, L"Input gltf and output gltf are not equal");
+
+        return doc;
+    }
+
     struct TestExtension : Extension
     {
         TestExtension(bool flag) : flag(flag) {}
@@ -299,47 +318,23 @@ namespace Microsoft
             {
                 GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_RoundTrip_And_Equality)
                 {
-                    const auto inputJson = ReadLocalJson(c_cubeJson);
-
-                    const auto extensionDeserializer = KHR::GetKHRExtensionDeserializer();
-                    const auto extensionSerializer = KHR::GetKHRExtensionSerializer();
-
-                    auto doc = Deserialize(inputJson, extensionDeserializer);
-
-                    // Serialize Document back to json
-                    auto outputJson = Serialize(doc, extensionSerializer);
-                    auto outputDoc = Deserialize(outputJson, extensionDeserializer);
-
-                    // Compare input and output Documents
-                    Assert::IsTrue(doc == outputDoc, L"Input gltf and output gltf are not equal");
+                    CheckExtensionRoundTripEquality(c_cubeJson);
                 }
 
                 GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_RoundTrip_And_Equality_Draco)
                 {
-                    const auto inputJson = ReadLocalJson(c_dracoBox);
-
-                    const auto extensionDeserializer = KHR::GetKHRExtensionDeserializer();
-                    const auto extensionSerializer = KHR::GetKHRExtensionSerializer();
-
-                    auto doc = Deserialize(inputJson, extensionDeserializer);
+                    auto doc = CheckExtensionRoundTripEquality(c_dracoBox);
 
                     Assert::AreEqual(doc.meshes.Size(), size_t(1));
                     Assert::AreEqual(doc.meshes[0].primitives.size(), size_t(1));
                     Assert::AreEqual(doc.meshes[0].primitives[0].GetExtensions().size(), size_t(1));
 
-                    auto draco = doc.meshes[0].primitives[0].GetExtension<KHR::MeshPrimitives::DracoMeshCompression>();
+                    auto& draco = doc.meshes[0].primitives[0].GetExtension<KHR::MeshPrimitives::DracoMeshCompression>();
 
                     Assert::AreEqual<std::string>(draco.bufferViewId, "0");
                     Assert::AreEqual<size_t>(draco.attributes.size(), 2);
-                    Assert::AreEqual<size_t>(draco.attributes[ACCESSOR_POSITION], 1);
-                    Assert::AreEqual<size_t>(draco.attributes[ACCESSOR_NORMAL], 0);
-
-                    // Serialize GLTFDocument back to json
-                    auto outputJson = Serialize(doc, extensionSerializer);
-                    auto outputDoc = Deserialize(outputJson, extensionDeserializer);
-
-                    // Compare input and output GLTFDocuments
-                    Assert::IsTrue(doc == outputDoc, L"Input gltf and output gltf are not equal");
+                    Assert::AreEqual<size_t>(draco.attributes.at(ACCESSOR_POSITION), 1);
+                    Assert::AreEqual<size_t>(draco.attributes.at(ACCESSOR_NORMAL), 0);
                 }
 
                 GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_GetExtension)
@@ -557,37 +552,162 @@ namespace Microsoft
 
                 GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_RoundTrip_And_Equality_TextureTransform)
                 {
-                    const auto inputJson = ReadLocalJson(c_textureTransformTestJson);
-
-                    const auto extensionDeserializer = KHR::GetKHRExtensionDeserializer();
-                    const auto extensionSerializer = KHR::GetKHRExtensionSerializer();
-
-                    auto doc = Deserialize(inputJson, extensionDeserializer);
-
-                    // Serialize GLTFDocument back to json
-                    auto outputJson = Serialize(doc, extensionSerializer);
-                    auto outputDoc = Deserialize(outputJson, extensionDeserializer);
-
-                    // Compare input and output GLTFDocuments
-                    Assert::IsTrue(doc == outputDoc, L"Input gltf and output gltf are not equal");
+                    CheckExtensionRoundTripEquality(c_textureTransformTestJson);
                 }
 
                 GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_RoundTrip_And_Equality_TextureTransform_SGOnly)
                 {
-                    // Test document has TextureInfo extensions embedded in SpecGloss extension
-                    const auto inputJson = ReadLocalJson(c_textureTransformTestSGOnlyJson);
+                    CheckExtensionRoundTripEquality(c_textureTransformTestSGOnlyJson);
+                }
+
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_HasClearcoatExtension)
+                {
+                    const auto inputJson = ReadLocalJson(c_singleTriangleWithClearcoatJson);
 
                     const auto extensionDeserializer = KHR::GetKHRExtensionDeserializer();
-                    const auto extensionSerializer = KHR::GetKHRExtensionSerializer();
-
                     auto doc = Deserialize(inputJson, extensionDeserializer);
 
-                    // Serialize GLTFDocument back to json
-                    auto outputJson = Serialize(doc, extensionSerializer);
-                    auto outputDoc = Deserialize(outputJson, extensionDeserializer);
+                    Assert::IsTrue(doc.materials[0].HasExtension<KHR::Materials::Clearcoat>());
 
-                    // Compare input and output GLTFDocuments
-                    Assert::IsTrue(doc == outputDoc, L"Input gltf and output gltf are not equal");
+                    auto& clearcoat = doc.materials[0].GetExtension<KHR::Materials::Clearcoat>();
+
+                    Assert::AreEqual(clearcoat.factor, 1.0f);
+                    Assert::AreEqual(clearcoat.texture.textureId.c_str(), "1");
+                    Assert::AreEqual(clearcoat.roughnessFactor, 0.1f);
+                    Assert::AreEqual(clearcoat.roughnessTexture.textureId.c_str(), "0");
+                    Assert::AreEqual(clearcoat.normalTexture.textureId.c_str(), "1");
+                }
+
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_RoundTrip_and_Equality_Clearcoat)
+                {
+                    CheckExtensionRoundTripEquality(c_singleTriangleWithClearcoatJson);
+                }
+
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_HasVolumeExtension)
+                {
+                    const auto inputJson = ReadLocalJson(c_singleTriangleWithVolumeJson);
+
+                    const auto extensionDeserializer = KHR::GetKHRExtensionDeserializer();
+                    auto doc = Deserialize(inputJson, extensionDeserializer);
+
+                    Assert::IsTrue(doc.materials[0].HasExtension<KHR::Materials::Volume>());
+
+                    auto& volume = doc.materials[0].GetExtension<KHR::Materials::Volume>();
+
+                    Assert::AreEqual(volume.attenuationColor, Color3(0.1f, 0.5f, 0.9f));
+                    Assert::AreEqual(volume.attenuationDistance, 1.0f);
+                    Assert::AreEqual(volume.thicknessFactor, 0.5f);
+                    Assert::AreEqual(volume.thicknessTexture.textureId.c_str(), "0");
+                }
+
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_HasTransmissionExtension)
+                {
+                    const auto inputJson = ReadLocalJson(c_singleTriangleWithVolumeJson);
+
+                    const auto extensionDeserializer = KHR::GetKHRExtensionDeserializer();
+                    auto doc = Deserialize(inputJson, extensionDeserializer);
+
+                    Assert::IsTrue(doc.materials[0].HasExtension<KHR::Materials::Transmission>());
+
+                    auto& transmission = doc.materials[0].GetExtension<KHR::Materials::Transmission>();
+
+                    Assert::AreEqual(transmission.factor, 1.0f);
+                    Assert::AreEqual(transmission.texture.textureId.c_str(), "0");
+                }
+
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_RoundTrip_and_Equality_Transmission_and_Volume)
+                {
+                    CheckExtensionRoundTripEquality(c_singleTriangleWithVolumeJson);
+                }
+                
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_HasIridescenceExtension)
+                {
+                    const auto inputJson = ReadLocalJson(c_singleTriangleWithIridescenceJson);
+
+                    const auto extensionDeserializer = KHR::GetKHRExtensionDeserializer();
+                    auto doc = Deserialize(inputJson, extensionDeserializer);
+
+                    Assert::IsTrue(doc.materials[0].HasExtension<KHR::Materials::Iridescence>());
+
+                    auto& iridescence = doc.materials[0].GetExtension<KHR::Materials::Iridescence>();
+
+                    Assert::AreEqual(iridescence.factor, 0.9f);
+                    Assert::AreEqual(iridescence.ior, 1.3f);
+                    Assert::AreEqual(iridescence.thicknessMax, 400.0f);
+                    Assert::AreEqual(iridescence.thicknessMin, 150.0f);
+                    Assert::AreEqual(iridescence.texture.textureId.c_str(), "0");
+                    Assert::AreEqual(iridescence.thicknessTexture.textureId.c_str(), "1");
+                }
+
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_RoundTrip_and_Equality_Iridescence)
+                {
+                    CheckExtensionRoundTripEquality(c_singleTriangleWithIridescenceJson);
+                }
+
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_HasSheenExtension)
+                {
+                    const auto inputJson = ReadLocalJson(c_singleTriangleWithSheenJson);
+
+                    const auto extensionDeserializer = KHR::GetKHRExtensionDeserializer();
+                    auto doc = Deserialize(inputJson, extensionDeserializer);
+
+                    Assert::IsTrue(doc.materials[0].HasExtension<KHR::Materials::Sheen>());
+
+                    auto& sheen = doc.materials[0].GetExtension<KHR::Materials::Sheen>();
+
+                    Assert::AreEqual(sheen.colorFactor, Color3(0.1f, 0.2f, 0.3f));
+                    Assert::AreEqual(sheen.colorTexture.textureId.c_str(), "1");
+                    Assert::AreEqual(sheen.roughnessFactor, 0.4f);
+                    Assert::AreEqual(sheen.roughnessTexture.textureId.c_str(), "0");
+                }
+
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_RoundTrip_and_Equality_Sheen)
+                {
+                    CheckExtensionRoundTripEquality(c_singleTriangleWithSheenJson);
+                }
+
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_HasSpecularExtension)
+                {
+                    const auto inputJson = ReadLocalJson(c_singleTriangleWithSpecularJson);
+
+                    const auto extensionDeserializer = KHR::GetKHRExtensionDeserializer();
+                    auto doc = Deserialize(inputJson, extensionDeserializer);
+
+                    Assert::IsTrue(doc.materials[0].HasExtension<KHR::Materials::Specular>());
+
+                    auto& specular = doc.materials[0].GetExtension<KHR::Materials::Specular>();
+
+                    Assert::AreEqual(specular.factor, 0.4f);
+                    Assert::AreEqual(specular.texture.textureId.c_str(), "0");
+                    Assert::AreEqual(specular.colorFactor, Color3(0.1f, 0.2f, 0.3f));
+                    Assert::AreEqual(specular.colorTexture.textureId.c_str(), "1");
+                }
+
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_RoundTrip_and_Equality_Specular)
+                {
+                    CheckExtensionRoundTripEquality(c_singleTriangleWithSpecularJson);
+                }
+
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_HasInstancing)
+                {
+                    const auto inputJson = ReadLocalJson(c_singleTriangleWithInstancingJson);
+
+                    const auto extensionDeserializer = KHR::GetKHRExtensionDeserializer();
+                    auto doc = Deserialize(inputJson, extensionDeserializer);
+
+                    Assert::IsTrue(doc.nodes[0].HasExtension<KHR::Nodes::MeshGPUInstancing>());
+
+                    auto& instancing = doc.nodes[0].GetExtension<KHR::Nodes::MeshGPUInstancing>();
+
+                    Assert::AreEqual(instancing.attributes.size(), 3);
+                    Assert::AreEqual(instancing.attributes.at(ACCESSOR_TRANSLATION).c_str(), "0");
+                    Assert::AreEqual(instancing.attributes.at(ACCESSOR_ROTATION).c_str(), "1");
+                    Assert::AreEqual(instancing.attributes.at(ACCESSOR_SCALE).c_str(), "2");
+                }
+
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_RoundTrip_and_Equality_Instancing)
+                {
+                    CheckExtensionRoundTripEquality(c_singleTriangleWithInstancingJson);
                 }
 
                 GLTFSDK_TEST_METHOD(ExtensionsTests, ExtensionSerializerAddHandler)

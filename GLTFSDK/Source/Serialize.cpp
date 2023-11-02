@@ -428,7 +428,10 @@ namespace
                 }
             }
 
-            materialValue.AddMember("pbrMetallicRoughness", pbrMetallicRoughness, a);
+            if (0 < pbrMetallicRoughness.MemberCount())
+            {
+                materialValue.AddMember("pbrMetallicRoughness", pbrMetallicRoughness, a);
+            }
 
             // Normal
             if (!material.normalTexture.textureId.empty())
