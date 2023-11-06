@@ -6,9 +6,22 @@
 #include <GLTFSDK/GLBResourceReader.h>
 #include <GLTFSDK/Deserialize.h>
 
-// Replace this with <filesystem> (and use std::filesystem rather than
-// std::experimental::filesystem) if your toolchain fully supports C++17
+#if __EMSCRIPTEN__
+#include <filesystem>
+namespace fs = std::__fs::filesystem;
+#else
+#if ((defined(_MSVC_LANG) && _MSVC_LANG >= 201703L) || __cplusplus >= 201703L)
+#include <filesystem>
+namespace fs = std::filesystem;
+#elif ((defined(_MSVC_LANG) && _MSVC_LANG >= 201402L) || __cplusplus >= 201402L)
 #include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
+#else
+    #error "Unsupported C++ standard"
+#endif
+#endif
+
+
 
 #include <fstream>
 #include <sstream>
@@ -28,7 +41,7 @@ namespace
     class StreamReader : public IStreamReader
     {
     public:
-        StreamReader(std::experimental::filesystem::path pathBase) : m_pathBase(std::move(pathBase))
+        StreamReader(fs::path pathBase) : m_pathBase(std::move(pathBase))
         {
             assert(m_pathBase.has_root_path());
         }
@@ -44,7 +57,7 @@ namespace
             //    if appropriate.
             // 3. Always open the file stream in binary mode. The glTF SDK will handle any text
             //    encoding issues for us.
-            auto streamPath = m_pathBase / std::experimental::filesystem::u8path(filename);
+            auto streamPath = m_pathBase / fs::u8path(filename);
             auto stream = std::make_shared<std::ifstream>(streamPath, std::ios_base::binary);
 
             // Check if the stream has no errors and is ready for I/O operations
@@ -57,7 +70,7 @@ namespace
         }
 
     private:
-        std::experimental::filesystem::path m_pathBase;
+        fs::path m_pathBase;
     };
 
     // Uses the Document class to print some basic information about various top-level glTF entities
@@ -185,13 +198,13 @@ namespace
         }
     }
 
-    void PrintInfo(const std::experimental::filesystem::path& path)
+    void PrintInfo(const fs::path& path)
     {
         // Pass the absolute path, without the filename, to the stream reader
         auto streamReader = std::make_unique<StreamReader>(path.parent_path());
 
-        std::experimental::filesystem::path pathFile = path.filename();
-        std::experimental::filesystem::path pathFileExt = pathFile.extension();
+        fs::path pathFile = path.filename();
+        fs::path pathFileExt = pathFile.extension();
 
         std::string manifest;
 
@@ -271,11 +284,11 @@ int main(int argc, char* argv[])
             throw std::runtime_error("Unexpected number of command line arguments");
         }
 
-        std::experimental::filesystem::path path = argv[1U];
+        fs::path path = argv[1U];
 
         if (path.is_relative())
         {
-            auto pathCurrent = std::experimental::filesystem::current_path();
+            auto pathCurrent = fs::current_path();
 
             // Convert the relative path into an absolute path by appending the command line argument to the current path
             pathCurrent /= path;
