@@ -124,7 +124,7 @@ jobs:
 
     pool:
       vmImage: 'macOS-10.14'
-    
+
     strategy:
       matrix:
         macOS-Release:
@@ -162,7 +162,7 @@ jobs:
 
     pool:
       vmImage: 'macOS-10.14'
-    
+
     strategy:
       matrix:
         iOS-Release:
@@ -180,7 +180,7 @@ jobs:
     - task: CMake@1
       inputs:
         workingDirectory: 'built/Int/cmake_$(buildPlatform)'
-        cmakeArgs: '../../.. -G Xcode -DCMAKE_TOOLCHAIN_FILE="$(Build.SourcesDirectory)/Build/CMake/ios.toolchain.cmake" -DPLATFORM=OS -DDEPLOYMENT_TARGET="10.11" -DENABLE_UNIT_TESTS="OFF"'
+        cmakeArgs: '../../.. -G Xcode -DCMAKE_TOOLCHAIN_FILE="$(Build.SourcesDirectory)/Build/CMake/ios.toolchain.cmake" -DPLATFORM=OS -DDEPLOYMENT_TARGET="10.13" -DENABLE_UNIT_TESTS="OFF"'
 
     - task: CMake@1
       inputs:
