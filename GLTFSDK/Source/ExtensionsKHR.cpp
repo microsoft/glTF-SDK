@@ -483,6 +483,11 @@ std::unique_ptr<Extension> KHR::TextureInfos::DeserializeTextureTransform(const 
     auto offsetIt = sit.FindMember("offset");
     if (offsetIt != sit.MemberEnd())
     {
+        if (!offsetIt->value.IsArray())
+        {
+            throw GLTFException("Offset member of " + std::string(TEXTURETRANSFORM_NAME) + " must be an array.");
+        }
+
         if (offsetIt->value.Size() != 2)
         {
             throw GLTFException("Offset member of " + std::string(TEXTURETRANSFORM_NAME) + " must have two values.");
@@ -504,6 +509,11 @@ std::unique_ptr<Extension> KHR::TextureInfos::DeserializeTextureTransform(const 
     auto scaleIt = sit.FindMember("scale");
     if (scaleIt != sit.MemberEnd())
     {
+        if (!scaleIt->value.IsArray())
+        {
+            throw GLTFException("Scale member of " + std::string(TEXTURETRANSFORM_NAME) + " must be an array.");
+        }
+
         if (scaleIt->value.Size() != 2)
         {
             throw GLTFException("Scale member of " + std::string(TEXTURETRANSFORM_NAME) + " must have two values.");

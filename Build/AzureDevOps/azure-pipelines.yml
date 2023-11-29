@@ -145,7 +145,7 @@ jobs:
   - job: MacOS
 
     pool:
-      vmImage: 'macOS-10.15'
+      vmImage: 'macos-latest'
     
     strategy:
       matrix:
@@ -183,7 +183,7 @@ jobs:
   - job: MacOSVcPkg
 
     pool:
-      vmImage: 'macOS-10.15'
+      vmImage: 'macos-latest'
     
     strategy:
       matrix:
@@ -228,7 +228,7 @@ jobs:
   - job: iOS
 
     pool:
-      vmImage: 'macOS-10.15'
+      vmImage: 'macos-latest'
     
     strategy:
       matrix:
