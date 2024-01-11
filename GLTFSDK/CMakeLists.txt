@@ -4,6 +4,22 @@ project (GLTFSDK)
 include(GLTFPlatform)
 GetGLTFPlatform(Platform)
 
+function(add_msvc_security_flags target)
+	# enable /Qspectre compiler flag in Visual Studio 2017 version 15.5.5 and later.
+	if(MSVC_VERSION GREATER_EQUAL 1913)
+		target_compile_options(${target} PRIVATE "/Qspectre")
+	endif()
+	# enable /ZH:SHA_256 compiler flag in Visual Studio 2019 version 16.4 and later.
+	if(MSVC_VERSION GREATER_EQUAL 1924)
+		target_compile_options(${target} PRIVATE "/ZH:SHA_256")
+	endif()
+	# The /guard:ehcont option is available in Visual Studio 2019 version 16.7 and later. The feature is supported for 64-bit processes on a 64-bit OS.
+	if((MSVC_VERSION GREATER_EQUAL 1928) AND (CMAKE_SIZEOF_VOID_P EQUAL 8))
+		target_compile_options(${target} PRIVATE "$<$<NOT:$<CONFIG:DEBUG>>:/guard:ehcont>")
+		target_link_options(${target} PRIVATE "$<$<NOT:$<CONFIG:DEBUG>>:/guard:ehcont>")
+	endif()
+endfunction()
+
 file(GLOB source_files
     "${CMAKE_CURRENT_LIST_DIR}/Source/*.cpp"
 )
@@ -30,9 +46,7 @@ if (MSVC)
 
     # Make sure that all PDB files on Windows are installed to the output folder with the libraries. By default, only the debug build does this.
     set_target_properties(GLTFSDK PROPERTIES COMPILE_PDB_NAME "GLTFSDK" COMPILE_PDB_OUTPUT_DIRECTORY "${LIBRARY_OUTPUT_DIRECTORY}")
-endif()
-
-if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     target_compile_options(GLTFSDK
         PRIVATE "-Wunguarded-availability"
         PRIVATE "-Wall"

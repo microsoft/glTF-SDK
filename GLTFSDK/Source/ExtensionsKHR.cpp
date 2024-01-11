@@ -234,7 +234,7 @@ std::unique_ptr<Extension> KHR::Materials::DeserializePBRSpecGloss(const std::st
     Materials::PBRSpecularGlossiness specGloss;
 
     auto doc = RapidJsonUtils::CreateDocumentFromString(json);
-    const rapidjson::Value sit = doc.GetObject();
+    const auto sit = doc.GetObject();
 
     // Diffuse Factor
     auto diffuseFactIt = sit.FindMember("diffuseFactor");
@@ -314,7 +314,7 @@ std::unique_ptr<Extension> KHR::Materials::DeserializeUnlit(const std::string& j
     Unlit unlit;
 
     auto doc = RapidJsonUtils::CreateDocumentFromString(json);
-    const rapidjson::Value objValue = doc.GetObject();
+    const auto objValue = doc.GetObject();
 
     ParseProperty(objValue, unlit, extensionDeserializer);
 
@@ -375,7 +375,7 @@ std::unique_ptr<Extension> KHR::MeshPrimitives::DeserializeDracoMeshCompression(
     auto extension = std::make_unique<DracoMeshCompression>();
 
     auto doc = RapidJsonUtils::CreateDocumentFromString(json);
-    const rapidjson::Value v = doc.GetObject();
+    const auto v = doc.GetObject();
 
     extension->bufferViewId = GetMemberValueAsString<uint32_t>(v, "bufferView");
 
@@ -481,12 +481,17 @@ std::unique_ptr<Extension> KHR::TextureInfos::DeserializeTextureTransform(const 
     TextureTransform textureTransform;
 
     auto doc = RapidJsonUtils::CreateDocumentFromString(json);
-    const rapidjson::Value sit = doc.GetObject();
+    const auto sit = doc.GetObject();
 
     // Offset
     auto offsetIt = sit.FindMember("offset");
     if (offsetIt != sit.MemberEnd())
     {
+        if (!offsetIt->value.IsArray())
+        {
+            throw GLTFException("Offset member of " + std::string(TEXTURETRANSFORM_NAME) + " must be an array.");
+        }
+
         if (offsetIt->value.Size() != 2)
         {
             throw GLTFException("Offset member of " + std::string(TEXTURETRANSFORM_NAME) + " must have two values.");
@@ -508,6 +513,11 @@ std::unique_ptr<Extension> KHR::TextureInfos::DeserializeTextureTransform(const 
     auto scaleIt = sit.FindMember("scale");
     if (scaleIt != sit.MemberEnd())
     {
+        if (!scaleIt->value.IsArray())
+        {
+            throw GLTFException("Scale member of " + std::string(TEXTURETRANSFORM_NAME) + " must be an array.");
+        }
+
         if (scaleIt->value.Size() != 2)
         {
             throw GLTFException("Scale member of " + std::string(TEXTURETRANSFORM_NAME) + " must have two values.");
