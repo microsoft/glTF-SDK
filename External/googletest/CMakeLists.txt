@@ -35,3 +35,12 @@ add_subdirectory(${CMAKE_BINARY_DIR}/googletest-src
 if (CMAKE_VERSION VERSION_LESS 2.8.11)
   include_directories("${gtest_SOURCE_DIR}/include")
 endif()
+
+if(MSVC AND CMAKE_VS_PLATFORM_NAME STREQUAL "Win32")
+  # Use __stdcall calling convention for Win32/x86 builds.
+  target_compile_options(gtest PRIVATE "/Gz")
+  target_compile_options(gtest_main PRIVATE "/Gz")
+
+  # Suppress warning C4007: 'main': must be '__cdecl' that gets treated as an error.
+  target_compile_options(gtest_main PRIVATE "/wd4007")
+endif()
