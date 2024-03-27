@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <GLTFSDK/Definitions.h>
+
 #include <tuple>
 #include <string>
 
@@ -33,7 +35,7 @@ namespace Microsoft
             bool operator==(const Version& rhs) const;
             bool operator!=(const Version& rhs) const;
 
-            static std::tuple<uint32_t, uint32_t> AsTuple(const char* version);
+            static std::tuple<uint32_t, uint32_t> GLTFSDK_CDECL AsTuple(const char* version);
         };
 
         namespace Versions
@@ -41,7 +43,7 @@ namespace Microsoft
             constexpr Version v2_0 = { 2U, 0U };
         }
 
-        bool IsMinVersionRequirementSatisfied(const Version& minVersion, std::initializer_list<Version> supported = { Versions::v2_0 });
-        bool IsMinVersionRequirementSatisfied(const std::string& minVersion, std::initializer_list<Version> supported = { Versions::v2_0 });
+        bool GLTFSDK_CDECL IsMinVersionRequirementSatisfied(const Version& minVersion, std::initializer_list<Version> supported = { Versions::v2_0 });
+        bool GLTFSDK_CDECL IsMinVersionRequirementSatisfied(const std::string& minVersion, std::initializer_list<Version> supported = { Versions::v2_0 });
     }
 }

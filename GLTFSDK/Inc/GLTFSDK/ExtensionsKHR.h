@@ -15,8 +15,8 @@ namespace Microsoft
     {
         namespace KHR
         {
-            ExtensionSerializer   GetKHRExtensionSerializer();
-            ExtensionDeserializer GetKHRExtensionDeserializer();
+            ExtensionSerializer   GLTFSDK_CDECL GetKHRExtensionSerializer();
+            ExtensionDeserializer GLTFSDK_CDECL GetKHRExtensionDeserializer();
 
             namespace Materials
             {

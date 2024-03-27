@@ -3,9 +3,11 @@
 
 #pragma once
 
+#include <GLTFSDK/Definitions.h>
+
 #include <string>
 
-namespace Microsoft 
+namespace Microsoft
 {
     namespace glTF
     {
@@ -23,7 +25,7 @@ namespace Microsoft
         class Document;
         class ExtensionSerializer;
 
-        std::string Serialize(const Document& gltfDocument, SerializeFlags flags = SerializeFlags::None);
-        std::string Serialize(const Document& gltfDocument, const ExtensionSerializer& extensionHandler, SerializeFlags flags = SerializeFlags::None);
+        std::string GLTFSDK_CDECL Serialize(const Document& gltfDocument, SerializeFlags flags = SerializeFlags::None);
+        std::string GLTFSDK_CDECL Serialize(const Document& gltfDocument, const ExtensionSerializer& extensionHandler, SerializeFlags flags = SerializeFlags::None);
     }
 }

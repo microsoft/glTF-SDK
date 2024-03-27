@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <GLTFSDK/Definitions.h>
+
 #include <vector>
 
 namespace Microsoft
@@ -17,23 +19,23 @@ namespace Microsoft
 
         namespace AnimationUtils
         {
-            std::vector<float> GetKeyframeTimes(const Document& doc, const GLTFResourceReader& reader, const Accessor& accessor);
-            std::vector<float> GetKeyframeTimes(const Document& doc, const GLTFResourceReader& reader, const AnimationSampler& sampler);
+            std::vector<float> GLTFSDK_CDECL GetKeyframeTimes(const Document& doc, const GLTFResourceReader& reader, const Accessor& accessor);
+            std::vector<float> GLTFSDK_CDECL GetKeyframeTimes(const Document& doc, const GLTFResourceReader& reader, const AnimationSampler& sampler);
 
-            std::vector<float> GetInverseBindMatrices(const Document& doc, const GLTFResourceReader& reader, const Accessor& skin);
-            std::vector<float> GetInverseBindMatrices(const Document& doc, const GLTFResourceReader& reader, const Skin& skin);
+            std::vector<float> GLTFSDK_CDECL GetInverseBindMatrices(const Document& doc, const GLTFResourceReader& reader, const Accessor& skin);
+            std::vector<float> GLTFSDK_CDECL GetInverseBindMatrices(const Document& doc, const GLTFResourceReader& reader, const Skin& skin);
 
-            std::vector<float> GetTranslations(const Document& doc, const GLTFResourceReader& reader, const Accessor& accessor);
-            std::vector<float> GetTranslations(const Document& doc, const GLTFResourceReader& reader, const AnimationSampler& accessor);
+            std::vector<float> GLTFSDK_CDECL GetTranslations(const Document& doc, const GLTFResourceReader& reader, const Accessor& accessor);
+            std::vector<float> GLTFSDK_CDECL GetTranslations(const Document& doc, const GLTFResourceReader& reader, const AnimationSampler& accessor);
 
-            std::vector<float> GetRotations(const Document& doc, const GLTFResourceReader& reader, const Accessor& accessor);
-            std::vector<float> GetRotations(const Document& doc, const GLTFResourceReader& reader, const AnimationSampler& accessor);
+            std::vector<float> GLTFSDK_CDECL GetRotations(const Document& doc, const GLTFResourceReader& reader, const Accessor& accessor);
+            std::vector<float> GLTFSDK_CDECL GetRotations(const Document& doc, const GLTFResourceReader& reader, const AnimationSampler& accessor);
 
-            std::vector<float> GetScales(const Document& doc, const GLTFResourceReader& reader, const Accessor& accessor);
-            std::vector<float> GetScales(const Document& doc, const GLTFResourceReader& reader, const AnimationSampler& accessor);
+            std::vector<float> GLTFSDK_CDECL GetScales(const Document& doc, const GLTFResourceReader& reader, const Accessor& accessor);
+            std::vector<float> GLTFSDK_CDECL GetScales(const Document& doc, const GLTFResourceReader& reader, const AnimationSampler& accessor);
 
-            std::vector<float> GetMorphWeights(const Document& doc, const GLTFResourceReader& reader, const Accessor& accessor);
-            std::vector<float> GetMorphWeights(const Document& doc, const GLTFResourceReader& reader, const AnimationSampler& accessor);
+            std::vector<float> GLTFSDK_CDECL GetMorphWeights(const Document& doc, const GLTFResourceReader& reader, const Accessor& accessor);
+            std::vector<float> GLTFSDK_CDECL GetMorphWeights(const Document& doc, const GLTFResourceReader& reader, const AnimationSampler& accessor);
         };
     }
 }
