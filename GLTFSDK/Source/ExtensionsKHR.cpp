@@ -125,7 +125,7 @@ namespace
     }
 }
 
-ExtensionSerializer KHR::GetKHRExtensionSerializer()
+ExtensionSerializer GLTFSDK_API KHR::GetKHRExtensionSerializer()
 {
     using namespace Materials;
     using namespace MeshPrimitives;
@@ -149,7 +149,7 @@ ExtensionSerializer KHR::GetKHRExtensionSerializer()
     return extensionSerializer;
 }
 
-ExtensionDeserializer KHR::GetKHRExtensionDeserializer()
+ExtensionDeserializer GLTFSDK_API KHR::GetKHRExtensionDeserializer()
 {
     using namespace Materials;
     using namespace MeshPrimitives;
