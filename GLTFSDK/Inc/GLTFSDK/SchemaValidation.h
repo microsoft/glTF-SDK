@@ -16,6 +16,6 @@ namespace Microsoft
             virtual const char* GetSchemaContent(const std::string& uri) const = 0;
         };
 
-        void GLTFSDK_CDECL ValidateDocumentAgainstSchema(const rapidjson::Document& d, const std::string& schemaUri, std::unique_ptr<const ISchemaLocator> schemaLocator);
+        void GLTFSDK_API ValidateDocumentAgainstSchema(const rapidjson::Document& d, const std::string& schemaUri, std::unique_ptr<const ISchemaLocator> schemaLocator);
     }
 }

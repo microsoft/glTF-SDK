@@ -3,8 +3,10 @@
 
 #pragma once
 
+#ifndef GLTFSDK_API
 #ifdef _WIN32
-#define GLTFSDK_CDECL __cdecl
+#define GLTFSDK_API __cdecl
 #else
-#define GLTFSDK_CDECL
+#define GLTFSDK_API
+#endif
 #endif

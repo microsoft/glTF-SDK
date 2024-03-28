@@ -25,7 +25,7 @@ namespace Microsoft
         class Document;
         class ExtensionSerializer;
 
-        std::string GLTFSDK_CDECL Serialize(const Document& gltfDocument, SerializeFlags flags = SerializeFlags::None);
-        std::string GLTFSDK_CDECL Serialize(const Document& gltfDocument, const ExtensionSerializer& extensionHandler, SerializeFlags flags = SerializeFlags::None);
+        std::string GLTFSDK_API Serialize(const Document& gltfDocument, SerializeFlags flags = SerializeFlags::None);
+        std::string GLTFSDK_API Serialize(const Document& gltfDocument, const ExtensionSerializer& extensionHandler, SerializeFlags flags = SerializeFlags::None);
     }
 }

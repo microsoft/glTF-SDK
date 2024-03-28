@@ -24,10 +24,10 @@ namespace Microsoft
 
         class ExtensionDeserializer;
 
-        Document GLTFSDK_CDECL Deserialize(const std::string& json, DeserializeFlags flags = DeserializeFlags::None, SchemaFlags schemaFlags = SchemaFlags::None);
-        Document GLTFSDK_CDECL Deserialize(const std::string& json, const ExtensionDeserializer& extensions, DeserializeFlags flags = DeserializeFlags::None, SchemaFlags schemaFlags = SchemaFlags::None);
+        Document GLTFSDK_API Deserialize(const std::string& json, DeserializeFlags flags = DeserializeFlags::None, SchemaFlags schemaFlags = SchemaFlags::None);
+        Document GLTFSDK_API Deserialize(const std::string& json, const ExtensionDeserializer& extensions, DeserializeFlags flags = DeserializeFlags::None, SchemaFlags schemaFlags = SchemaFlags::None);
 
-        Document GLTFSDK_CDECL Deserialize(std::istream& jsonStream, DeserializeFlags flags = DeserializeFlags::None, SchemaFlags schemaFlags = SchemaFlags::None);
-        Document GLTFSDK_CDECL Deserialize(std::istream& jsonStream, const ExtensionDeserializer& extensions, DeserializeFlags flags = DeserializeFlags::None, SchemaFlags schemaFlags = SchemaFlags::None);
+        Document GLTFSDK_API Deserialize(std::istream& jsonStream, DeserializeFlags flags = DeserializeFlags::None, SchemaFlags schemaFlags = SchemaFlags::None);
+        Document GLTFSDK_API Deserialize(std::istream& jsonStream, const ExtensionDeserializer& extensions, DeserializeFlags flags = DeserializeFlags::None, SchemaFlags schemaFlags = SchemaFlags::None);
     }
 }

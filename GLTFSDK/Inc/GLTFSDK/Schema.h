@@ -47,7 +47,7 @@ namespace Microsoft
         constexpr const char SCHEMA_URI_EXTENSION[] = "extension.schema.json";
         constexpr const char SCHEMA_URI_EXTRAS[] = "extras.schema.json";
 
-        const std::unordered_map<std::string, std::string>& GLTFSDK_CDECL GetDefaultSchemaUriMap();
+        const std::unordered_map<std::string, std::string>& GLTFSDK_API GetDefaultSchemaUriMap();
 
         enum class SchemaFlags : uint64_t
         {
@@ -92,6 +92,6 @@ namespace Microsoft
         SchemaFlags  operator& (SchemaFlags lhs,  SchemaFlags rhs);
         SchemaFlags& operator&=(SchemaFlags& lhs, SchemaFlags rhs);
 
-        std::unique_ptr<const class ISchemaLocator> GLTFSDK_CDECL GetDefaultSchemaLocator(SchemaFlags schemaFlags);
+        std::unique_ptr<const class ISchemaLocator> GLTFSDK_API GetDefaultSchemaLocator(SchemaFlags schemaFlags);
     }
 }

@@ -36,7 +36,7 @@ namespace Microsoft
 
         class BufferBuilder final
         {
-            typedef std::function<std::string GLTFSDK_CDECL (const BufferBuilder&)> FnGenId;
+            typedef std::function<std::string GLTFSDK_API (const BufferBuilder&)> FnGenId;
 
         public:
             BufferBuilder(std::unique_ptr<ResourceWriter>&& resourceWriter);
