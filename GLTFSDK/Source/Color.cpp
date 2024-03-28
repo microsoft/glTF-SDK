@@ -163,14 +163,14 @@ Color3 Color3::Clamp(const Color3& color, float lo, float hi)
     };
 }
 
-bool Microsoft::glTF::operator==(const Color3& lhs, const Color3& rhs)
+bool GLTFSDK_API Microsoft::glTF::operator==(const Color3& lhs, const Color3& rhs)
 {
     return lhs.r == rhs.r
         && lhs.g == rhs.g
         && lhs.b == rhs.b;
 }
 
-bool Microsoft::glTF::operator!=(const Color3& lhs, const Color3& rhs)
+bool GLTFSDK_API Microsoft::glTF::operator!=(const Color3& lhs, const Color3& rhs)
 {
     return !(lhs == rhs);
 }
@@ -333,7 +333,7 @@ Color4 Color4::Clamp(const Color4& color, float lo, float hi)
     };
 }
 
-bool Microsoft::glTF::operator==(const Color4& lhs, const Color4& rhs)
+bool GLTFSDK_API Microsoft::glTF::operator==(const Color4& lhs, const Color4& rhs)
 {
     return lhs.r == rhs.r
         && lhs.g == rhs.g
@@ -341,7 +341,7 @@ bool Microsoft::glTF::operator==(const Color4& lhs, const Color4& rhs)
         && lhs.a == rhs.a;
 }
 
-bool Microsoft::glTF::operator!=(const Color4& lhs, const Color4& rhs)
+bool GLTFSDK_API Microsoft::glTF::operator!=(const Color4& lhs, const Color4& rhs)
 {
     return !(lhs == rhs);
 }

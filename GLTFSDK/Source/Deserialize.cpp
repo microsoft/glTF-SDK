@@ -834,12 +834,12 @@ namespace
     }
 }
 
-Document Microsoft::glTF::Deserialize(const std::string& json, DeserializeFlags flags, SchemaFlags schemaFlags)
+Document GLTFSDK_API Microsoft::glTF::Deserialize(const std::string& json, DeserializeFlags flags, SchemaFlags schemaFlags)
 {
     return Deserialize(json, ExtensionDeserializer(), flags, schemaFlags);
 }
 
-Document Microsoft::glTF::Deserialize(const std::string& json, const ExtensionDeserializer& extensionDeserializer, DeserializeFlags flags, SchemaFlags schemaFlags)
+Document GLTFSDK_API Microsoft::glTF::Deserialize(const std::string& json, const ExtensionDeserializer& extensionDeserializer, DeserializeFlags flags, SchemaFlags schemaFlags)
 {
     const auto document = HasFlag(flags, DeserializeFlags::IgnoreByteOrderMark) ?
         RapidJsonUtils::CreateDocumentFromEncodedString(json) :
@@ -848,12 +848,12 @@ Document Microsoft::glTF::Deserialize(const std::string& json, const ExtensionDe
     return DeserializeInternal(document, extensionDeserializer, schemaFlags);
 }
 
-Document Microsoft::glTF::Deserialize(std::istream& jsonStream, DeserializeFlags flags, SchemaFlags schemaFlags)
+Document GLTFSDK_API Microsoft::glTF::Deserialize(std::istream& jsonStream, DeserializeFlags flags, SchemaFlags schemaFlags)
 {
     return Deserialize(jsonStream, ExtensionDeserializer(), flags, schemaFlags);
 }
 
-Document Microsoft::glTF::Deserialize(std::istream& jsonStream, const ExtensionDeserializer& extensionDeserializer, DeserializeFlags flags, SchemaFlags schemaFlags)
+Document GLTFSDK_API Microsoft::glTF::Deserialize(std::istream& jsonStream, const ExtensionDeserializer& extensionDeserializer, DeserializeFlags flags, SchemaFlags schemaFlags)
 {
     const auto document = HasFlag(flags, DeserializeFlags::IgnoreByteOrderMark) ?
         RapidJsonUtils::CreateDocumentFromEncodedStream(jsonStream) :

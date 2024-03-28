@@ -13,18 +13,18 @@ namespace Microsoft
     {
         namespace Validation
         {
-            void Validate(const Document& doc);
-            void ValidateAccessors(const Document& doc);
-            void ValidateMeshes(const Document& doc);
-            void ValidateMeshPrimitive(const Document& doc, const MeshPrimitive& primitive);
-            void ValidateMeshPrimitiveAttributeAccessors(const Document& doc, const std::unordered_map<std::string, std::string>& attributes, const size_t vertexCount);
-            void ValidateAccessorTypes(const Accessor& accessor, const std::string& accessorName,
+            void GLTFSDK_API Validate(const Document& doc);
+            void GLTFSDK_API ValidateAccessors(const Document& doc);
+            void GLTFSDK_API ValidateMeshes(const Document& doc);
+            void GLTFSDK_API ValidateMeshPrimitive(const Document& doc, const MeshPrimitive& primitive);
+            void GLTFSDK_API ValidateMeshPrimitiveAttributeAccessors(const Document& doc, const std::unordered_map<std::string, std::string>& attributes, const size_t vertexCount);
+            void GLTFSDK_API ValidateAccessorTypes(const Accessor& accessor, const std::string& accessorName,
                 const std::set<AccessorType>& accessorTypes, const std::set<ComponentType>& componentTypes);
-            void ValidateAccessor(const Document& doc, const Accessor& accessor);
-            void ValidateBufferView(const BufferView& buffer_view, const Buffer& buffer);
+            void GLTFSDK_API ValidateAccessor(const Document& doc, const Accessor& accessor);
+            void GLTFSDK_API ValidateBufferView(const BufferView& buffer_view, const Buffer& buffer);
 
-            bool SafeAddition(size_t a, size_t b, size_t& result);
-            bool SafeMultiplication(size_t a, size_t b, size_t& result);
+            bool GLTFSDK_API SafeAddition(size_t a, size_t b, size_t& result);
+            bool GLTFSDK_API SafeMultiplication(size_t a, size_t b, size_t& result);
         };
     }
 }
