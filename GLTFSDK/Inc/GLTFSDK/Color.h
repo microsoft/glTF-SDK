@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <GLTFSDK/Definitions.h>
+
 #include <cstdint>
 
 namespace Microsoft
@@ -123,7 +125,7 @@ namespace Microsoft
             Color3(float r, float g, float b);
             Color3(uint8_t r, uint8_t g, uint8_t b);
 
-            static Color3 FromScalar(float value);
+            static Color3 GLTFSDK_API FromScalar(float value);
 
             Color3& operator*=(const Color3& rhs);
             Color3& operator*=(float rhs);
@@ -145,14 +147,14 @@ namespace Microsoft
             uint32_t AsUint32RGBA() const;
             uint32_t AsUint32BGRA() const;
 
-            static Color3 FromUint32RGBA(uint32_t color);
-            static Color3 FromUint32BGRA(uint32_t color);
+            static Color3 GLTFSDK_API FromUint32RGBA(uint32_t color);
+            static Color3 GLTFSDK_API FromUint32BGRA(uint32_t color);
 
-            static Color3 Clamp(const Color3& color, float lo, float hi);
+            static Color3 GLTFSDK_API Clamp(const Color3& color, float lo, float hi);
         };
 
-        bool operator==(const Color3& lhs, const Color3& rhs);
-        bool operator!=(const Color3& lhs, const Color3& rhs);
+        bool GLTFSDK_API operator==(const Color3& lhs, const Color3& rhs);
+        bool GLTFSDK_API operator!=(const Color3& lhs, const Color3& rhs);
 
         struct Color4 : private ColorBase<Color4>
         {
@@ -166,7 +168,7 @@ namespace Microsoft
             Color4(float r, float g, float b, float a);
             Color4(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 
-            static Color4 FromScalar(float value);
+            static Color4 GLTFSDK_API FromScalar(float value);
 
             Color4& operator*=(const Color4& rhs);
             Color4& operator*=(float);
@@ -185,13 +187,13 @@ namespace Microsoft
             uint32_t AsUint32RGBA() const;
             uint32_t AsUint32BGRA() const;
 
-            static Color4 FromUint32RGBA(uint32_t color);
-            static Color4 FromUint32BGRA(uint32_t color);
+            static Color4 GLTFSDK_API FromUint32RGBA(uint32_t color);
+            static Color4 GLTFSDK_API FromUint32BGRA(uint32_t color);
 
-            static Color4 Clamp(const Color4& color, float lo, float hi);
+            static Color4 GLTFSDK_API Clamp(const Color4& color, float lo, float hi);
         };
 
-        bool operator==(const Color4& lhs, const Color4& rhs);
-        bool operator!=(const Color4& lhs, const Color4& rhs);
+        bool GLTFSDK_API operator==(const Color4& lhs, const Color4& rhs);
+        bool GLTFSDK_API operator!=(const Color4& lhs, const Color4& rhs);
     }
 }

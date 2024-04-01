@@ -125,7 +125,7 @@ namespace
     }
 }
 
-ExtensionSerializer KHR::GetKHRExtensionSerializer()
+ExtensionSerializer GLTFSDK_API KHR::GetKHRExtensionSerializer()
 {
     using namespace Materials;
     using namespace MeshPrimitives;
@@ -149,7 +149,7 @@ ExtensionSerializer KHR::GetKHRExtensionSerializer()
     return extensionSerializer;
 }
 
-ExtensionDeserializer KHR::GetKHRExtensionDeserializer()
+ExtensionDeserializer GLTFSDK_API KHR::GetKHRExtensionDeserializer()
 {
     using namespace Materials;
     using namespace MeshPrimitives;
@@ -200,7 +200,7 @@ bool KHR::Materials::PBRSpecularGlossiness::IsEqual(const Extension& rhs) const
         && this->specularGlossinessTexture == other->specularGlossinessTexture;
 }
 
-std::string KHR::Materials::SerializePBRSpecGloss(const Materials::PBRSpecularGlossiness& specGloss, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
+std::string GLTFSDK_API KHR::Materials::SerializePBRSpecGloss(const Materials::PBRSpecularGlossiness& specGloss, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
 {
     rapidjson::Document doc;
     auto& a = doc.GetAllocator();
@@ -245,7 +245,7 @@ std::string KHR::Materials::SerializePBRSpecGloss(const Materials::PBRSpecularGl
     return buffer.GetString();
 }
 
-std::unique_ptr<Extension> KHR::Materials::DeserializePBRSpecGloss(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
+std::unique_ptr<Extension> GLTFSDK_API KHR::Materials::DeserializePBRSpecGloss(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
 {
     Materials::PBRSpecularGlossiness specGloss;
 
@@ -314,7 +314,7 @@ bool KHR::Materials::Unlit::IsEqual(const Extension& rhs) const
     return dynamic_cast<const Unlit*>(&rhs) != nullptr;
 }
 
-std::string KHR::Materials::SerializeUnlit(const Materials::Unlit& extension, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
+std::string GLTFSDK_API KHR::Materials::SerializeUnlit(const Materials::Unlit& extension, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
 {
     rapidjson::Document doc;
     auto& a = doc.GetAllocator();
@@ -329,7 +329,7 @@ std::string KHR::Materials::SerializeUnlit(const Materials::Unlit& extension, co
     return buffer.GetString();
 }
 
-std::unique_ptr<Extension> KHR::Materials::DeserializeUnlit(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
+std::unique_ptr<Extension> GLTFSDK_API KHR::Materials::DeserializeUnlit(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
 {
     Unlit unlit;
 
@@ -367,7 +367,7 @@ bool KHR::Materials::Clearcoat::IsEqual(const Extension& rhs) const
         && this->normalTexture == other->normalTexture;
 }
 
-std::string KHR::Materials::SerializeClearcoat(const Materials::Clearcoat& clearcoat, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
+std::string GLTFSDK_API KHR::Materials::SerializeClearcoat(const Materials::Clearcoat& clearcoat, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
 {
     rapidjson::Document doc;
     auto& a = doc.GetAllocator();
@@ -414,7 +414,7 @@ std::string KHR::Materials::SerializeClearcoat(const Materials::Clearcoat& clear
     return buffer.GetString();
 }
 
-std::unique_ptr<Extension> KHR::Materials::DeserializeClearcoat(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
+std::unique_ptr<Extension> GLTFSDK_API KHR::Materials::DeserializeClearcoat(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
 {
     Materials::Clearcoat clearcoat;
 
@@ -487,7 +487,7 @@ bool KHR::Materials::Volume::IsEqual(const Extension& rhs) const
         && this->thicknessTexture == other->thicknessTexture;
 }
 
-std::string KHR::Materials::SerializeVolume(const Materials::Volume& volume, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
+std::string GLTFSDK_API KHR::Materials::SerializeVolume(const Materials::Volume& volume, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
 {
     rapidjson::Document doc;
     auto& a = doc.GetAllocator();
@@ -525,7 +525,7 @@ std::string KHR::Materials::SerializeVolume(const Materials::Volume& volume, con
     return buffer.GetString();
 }
 
-std::unique_ptr<Extension> KHR::Materials::DeserializeVolume(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
+std::unique_ptr<Extension> GLTFSDK_API KHR::Materials::DeserializeVolume(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
 {
     Materials::Volume volume;
 
@@ -599,7 +599,7 @@ bool KHR::Materials::Iridescence::IsEqual(const Extension& rhs) const
         && this->thicknessTexture == other->thicknessTexture;
 }
 
-std::string KHR::Materials::SerializeIridescence(const Materials::Iridescence& iridescence, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
+std::string GLTFSDK_API KHR::Materials::SerializeIridescence(const Materials::Iridescence& iridescence, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
 {
     rapidjson::Document doc;
     auto& a = doc.GetAllocator();
@@ -649,7 +649,7 @@ std::string KHR::Materials::SerializeIridescence(const Materials::Iridescence& i
     return buffer.GetString();
 }
 
-std::unique_ptr<Extension> KHR::Materials::DeserializeIridescence(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
+std::unique_ptr<Extension> GLTFSDK_API KHR::Materials::DeserializeIridescence(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
 {
     Materials::Iridescence iridescence;
 
@@ -725,7 +725,7 @@ bool KHR::Materials::Transmission::IsEqual(const Extension& rhs) const
         && this->texture == other->texture;
 }
 
-std::string KHR::Materials::SerializeTransmission(const Materials::Transmission& transmission, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
+std::string GLTFSDK_API KHR::Materials::SerializeTransmission(const Materials::Transmission& transmission, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
 {
     rapidjson::Document doc;
     auto& a = doc.GetAllocator();
@@ -753,7 +753,7 @@ std::string KHR::Materials::SerializeTransmission(const Materials::Transmission&
     return buffer.GetString();
 }
 
-std::unique_ptr<Extension> KHR::Materials::DeserializeTransmission(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
+std::unique_ptr<Extension> GLTFSDK_API KHR::Materials::DeserializeTransmission(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
 {
     Materials::Transmission transmission;
 
@@ -804,7 +804,7 @@ bool KHR::Materials::Sheen::IsEqual(const Extension& rhs) const
         && this->roughnessTexture == other->roughnessTexture;
 }
 
-std::string KHR::Materials::SerializeSheen(const Materials::Sheen& sheen, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
+std::string GLTFSDK_API KHR::Materials::SerializeSheen(const Materials::Sheen& sheen, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
 {
     rapidjson::Document doc;
     auto& a = doc.GetAllocator();
@@ -844,7 +844,7 @@ std::string KHR::Materials::SerializeSheen(const Materials::Sheen& sheen, const 
     return buffer.GetString();
 }
 
-std::unique_ptr<Extension> KHR::Materials::DeserializeSheen(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
+std::unique_ptr<Extension> GLTFSDK_API KHR::Materials::DeserializeSheen(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
 {
     Materials::Sheen sheen;
 
@@ -914,7 +914,7 @@ bool KHR::Materials::Specular::IsEqual(const Extension& rhs) const
         && this->texture == other->texture;
 }
 
-std::string KHR::Materials::SerializeSpecular(const Materials::Specular& specular, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
+std::string GLTFSDK_API KHR::Materials::SerializeSpecular(const Materials::Specular& specular, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
 {
     rapidjson::Document doc;
     auto& a = doc.GetAllocator();
@@ -954,7 +954,7 @@ std::string KHR::Materials::SerializeSpecular(const Materials::Specular& specula
     return buffer.GetString();
 }
 
-std::unique_ptr<Extension> KHR::Materials::DeserializeSpecular(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
+std::unique_ptr<Extension> GLTFSDK_API KHR::Materials::DeserializeSpecular(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
 {
     Materials::Specular specular;
 
@@ -1016,7 +1016,7 @@ bool KHR::MeshPrimitives::DracoMeshCompression::IsEqual(const Extension& rhs) co
         && this->attributes == other->attributes;
 }
 
-std::string KHR::MeshPrimitives::SerializeDracoMeshCompression(const MeshPrimitives::DracoMeshCompression& dracoMeshCompression, const Document& glTFdoc, const ExtensionSerializer& extensionSerializer)
+std::string GLTFSDK_API KHR::MeshPrimitives::SerializeDracoMeshCompression(const MeshPrimitives::DracoMeshCompression& dracoMeshCompression, const Document& glTFdoc, const ExtensionSerializer& extensionSerializer)
 {
     rapidjson::Document doc;
     auto& a = doc.GetAllocator();
@@ -1048,7 +1048,7 @@ std::string KHR::MeshPrimitives::SerializeDracoMeshCompression(const MeshPrimiti
     return buffer.GetString();
 }
 
-std::unique_ptr<Extension> KHR::MeshPrimitives::DeserializeDracoMeshCompression(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
+std::unique_ptr<Extension> GLTFSDK_API KHR::MeshPrimitives::DeserializeDracoMeshCompression(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
 {
     auto extension = std::make_unique<DracoMeshCompression>();
 
@@ -1102,7 +1102,7 @@ bool KHR::Nodes::MeshGPUInstancing::IsEqual(const Extension& rhs) const
         && glTFProperty::Equals(*this, *other);
 }
 
-std::string KHR::Nodes::SerializeMeshGPUInstancing(const Nodes::MeshGPUInstancing& instancing, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
+std::string GLTFSDK_API KHR::Nodes::SerializeMeshGPUInstancing(const Nodes::MeshGPUInstancing& instancing, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
 {
     rapidjson::Document doc;
     auto& a = doc.GetAllocator();
@@ -1126,7 +1126,7 @@ std::string KHR::Nodes::SerializeMeshGPUInstancing(const Nodes::MeshGPUInstancin
     return buffer.GetString();
 }
 
-std::unique_ptr<Extension> KHR::Nodes::DeserializeMeshGPUInstancing(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
+std::unique_ptr<Extension> GLTFSDK_API KHR::Nodes::DeserializeMeshGPUInstancing(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
 {
     Nodes::MeshGPUInstancing instancing;
 
@@ -1185,7 +1185,7 @@ bool KHR::TextureInfos::TextureTransform::IsEqual(const Extension& rhs) const
         && this->texCoord == other->texCoord;
 }
 
-std::string KHR::TextureInfos::SerializeTextureTransform(const TextureTransform& textureTransform, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
+std::string GLTFSDK_API KHR::TextureInfos::SerializeTextureTransform(const TextureTransform& textureTransform, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
 {
     rapidjson::Document doc;
     auto& a = doc.GetAllocator();
@@ -1221,7 +1221,7 @@ std::string KHR::TextureInfos::SerializeTextureTransform(const TextureTransform&
     return buffer.GetString();
 }
 
-std::unique_ptr<Extension> KHR::TextureInfos::DeserializeTextureTransform(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
+std::unique_ptr<Extension> GLTFSDK_API KHR::TextureInfos::DeserializeTextureTransform(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
 {
     TextureTransform textureTransform;
 

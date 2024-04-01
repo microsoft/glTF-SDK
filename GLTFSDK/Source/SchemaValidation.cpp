@@ -54,7 +54,7 @@ namespace
     };
 }
 
-void Microsoft::glTF::ValidateDocumentAgainstSchema(const rapidjson::Document& document, const std::string& schemaUri, std::unique_ptr<const ISchemaLocator> schemaLocator)
+void GLTFSDK_API Microsoft::glTF::ValidateDocumentAgainstSchema(const rapidjson::Document& document, const std::string& schemaUri, std::unique_ptr<const ISchemaLocator> schemaLocator)
 {
     if (!schemaLocator)
     {

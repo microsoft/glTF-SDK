@@ -512,7 +512,7 @@ namespace
     }
 }
 
-std::vector<uint16_t> MeshPrimitiveUtils::GetIndices16(const Document& doc, const GLTFResourceReader& reader, const Accessor& accessor)
+std::vector<uint16_t> GLTFSDK_API MeshPrimitiveUtils::GetIndices16(const Document& doc, const GLTFResourceReader& reader, const Accessor& accessor)
 {
     if (accessor.type != TYPE_SCALAR)
     {
@@ -535,13 +535,13 @@ std::vector<uint16_t> MeshPrimitiveUtils::GetIndices16(const Document& doc, cons
     }
 }
 
-std::vector<uint16_t> MeshPrimitiveUtils::GetIndices16(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive)
+std::vector<uint16_t> GLTFSDK_API MeshPrimitiveUtils::GetIndices16(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive)
 {
     const auto& accessor = doc.accessors.Get(meshPrimitive.indicesAccessorId);
     return GetIndices16(doc, reader, accessor);
 }
 
-std::vector<uint32_t> MeshPrimitiveUtils::GetIndices32(const Document& doc, const GLTFResourceReader& reader, const Accessor& accessor)
+std::vector<uint32_t> GLTFSDK_API MeshPrimitiveUtils::GetIndices32(const Document& doc, const GLTFResourceReader& reader, const Accessor& accessor)
 {
     if (accessor.type != TYPE_SCALAR)
     {
@@ -564,35 +564,35 @@ std::vector<uint32_t> MeshPrimitiveUtils::GetIndices32(const Document& doc, cons
     }
 }
 
-std::vector<uint32_t> MeshPrimitiveUtils::GetIndices32(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive)
+std::vector<uint32_t> GLTFSDK_API MeshPrimitiveUtils::GetIndices32(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive)
 {
     const auto& accessor = doc.accessors.Get(meshPrimitive.indicesAccessorId);
     return GetIndices32(doc, reader, accessor);
 }
 
-std::vector<uint16_t> MeshPrimitiveUtils::GetTriangulatedIndices16(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive)
+std::vector<uint16_t> GLTFSDK_API MeshPrimitiveUtils::GetTriangulatedIndices16(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive)
 {
     return GetTriangulatedIndices<uint16_t>(meshPrimitive.mode, GetOrCreateIndices16(doc, reader, meshPrimitive));
 }
 
-std::vector<uint32_t> MeshPrimitiveUtils::GetTriangulatedIndices32(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive)
+std::vector<uint32_t> GLTFSDK_API MeshPrimitiveUtils::GetTriangulatedIndices32(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive)
 {
     return GetTriangulatedIndices<uint32_t>(meshPrimitive.mode, GetOrCreateIndices32(doc, reader, meshPrimitive));
 }
 
-std::vector<uint16_t> MeshPrimitiveUtils::GetSegmentedIndices16(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive)
+std::vector<uint16_t> GLTFSDK_API MeshPrimitiveUtils::GetSegmentedIndices16(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive)
 {
 
     return GetSegmentedIndices<uint16_t>(meshPrimitive.mode, GetOrCreateIndices16(doc, reader, meshPrimitive));
 }
 
-std::vector<uint32_t> MeshPrimitiveUtils::GetSegmentedIndices32(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive)
+std::vector<uint32_t> GLTFSDK_API MeshPrimitiveUtils::GetSegmentedIndices32(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive)
 {
     return GetSegmentedIndices<uint32_t>(meshPrimitive.mode, GetOrCreateIndices32(doc, reader, meshPrimitive));
 }
 
 // Positions
-std::vector<float> MeshPrimitiveUtils::GetPositions(const Document& doc, const GLTFResourceReader& reader, const Accessor& positionsAccessor)
+std::vector<float> GLTFSDK_API MeshPrimitiveUtils::GetPositions(const Document& doc, const GLTFResourceReader& reader, const Accessor& positionsAccessor)
 {
     if (positionsAccessor.type != TYPE_VEC3)
     {
@@ -607,20 +607,20 @@ std::vector<float> MeshPrimitiveUtils::GetPositions(const Document& doc, const G
     return reader.ReadFloatData(doc, positionsAccessor);
 }
 
-std::vector<float> MeshPrimitiveUtils::GetPositions(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive)
+std::vector<float> GLTFSDK_API MeshPrimitiveUtils::GetPositions(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive)
 {
     const auto& positionsAccessor = doc.accessors.Get(meshPrimitive.GetAttributeAccessorId(ACCESSOR_POSITION));
     return GetPositions(doc, reader, positionsAccessor);
 }
 
-std::vector<float> MeshPrimitiveUtils::GetPositions(const Document& doc, const GLTFResourceReader& reader, const MorphTarget& morphTarget)
+std::vector<float> GLTFSDK_API MeshPrimitiveUtils::GetPositions(const Document& doc, const GLTFResourceReader& reader, const MorphTarget& morphTarget)
 {
     const auto& positionsAccessor = doc.accessors.Get(morphTarget.positionsAccessorId);
     return GetPositions(doc, reader, positionsAccessor);
 }
 
 // Normals
-std::vector<float> MeshPrimitiveUtils::GetNormals(const Document& doc, const GLTFResourceReader& reader, const Accessor& normalsAccessor)
+std::vector<float> GLTFSDK_API MeshPrimitiveUtils::GetNormals(const Document& doc, const GLTFResourceReader& reader, const Accessor& normalsAccessor)
 {
     if (normalsAccessor.type != TYPE_VEC3)
     {
@@ -635,20 +635,20 @@ std::vector<float> MeshPrimitiveUtils::GetNormals(const Document& doc, const GLT
     return reader.ReadFloatData(doc, normalsAccessor);
 }
 
-std::vector<float> MeshPrimitiveUtils::GetNormals(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive)
+std::vector<float> GLTFSDK_API MeshPrimitiveUtils::GetNormals(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive)
 {
     const auto& accessor = doc.accessors.Get(meshPrimitive.GetAttributeAccessorId(ACCESSOR_NORMAL));
     return GetNormals(doc, reader, accessor);
 }
 
-std::vector<float> MeshPrimitiveUtils::GetNormals(const Document& doc, const GLTFResourceReader& reader, const MorphTarget& morphTarget)
+std::vector<float> GLTFSDK_API MeshPrimitiveUtils::GetNormals(const Document& doc, const GLTFResourceReader& reader, const MorphTarget& morphTarget)
 {
     const auto& accessor = doc.accessors.Get(morphTarget.normalsAccessorId);
     return GetNormals(doc, reader, accessor);
 }
 
 // Tangents
-std::vector<float> MeshPrimitiveUtils::GetTangents(const Document& doc, const GLTFResourceReader& reader, const Accessor& tangentsAccessor)
+std::vector<float> GLTFSDK_API MeshPrimitiveUtils::GetTangents(const Document& doc, const GLTFResourceReader& reader, const Accessor& tangentsAccessor)
 {
     if (tangentsAccessor.type != TYPE_VEC4)
     {
@@ -663,14 +663,14 @@ std::vector<float> MeshPrimitiveUtils::GetTangents(const Document& doc, const GL
     return reader.ReadFloatData(doc, tangentsAccessor);
 }
 
-std::vector<float> MeshPrimitiveUtils::GetTangents(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive)
+std::vector<float> GLTFSDK_API MeshPrimitiveUtils::GetTangents(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive)
 {
     const auto& accessor = doc.accessors.Get(meshPrimitive.GetAttributeAccessorId(ACCESSOR_TANGENT));
     return GetTangents(doc, reader, accessor);
 }
 
 // Morph Target Tangents (which have a different accessor type than base mesh tangents)
-std::vector<float> MeshPrimitiveUtils::GetMorphTangents(const Document& doc, const GLTFResourceReader& reader, const Accessor& tangentsAccessor)
+std::vector<float> GLTFSDK_API MeshPrimitiveUtils::GetMorphTangents(const Document& doc, const GLTFResourceReader& reader, const Accessor& tangentsAccessor)
 {
     if (tangentsAccessor.type != TYPE_VEC3)
     {
@@ -685,14 +685,14 @@ std::vector<float> MeshPrimitiveUtils::GetMorphTangents(const Document& doc, con
     return reader.ReadFloatData(doc, tangentsAccessor);
 }
 
-std::vector<float> MeshPrimitiveUtils::GetTangents(const Document& doc, const GLTFResourceReader& reader, const MorphTarget& morphTarget)
+std::vector<float> GLTFSDK_API MeshPrimitiveUtils::GetTangents(const Document& doc, const GLTFResourceReader& reader, const MorphTarget& morphTarget)
 {
     const auto& accessor = doc.accessors.Get(morphTarget.tangentsAccessorId);
     return GetMorphTangents(doc, reader, accessor);
 }
 
 // Texcoords
-std::vector<float> MeshPrimitiveUtils::GetTexCoords(const Document& doc, const GLTFResourceReader& reader, const Accessor& accessor)
+std::vector<float> GLTFSDK_API MeshPrimitiveUtils::GetTexCoords(const Document& doc, const GLTFResourceReader& reader, const Accessor& accessor)
 {
     if (accessor.type != TYPE_VEC2)
     {
@@ -707,20 +707,20 @@ std::vector<float> MeshPrimitiveUtils::GetTexCoords(const Document& doc, const G
     return reader.ReadFloatData(doc, accessor);
 }
 
-std::vector<float> MeshPrimitiveUtils::GetTexCoords_0(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive)
+std::vector<float> GLTFSDK_API MeshPrimitiveUtils::GetTexCoords_0(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive)
 {
     const auto& accessor = doc.accessors.Get(meshPrimitive.GetAttributeAccessorId(ACCESSOR_TEXCOORD_0));
     return GetTexCoords(doc, reader, accessor);
 }
 
-std::vector<float> MeshPrimitiveUtils::GetTexCoords_1(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive)
+std::vector<float> GLTFSDK_API MeshPrimitiveUtils::GetTexCoords_1(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive)
 {
     const auto& accessor = doc.accessors.Get(meshPrimitive.GetAttributeAccessorId(ACCESSOR_TEXCOORD_1));
     return GetTexCoords(doc, reader, accessor);
 }
 
 // Colors
-std::vector<uint32_t> MeshPrimitiveUtils::GetColors(const Document& doc, const GLTFResourceReader& reader, const Accessor& colorsAccessor)
+std::vector<uint32_t> GLTFSDK_API MeshPrimitiveUtils::GetColors(const Document& doc, const GLTFResourceReader& reader, const Accessor& colorsAccessor)
 {
     if (colorsAccessor.type != TYPE_VEC4 && colorsAccessor.type != TYPE_VEC3)
     {
@@ -752,14 +752,14 @@ std::vector<uint32_t> MeshPrimitiveUtils::GetColors(const Document& doc, const G
     }
 }
 
-std::vector<uint32_t> MeshPrimitiveUtils::GetColors_0(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive)
+std::vector<uint32_t> GLTFSDK_API MeshPrimitiveUtils::GetColors_0(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive)
 {
     const auto& accessor = doc.accessors.Get(meshPrimitive.GetAttributeAccessorId(ACCESSOR_COLOR_0));
     return GetColors(doc, reader, accessor);
 }
 
 // Joints
-std::vector<uint32_t> MeshPrimitiveUtils::GetJointIndices32(const Document& doc, const GLTFResourceReader& reader, const Accessor& jointsAccessor)
+std::vector<uint32_t> GLTFSDK_API MeshPrimitiveUtils::GetJointIndices32(const Document& doc, const GLTFResourceReader& reader, const Accessor& jointsAccessor)
 {
     if (jointsAccessor.type != TYPE_VEC4)
     {
@@ -779,13 +779,13 @@ std::vector<uint32_t> MeshPrimitiveUtils::GetJointIndices32(const Document& doc,
     }
 }
 
-std::vector<uint32_t> MeshPrimitiveUtils::GetJointIndices32_0(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive)
+std::vector<uint32_t> GLTFSDK_API MeshPrimitiveUtils::GetJointIndices32_0(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive)
 {
     const auto& accessor = doc.accessors.Get(meshPrimitive.GetAttributeAccessorId(ACCESSOR_JOINTS_0));
     return GetJointIndices32(doc, reader, accessor);
 }
 
-std::vector<uint64_t> MeshPrimitiveUtils::GetJointIndices64(const Document& doc, const GLTFResourceReader& reader, const Accessor& jointsAccessor)
+std::vector<uint64_t> GLTFSDK_API MeshPrimitiveUtils::GetJointIndices64(const Document& doc, const GLTFResourceReader& reader, const Accessor& jointsAccessor)
 {
     if (jointsAccessor.type != TYPE_VEC4)
     {
@@ -805,14 +805,14 @@ std::vector<uint64_t> MeshPrimitiveUtils::GetJointIndices64(const Document& doc,
     }
 }
 
-std::vector<uint64_t> MeshPrimitiveUtils::GetJointIndices64_0(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive)
+std::vector<uint64_t> GLTFSDK_API MeshPrimitiveUtils::GetJointIndices64_0(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive)
 {
     const auto& accessor = doc.accessors.Get(meshPrimitive.GetAttributeAccessorId(ACCESSOR_JOINTS_0));
     return GetJointIndices64(doc, reader, accessor);
 }
 
 // Weights
-std::vector<uint32_t> MeshPrimitiveUtils::GetJointWeights32(const Document& doc, const GLTFResourceReader& reader, const Accessor& weightsAccessor)
+std::vector<uint32_t> GLTFSDK_API MeshPrimitiveUtils::GetJointWeights32(const Document& doc, const GLTFResourceReader& reader, const Accessor& weightsAccessor)
 {
     if (weightsAccessor.type != TYPE_VEC4)
     {
@@ -838,48 +838,48 @@ std::vector<uint32_t> MeshPrimitiveUtils::GetJointWeights32(const Document& doc,
     }
 }
 
-std::vector<uint32_t> MeshPrimitiveUtils::GetJointWeights32_0(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive)
+std::vector<uint32_t> GLTFSDK_API MeshPrimitiveUtils::GetJointWeights32_0(const Document& doc, const GLTFResourceReader& reader, const MeshPrimitive& meshPrimitive)
 {
     const auto& accessor = doc.accessors.Get(meshPrimitive.GetAttributeAccessorId(ACCESSOR_WEIGHTS_0));
     return GetJointWeights32(doc, reader, accessor);
 }
 
-std::vector<uint16_t> MeshPrimitiveUtils::ReverseTriangulateIndices16(const uint16_t* indices, size_t indexCount, MeshMode mode)
+std::vector<uint16_t> GLTFSDK_API MeshPrimitiveUtils::ReverseTriangulateIndices16(const uint16_t* indices, size_t indexCount, MeshMode mode)
 {
     return ReverseTriangulateIndices(indices, indexCount, mode);
 }
 
-std::vector<uint32_t> MeshPrimitiveUtils::ReverseTriangulateIndices32(const uint32_t* indices, size_t indexCount, MeshMode mode)
+std::vector<uint32_t> GLTFSDK_API MeshPrimitiveUtils::ReverseTriangulateIndices32(const uint32_t* indices, size_t indexCount, MeshMode mode)
 {
     return ReverseTriangulateIndices(indices, indexCount, mode);
 }
 
-std::vector<uint16_t> MeshPrimitiveUtils::ReverseTriangulateIndices16(const std::vector<uint16_t>& indices, MeshMode mode)
+std::vector<uint16_t> GLTFSDK_API MeshPrimitiveUtils::ReverseTriangulateIndices16(const std::vector<uint16_t>& indices, MeshMode mode)
 {
     return ReverseTriangulateIndices(indices.data(), indices.size(), mode);
 }
 
-std::vector<uint32_t> MeshPrimitiveUtils::ReverseTriangulateIndices32(const std::vector<uint32_t>& indices, MeshMode mode)
+std::vector<uint32_t> GLTFSDK_API MeshPrimitiveUtils::ReverseTriangulateIndices32(const std::vector<uint32_t>& indices, MeshMode mode)
 {
     return ReverseTriangulateIndices(indices.data(), indices.size(), mode);
 }
 
-std::vector<uint16_t> MeshPrimitiveUtils::ReverseSegmentIndices16(const uint16_t* indices, size_t indexCount, MeshMode mode)
+std::vector<uint16_t> GLTFSDK_API MeshPrimitiveUtils::ReverseSegmentIndices16(const uint16_t* indices, size_t indexCount, MeshMode mode)
 {
     return ReverseSegmentIndices(indices, indexCount, mode);
 }
 
-std::vector<uint32_t> MeshPrimitiveUtils::ReverseSegmentIndices32(const uint32_t* indices, size_t indexCount, MeshMode mode)
+std::vector<uint32_t> GLTFSDK_API MeshPrimitiveUtils::ReverseSegmentIndices32(const uint32_t* indices, size_t indexCount, MeshMode mode)
 {
     return ReverseSegmentIndices(indices, indexCount, mode);
 }
 
-std::vector<uint16_t> MeshPrimitiveUtils::ReverseSegmentIndices16(const std::vector<uint16_t>& indices, MeshMode mode)
+std::vector<uint16_t> GLTFSDK_API MeshPrimitiveUtils::ReverseSegmentIndices16(const std::vector<uint16_t>& indices, MeshMode mode)
 {
     return ReverseSegmentIndices(indices.data(), indices.size(), mode);
 }
 
-std::vector<uint32_t> MeshPrimitiveUtils::ReverseSegmentIndices32(const std::vector<uint32_t>& indices, MeshMode mode)
+std::vector<uint32_t> GLTFSDK_API MeshPrimitiveUtils::ReverseSegmentIndices32(const std::vector<uint32_t>& indices, MeshMode mode)
 {
     return ReverseSegmentIndices(indices.data(), indices.size(), mode);
 }
