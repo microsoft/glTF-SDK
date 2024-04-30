@@ -203,6 +203,7 @@ namespace
     Scene ParseScene(const rapidjson::Value& v, const ExtensionDeserializer& extensionDeserializer)
     {
         Scene scene;
+        scene.name = GetMemberValueOrDefault<std::string>(v, "name");
 
         rapidjson::Value::ConstMemberIterator it = v.FindMember("nodes");
         if (it != v.MemberEnd())
