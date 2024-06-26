@@ -51,7 +51,11 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         PRIVATE "-Wunguarded-availability"
         PRIVATE "-Wall"
         PRIVATE "-Werror"
-        PUBLIC "-Wno-unknown-pragmas")
+        PUBLIC "-Wno-unknown-pragmas"
+        PRIVATE "-fstack-protector-strong"
+        PRIVATE "-Wformat"
+        PRIVATE "-Wformat-security"
+        PRIVATE "-Werror=format-security")
 endif()
 
 target_include_directories(GLTFSDK
