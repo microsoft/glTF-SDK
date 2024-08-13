@@ -5,7 +5,6 @@
 
 #include <sstream>
 #include <fstream>
-#include <iostream>
 
 using namespace Microsoft::glTF;
 
@@ -97,6 +96,9 @@ void GLBResourceWriter::FlushStream(const std::string& manifest, T* stream)
         StreamUtils::WriteBinary(*stream, std::vector<uint8_t>(binaryPaddingLength, 0));
     }
 }
+
+template void GLBResourceWriter::FlushStream<std::fstream>(const std::string& manifest, std::fstream* stream);
+template void GLBResourceWriter::FlushStream<std::stringstream>(const std::string& manifest, std::stringstream* stream);
 
 void GLBResourceWriter::Flush(const std::string& manifest, const std::string& uri)
 {
