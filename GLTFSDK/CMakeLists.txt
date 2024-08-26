@@ -55,6 +55,10 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         PRIVATE "-Wunguarded-availability"
         PRIVATE "-Wall"
         PRIVATE "-Werror"
+        PRIVATE "-fstack-protector-strong"
+        PRIVATE "-Wformat"
+        PRIVATE "-Wformat-security"
+        PRIVATE "-Werror=format-security"
         PUBLIC "-Wno-unknown-pragmas")
 endif()
 
