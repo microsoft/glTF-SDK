@@ -8,6 +8,7 @@
 #include <set>
 #include <regex>
 #include <sstream>
+#include <limits>
 
 using namespace Microsoft::glTF;
 

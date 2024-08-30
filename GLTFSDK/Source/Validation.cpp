@@ -7,6 +7,8 @@
 
 #include <sstream>
 
+#include <limits>
+
 using namespace Microsoft::glTF;
 
 namespace
