@@ -4,6 +4,7 @@
 #include <GLTFSDK/GLBResourceWriter.h>
 
 #include <sstream>
+#include <fstream>
 
 using namespace Microsoft::glTF;
 
@@ -42,7 +43,8 @@ GLBResourceWriter::GLBResourceWriter(std::unique_ptr<IStreamWriterCache> streamC
 {
 }
 
-void GLBResourceWriter::Flush(const std::string& manifest, const std::string& uri)
+template <typename T>
+void GLBResourceWriter::FlushStream(const std::string& manifest, T* stream)
 {
     uint32_t jsonChunkLength = static_cast<uint32_t>(manifest.length());
     const uint32_t jsonPaddingLength = ::CalculatePadding(jsonChunkLength);
@@ -59,7 +61,6 @@ void GLBResourceWriter::Flush(const std::string& manifest, const std::string& ur
         + sizeof(binaryChunkLength) + GLB_CHUNK_TYPE_SIZE // 8 bytes (BIN header)
         + binaryChunkLength;
 
-    auto stream = m_streamWriterCache->Get(uri);
 
     // Write GLB header (12 bytes)
     StreamUtils::WriteBinary(*stream, GLB_HEADER_MAGIC_STRING, GLB_HEADER_MAGIC_STRING_SIZE);
@@ -94,6 +95,15 @@ void GLBResourceWriter::Flush(const std::string& manifest, const std::string& ur
         // GLB spec requires the BIN chunk to be padded with trailing zeros (0x00) to satisfy alignment requirements
         StreamUtils::WriteBinary(*stream, std::vector<uint8_t>(binaryPaddingLength, 0));
     }
+}
+
+template void GLBResourceWriter::FlushStream<std::fstream>(const std::string& manifest, std::fstream* stream);
+template void GLBResourceWriter::FlushStream<std::stringstream>(const std::string& manifest, std::stringstream* stream);
+
+void GLBResourceWriter::Flush(const std::string& manifest, const std::string& uri)
+{
+    auto stream = m_streamWriterCache->Get(uri);
+    this->FlushStream<std::ostream>(manifest, stream.get());
 }
 
 std::string GLBResourceWriter::GenerateBufferUri(const std::string& bufferId) const

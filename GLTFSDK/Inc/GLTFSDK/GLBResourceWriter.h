@@ -20,6 +20,9 @@ namespace Microsoft
             GLBResourceWriter(std::unique_ptr<IStreamWriterCache> streamCache);
             GLBResourceWriter(std::unique_ptr<IStreamWriterCache> streamCache, std::unique_ptr<std::iostream> tempBufferStream);
 
+            // Write to a stream instead of a file (can be useful for draco compression)
+            template <typename T>
+            void FlushStream(const std::string& manifest, T* stream);
             void Flush(const std::string& manifest, const std::string& uri);
             std::string GenerateBufferUri(const std::string& bufferId) const override;
             std::ostream* GetBufferStream(const std::string& bufferId) override;
