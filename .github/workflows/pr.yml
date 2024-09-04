@@ -1,0 +1,98 @@
+name: Master - PR
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+    # Windows
+    build-windows:
+        runs-on: windows-2019
+        strategy:
+          matrix:
+            platform: [Win32, x64, ARM, ARM64]
+            config: [Debug, Release]
+        steps:
+          - name: Git Checkout
+            uses: actions/checkout@v2.3.3
+            with:
+              submodules: 'true'
+          - name: Setup MSBuild
+            uses: microsoft/setup-msbuild@v1.0.2
+          - name: Setup CMake
+            uses: jwlawson/actions-setup-cmake@v1.8
+            with:
+              cmake-version: 'latest'
+          - name: CMake Configure
+            run: cmake -G "Visual Studio 16 2019" -A ${{ matrix.platform }} ..\..\..
+            working-directory: built\Int\cmake_${{ matrix.platform }}
+          - name: CMake Build
+            run: cmake --build . --target install --config ${{ matrix.config }}
+            working-directory: built\Int\cmake_${{ matrix.platform }}
+          - name: Running Unit Tests
+            if: (${{ matrix.platform }} == 'x64') || (${{ matrix.platform }} == 'Win32')
+            run: .\GLTFSDK.Test.exe --gtest_output=xml:GLTFSDK.Test.log
+            working-directory: built\Out\windows_${{ matrix.platform }}\${{ matrix.config }}\GLTFSDK.Test
+          - uses: actions/upload-artifact@v4
+            name: "Upload test results"
+            if: (${{ matrix.platform }} == 'x64') || (${{ matrix.platform }} == 'Win32')
+            with:
+              name: GLTFSDK.Test.Windows.${{ matrix.platform }}.${{ matrix.config }}
+              path: built\Out\windows_${{ matrix.platform }}\${{ matrix.config }}\GLTFSDK.Test\GLTFSDK.Test.log
+    # MacOS
+    build-macos:
+        runs-on: macos-latest
+        strategy:
+          matrix:
+            platform: [macOS]
+            config: [Debug, Release]
+        steps:
+          - name: Git Checkout
+            uses: actions/checkout@v2.3.3
+            with:
+              submodules: 'true'
+          - name: Setup MSBuild
+            uses: microsoft/setup-msbuild@v1.0.2
+          - name: Setup CMake
+            uses: jwlawson/actions-setup-cmake@v1.8
+            with:
+              cmake-version: 'latest'
+          - name: CMake Configure
+            run: cmake -G Xcode
+            working-directory: built\Int\cmake_${{ matrix.platform }}
+          - name: CMake Build
+            run: cmake --build . --target install --config ${{ matrix.config }}
+            working-directory: built\Int\cmake_${{ matrix.platform }}
+          - name: Running Unit Tests
+            run: ./GLTFSDK.Test --gtest_output=xml:GLTFSDK.Test.log
+            working-directory: built\Out\${{ matrix.platform }}\${{ matrix.config }}\GLTFSDK.Test
+          - uses: actions/upload-artifact@v4
+            name: "Upload test results"
+            with:
+              name: GLTFSDK.Test.MacOS.${{ matrix.platform }}.${{ matrix.config }}
+              path: built\Out\${{ matrix.platform }}\${{ matrix.config }}\GLTFSDK.Test\GLTFSDK.Test.log
+    # iOS
+    build-ios:
+        runs-on: macos-latest
+        strategy:
+          matrix:
+            platform: [iOS]
+            config: [Debug, Release]
+        steps:
+          - name: Git Checkout
+            uses: actions/checkout@v2.3.3
+            with:
+              submodules: 'true'
+          - name: Setup MSBuild
+            uses: microsoft/setup-msbuild@v1.0.2
+          - name: Setup CMake
+            uses: jwlawson/actions-setup-cmake@v1.8
+            with:
+              cmake-version: 'latest'
+          - name: CMake Configure
+            run: -G Xcode -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/Build/CMake/ios.toolchain.cmake" -DPLATFORM=OS -DDEPLOYMENT_TARGET="10.11" -DENABLE_UNIT_TESTS="OFF"'
+            working-directory: built\Int\cmake_${{ matrix.platform }}
+          - name: CMake Build
+            run: cmake --build . --target install --config ${{ matrix.config }}
+            working-directory: built\Int\cmake_${{ matrix.platform }}
