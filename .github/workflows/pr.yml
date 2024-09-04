@@ -18,7 +18,7 @@ jobs:
             config: [Debug, Release]
         steps:
           - name: Git Checkout
-            uses: actions/checkout@v2.3.3
+            uses: actions/checkout@v4
             with:
               submodules: 'true'
           - name: Setup MSBuild
@@ -40,12 +40,12 @@ jobs:
             run: cmake --build . --target install --config ${{ matrix.config }}
             working-directory: ${{ github.workspace }}\built\Int\cmake_${{ matrix.platform }}
           - name: Running Unit Tests
-            if: ${{ (matrix.platform != 'x64') || (matrix.platform != 'Win32') }}
+            if: ${{ (matrix.platform == 'x64') || (matrix.platform == 'Win32') }}
             run: .\GLTFSDK.Test.exe --gtest_output=xml:GLTFSDK.Test.log
             working-directory: ${{ github.workspace }}\built\Out\windows_${{ matrix.platform }}\${{ matrix.config }}\GLTFSDK.Test
           - uses: actions/upload-artifact@v4
             name: "Upload test results"
-            if: ${{ (matrix.platform != 'x64') || (matrix.platform != 'Win32') }}
+            if: ${{ (matrix.platform == 'x64') || (matrix.platform == 'Win32') }}
             with:
               name: GLTFSDK.Test.Windows.${{ matrix.platform }}.${{ matrix.config }}
               path: built\Out\windows_${{ matrix.platform }}\${{ matrix.config }}\GLTFSDK.Test\GLTFSDK.Test.log
@@ -58,7 +58,7 @@ jobs:
             config: [Debug, Release]
         steps:
           - name: Git Checkout
-            uses: actions/checkout@v2.3.3
+            uses: actions/checkout@v4
             with:
               submodules: 'true'
           - name: Setup CMake
@@ -94,7 +94,7 @@ jobs:
             config: [Debug, Release]
         steps:
           - name: Git Checkout
-            uses: actions/checkout@v2.3.3
+            uses: actions/checkout@v4
             with:
               submodules: 'true'
           - name: Setup CMake
