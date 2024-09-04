@@ -106,7 +106,7 @@ jobs:
               cd Int && 
               mkdir cmake_${{ matrix.platform }}
           - name: CMake Configure
-            run: -G Xcode -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/Build/CMake/ios.toolchain.cmake" -DPLATFORM=OS -DDEPLOYMENT_TARGET="10.11" -DENABLE_UNIT_TESTS="OFF" ../../..
+            run: cmake -G Xcode -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/Build/CMake/ios.toolchain.cmake" -DPLATFORM=OS -DDEPLOYMENT_TARGET="10.11" -DENABLE_UNIT_TESTS="OFF" ../../..
             working-directory: ./built/Int/cmake_${{ matrix.platform }}
           - name: CMake Build
             run: cmake --build . --target install --config ${{ matrix.config }}
