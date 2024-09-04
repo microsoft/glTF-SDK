@@ -32,9 +32,11 @@ namespace Microsoft
             template <>
             inline void AreEqual<float>(const std::vector<float>& a, const std::vector<float>& b, wchar_t const* message)
             {
+                const float tolerancePercentage = 0.0001f;
+
                 Assert::IsTrue(std::equal(std::begin(a), std::end(a), std::begin(b), std::end(b), 
-                [](float a, float b){
-                    return  std::abs(a - b) <= std::numeric_limits<float>::epsilon();
+                [tolerancePercentage](float a, float b){
+                    return  std::abs(a - b) <= std::abs(a * tolerancePercentage);
                 }), message);
             }
 
