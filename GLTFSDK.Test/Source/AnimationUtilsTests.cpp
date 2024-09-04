@@ -120,13 +120,21 @@ namespace Microsoft
                     // Accessor
                     GLTFResourceReader reader(readerWriter);
                     auto output = AnimationUtils::GetRotations(doc, reader, accessor);
+                    
+                    printf("\n DEBUG ACCESSOR ROTATION COMPARE: \n a0: %.10f \n a1: %.10f \n a2: %.10f \n a3: %.10f \n b0: %.10f \n b1: %.10f \n b2: %.10f \n b3: %.10f", expectedOutput[0], expectedOutput[1], expectedOutput[2], expectedOutput[3], output[0], output[1], output[2], output[3]);
+
                     AreEqual(expectedOutput, output, msg.c_str());
 
                     // Sampler
                     AnimationSampler animationSampler;
                     animationSampler.outputAccessorId = accessor.id;
                     output = AnimationUtils::GetRotations(doc, reader, animationSampler);
+                    
+                    printf("\n DEBUG SAMPLER ROTATION COMPARE: \n a0: %.10f \n a1: %.10f \n a2: %.10f \n a3: %.10f \n b0: %.10f \n b1: %.10f \n b2: %.10f \n b3: %.10f", expectedOutput[0], expectedOutput[1], expectedOutput[2], expectedOutput[3], output[0], output[1], output[2], output[3]);
+
                     AreEqual(expectedOutput, output, msg.c_str());
+
+
                 }
             }
 

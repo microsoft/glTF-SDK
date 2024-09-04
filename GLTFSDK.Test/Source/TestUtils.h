@@ -35,9 +35,7 @@ namespace Microsoft
                 const float tolerancePercentage = 0.0001f;
 
                 Assert::IsTrue(std::equal(std::begin(a), std::end(a), std::begin(b), std::end(b), 
-                [tolerancePercentage](float a, float b){
-                    
-                    printf("DEBUG FLOAT COMPARE: \n a: %f \n b: %f \n a - b: %f \n tolerance: %f \n result: %d", a, b, std::abs(a - b), std::abs(a * tolerancePercentage), std::abs(a - b) <= std::abs(a * tolerancePercentage));
+                [tolerancePercentage](float a, float b){    
                     return  std::abs(a - b) <= std::abs(a * tolerancePercentage);
                 }), message);
             }
