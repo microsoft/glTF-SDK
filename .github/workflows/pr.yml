@@ -1,4 +1,4 @@
-name: Master - PR
+name: Master - CI
 on:
   push:
     branches: [ "master" , "sergio/github-actions-migration" ]
@@ -22,7 +22,7 @@ jobs:
             with:
               submodules: 'true'
           - name: Setup CMake
-            uses: jwlawson/actions-setup-cmake@v2
+            uses: jwlawson/actions-setup-cmake@v2.0.2
             with:
               cmake-version: ${{ env.CMake_Version }}
           - name: Make Solution Directory
@@ -60,7 +60,7 @@ jobs:
             with:
               submodules: 'true'
           - name: Setup CMake
-            uses: jwlawson/actions-setup-cmake@v2
+            uses: jwlawson/actions-setup-cmake@v2.0.2
             with:
               cmake-version: ${{ env.CMake_Version }}
           - name: Make Solution Directory
@@ -96,7 +96,7 @@ jobs:
             with:
               submodules: 'true'
           - name: Setup CMake
-            uses: jwlawson/actions-setup-cmake@v2
+            uses: jwlawson/actions-setup-cmake@v2.0.2
             with:
               cmake-version: ${{ env.CMake_Version }}
           - name: Make Solution Directory

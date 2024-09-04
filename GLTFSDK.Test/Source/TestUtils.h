@@ -24,17 +24,17 @@ namespace Microsoft
         namespace Test
         {
             template <typename T>
-            static void AreEqual(const std::vector<T>& a, const std::vector<T>& b, wchar_t const* message = nullptr)
+            inline void AreEqual(const std::vector<T>& a, const std::vector<T>& b, wchar_t const* message = nullptr)
             {
                 Assert::IsTrue(a == b, message);
             }
 
             template <>
-            void AreEqual<float>(const std::vector<float>& a, const std::vector<float>& b, wchar_t const* message)
+            inline void AreEqual<float>(const std::vector<float>& a, const std::vector<float>& b, wchar_t const* message)
             {
                 Assert::IsTrue(std::equal(std::begin(a), std::end(a), std::begin(b), std::end(b), 
                 [](float a, float b){
-                    return std::numeric_limits<float>::epsilon() > (a - b);
+                    return  std::abs(a - b) <= std::numeric_limits<float>::epsilon();
                 }), message);
             }
 
