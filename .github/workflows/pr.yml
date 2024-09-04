@@ -27,6 +27,12 @@ jobs:
             uses: jwlawson/actions-setup-cmake@v1.8
             with:
               cmake-version: ${{ env.CMake_Version }}
+          - name: Make Solution Directory
+            run: mkdir built && 
+              cd built &&
+              mkdir Int &&
+              cd Int && 
+              mkdir cmake_${{ matrix.platform }}
           - name: CMake Configure
             run: cmake -G "Visual Studio 16 2019" -A ${{ matrix.platform }} ..\..\..
             working-directory: built\Int\cmake_${{ matrix.platform }}
@@ -59,6 +65,12 @@ jobs:
             uses: jwlawson/actions-setup-cmake@v1.8
             with:
               cmake-version: ${{ env.CMake_Version }}
+          - name: Make Solution Directory
+            run: mkdir built && 
+              cd built &&
+              mkdir Int &&
+              cd Int && 
+              mkdir cmake_${{ matrix.platform }}
           - name: CMake Configure
             run: cmake -G Xcode
             working-directory: built\Int\cmake_${{ matrix.platform }}
@@ -89,6 +101,12 @@ jobs:
             uses: jwlawson/actions-setup-cmake@v1.8
             with:
               cmake-version: ${{ env.CMake_Version }}
+          - name: Make Solution Directory
+            run: mkdir built && 
+              cd built &&
+              mkdir Int &&
+              cd Int && 
+              mkdir cmake_${{ matrix.platform }}
           - name: CMake Configure
             run: -G Xcode -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/Build/CMake/ios.toolchain.cmake" -DPLATFORM=OS -DDEPLOYMENT_TARGET="10.11" -DENABLE_UNIT_TESTS="OFF"'
             working-directory: built\Int\cmake_${{ matrix.platform }}
