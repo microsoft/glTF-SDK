@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 project (GLTFSDK)
 
+
 option(ENABLE_UNIT_TESTS "ENABLE_UNIT_TESTS" ON)
 if(ENABLE_UNIT_TESTS)
     enable_testing()
