@@ -5,6 +5,9 @@ on:
   pull_request:
     branches: [ "master" ]
 
+env:
+  CMake_Version: '3.26.3'
+
 jobs:
     # Windows
     build-windows:
@@ -23,7 +26,7 @@ jobs:
           - name: Setup CMake
             uses: jwlawson/actions-setup-cmake@v1.8
             with:
-              cmake-version: 'latest'
+              cmake-version: ${{ env.CMake_Version }}
           - name: CMake Configure
             run: cmake -G "Visual Studio 16 2019" -A ${{ matrix.platform }} ..\..\..
             working-directory: built\Int\cmake_${{ matrix.platform }}
@@ -55,7 +58,7 @@ jobs:
           - name: Setup CMake
             uses: jwlawson/actions-setup-cmake@v1.8
             with:
-              cmake-version: 'latest'
+              cmake-version: ${{ env.CMake_Version }}
           - name: CMake Configure
             run: cmake -G Xcode
             working-directory: built\Int\cmake_${{ matrix.platform }}
@@ -85,7 +88,7 @@ jobs:
           - name: Setup CMake
             uses: jwlawson/actions-setup-cmake@v1.8
             with:
-              cmake-version: 'latest'
+              cmake-version: ${{ env.CMake_Version }}
           - name: CMake Configure
             run: -G Xcode -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/Build/CMake/ios.toolchain.cmake" -DPLATFORM=OS -DDEPLOYMENT_TARGET="10.11" -DENABLE_UNIT_TESTS="OFF"'
             working-directory: built\Int\cmake_${{ matrix.platform }}
