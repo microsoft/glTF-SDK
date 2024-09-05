@@ -1,7 +1,7 @@
 name: Master - CI
 on:
   push:
-    branches: [ "master" , "sergio/github-actions-migration" ]
+    branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
   schedule:
