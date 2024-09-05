@@ -82,10 +82,8 @@ namespace Microsoft
 
                 // Utility for verifying GetRotations
                 template<typename T>
-                void VerifyGetRotations()
-                {
-                    std::vector<float> testValues = { 0.213941514f, 0.963860869f, 0.158749819f, 0.204712942f };
-
+                void VerifyGetRotations(std::vector<float> testValues)
+                {                
                     auto readerWriter = std::make_shared<const StreamReaderWriter>();
                     auto bufferBuilder = BufferBuilder(std::make_unique<GLTFResourceWriter>(readerWriter));
 
@@ -254,11 +252,14 @@ namespace Microsoft
                 // Verify GetRotations for all possible component types
                 GLTFSDK_TEST_METHOD(AnimationUtilsTests, AnimationUtils_Test_GetRotations)
                 {
-                    VerifyGetRotations<float>();
-                    VerifyGetRotations<int8_t>();
-                    VerifyGetRotations<uint8_t>();
-                    VerifyGetRotations<int16_t>();
-                    VerifyGetRotations<uint16_t>();
+                    const std::vector<float> testValues = { 0.213941514f, 0.963860869f, -0.158749819f, 0.204712942f };
+                    const std::vector<float> testValuesPositivesOnly = { 0.213941514f, 0.963860869f, 0.158749819f, 0.204712942f };
+
+                    VerifyGetRotations<float>(testValues);
+                    VerifyGetRotations<int8_t>(testValues);
+                    VerifyGetRotations<uint8_t>(testValuesPositivesOnly);
+                    VerifyGetRotations<int16_t>(testValues);
+                    VerifyGetRotations<uint16_t>(testValuesPositivesOnly);
                 }
             };
         }
