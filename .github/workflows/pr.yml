@@ -5,22 +5,19 @@ on:
   pull_request:
     branches: [ "master" ]
 
-env:
-  cmake-version: '3.26.3'
-
 jobs:
     # Windows
     build-windows:
       uses: ./.github/workflows/windows.yml
       with:
-        cmake-version: ${{ env.cmake-version }}
+        cmake-version: '3.26.3'
     # MacOS
     build-macos:
       uses: ./.github/workflows/macos.yml
       with:
-        cmake-version: ${{ env.cmake-version }}
+        cmake-version: '3.26.3'
     # iOS
     build-ios:
       uses: ./.github/workflows/ios.yml
       with:
-        cmake-version: ${{ env.cmake-version }}
+        cmake-version: '3.26.3'
