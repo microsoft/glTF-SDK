@@ -6,14 +6,20 @@ on:
       cmake-version:
         required: true
         type: string
+      platforms:
+        required: true
+        type: string
+      configurations:
+        required: true
+        type: string
 
 jobs:
-  build-macos:
+  build:
     runs-on: macos-latest
     strategy:
         matrix:
-            platform: [macOS]
-            config: [Debug, Release]
+            platform: ${{ fromJson(inputs.platforms) }}
+            config: ${{ fromJson(inputs.configurations) }}
     steps:
       - name: Git Checkout
         uses: actions/checkout@v4
