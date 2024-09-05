@@ -1,0 +1,37 @@
+name: 'build macos'
+
+on:
+  workflow_call:
+    inputs:
+      cmake-version:
+        required: true
+        type: string
+
+jobs:
+  build-ios:
+    runs-on: macos-latest
+    strategy:
+        matrix:
+            platform: [iOS]
+            config: [Debug, Release]
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v4
+        with:
+            submodules: 'true'
+      - name: Setup CMake
+        uses: jwlawson/actions-setup-cmake@v2.0.2
+        with:
+            cmake-version: ${{ inputs.cmake-version }}
+      - name: Make Solution Directory
+        run: mkdir built && 
+            cd built &&
+            mkdir Int &&
+            cd Int && 
+            mkdir cmake_${{ matrix.platform }}
+      - name: CMake Configure
+        run: cmake -G Xcode -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/Build/CMake/ios.toolchain.cmake" -DPLATFORM=OS -DDEPLOYMENT_TARGET="10.11" -DENABLE_UNIT_TESTS="OFF" ../../..
+        working-directory: ./built/Int/cmake_${{ matrix.platform }}
+      - name: CMake Build
+        run: cmake --build . --target install --config ${{ matrix.config }}
+        working-directory: ./built/Int/cmake_${{ matrix.platform }}

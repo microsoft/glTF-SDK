@@ -1,9 +1,9 @@
-name: Master - CI
+name: Nightly build
+
 on:
-  push:
-    branches: [ "master" , "sergio/github-actions-migration" ]
-  pull_request:
-    branches: [ "master" ]
+  workflow_dispatch:
+  schedule:
+    - cron: 0 23 * * 1-5
 
 env:
   cmake-version: '3.26.3'
