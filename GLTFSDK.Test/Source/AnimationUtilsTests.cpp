@@ -82,7 +82,7 @@ namespace Microsoft
 
                 // Utility for verifying GetRotations
                 template<typename T>
-                void VerifyGetRotations(std::vector<float> testValues)
+                void VerifyGetRotations(const std::vector<float>& testValues)
                 {                
                     auto readerWriter = std::make_shared<const StreamReaderWriter>();
                     auto bufferBuilder = BufferBuilder(std::make_unique<GLTFResourceWriter>(readerWriter));
