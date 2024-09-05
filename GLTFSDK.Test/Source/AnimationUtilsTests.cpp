@@ -120,14 +120,12 @@ namespace Microsoft
                     // Accessor
                     GLTFResourceReader reader(readerWriter);
                     auto output = AnimationUtils::GetRotations(doc, reader, accessor);
-                    
                     AreEqual(expectedOutput, output, msg.c_str());
 
                     // Sampler
                     AnimationSampler animationSampler;
                     animationSampler.outputAccessorId = accessor.id;
                     output = AnimationUtils::GetRotations(doc, reader, animationSampler);
-                    
                     AreEqual(expectedOutput, output, msg.c_str());
                 }
             }
