@@ -129,8 +129,6 @@ namespace Microsoft
                     output = AnimationUtils::GetRotations(doc, reader, animationSampler);
                     
                     AreEqual(expectedOutput, output, msg.c_str());
-
-
                 }
             }
 
