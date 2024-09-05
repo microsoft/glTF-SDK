@@ -6,14 +6,20 @@ on:
       cmake-version:
         required: true
         type: string
+      platforms:
+        required: true
+        type: string
+      configurations:
+        required: true
+        type: string
 
 jobs:
-  build-windows:
+  build:
     runs-on: windows-2019
     strategy:
         matrix:
-            platform: [Win32, x64, ARM, ARM64]
-            config: [Debug, Release]
+            platform: ${{ fromJson(inputs.platforms) }}
+            config: ${{ fromJson(inputs.configurations) }}
     steps:
       - name: Git Checkout
         uses: actions/checkout@v4
