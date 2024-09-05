@@ -1,4 +1,4 @@
-[![Build Status](https://gltfsdk.visualstudio.com/build/_apis/build/status/Microsoft.glTF-SDK)](https://gltfsdk.visualstudio.com/build/_build/latest?definitionId=1)
+[![Build Status](https://github.com/microsoft/glTF-SDK/actions/workflows/ci.yml/badge.svg)](https://github.com/microsoft/glTF-SDK/actions/workflows/ci.yml)
 
 # Microsoft glTF SDK - A C++ Deserializer/Serializer for glTF
 
@@ -9,14 +9,6 @@
 * Built-in schema validation during deserialization
 * Low memory overhead
 * Utilities for converting input data of any type (e.g. float/uint8/uint16 RGB/RGBA color) into a single type such as float RGBA color
-
-# Nuget Packages
-
-* [Microsoft.glTF.VS2019.CPP](https://www.nuget.org/packages/Microsoft.glTF.VS2019.CPP/)
-* [Microsoft.glTF.VS2017.CPP](https://www.nuget.org/packages/Microsoft.glTF.VS2017.CPP/)
-* [Microsoft.glTF.macOS.CPP](https://www.nuget.org/packages/Microsoft.glTF.macOS.CPP/)
-* [Microsoft.glTF.iOS.CPP](https://www.nuget.org/packages/Microsoft.glTF.iOS.CPP/)
-* [Microsoft.glTF.Android.CPP](https://www.nuget.org/packages/Microsoft.glTF.Android.CPP/)
 
 # Trademarks
 
