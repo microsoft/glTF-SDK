@@ -15,6 +15,8 @@ if (MSVC)
     # Set warning level to 4 (/W4)
     target_compile_options(Serialize PRIVATE "/Zi;/W4;/EHsc")
 
+    add_msvc_security_flags(Serialize)
+
     # Make sure that all PDB files on Windows are installed to the output folder.  By default, only the debug build does this.
     set_target_properties(Serialize PROPERTIES COMPILE_PDB_NAME "Serialize" COMPILE_PDB_OUTPUT_DIRECTORY "${RUNTIME_OUTPUT_DIRECTORY}")
 endif()
