@@ -384,7 +384,7 @@ std::unique_ptr<Extension> KHR::MeshPrimitives::DeserializeDracoMeshCompression(
     if (!doc.IsObject()) {
       return extension;
     }
-    const auto v = doc.GetObject();
+    const rapidjson::Value v = doc.GetObject();
 
     extension->bufferViewId = GetMemberValueAsString<uint32_t>(v, "bufferView");
 
