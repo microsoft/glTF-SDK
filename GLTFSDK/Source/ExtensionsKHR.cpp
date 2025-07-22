@@ -237,7 +237,7 @@ std::unique_ptr<Extension> KHR::Materials::DeserializePBRSpecGloss(const std::st
     if (!doc.IsObject()) {
       return std::make_unique<Materials::PBRSpecularGlossiness>(specGloss);
     }
-    const auto sit = doc.GetObject();
+    const rapidjson::Value sit = doc.GetObject();
 
     // Diffuse Factor
     auto diffuseFactIt = sit.FindMember("diffuseFactor");
@@ -320,7 +320,7 @@ std::unique_ptr<Extension> KHR::Materials::DeserializeUnlit(const std::string& j
     if (!doc.IsObject()) {
       return std::make_unique<Unlit>(unlit);
     }
-    const auto objValue = doc.GetObject();
+    const rapidjson::Value objValue = doc.GetObject();
 
     ParseProperty(objValue, unlit, extensionDeserializer);
 
@@ -493,7 +493,7 @@ std::unique_ptr<Extension> KHR::TextureInfos::DeserializeTextureTransform(const 
     if (!doc.IsObject()) {
       return std::make_unique<TextureTransform>(textureTransform);
     }
-    const auto sit = doc.GetObject();
+    const rapidjson::Value sit = doc.GetObject();
 
     // Offset
     auto offsetIt = sit.FindMember("offset");
