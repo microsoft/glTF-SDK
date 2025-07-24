@@ -29,4 +29,8 @@ target_link_libraries(Deserialize
     GLTFSDK
 )
 
+if (CMAKE_COMPILER_IS_GNUCC AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 8.1)
+    target_link_libraries(Deserialize stdc++fs)
+endif()
+
 CreateGLTFInstallTargets(Deserialize ${Platform})
