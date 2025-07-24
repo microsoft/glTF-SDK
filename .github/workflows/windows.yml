@@ -15,7 +15,7 @@ on:
 
 jobs:
   build:
-    runs-on: windows-2019
+    runs-on: windows
     strategy:
         matrix:
             platform: ${{ fromJson(inputs.platforms) }}
@@ -30,7 +30,7 @@ jobs:
         with:
             cmake-version: ${{ inputs.cmake-version }}
       - name: CMake Configure
-        run: cmake -G "Visual Studio 16 2019" -A ${{ matrix.platform }} -B ./built/Int/cmake_${{ matrix.platform }} .
+        run: cmake -G "Visual Studio 17 2022" -A ${{ matrix.platform }} -B ./built/Int/cmake_${{ matrix.platform }} .
       - name: CMake Build
         run: cmake --build . --target install --config ${{ matrix.config }}
         working-directory: ./built/Int/cmake_${{ matrix.platform }}
