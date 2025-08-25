@@ -39,6 +39,8 @@ elseif (IOS_PLATFORM)
     endif()
 elseif (MSVC)
     set(${outPlatform} "windows_${CMAKE_GENERATOR_PLATFORM}" PARENT_SCOPE)
+elseif (UNIX AND NOT APPLE)
+    set(${outPlatform} "${CMAKE_SYSTEM_NAME}" PARENT_SCOPE)
 else()
     # MacOS
     set(${outPlatform} macOS PARENT_SCOPE)
