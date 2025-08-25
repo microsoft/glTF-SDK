@@ -14,25 +14,25 @@ jobs:
       with:
         cmake-version: '3.31.0'
         platforms: "['x64', 'Win32', 'ARM64']"
-        configurations: "['Release', 'Debug']"
+        configurations: "['RelWithDebInfo', 'Debug']"
     # MacOS
     build-macos:
       uses: ./.github/workflows/macos.yml
       with:
         cmake-version: '3.31.0'
         platforms: "['macOS']"
-        configurations: "['Release', 'Debug']"
+        configurations: "['RelWithDebInfo', 'Debug']"
     # iOS
     build-ios:
       uses: ./.github/workflows/ios.yml
       with:
         cmake-version: '3.31.0'
         platforms: "['iOS']"
-        configurations: "['Release', 'Debug']"
+        configurations: "['RelWithDebInfo', 'Debug']"
     # Linux
     build-linux:
       uses: ./.github/workflows/linux.yml
       with:
         cmake-version: '3.31.0'
         platforms: "['x64']"
-        configurations: "['Release', 'Debug']"
+        configurations: "['RelWithDebInfo', 'Debug']"

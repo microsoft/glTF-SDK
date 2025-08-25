@@ -30,7 +30,7 @@ jobs:
         with:
             cmake-version: ${{ inputs.cmake-version }}
       - name: CMake Configure
-        run: cmake -G "Unix Makefiles" -B ./built/Int/cmake_${{ matrix.platform }} .
+        run: cmake -G "Ninja" -B ./built/Int/cmake_${{ matrix.platform }} CMAKE_BUILD_TYPE=${{ matrix.config }} .
       - name: CMake Build
         run: cmake --build . --target install --config ${{ matrix.config }}
         working-directory: ./built/Int/cmake_${{ matrix.platform }}
