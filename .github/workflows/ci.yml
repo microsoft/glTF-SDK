@@ -29,3 +29,10 @@ jobs:
         cmake-version: '3.31.0'
         platforms: "['iOS']"
         configurations: "['Release', 'Debug']"
+    # Linux
+    build-linux:
+      uses: ./.github/workflows/linux.yml
+      with:
+        cmake-version: '3.31.0'
+        platforms: "['x64']"
+        configurations: "['Release', 'Debug']"
