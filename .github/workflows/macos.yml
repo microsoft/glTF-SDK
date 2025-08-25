@@ -1,0 +1,44 @@
+name: 'build macos'
+
+on:
+  workflow_call:
+    inputs:
+      cmake-version:
+        required: true
+        type: string
+      platforms:
+        required: true
+        type: string
+      configurations:
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: macos-latest
+    strategy:
+        matrix:
+            platform: ${{ fromJson(inputs.platforms) }}
+            config: ${{ fromJson(inputs.configurations) }}
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v4
+        with:
+            submodules: 'true'
+      - name: Setup CMake
+        uses: jwlawson/actions-setup-cmake@v2.0.2
+        with:
+            cmake-version: ${{ inputs.cmake-version }}
+      - name: CMake Configure
+        run: cmake -G Xcode -B ./built/Int/cmake_${{ matrix.platform }} .
+      - name: CMake Build
+        run: cmake --build . --target install --config ${{ matrix.config }}
+        working-directory: ./built/Int/cmake_${{ matrix.platform }}
+      - name: Running Unit Tests
+        run: ./GLTFSDK.Test --gtest_output=xml:GLTFSDK.Test.log
+        working-directory: ./built/Out/${{ matrix.platform }}/${{ matrix.config }}/GLTFSDK.Test
+      - uses: actions/upload-artifact@v4
+        name: "Upload test results"
+        with:
+            name: GLTFSDK.Test.MacOS.${{ matrix.platform }}.${{ matrix.config }}
+            path: ${{ github.workspace }}/built/Out/${{ matrix.platform }}/${{ matrix.config }}/GLTFSDK.Test/GLTFSDK.Test.log

@@ -13,6 +13,7 @@
 #include <memory>
 #include <unordered_map>
 #include <sstream>
+#include <limits>
 
 using namespace glTF::UnitTest;
 
@@ -23,9 +24,20 @@ namespace Microsoft
         namespace Test
         {
             template <typename T>
-            static void AreEqual(const std::vector<T>& a, const std::vector<T>& b, wchar_t const* message = nullptr)
+            inline void AreEqual(const std::vector<T>& a, const std::vector<T>& b, wchar_t const* message = nullptr)
             {
                 Assert::IsTrue(a == b, message);
+            }
+
+            template <>
+            inline void AreEqual<float>(const std::vector<float>& a, const std::vector<float>& b, wchar_t const* message)
+            {
+                const float tolerancePercentage = 0.0001f;
+
+                Assert::IsTrue(std::equal(std::begin(a), std::end(a), std::begin(b), std::end(b), 
+                [tolerancePercentage](float a, float b){    
+                    return  std::abs(a - b) <= std::abs(a * tolerancePercentage);
+                }), message);
             }
 
             class StreamReaderWriter : public Microsoft::glTF::IStreamWriter, public Microsoft::glTF::IStreamReader

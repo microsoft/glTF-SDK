@@ -1,4 +1,4 @@
-[![Build Status](https://gltfsdk.visualstudio.com/build/_apis/build/status/Microsoft.glTF-SDK)](https://gltfsdk.visualstudio.com/build/_build/latest?definitionId=1)
+[![Build Status](https://github.com/microsoft/glTF-SDK/actions/workflows/ci.yml/badge.svg)](https://github.com/microsoft/glTF-SDK/actions/workflows/ci.yml)
 
 # Microsoft glTF SDK - A C++ Deserializer/Serializer for glTF
 
@@ -10,13 +10,52 @@
 * Low memory overhead
 * Utilities for converting input data of any type (e.g. float/uint8/uint16 RGB/RGBA color) into a single type such as float RGBA color
 
-# Nuget Packages
+# Project setup and build
 
-* [Microsoft.glTF.VS2019.CPP](https://www.nuget.org/packages/Microsoft.glTF.VS2019.CPP/)
-* [Microsoft.glTF.VS2017.CPP](https://www.nuget.org/packages/Microsoft.glTF.VS2017.CPP/)
-* [Microsoft.glTF.macOS.CPP](https://www.nuget.org/packages/Microsoft.glTF.macOS.CPP/)
-* [Microsoft.glTF.iOS.CPP](https://www.nuget.org/packages/Microsoft.glTF.iOS.CPP/)
-* [Microsoft.glTF.Android.CPP](https://www.nuget.org/packages/Microsoft.glTF.Android.CPP/)
+This quick overview will help you get started developing in the glTF SDK
+repository. We support development on Windows, macOS, and Linux. This overview is intended
+for developers familiar with common native development practices.
+
+## **CMake Configure and Build**
+
+**Required Tools:** [git](https://git-scm.com/), [CMake (version 3.X.X)](https://cmake.org/), [powershell](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell?view=powershell-7.5)
+
+The first step for all development environments and targets is to clone the repo. Use a
+git-enabled terminal to follow the steps below.
+
+```
+git clone https://github.com/microsoft/glTF-SDK.git
+```
+
+glTF SDK build system is based on CMake, which customarily uses a separate
+build directory. Build directory location is up to you, but we highly recommend using
+the `Built` directory from the repository root. The `.gitignore` file is set up to
+ignore this `Built` directory.
+
+**NOTE:** We don't currently support usage of CMake 4.0 or higher.
+
+Use the following command to output a platform specific project using CMake:
+
+```
+cmake -B Built
+```
+
+Use the following command to build the binaries and install: 
+
+```
+cmake --build ./Built --target install --config Debug
+```
+
+This will install all binaries produced by this repo into a "Built/Out". This include the static library, the Serialize and Deserialize applications as well as the GLTFSDK.Test test application.
+
+
+## **Running tests**
+
+To run the test application and save the results just use the following command from the GLTFSDK.Test installation folder:
+
+```
+.\GLTFSDK.Test.exe --gtest_output=xml:GLTFSDK.Test.log
+```
 
 # Trademarks
 
