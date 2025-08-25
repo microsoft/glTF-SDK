@@ -34,5 +34,5 @@ jobs:
       uses: ./.github/workflows/linux.yml
       with:
         cmake-version: '3.31.0'
-        platforms: "['linux']"
+        platforms: "['Linux']"
         configurations: "['RelWithDebInfo', 'Debug']"
