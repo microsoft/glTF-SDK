@@ -13,7 +13,7 @@ jobs:
       uses: ./.github/workflows/windows.yml
       with:
         cmake-version: '3.31.0'
-        platforms: "['x64', 'Win32', 'ARM', 'ARM64']"
+        platforms: "['x64', 'Win32', 'ARM64']"
         configurations: "['Release', 'Debug']"
     # MacOS
     build-macos:
