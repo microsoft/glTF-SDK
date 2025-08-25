@@ -30,17 +30,17 @@ jobs:
         with:
             cmake-version: ${{ inputs.cmake-version }}
       - name: CMake Configure
-        run: cmake -G "Visual Studio 17 2022" -A ${{ matrix.platform }} -B ./built/Int/cmake_${{ matrix.platform }} .
+        run: cmake -G "Visual Studio 17 2022" -A ${{ matrix.platform }} -B ./Built/Int/cmake_${{ matrix.platform }} .
       - name: CMake Build
         run: cmake --build . --target install --config ${{ matrix.config }}
-        working-directory: ./built/Int/cmake_${{ matrix.platform }}
+        working-directory: ./Built/Int/cmake_${{ matrix.platform }}
       - name: Running Unit Tests
         if: ${{ (matrix.platform == 'x64') || (matrix.platform == 'Win32') }}
         run: .\GLTFSDK.Test.exe --gtest_output=xml:GLTFSDK.Test.log
-        working-directory: ./built/Out/windows_${{ matrix.platform }}\${{ matrix.config }}\GLTFSDK.Test
+        working-directory: ./Built/Out/windows_${{ matrix.platform }}\${{ matrix.config }}\GLTFSDK.Test
       - uses: actions/upload-artifact@v4
         name: "Upload test results"
         if: ${{ (matrix.platform == 'x64') || (matrix.platform == 'Win32') }}
         with:
             name: GLTFSDK.Test.Windows.${{ matrix.platform }}.${{ matrix.config }}
-            path: ${{ github.workspace }}\built\Out\windows_${{ matrix.platform }}\${{ matrix.config }}\GLTFSDK.Test\GLTFSDK.Test.log
+            path: ${{ github.workspace }}\Built\Out\windows_${{ matrix.platform }}\${{ matrix.config }}\GLTFSDK.Test\GLTFSDK.Test.log
