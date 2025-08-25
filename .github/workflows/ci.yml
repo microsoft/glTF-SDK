@@ -12,20 +12,20 @@ jobs:
     build-windows:
       uses: ./.github/workflows/windows.yml
       with:
-        cmake-version: '3.26.3'
-        platforms: "['x64', 'Win32', 'ARM', 'ARM64']"
+        cmake-version: '3.31.0'
+        platforms: "['x64', 'Win32', 'ARM64']"
         configurations: "['Release', 'Debug']"
     # MacOS
     build-macos:
       uses: ./.github/workflows/macos.yml
       with:
-        cmake-version: '3.26.3'
+        cmake-version: '3.31.0'
         platforms: "['macOS']"
         configurations: "['Release', 'Debug']"
     # iOS
     build-ios:
       uses: ./.github/workflows/ios.yml
       with:
-        cmake-version: '3.26.3'
+        cmake-version: '3.31.0'
         platforms: "['iOS']"
         configurations: "['Release', 'Debug']"
