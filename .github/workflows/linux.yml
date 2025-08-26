@@ -1,4 +1,4 @@
-name: 'build ios'
+name: 'build linux'
 
 on:
   workflow_call:
@@ -15,7 +15,7 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     strategy:
         matrix:
             platform: ${{ fromJson(inputs.platforms) }}
@@ -30,7 +30,15 @@ jobs:
         with:
             cmake-version: ${{ inputs.cmake-version }}
       - name: CMake Configure
-        run: cmake -G Xcode -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/Build/CMake/ios.toolchain.cmake" -DPLATFORM=OS -DDEPLOYMENT_TARGET="10.11" -DENABLE_UNIT_TESTS="OFF" -B ./Built/Int/cmake_${{ matrix.platform }} .
+        run: cmake -G "Unix Makefiles" -B ./Built/Int/cmake_${{ matrix.platform }} -D CMAKE_BUILD_TYPE=${{ matrix.config }} .
       - name: CMake Build
         run: cmake --build . --target install --config ${{ matrix.config }}
         working-directory: ./Built/Int/cmake_${{ matrix.platform }}
+      - name: Running Unit Tests
+        run: ./GLTFSDK.Test --gtest_output=xml:GLTFSDK.Test.log
+        working-directory: ./Built/Out/${{ matrix.platform }}/${{ matrix.config }}/GLTFSDK.Test
+      - uses: actions/upload-artifact@v4
+        name: "Upload test results"
+        with:
+            name: GLTFSDK.Test.Linux.${{ matrix.platform }}.${{ matrix.config }}
+            path: ${{ github.workspace }}/Built/Out/${{ matrix.platform }}/${{ matrix.config }}/GLTFSDK.Test/GLTFSDK.Test.log
