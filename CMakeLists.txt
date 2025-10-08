@@ -42,12 +42,6 @@ endif()
 if(NOT RapidJSON_FOUND)
     add_subdirectory(External/RapidJSON)
 endif()
-find_package(GTest CONFIG)
-if(NOT GTest_FOUND)
-    # import and alias just like it is already installed via VcPkg
-    add_subdirectory(External/googletest)
-    add_library(GTest::gtest_main ALIAS gtest_main)
-endif()
 
 add_subdirectory(GLTFSDK)
 
@@ -63,6 +57,15 @@ elseif(TARGET RapidJSON)
 endif()
 
 if(ENABLE_UNIT_TESTS)
+
+    # Try to find GTest via VcPkg first, then fall back to the External directory.
+    find_package(GTest CONFIG)
+    if(NOT GTest_FOUND)
+        # import and alias just like it is already installed via VcPkg
+        add_subdirectory(External/googletest)
+        add_library(GTest::gtest_main ALIAS gtest_main)
+    endif()
+
     add_subdirectory(GLTFSDK.TestUtils)
     add_subdirectory(GLTFSDK.Test)
 endif()
