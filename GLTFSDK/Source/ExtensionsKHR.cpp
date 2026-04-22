@@ -273,16 +273,14 @@ std::unique_ptr<Extension> KHR::Materials::DeserializePBRSpecGloss(const std::st
         {
             throw GLTFException("specularFactor must be an array");
         }
-        std::vector<float> specularFactor;
-        for (rapidjson::Value::ConstValueIterator ait = specularFactIt->value.Begin(); ait != specularFactIt->value.End(); ++ait)
-        {
-            specularFactor.push_back(static_cast<float>(ait->GetDouble()));
-        }
-        if (specularFactor.size() != 3)
+        if (specularFactIt->value.Size() != 3)
         {
             throw GLTFException("specularFactor must have exactly 3 elements");
         }
-        specGloss.specularFactor = Color3(specularFactor[0], specularFactor[1], specularFactor[2]);
+        specGloss.specularFactor = Color3(
+            static_cast<float>(specularFactIt->value[0].GetDouble()),
+            static_cast<float>(specularFactIt->value[1].GetDouble()),
+            static_cast<float>(specularFactIt->value[2].GetDouble()));
     }
 
     // Glossiness Factor
