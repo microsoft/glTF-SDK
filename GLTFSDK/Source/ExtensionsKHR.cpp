@@ -260,16 +260,15 @@ std::unique_ptr<Extension> KHR::Materials::DeserializePBRSpecGloss(const std::st
         {
             throw GLTFException("diffuseFactor must be an array");
         }
-        std::vector<float> diffuseFactor;
-        for (rapidjson::Value::ConstValueIterator ait = diffuseFactIt->value.Begin(); ait != diffuseFactIt->value.End(); ++ait)
-        {
-            diffuseFactor.push_back(static_cast<float>(ait->GetDouble()));
-        }
-        if (diffuseFactor.size() != 4)
+        if (diffuseFactIt->value.Size() != 4)
         {
             throw GLTFException("diffuseFactor must have exactly 4 elements");
         }
-        specGloss.diffuseFactor = Color4(diffuseFactor[0], diffuseFactor[1], diffuseFactor[2], diffuseFactor[3]);
+        specGloss.diffuseFactor = Color4(
+            static_cast<float>(diffuseFactIt->value[0].GetDouble()),
+            static_cast<float>(diffuseFactIt->value[1].GetDouble()),
+            static_cast<float>(diffuseFactIt->value[2].GetDouble()),
+            static_cast<float>(diffuseFactIt->value[3].GetDouble()));
     }
 
     // Diffuse Texture
