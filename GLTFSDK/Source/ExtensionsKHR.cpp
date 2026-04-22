@@ -256,12 +256,19 @@ std::unique_ptr<Extension> GLTFSDK_API KHR::Materials::DeserializePBRSpecGloss(c
     auto diffuseFactIt = sit.FindMember("diffuseFactor");
     if (diffuseFactIt != sit.MemberEnd())
     {
-        std::vector<float> diffuseFactor;
-        for (rapidjson::Value::ConstValueIterator ait = diffuseFactIt->value.Begin(); ait != diffuseFactIt->value.End(); ++ait)
+        if (!diffuseFactIt->value.IsArray())
         {
-            diffuseFactor.push_back(static_cast<float>(ait->GetDouble()));
+            throw GLTFException("diffuseFactor must be an array");
         }
-        specGloss.diffuseFactor = Color4(diffuseFactor[0], diffuseFactor[1], diffuseFactor[2], diffuseFactor[3]);
+        if (diffuseFactIt->value.Size() != 4)
+        {
+            throw GLTFException("diffuseFactor must have exactly 4 elements");
+        }
+        specGloss.diffuseFactor = Color4(
+            static_cast<float>(diffuseFactIt->value[0].GetDouble()),
+            static_cast<float>(diffuseFactIt->value[1].GetDouble()),
+            static_cast<float>(diffuseFactIt->value[2].GetDouble()),
+            static_cast<float>(diffuseFactIt->value[3].GetDouble()));
     }
 
     // Diffuse Texture
@@ -275,12 +282,18 @@ std::unique_ptr<Extension> GLTFSDK_API KHR::Materials::DeserializePBRSpecGloss(c
     auto specularFactIt = sit.FindMember("specularFactor");
     if (specularFactIt != sit.MemberEnd())
     {
-        std::vector<float> specularFactor;
-        for (rapidjson::Value::ConstValueIterator ait = specularFactIt->value.Begin(); ait != specularFactIt->value.End(); ++ait)
+        if (!specularFactIt->value.IsArray())
         {
-            specularFactor.push_back(static_cast<float>(ait->GetDouble()));
+            throw GLTFException("specularFactor must be an array");
         }
-        specGloss.specularFactor = Color3(specularFactor[0], specularFactor[1], specularFactor[2]);
+        if (specularFactIt->value.Size() != 3)
+        {
+            throw GLTFException("specularFactor must have exactly 3 elements");
+        }
+        specGloss.specularFactor = Color3(
+            static_cast<float>(specularFactIt->value[0].GetDouble()),
+            static_cast<float>(specularFactIt->value[1].GetDouble()),
+            static_cast<float>(specularFactIt->value[2].GetDouble()));
     }
 
     // Glossiness Factor

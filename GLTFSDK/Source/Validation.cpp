@@ -81,11 +81,17 @@ namespace
             throw ValidationException("Accessor" + id + " byte length safe value does not match actual value");
         }
 
-        if (byteLength > bufferView.byteLength)
+        size_t totalAccessorRange;
+        if (!Validation::SafeAddition(byteOffset, byteLength, totalAccessorRange))
+        {
+            throw ValidationException("Accessor" + id + " byte offset + byte length overflow");
+        }
+
+        if (totalAccessorRange > bufferView.byteLength)
         {
             std::string accessorByteLengthStr = std::to_string(byteLength);
             std::string bvByteLength = std::to_string(bufferView.byteLength);
-            throw ValidationException("Accessor" + id + " byte length (" + accessorByteLengthStr + ") greater than buffer view (" + bvByteLength + ")");
+            throw ValidationException("Accessor" + id + " byte offset + byte length (" + std::to_string(byteOffset) + " + " + accessorByteLengthStr + ") greater than buffer view (" + bvByteLength + ")");
         }
 
         short accessorComponentTypeSize = Accessor::GetComponentTypeSize(componentType);
