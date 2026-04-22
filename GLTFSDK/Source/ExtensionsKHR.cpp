@@ -261,6 +261,10 @@ std::unique_ptr<Extension> KHR::Materials::DeserializePBRSpecGloss(const std::st
         {
             diffuseFactor.push_back(static_cast<float>(ait->GetDouble()));
         }
+        if (diffuseFactor.size() < 4)
+        {
+            throw GLTFException("diffuseFactor must have 4 elements");
+        }
         specGloss.diffuseFactor = Color4(diffuseFactor[0], diffuseFactor[1], diffuseFactor[2], diffuseFactor[3]);
     }
 
@@ -279,6 +283,10 @@ std::unique_ptr<Extension> KHR::Materials::DeserializePBRSpecGloss(const std::st
         for (rapidjson::Value::ConstValueIterator ait = specularFactIt->value.Begin(); ait != specularFactIt->value.End(); ++ait)
         {
             specularFactor.push_back(static_cast<float>(ait->GetDouble()));
+        }
+        if (specularFactor.size() < 3)
+        {
+            throw GLTFException("specularFactor must have 3 elements");
         }
         specGloss.specularFactor = Color3(specularFactor[0], specularFactor[1], specularFactor[2]);
     }
