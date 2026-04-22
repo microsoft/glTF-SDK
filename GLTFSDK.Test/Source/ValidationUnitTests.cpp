@@ -289,9 +289,14 @@ namespace Microsoft
                 {
                     auto doc = ReadAsset(c_meshPrimitiveMode_00);
                     auto accessor = doc.accessors[doc.meshes.Front().primitives.front().GetAttributeAccessorId(ACCESSOR_POSITION)];
+                    auto bufferView = doc.bufferViews.Get(accessor.bufferViewId);
 
-                    // Set byteOffset to near-max to trigger size_t overflow
-                    accessor.byteOffset = std::numeric_limits<size_t>::max() - 1;
+                    // Keep byteOffset within the bufferView range so validation reaches
+                    // the SafeAddition(byteOffset, byteLength, ...) overflow check.
+                    bufferView.byteLength = std::numeric_limits<size_t>::max();
+                    accessor.byteOffset = bufferView.byteLength - 1;
+
+                    doc.bufferViews.Replace(bufferView);
                     doc.accessors.Replace(accessor);
                     ExpectValidationFail(doc);
                 }
