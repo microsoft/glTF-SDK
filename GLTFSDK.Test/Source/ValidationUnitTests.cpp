@@ -271,6 +271,30 @@ namespace Microsoft
                     doc.accessors.Replace(accessor);
                     ExpectValidationFail(doc);
                 }
+
+                GLTFSDK_TEST_METHOD(ValidationUnitTests, Validate_Accessor_ByteOffset_Plus_ByteLength_Exceeds_BufferView)
+                {
+                    auto doc = ReadAsset(c_meshPrimitiveMode_00);
+                    auto accessor = doc.accessors[doc.meshes.Front().primitives.front().GetAttributeAccessorId(ACCESSOR_POSITION)];
+                    auto bufferView = doc.bufferViews.Get(accessor.bufferViewId);
+
+                    // Set byteOffset so that byteOffset + byteLength > bufferView.byteLength
+                    // but both individually are within range
+                    accessor.byteOffset = bufferView.byteLength - 1;
+                    doc.accessors.Replace(accessor);
+                    ExpectValidationFail(doc);
+                }
+
+                GLTFSDK_TEST_METHOD(ValidationUnitTests, Validate_Accessor_ByteOffset_Plus_ByteLength_Overflow)
+                {
+                    auto doc = ReadAsset(c_meshPrimitiveMode_00);
+                    auto accessor = doc.accessors[doc.meshes.Front().primitives.front().GetAttributeAccessorId(ACCESSOR_POSITION)];
+
+                    // Set byteOffset to near-max to trigger size_t overflow
+                    accessor.byteOffset = std::numeric_limits<size_t>::max() - 1;
+                    doc.accessors.Replace(accessor);
+                    ExpectValidationFail(doc);
+                }
             };
         }
     }
