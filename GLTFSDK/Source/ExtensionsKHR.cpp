@@ -243,14 +243,18 @@ std::unique_ptr<Extension> KHR::Materials::DeserializePBRSpecGloss(const std::st
     auto diffuseFactIt = sit.FindMember("diffuseFactor");
     if (diffuseFactIt != sit.MemberEnd())
     {
+        if (!diffuseFactIt->value.IsArray())
+        {
+            throw GLTFException("diffuseFactor must be an array");
+        }
         std::vector<float> diffuseFactor;
         for (rapidjson::Value::ConstValueIterator ait = diffuseFactIt->value.Begin(); ait != diffuseFactIt->value.End(); ++ait)
         {
             diffuseFactor.push_back(static_cast<float>(ait->GetDouble()));
         }
-        if (diffuseFactor.size() < 4)
+        if (diffuseFactor.size() != 4)
         {
-            throw GLTFException("diffuseFactor must have 4 elements");
+            throw GLTFException("diffuseFactor must have exactly 4 elements");
         }
         specGloss.diffuseFactor = Color4(diffuseFactor[0], diffuseFactor[1], diffuseFactor[2], diffuseFactor[3]);
     }
@@ -266,14 +270,18 @@ std::unique_ptr<Extension> KHR::Materials::DeserializePBRSpecGloss(const std::st
     auto specularFactIt = sit.FindMember("specularFactor");
     if (specularFactIt != sit.MemberEnd())
     {
+        if (!specularFactIt->value.IsArray())
+        {
+            throw GLTFException("specularFactor must be an array");
+        }
         std::vector<float> specularFactor;
         for (rapidjson::Value::ConstValueIterator ait = specularFactIt->value.Begin(); ait != specularFactIt->value.End(); ++ait)
         {
             specularFactor.push_back(static_cast<float>(ait->GetDouble()));
         }
-        if (specularFactor.size() < 3)
+        if (specularFactor.size() != 3)
         {
-            throw GLTFException("specularFactor must have 3 elements");
+            throw GLTFException("specularFactor must have exactly 3 elements");
         }
         specGloss.specularFactor = Color3(specularFactor[0], specularFactor[1], specularFactor[2]);
     }

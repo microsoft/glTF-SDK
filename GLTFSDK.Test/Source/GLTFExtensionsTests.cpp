@@ -747,6 +747,86 @@ namespace Microsoft
                         Deserialize(extensionSchemaInvalidUnknownProperty, extensionDeserializer);
                     });
                 }
+
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_DiffuseFactor_TooFewElements)
+                {
+                    ExtensionDeserializer extensionDeserializer;
+
+                    Assert::ExpectException<GLTFException>([&extensionDeserializer]()
+                    {
+                        KHR::Materials::DeserializePBRSpecGloss(R"({"diffuseFactor": [1.0, 0.5, 0.2]})", extensionDeserializer);
+                    });
+
+                    Assert::ExpectException<GLTFException>([&extensionDeserializer]()
+                    {
+                        KHR::Materials::DeserializePBRSpecGloss(R"({"diffuseFactor": [1.0]})", extensionDeserializer);
+                    });
+
+                    Assert::ExpectException<GLTFException>([&extensionDeserializer]()
+                    {
+                        KHR::Materials::DeserializePBRSpecGloss(R"({"diffuseFactor": []})", extensionDeserializer);
+                    });
+                }
+
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_DiffuseFactor_TooManyElements)
+                {
+                    ExtensionDeserializer extensionDeserializer;
+
+                    Assert::ExpectException<GLTFException>([&extensionDeserializer]()
+                    {
+                        KHR::Materials::DeserializePBRSpecGloss(R"({"diffuseFactor": [1.0, 0.5, 0.2, 1.0, 0.5]})", extensionDeserializer);
+                    });
+                }
+
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_DiffuseFactor_NotArray)
+                {
+                    ExtensionDeserializer extensionDeserializer;
+
+                    Assert::ExpectException<GLTFException>([&extensionDeserializer]()
+                    {
+                        KHR::Materials::DeserializePBRSpecGloss(R"({"diffuseFactor": 1.0})", extensionDeserializer);
+                    });
+                }
+
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_SpecularFactor_TooFewElements)
+                {
+                    ExtensionDeserializer extensionDeserializer;
+
+                    Assert::ExpectException<GLTFException>([&extensionDeserializer]()
+                    {
+                        KHR::Materials::DeserializePBRSpecGloss(R"({"specularFactor": [1.0, 0.5]})", extensionDeserializer);
+                    });
+
+                    Assert::ExpectException<GLTFException>([&extensionDeserializer]()
+                    {
+                        KHR::Materials::DeserializePBRSpecGloss(R"({"specularFactor": [1.0]})", extensionDeserializer);
+                    });
+
+                    Assert::ExpectException<GLTFException>([&extensionDeserializer]()
+                    {
+                        KHR::Materials::DeserializePBRSpecGloss(R"({"specularFactor": []})", extensionDeserializer);
+                    });
+                }
+
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_SpecularFactor_TooManyElements)
+                {
+                    ExtensionDeserializer extensionDeserializer;
+
+                    Assert::ExpectException<GLTFException>([&extensionDeserializer]()
+                    {
+                        KHR::Materials::DeserializePBRSpecGloss(R"({"specularFactor": [1.0, 0.5, 0.2, 1.0]})", extensionDeserializer);
+                    });
+                }
+
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_SpecularFactor_NotArray)
+                {
+                    ExtensionDeserializer extensionDeserializer;
+
+                    Assert::ExpectException<GLTFException>([&extensionDeserializer]()
+                    {
+                        KHR::Materials::DeserializePBRSpecGloss(R"({"specularFactor": "invalid"})", extensionDeserializer);
+                    });
+                }
             };
         }
     }
