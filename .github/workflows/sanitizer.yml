@@ -1,0 +1,55 @@
+name: 'sanitizer tests'
+
+on:
+  workflow_call:
+
+jobs:
+  ubsan:
+    name: UBSAN - RapidJSON schema validator
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: 'true'
+
+      - name: Install Clang
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y clang
+
+      - name: Download RapidJSON source
+        run: |
+          # Extract GIT_TAG from the CMake download template
+          RAPIDJSON_TAG=$(grep 'GIT_TAG' External/RapidJSON/CMakeRapidJSONDownload.txt.in | head -1 | awk '{print $2}')
+          echo "RapidJSON tag: $RAPIDJSON_TAG"
+
+          # Clone RapidJSON at the pinned version
+          git clone --depth 1 https://github.com/Tencent/rapidjson.git /tmp/rapidjson-src
+          cd /tmp/rapidjson-src
+          git fetch --depth 1 origin "$RAPIDJSON_TAG"
+          git checkout "$RAPIDJSON_TAG"
+
+          # Apply the patch if it exists (mirrors the CMake PATCH_COMMAND)
+          PATCH_SCRIPT="${GITHUB_WORKSPACE}/External/RapidJSON/patches/fix-null-allocator-deref.cmake"
+          if [ -f "$PATCH_SCRIPT" ]; then
+            echo "Applying patch via CMake script..."
+            cmake -DSOURCE_DIR=/tmp/rapidjson-src -P "$PATCH_SCRIPT"
+          else
+            echo "No patch script found, testing unpatched code"
+          fi
+
+      - name: Build UBSAN reproducer
+        run: |
+          clang++ -std=c++14 -O1 -g \
+            -fsanitize=undefined -fno-sanitize-recover=undefined \
+            -fno-omit-frame-pointer \
+            -I/tmp/rapidjson-src/include \
+            GLTFSDK.Test/Sanitizer/UBSanSchemaTest.cpp \
+            -o ubsan_schema_test
+
+      - name: Run UBSAN reproducer
+        run: |
+          echo "Running schema validator UBSAN test..."
+          ./ubsan_schema_test
+          echo "UBSAN test completed successfully"
