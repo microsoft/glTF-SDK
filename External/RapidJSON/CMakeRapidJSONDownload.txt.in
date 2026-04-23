@@ -5,10 +5,9 @@ project(RapidJSON-download NONE)
 include(ExternalProject)
 ExternalProject_Add(RapidJSON
   GIT_REPOSITORY    https://github.com/Tencent/rapidjson.git
-  GIT_TAG           24b5e7a8b27f42fa16b96fc70aade9106cf7102f
+  GIT_TAG           232389d4f1012dddec4ef84861face2d2ba85709
   SOURCE_DIR        "${CMAKE_BINARY_DIR}/RapidJSON-src"
   BINARY_DIR        "${CMAKE_BINARY_DIR}/RapidJSON-build"
-  PATCH_COMMAND     "${CMAKE_COMMAND}" -DSOURCE_DIR=${CMAKE_BINARY_DIR}/RapidJSON-src -P "${CMAKE_CURRENT_SOURCE_DIR}/patches/fix-null-allocator-deref.cmake"
   CONFIGURE_COMMAND ""
   BUILD_COMMAND     ""
   INSTALL_COMMAND   ""

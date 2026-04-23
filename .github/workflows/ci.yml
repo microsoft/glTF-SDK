@@ -36,6 +36,8 @@ jobs:
         cmake-version: '3.31.0'
         platforms: "['Linux']"
         configurations: "['RelWithDebInfo', 'Debug']"
-    # Sanitizer tests (Clang + UBSAN on Linux)
+    # Sanitizer tests (Clang + ASAN/UBSAN on Linux)
     sanitizer:
       uses: ./.github/workflows/sanitizer.yml
+      with:
+        cmake-version: '3.31.0'

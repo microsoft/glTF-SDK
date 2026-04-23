@@ -2,54 +2,58 @@ name: 'sanitizer tests'
 
 on:
   workflow_call:
+    inputs:
+      cmake-version:
+        required: true
+        type: string
 
 jobs:
-  ubsan:
-    name: UBSAN - RapidJSON schema validator
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Git Checkout
         uses: actions/checkout@v4
         with:
-          submodules: 'true'
+            submodules: 'true'
+
+      - name: Setup CMake
+        uses: jwlawson/actions-setup-cmake@v2.0.2
+        with:
+            cmake-version: ${{ inputs.cmake-version }}
 
       - name: Install Clang
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y clang
+          sudo apt-get install -y clang lld
 
-      - name: Download RapidJSON source
-        run: |
-          # Extract GIT_TAG from the CMake download template
-          RAPIDJSON_TAG=$(grep 'GIT_TAG' External/RapidJSON/CMakeRapidJSONDownload.txt.in | head -1 | awk '{print $2}')
-          echo "RapidJSON tag: $RAPIDJSON_TAG"
+      - name: CMake Configure
+        run: >
+          cmake -G "Unix Makefiles"
+          -B ./Built/Int/cmake_Linux_Sanitizer
+          -D CMAKE_BUILD_TYPE=Debug
+          -D CMAKE_C_COMPILER=clang
+          -D CMAKE_CXX_COMPILER=clang++
+          -D CMAKE_CXX_FLAGS="-fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer"
+          -D CMAKE_C_FLAGS="-fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer"
+          -D CMAKE_EXE_LINKER_FLAGS="-fsanitize=address,undefined"
+          -D CMAKE_SHARED_LINKER_FLAGS="-fsanitize=address,undefined"
+          -D ENABLE_SAMPLES=OFF
+          .
 
-          # Clone RapidJSON at the pinned version
-          git clone --depth 1 https://github.com/Tencent/rapidjson.git /tmp/rapidjson-src
-          cd /tmp/rapidjson-src
-          git fetch --depth 1 origin "$RAPIDJSON_TAG"
-          git checkout "$RAPIDJSON_TAG"
+      - name: CMake Build
+        run: cmake --build . --target install --config Debug
+        working-directory: ./Built/Int/cmake_Linux_Sanitizer
 
-          # Apply the patch if it exists (mirrors the CMake PATCH_COMMAND)
-          PATCH_SCRIPT="${GITHUB_WORKSPACE}/External/RapidJSON/patches/fix-null-allocator-deref.cmake"
-          if [ -f "$PATCH_SCRIPT" ]; then
-            echo "Applying patch via CMake script..."
-            cmake -DSOURCE_DIR=/tmp/rapidjson-src -P "$PATCH_SCRIPT"
-          else
-            echo "No patch script found, testing unpatched code"
-          fi
+      - name: Running Unit Tests
+        run: ./GLTFSDK.Test --gtest_output=xml:GLTFSDK.Test.Sanitizer.log
+        working-directory: ./Built/Out/Linux/Debug/GLTFSDK.Test
+        env:
+          ASAN_OPTIONS: "detect_leaks=0:halt_on_error=1"
+          UBSAN_OPTIONS: "print_stacktrace=1:halt_on_error=1"
 
-      - name: Build UBSAN reproducer
-        run: |
-          clang++ -std=c++14 -O1 -g \
-            -fsanitize=undefined -fno-sanitize-recover=undefined \
-            -fno-omit-frame-pointer \
-            -I/tmp/rapidjson-src/include \
-            GLTFSDK.Test/Sanitizer/UBSanSchemaTest.cpp \
-            -o ubsan_schema_test
-
-      - name: Run UBSAN reproducer
-        run: |
-          echo "Running schema validator UBSAN test..."
-          ./ubsan_schema_test
-          echo "UBSAN test completed successfully"
+      - uses: actions/upload-artifact@v4
+        name: "Upload test results"
+        if: always()
+        with:
+            name: GLTFSDK.Test.Sanitizer
+            path: ${{ github.workspace }}/Built/Out/Linux/Debug/GLTFSDK.Test/GLTFSDK.Test.Sanitizer.log
