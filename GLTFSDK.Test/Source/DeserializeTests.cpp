@@ -10,6 +10,32 @@ using namespace glTF::UnitTest;
 
 namespace
 {
+    // Malformed glTF JSON inputs that trigger schema dependency validation errors.
+    // These exercise the EndMissingDependentProperties code path in RapidJSON's
+    // schema validator which previously crashed with a null pointer dereference
+    // (CWE-476) when GetInvalidSchemaPointer().GetAllocator() was called on a
+    // pointer with a null allocator.
+
+    // Root-level dependency: "scene" requires "scenes" to be present
+    const char* c_missingDependentPropertyScenes = R"({
+    "asset": {"version": "2.0"},
+    "scene": 0
+})";
+
+    // Accessor-level dependency: "byteOffset" requires "bufferView" to be present
+    // (same as c_invalidAccessorDependency but kept separate for regression clarity)
+    const char* c_missingDependentPropertyBufferView = R"({
+    "accessors": [
+        {
+            "byteOffset": 0,
+            "componentType": 5123,
+            "count": 1,
+            "type": "SCALAR"
+        }
+    ],
+    "asset": {"version": "2.0"}
+})";
+
     const char* c_validPrimitiveNoIndices = R"({
     "meshes": [
         {
@@ -539,6 +565,26 @@ namespace Microsoft
 
                     Assert::AreEqual(doc.samplers[1].wrapS, Wrap_MIRRORED_REPEAT, L"Sampler wrapS property was not deserialized correctly");
                     Assert::AreEqual(doc.samplers[1].wrapT, Wrap_CLAMP_TO_EDGE, L"Sampler wrapT property was not deserialized correctly");
+                }
+
+                // Regression test for CWE-476: null pointer dereference in RapidJSON
+                // schema validator's EndMissingDependentProperties(). A missing
+                // dependent property must throw ValidationException rather than
+                // crashing with a null pointer dereference.
+                GLTFSDK_TEST_METHOD(DeserializeTests, DeserializeFail_MissingDependentPropertyScenes)
+                {
+                    Assert::ExpectException<ValidationException>([]()
+                    {
+                        Deserialize(c_missingDependentPropertyScenes);
+                    });
+                }
+
+                GLTFSDK_TEST_METHOD(DeserializeTests, DeserializeFail_MissingDependentPropertyBufferView)
+                {
+                    Assert::ExpectException<ValidationException>([]()
+                    {
+                        Deserialize(c_missingDependentPropertyBufferView);
+                    });
                 }
             };
         }

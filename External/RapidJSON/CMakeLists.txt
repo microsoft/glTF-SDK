@@ -26,9 +26,13 @@ add_subdirectory(${CMAKE_BINARY_DIR}/RapidJSON-src
                  ${CMAKE_BINARY_DIR}/RapidJSON-build
                  EXCLUDE_FROM_ALL)
 
-# Set the RapidJSONConfig.cmake path and make find_package to work in config mode explicitly.
-set(RapidJSON_DIR "${CMAKE_BINARY_DIR}/RapidJSON-build" CACHE LOCATION "Specific configuration file location" FORCE)
-find_package(RapidJSON REQUIRED CONFIG)
-
-add_library(RapidJSON INTERFACE IMPORTED GLOBAL)
-set_target_properties(RapidJSON PROPERTIES INTERFACE_INCLUDE_DIRECTORIES ${RapidJSON_INCLUDE_DIRS})
+# Get include directories directly from the target created by add_subdirectory.
+# Previous versions used find_package(RapidJSON REQUIRED CONFIG) here, but newer
+# RapidJSON versions generate a config that requires a build-step-generated targets
+# file. Since we use BUILD_COMMAND "", we get the include dirs from the target directly.
+# Note: newer RapidJSON only sets INSTALL_INTERFACE, so we must add BUILD_INTERFACE
+# include dirs explicitly for subdirectory usage.
+set(RapidJSON_INCLUDE_DIRS "${CMAKE_BINARY_DIR}/RapidJSON-src/include")
+target_include_directories(RapidJSON INTERFACE
+    $<BUILD_INTERFACE:${RapidJSON_INCLUDE_DIRS}>
+)
