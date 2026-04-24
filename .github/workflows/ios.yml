@@ -23,14 +23,21 @@ jobs:
     steps:
       - name: Git Checkout
         uses: actions/checkout@v4
-        with:
-            submodules: 'true'
       - name: Setup CMake
         uses: jwlawson/actions-setup-cmake@v2.0.2
         with:
             cmake-version: ${{ inputs.cmake-version }}
       - name: CMake Configure
-        run: cmake -G Xcode -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/Build/CMake/ios.toolchain.cmake" -DPLATFORM=OS -DDEPLOYMENT_TARGET="10.11" -DENABLE_UNIT_TESTS="OFF" -B ./Built/Int/cmake_${{ matrix.platform }} .
+        run: >
+          cmake -G Xcode
+          -DCMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake
+          -DVCPKG_CHAINLOAD_TOOLCHAIN_FILE=${{ github.workspace }}/Build/CMake/ios.toolchain.cmake
+          -DVCPKG_TARGET_TRIPLET=arm64-ios
+          -DPLATFORM=OS
+          -DDEPLOYMENT_TARGET="10.11"
+          -DENABLE_UNIT_TESTS="OFF"
+          -B ./Built/Int/cmake_${{ matrix.platform }}
+          .
       - name: CMake Build
         run: cmake --build . --target install --config ${{ matrix.config }}
         working-directory: ./Built/Int/cmake_${{ matrix.platform }}

@@ -13,8 +13,6 @@ jobs:
     steps:
       - name: Git Checkout
         uses: actions/checkout@v4
-        with:
-            submodules: 'true'
 
       - name: Setup CMake
         uses: jwlawson/actions-setup-cmake@v2.0.2
@@ -27,6 +25,9 @@ jobs:
           sudo apt-get install -y clang lld
 
       - name: CMake Configure
+        env:
+          CC: clang
+          CXX: clang++
         run: >
           cmake -G "Unix Makefiles"
           -B ./Built/Int/cmake_Linux_Sanitizer
@@ -38,6 +39,10 @@ jobs:
           -D CMAKE_EXE_LINKER_FLAGS="-fsanitize=address,undefined"
           -D CMAKE_SHARED_LINKER_FLAGS="-fsanitize=address,undefined"
           -D ENABLE_SAMPLES=OFF
+          -D CMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake
+          -D VCPKG_TARGET_TRIPLET=x64-linux-asan
+          -D VCPKG_OVERLAY_TRIPLETS=${{ github.workspace }}/Build/vcpkg-triplets
+          -D VCPKG_MANIFEST_FEATURES="tests"
           .
 
       - name: CMake Build

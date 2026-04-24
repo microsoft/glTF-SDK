@@ -1,0 +1,22 @@
+{
+  "name": "gltf-sdk",
+  "version-string": "0.0.1",
+  "builtin-baseline": "c3867e714dd3a51c272826eea77267876517ed99",
+  "dependencies": [
+    "rapidjson"
+  ],
+  "features": {
+    "tests": {
+      "description": "Build unit tests",
+      "dependencies": [
+        "gtest"
+      ]
+    }
+  },
+  "overrides": [
+    {
+      "name": "rapidjson",
+      "version": "2025-02-26"
+    }
+  ]
+}
