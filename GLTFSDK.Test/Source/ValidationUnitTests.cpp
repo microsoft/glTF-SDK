@@ -271,6 +271,35 @@ namespace Microsoft
                     doc.accessors.Replace(accessor);
                     ExpectValidationFail(doc);
                 }
+
+                GLTFSDK_TEST_METHOD(ValidationUnitTests, Validate_Accessor_ByteOffset_Plus_ByteLength_Exceeds_BufferView)
+                {
+                    auto doc = ReadAsset(c_meshPrimitiveMode_00);
+                    auto accessor = doc.accessors[doc.meshes.Front().primitives.front().GetAttributeAccessorId(ACCESSOR_POSITION)];
+                    auto bufferView = doc.bufferViews.Get(accessor.bufferViewId);
+
+                    // Set byteOffset so that byteOffset + byteLength > bufferView.byteLength
+                    // but both individually are within range
+                    accessor.byteOffset = bufferView.byteLength - 1;
+                    doc.accessors.Replace(accessor);
+                    ExpectValidationFail(doc);
+                }
+
+                GLTFSDK_TEST_METHOD(ValidationUnitTests, Validate_Accessor_ByteOffset_Plus_ByteLength_Overflow)
+                {
+                    auto doc = ReadAsset(c_meshPrimitiveMode_00);
+                    auto accessor = doc.accessors[doc.meshes.Front().primitives.front().GetAttributeAccessorId(ACCESSOR_POSITION)];
+                    auto bufferView = doc.bufferViews.Get(accessor.bufferViewId);
+
+                    // Keep byteOffset within the bufferView range so validation reaches
+                    // the SafeAddition(byteOffset, byteLength, ...) overflow check.
+                    bufferView.byteLength = std::numeric_limits<size_t>::max();
+                    accessor.byteOffset = bufferView.byteLength - 1;
+
+                    doc.bufferViews.Replace(bufferView);
+                    doc.accessors.Replace(accessor);
+                    ExpectValidationFail(doc);
+                }
             };
         }
     }

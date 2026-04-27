@@ -5,6 +5,7 @@
 
 #include <GLTFSDK/Color.h>
 #include <GLTFSDK/Constants.h>
+#include <GLTFSDK/Definitions.h>
 #include <GLTFSDK/Exceptions.h>
 #include <GLTFSDK/Extension.h>
 #include <GLTFSDK/IndexedContainer.h>
@@ -876,7 +877,7 @@ namespace Microsoft
 
             virtual ProjectionType GetProjectionType() const = 0;
             virtual std::unique_ptr<Projection> Clone() const = 0;
-            
+
             virtual bool IsValid() const = 0;
 
             bool operator==(const Projection& rhs) const
@@ -1228,7 +1229,7 @@ namespace Microsoft
             }
 
             static WrapMode GetSamplerWrapMode(size_t readValue)
-            { 
+            {
                 switch (readValue)
                 {
                     case Wrap_CLAMP_TO_EDGE:
@@ -1294,7 +1295,7 @@ namespace Microsoft
                 return !operator==(rhs);
             }
         };
-        
+
         struct AnimationSampler : glTFProperty
         {
             std::string id;

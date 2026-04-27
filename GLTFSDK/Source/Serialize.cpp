@@ -864,12 +864,12 @@ namespace
     }
 }
 
-std::string Microsoft::glTF::Serialize(const Document& gltfDocument, SerializeFlags flags)
+std::string GLTFSDK_API Microsoft::glTF::Serialize(const Document& gltfDocument, SerializeFlags flags)
 {
     return Serialize(gltfDocument, ExtensionSerializer(), flags);
 }
 
-std::string Microsoft::glTF::Serialize(const Document& gltfDocument, const ExtensionSerializer& extensionSerializer, SerializeFlags flags)
+std::string GLTFSDK_API Microsoft::glTF::Serialize(const Document& gltfDocument, const ExtensionSerializer& extensionSerializer, SerializeFlags flags)
 {
     auto doc = CreateJsonDocument(gltfDocument, extensionSerializer);
 

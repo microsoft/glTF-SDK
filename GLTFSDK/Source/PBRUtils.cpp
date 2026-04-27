@@ -6,7 +6,7 @@
 using namespace Microsoft::glTF;
 
 // https://bghgary.github.io/glTF/convert-between-workflows-bjs/js/babylon.pbrUtilities.js
-float Detail::SolveMetallic(float dielectricSpecular, float diffuse, float specular, float oneMinusSpecularStrength)
+float GLTFSDK_API Detail::SolveMetallic(float dielectricSpecular, float diffuse, float specular, float oneMinusSpecularStrength)
 {
     if (specular <= dielectricSpecular)
     {
@@ -41,12 +41,12 @@ namespace Microsoft
     }
 }
 
-MetallicRoughnessValue Microsoft::glTF::SGToMR(const SpecularGlossinessValue& sg)
+MetallicRoughnessValue GLTFSDK_API Microsoft::glTF::SGToMR(const SpecularGlossinessValue& sg)
 {
     return SGToMR<Color3>(sg);
 }
 
-SpecularGlossinessValue Microsoft::glTF::MRToSG(const MetallicRoughnessValue& mr)
+SpecularGlossinessValue GLTFSDK_API Microsoft::glTF::MRToSG(const MetallicRoughnessValue& mr)
 {
     return MRToSG<Color3>(mr);
 }

@@ -87,12 +87,12 @@ namespace
 
 // Microsoft::glTF namespace function definitions
 
-const std::unordered_map<std::string, std::string>& Microsoft::glTF::GetDefaultSchemaUriMap()
+const std::unordered_map<std::string, std::string>& GLTFSDK_API Microsoft::glTF::GetDefaultSchemaUriMap()
 {
     return SchemaJson::GLTF_SCHEMA_MAP;
 }
 
-std::unique_ptr<const ISchemaLocator> Microsoft::glTF::GetDefaultSchemaLocator(SchemaFlags schemaFlags)
+std::unique_ptr<const ISchemaLocator> GLTFSDK_API Microsoft::glTF::GetDefaultSchemaLocator(SchemaFlags schemaFlags)
 {
     return std::make_unique<const DefaultSchemaLocator>(schemaFlags);
 }

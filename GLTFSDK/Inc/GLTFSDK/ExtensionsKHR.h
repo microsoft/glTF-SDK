@@ -15,8 +15,8 @@ namespace Microsoft
     {
         namespace KHR
         {
-            ExtensionSerializer   GetKHRExtensionSerializer();
-            ExtensionDeserializer GetKHRExtensionDeserializer();
+            ExtensionSerializer   GLTFSDK_API GetKHRExtensionSerializer();
+            ExtensionDeserializer GLTFSDK_API GetKHRExtensionDeserializer();
 
             namespace Materials
             {
@@ -37,8 +37,8 @@ namespace Microsoft
                     bool IsEqual(const Extension& rhs) const override;
                 };
 
-                std::string SerializePBRSpecGloss(const PBRSpecularGlossiness& specGloss, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer);
-                std::unique_ptr<Extension> DeserializePBRSpecGloss(const std::string& json, const ExtensionDeserializer& extensionDeserializer);
+                std::string GLTFSDK_API SerializePBRSpecGloss(const PBRSpecularGlossiness& specGloss, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer);
+                std::unique_ptr<Extension> GLTFSDK_API DeserializePBRSpecGloss(const std::string& json, const ExtensionDeserializer& extensionDeserializer);
 
                 constexpr const char* UNLIT_NAME = "KHR_materials_unlit";
 
@@ -49,8 +49,8 @@ namespace Microsoft
                     bool IsEqual(const Extension& rhs) const override;
                 };
 
-                std::string SerializeUnlit(const Unlit& unlit, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer);
-                std::unique_ptr<Extension> DeserializeUnlit(const std::string& json, const ExtensionDeserializer& extensionDeserializer);
+                std::string GLTFSDK_API SerializeUnlit(const Unlit& unlit, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer);
+                std::unique_ptr<Extension> GLTFSDK_API DeserializeUnlit(const std::string& json, const ExtensionDeserializer& extensionDeserializer);
 
                 constexpr const char* CLEARCOAT_NAME = "KHR_materials_clearcoat";
 
@@ -69,8 +69,8 @@ namespace Microsoft
                     bool IsEqual(const Extension& rhs) const override;
                 };
 
-                std::string SerializeClearcoat(const Clearcoat& clearcoat, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer);
-                std::unique_ptr<Extension> DeserializeClearcoat(const std::string& json, const ExtensionDeserializer& extensionDeserializer);
+                std::string GLTFSDK_API SerializeClearcoat(const Clearcoat& clearcoat, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer);
+                std::unique_ptr<Extension> GLTFSDK_API DeserializeClearcoat(const std::string& json, const ExtensionDeserializer& extensionDeserializer);
 
                 constexpr const char* VOLUME_NAME = "KHR_materials_volume";
 
@@ -88,8 +88,8 @@ namespace Microsoft
                     bool IsEqual(const Extension& rhs) const override;
                 };
 
-                std::string SerializeVolume(const Volume& volume, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer);
-                std::unique_ptr<Extension> DeserializeVolume(const std::string& json, const ExtensionDeserializer& extensionDeserializer);
+                std::string GLTFSDK_API SerializeVolume(const Volume& volume, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer);
+                std::unique_ptr<Extension> GLTFSDK_API DeserializeVolume(const std::string& json, const ExtensionDeserializer& extensionDeserializer);
 
                 constexpr const char* IRIDESCENCE_NAME = "KHR_materials_iridescence";
 
@@ -109,8 +109,8 @@ namespace Microsoft
                     bool IsEqual(const Extension& rhs) const override;
                 };
 
-                std::string SerializeIridescence(const Iridescence& iridescence, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer);
-                std::unique_ptr<Extension> DeserializeIridescence(const std::string& json, const ExtensionDeserializer& extensionDeserializer);
+                std::string GLTFSDK_API SerializeIridescence(const Iridescence& iridescence, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer);
+                std::unique_ptr<Extension> GLTFSDK_API DeserializeIridescence(const std::string& json, const ExtensionDeserializer& extensionDeserializer);
 
                 constexpr const char* TRANSMISSION_NAME = "KHR_materials_transmission";
 
@@ -126,8 +126,8 @@ namespace Microsoft
                     bool IsEqual(const Extension& rhs) const override;
                 };
 
-                std::string SerializeTransmission(const Transmission& transmission, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer);
-                std::unique_ptr<Extension> DeserializeTransmission(const std::string& json, const ExtensionDeserializer& extensionDeserializer);
+                std::string GLTFSDK_API SerializeTransmission(const Transmission& transmission, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer);
+                std::unique_ptr<Extension> GLTFSDK_API DeserializeTransmission(const std::string& json, const ExtensionDeserializer& extensionDeserializer);
 
                 constexpr const char* SHEEN_NAME = "KHR_materials_sheen";
 
@@ -145,8 +145,8 @@ namespace Microsoft
                     bool IsEqual(const Extension& rhs) const override;
                 };
 
-                std::string SerializeSheen(const Sheen& sheen, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer);
-                std::unique_ptr<Extension> DeserializeSheen(const std::string& json, const ExtensionDeserializer& extensionDeserializer);
+                std::string GLTFSDK_API SerializeSheen(const Sheen& sheen, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer);
+                std::unique_ptr<Extension> GLTFSDK_API DeserializeSheen(const std::string& json, const ExtensionDeserializer& extensionDeserializer);
 
                 constexpr const char* SPECULAR_NAME = "KHR_materials_specular";
 
@@ -164,8 +164,8 @@ namespace Microsoft
                     bool IsEqual(const Extension& rhs) const override;
                 };
 
-                std::string SerializeSpecular(const Specular& specular, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer);
-                std::unique_ptr<Extension> DeserializeSpecular(const std::string& json, const ExtensionDeserializer& extensionDeserializer);
+                std::string GLTFSDK_API SerializeSpecular(const Specular& specular, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer);
+                std::unique_ptr<Extension> GLTFSDK_API DeserializeSpecular(const std::string& json, const ExtensionDeserializer& extensionDeserializer);
             }
 
             namespace MeshPrimitives
@@ -183,8 +183,8 @@ namespace Microsoft
                     bool IsEqual(const Extension& rhs) const override;
                 };
 
-                std::string SerializeDracoMeshCompression(const DracoMeshCompression& dracoMeshCompression, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer);
-                std::unique_ptr<Extension> DeserializeDracoMeshCompression(const std::string& json, const ExtensionDeserializer& extensionDeserializer);
+                std::string GLTFSDK_API SerializeDracoMeshCompression(const DracoMeshCompression& dracoMeshCompression, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer);
+                std::unique_ptr<Extension> GLTFSDK_API DeserializeDracoMeshCompression(const std::string& json, const ExtensionDeserializer& extensionDeserializer);
 
                 // KHR_materials_variants: not implemented yet
                 constexpr const char* MATERIALSVARIANTS_NAME = "KHR_materials_variants";
@@ -205,8 +205,8 @@ namespace Microsoft
                     bool IsEqual(const Extension& rhs) const override;
                 };
 
-                std::string SerializeMeshGPUInstancing(const MeshGPUInstancing& meshGPUInstancing, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer);
-                std::unique_ptr<Extension> DeserializeMeshGPUInstancing(const std::string& json, const ExtensionDeserializer& extensionDeserializer);
+                std::string GLTFSDK_API SerializeMeshGPUInstancing(const MeshGPUInstancing& meshGPUInstancing, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer);
+                std::unique_ptr<Extension> GLTFSDK_API DeserializeMeshGPUInstancing(const std::string& json, const ExtensionDeserializer& extensionDeserializer);
             }
 
             namespace TextureInfos
@@ -228,8 +228,8 @@ namespace Microsoft
                     bool IsEqual(const Extension& rhs) const override;
                 };
 
-                std::string SerializeTextureTransform(const TextureTransform& textureTransform, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer);
-                std::unique_ptr<Extension> DeserializeTextureTransform(const std::string& json, const ExtensionDeserializer& extensionDeserializer);
+                std::string GLTFSDK_API SerializeTextureTransform(const TextureTransform& textureTransform, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer);
+                std::unique_ptr<Extension> GLTFSDK_API DeserializeTextureTransform(const std::string& json, const ExtensionDeserializer& extensionDeserializer);
             }
         }
     }

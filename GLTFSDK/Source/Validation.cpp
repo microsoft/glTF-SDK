@@ -81,11 +81,17 @@ namespace
             throw ValidationException("Accessor" + id + " byte length safe value does not match actual value");
         }
 
-        if (byteLength > bufferView.byteLength)
+        size_t totalAccessorRange;
+        if (!Validation::SafeAddition(byteOffset, byteLength, totalAccessorRange))
+        {
+            throw ValidationException("Accessor" + id + " byte offset + byte length overflow");
+        }
+
+        if (totalAccessorRange > bufferView.byteLength)
         {
             std::string accessorByteLengthStr = std::to_string(byteLength);
             std::string bvByteLength = std::to_string(bufferView.byteLength);
-            throw ValidationException("Accessor" + id + " byte length (" + accessorByteLengthStr + ") greater than buffer view (" + bvByteLength + ")");
+            throw ValidationException("Accessor" + id + " byte offset + byte length (" + std::to_string(byteOffset) + " + " + accessorByteLengthStr + ") greater than buffer view (" + bvByteLength + ")");
         }
 
         short accessorComponentTypeSize = Accessor::GetComponentTypeSize(componentType);
@@ -151,13 +157,13 @@ namespace
     }
 }
 
-void Validation::Validate(const Document& doc)
+void GLTFSDK_API Validation::Validate(const Document& doc)
 {
     ValidateAccessors(doc);
     ValidateMeshes(doc);
 }
 
-void Validation::ValidateAccessors(const Document& doc)
+void GLTFSDK_API Validation::ValidateAccessors(const Document& doc)
 {
     for (const auto& accessor : doc.accessors.Elements())
     {
@@ -165,7 +171,7 @@ void Validation::ValidateAccessors(const Document& doc)
     }
 }
 
-void Validation::ValidateMeshes(const Document& doc)
+void GLTFSDK_API Validation::ValidateMeshes(const Document& doc)
 {
     for (const auto& mesh : doc.meshes.Elements())
     {
@@ -176,7 +182,7 @@ void Validation::ValidateMeshes(const Document& doc)
     }
 }
 
-void Validation::ValidateMeshPrimitive(const Document& doc, const MeshPrimitive& primitive)
+void GLTFSDK_API Validation::ValidateMeshPrimitive(const Document& doc, const MeshPrimitive& primitive)
 {
     if (!primitive.HasAttribute(ACCESSOR_POSITION))
     {
@@ -200,7 +206,7 @@ void Validation::ValidateMeshPrimitive(const Document& doc, const MeshPrimitive&
     ValidateMeshPrimitiveAttributeAccessors(doc, primitive.attributes, vertexCount);
 }
 
-void Validation::ValidateMeshPrimitiveAttributeAccessors(
+void GLTFSDK_API Validation::ValidateMeshPrimitiveAttributeAccessors(
     const Document& doc,
     const std::unordered_map<std::string, std::string>& attributes,
     const size_t vertexCount
@@ -241,7 +247,7 @@ void Validation::ValidateMeshPrimitiveAttributeAccessors(
     }
 }
 
-void Validation::ValidateAccessorTypes(
+void GLTFSDK_API Validation::ValidateAccessorTypes(
     const Accessor& accessor,
     const std::string& accessorName,
     const std::set<AccessorType>& accessorTypes,
@@ -263,7 +269,7 @@ void Validation::ValidateAccessorTypes(
     }
 }
 
-void Validation::ValidateAccessor(const Document& gltfDocument, const Accessor& accessor)
+void GLTFSDK_API Validation::ValidateAccessor(const Document& gltfDocument, const Accessor& accessor)
 {
     if (!accessor.bufferViewId.empty())
     {
@@ -288,7 +294,7 @@ void Validation::ValidateAccessor(const Document& gltfDocument, const Accessor& 
     }
 }
 
-void Validation::ValidateBufferView(const BufferView& buffer_view, const Buffer& buffer)
+void GLTFSDK_API Validation::ValidateBufferView(const BufferView& buffer_view, const Buffer& buffer)
 {
     size_t totalBufferViewLength;
     if (!SafeAddition(buffer_view.byteOffset, buffer_view.byteLength, totalBufferViewLength))
@@ -307,7 +313,7 @@ void Validation::ValidateBufferView(const BufferView& buffer_view, const Buffer&
 // Figure out if the two arguments, when summed, will overflow a size_t or not.
 // If addition was successful, return true and the result of the addition in result.
 // If addition was unsuccessful, return false and the value in result is not valid.
-bool Validation::SafeAddition(size_t a, size_t b, size_t& result)
+bool GLTFSDK_API Validation::SafeAddition(size_t a, size_t b, size_t& result)
 {
     if (b <= std::numeric_limits<size_t>::max() - a)
     {
@@ -322,7 +328,7 @@ bool Validation::SafeAddition(size_t a, size_t b, size_t& result)
 // Figure out if the two arguments, when multiplied, will overflow a size_t or not.
 // If multiplication was successful, return true and the result of the addition in result.
 // If multiplication was unsuccessful, return false and the value in result is not valid.
-bool Validation::SafeMultiplication(size_t a, size_t b, size_t& result)
+bool GLTFSDK_API Validation::SafeMultiplication(size_t a, size_t b, size_t& result)
 {
     if (b == 0)
     {
