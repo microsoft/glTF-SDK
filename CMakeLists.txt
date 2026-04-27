@@ -62,12 +62,12 @@ elseif(TARGET RapidJSON)
     )
 endif()
 
-if(ENABLE_UNIT_TESTS)
+if(ENABLE_UNIT_TESTS AND (NOT DEFINED EMSCRIPTEN))
     add_subdirectory(GLTFSDK.TestUtils)
     add_subdirectory(GLTFSDK.Test)
 endif()
 
-if(ENABLE_SAMPLES)
+if(ENABLE_SAMPLES AND (NOT DEFINED EMSCRIPTEN))
     add_subdirectory(GLTFSDK.Samples)
 endif()
 
