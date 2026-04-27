@@ -5,6 +5,7 @@
 
 #include <GLTFSDK/BufferBuilder.h>
 
+#include <limits>
 #include <sstream>
 
 using namespace Microsoft::glTF;
