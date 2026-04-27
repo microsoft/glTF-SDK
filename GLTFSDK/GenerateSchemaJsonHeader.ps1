@@ -225,7 +225,7 @@ Get-ChildItem -File -Recurse -Filter "*.json" "$SCHEMAS_PATH" | Sort-Object | Fo
    AppendToHeader $varText $globalIndentLevel
 }
 
-DeclareGltfSchemaVars $CLASS_NAME $mapNamesList
+DeclareGltfSchemaVars
 
 CloseScope "class $CLASS_NAME" $scopeSet
 

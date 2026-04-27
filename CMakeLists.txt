@@ -56,8 +56,7 @@ elseif(TARGET RapidJSON)
     )
 endif()
 
-if(ENABLE_UNIT_TESTS)
-
+if(ENABLE_UNIT_TESTS AND (NOT DEFINED EMSCRIPTEN))
     # Try to find GTest via VcPkg first, then fall back to the External directory.
     find_package(GTest CONFIG)
     if(NOT GTest_FOUND)
@@ -70,7 +69,7 @@ if(ENABLE_UNIT_TESTS)
     add_subdirectory(GLTFSDK.Test)
 endif()
 
-if(ENABLE_SAMPLES)
+if(ENABLE_SAMPLES AND (NOT DEFINED EMSCRIPTEN))
     add_subdirectory(GLTFSDK.Samples)
 endif()
 
