@@ -6,6 +6,8 @@
 #include <GLTFSDK/Color.h>
 #include <GLTFSDK/ExtensionsKHR.h>
 
+#include <limits>
+
 namespace Microsoft
 {
     namespace glTF
