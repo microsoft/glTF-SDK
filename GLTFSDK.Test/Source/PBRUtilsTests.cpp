@@ -11,7 +11,7 @@ namespace
 {
     float Random(float a = 0.0f, float b = 1.0f)
     {
-        return a + (b - a) * (static_cast<float>(rand()) / RAND_MAX);
+        return a + (b - a) * (static_cast<float>(rand()) / static_cast<float>(RAND_MAX));
     }
 
     bool FuzzyEqual(float a, float b, float epsilon = std::numeric_limits<float>::epsilon())
