@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include <cmath>
+#include <algorithm>
 #include <limits>
 
 namespace Microsoft
@@ -232,9 +233,13 @@ namespace Microsoft
             static_assert(std::is_same<float, T>::value, "Microsoft::glTF::FloatToComponent: expecting float template type");
             return f;
         }
-        template<> inline int8_t   FloatToComponent<int8_t>(const float f)  { return static_cast<int8_t>(std::round(f*127.0f)); }
-        template<> inline uint8_t  FloatToComponent<uint8_t>(const float f) { return static_cast<uint8_t>(std::round(f*255.0f)); }
-        template<> inline int16_t  FloatToComponent<int16_t>(const float f) { return static_cast<int16_t>(std::round(f*32767.0f)); }
-        template<> inline uint16_t FloatToComponent<uint16_t>(const float f){ return static_cast<uint16_t>(std::round(f*65535.0f)); }
+        // Clamp to the normalized range expected by the glTF 2.0 spec before scaling
+        // and casting. Without clamping, out-of-range float values would produce a
+        // float outside the destination integer's range, which is undefined behavior
+        // (caught by UBSan, and observed to differ between MSVC, clang on macOS, etc.).
+        template<> inline int8_t   FloatToComponent<int8_t>(const float f)  { return static_cast<int8_t>  (std::round(std::max(-1.0f, std::min(1.0f, f)) * 127.0f)); }
+        template<> inline uint8_t  FloatToComponent<uint8_t>(const float f) { return static_cast<uint8_t> (std::round(std::max( 0.0f, std::min(1.0f, f)) * 255.0f)); }
+        template<> inline int16_t  FloatToComponent<int16_t>(const float f) { return static_cast<int16_t> (std::round(std::max(-1.0f, std::min(1.0f, f)) * 32767.0f)); }
+        template<> inline uint16_t FloatToComponent<uint16_t>(const float f){ return static_cast<uint16_t>(std::round(std::max( 0.0f, std::min(1.0f, f)) * 65535.0f)); }
     }
 }
