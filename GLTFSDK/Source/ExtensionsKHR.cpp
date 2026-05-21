@@ -1245,6 +1245,10 @@ std::unique_ptr<Extension> GLTFSDK_API KHR::TextureInfos::DeserializeTextureTran
     auto offsetIt = sit.FindMember("offset");
     if (offsetIt != sit.MemberEnd())
     {
+        if (!offsetIt->value.IsArray())
+        {
+            throw GLTFException("Offset member of " + std::string(TEXTURETRANSFORM_NAME) + " must be an array.");
+        }
         if (offsetIt->value.Size() != 2)
         {
             throw GLTFException("Offset member of " + std::string(TEXTURETRANSFORM_NAME) + " must have two values.");
@@ -1253,6 +1257,10 @@ std::unique_ptr<Extension> GLTFSDK_API KHR::TextureInfos::DeserializeTextureTran
         std::vector<float> offset;
         for (rapidjson::Value::ConstValueIterator ait = offsetIt->value.Begin(); ait != offsetIt->value.End(); ++ait)
         {
+            if (!ait->IsNumber())
+            {
+                throw GLTFException("Offset member of " + std::string(TEXTURETRANSFORM_NAME) + " must contain numeric values.");
+            }
             offset.push_back(static_cast<float>(ait->GetDouble()));
         }
         textureTransform.offset.x = offset[0];
@@ -1263,6 +1271,10 @@ std::unique_ptr<Extension> GLTFSDK_API KHR::TextureInfos::DeserializeTextureTran
     auto rotationIt = sit.FindMember("rotation");
     if (rotationIt != sit.MemberEnd())
     {
+        if (!rotationIt->value.IsNumber())
+        {
+            throw GLTFException("Rotation member of " + std::string(TEXTURETRANSFORM_NAME) + " must be a number.");
+        }
         textureTransform.rotation = rotationIt->value.GetFloat();
     }
 
@@ -1270,6 +1282,10 @@ std::unique_ptr<Extension> GLTFSDK_API KHR::TextureInfos::DeserializeTextureTran
     auto scaleIt = sit.FindMember("scale");
     if (scaleIt != sit.MemberEnd())
     {
+        if (!scaleIt->value.IsArray())
+        {
+            throw GLTFException("Scale member of " + std::string(TEXTURETRANSFORM_NAME) + " must be an array.");
+        }
         if (scaleIt->value.Size() != 2)
         {
             throw GLTFException("Scale member of " + std::string(TEXTURETRANSFORM_NAME) + " must have two values.");
@@ -1278,6 +1294,10 @@ std::unique_ptr<Extension> GLTFSDK_API KHR::TextureInfos::DeserializeTextureTran
         std::vector<float> scale;
         for (rapidjson::Value::ConstValueIterator ait = scaleIt->value.Begin(); ait != scaleIt->value.End(); ++ait)
         {
+            if (!ait->IsNumber())
+            {
+                throw GLTFException("Scale member of " + std::string(TEXTURETRANSFORM_NAME) + " must contain numeric values.");
+            }
             scale.push_back(static_cast<float>(ait->GetDouble()));
         }
         textureTransform.scale.x = scale[0];
@@ -1288,6 +1308,10 @@ std::unique_ptr<Extension> GLTFSDK_API KHR::TextureInfos::DeserializeTextureTran
     auto texCoordIt = sit.FindMember("texCoord");
     if (texCoordIt != sit.MemberEnd())
     {
+        if (!texCoordIt->value.IsUint())
+        {
+            throw GLTFException("TexCoord member of " + std::string(TEXTURETRANSFORM_NAME) + " must be an unsigned integer.");
+        }
         textureTransform.texCoord = static_cast<size_t>(texCoordIt->value.GetUint());
     }
 
