@@ -34,6 +34,13 @@ using namespace Microsoft::glTF;
 
 namespace
 {
+    // Always returns a UTF-8 encoded std::string regardless of filesystem version.
+    std::string PathToUtf8(const fs::path& p) 
+    {
+        auto u8 = p.u8string();
+        return { reinterpret_cast<const char*>(u8.data()), u8.size() };
+    }
+
     // The glTF SDK is decoupled from all file I/O by the IStreamWriter (and IStreamReader)
     // interface(s) and the C++ stream-based I/O library. This allows the glTF SDK to be used in
     // sandboxed environments, such as WebAssembly modules and UWP apps, where any file I/O code
@@ -250,11 +257,11 @@ namespace
 
         if (auto glbResourceWriter = dynamic_cast<GLBResourceWriter*>(&gltfResourceWriter))
         {
-            glbResourceWriter->Flush(manifest, pathFile.u8string()); // A GLB container isn't created until the GLBResourceWriter::Flush member function is called
+            glbResourceWriter->Flush(manifest, PathToUtf8(pathFile)); // A GLB container isn't created until the GLBResourceWriter::Flush member function is called
         }
         else
         {
-            gltfResourceWriter.WriteExternal(pathFile.u8string(), manifest); // Binary resources have already been written, just need to write the manifest
+            gltfResourceWriter.WriteExternal(PathToUtf8(pathFile), manifest); // Binary resources have already been written, just need to write the manifest
         }
     }
 }

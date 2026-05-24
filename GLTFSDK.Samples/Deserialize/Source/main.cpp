@@ -34,6 +34,13 @@ using namespace Microsoft::glTF;
 
 namespace
 {
+    // Always returns a UTF-8 encoded std::string regardless of filesystem version.
+    std::string PathToUtf8(const fs::path& p) 
+    {
+        auto u8 = p.u8string();
+        return { reinterpret_cast<const char*>(u8.data()), u8.size() };
+    }
+
     // The glTF SDK is decoupled from all file I/O by the IStreamReader (and IStreamWriter)
     // interface(s) and the C++ stream-based I/O library. This allows the glTF SDK to be used in
     // sandboxed environments, such as WebAssembly modules and UWP apps, where any file I/O code
@@ -218,7 +225,7 @@ namespace
         // If the file has a '.gltf' extension then create a GLTFResourceReader
         if (pathFileExt == MakePathExt(GLTF_EXTENSION))
         {
-            auto gltfStream = streamReader->GetInputStream(pathFile.u8string()); // Pass a UTF-8 encoded filename to GetInputString
+            auto gltfStream = streamReader->GetInputStream(PathToUtf8(pathFile)); // Pass a UTF-8 encoded filename to GetInputString
             auto gltfResourceReader = std::make_unique<GLTFResourceReader>(std::move(streamReader));
 
             std::stringstream manifestStream;
@@ -235,7 +242,7 @@ namespace
         // JSON chunk and resource data from the binary chunk.
         if (pathFileExt == MakePathExt(GLB_EXTENSION))
         {
-            auto glbStream = streamReader->GetInputStream(pathFile.u8string()); // Pass a UTF-8 encoded filename to GetInputString
+            auto glbStream = streamReader->GetInputStream(PathToUtf8(pathFile)); // Pass a UTF-8 encoded filename to GetInputString
             auto glbResourceReader = std::make_unique<GLBResourceReader>(std::move(streamReader), std::move(glbStream));
 
             manifest = glbResourceReader->GetJson(); // Get the manifest from the JSON chunk
