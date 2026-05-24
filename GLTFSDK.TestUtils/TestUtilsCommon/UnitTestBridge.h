@@ -351,7 +351,7 @@ namespace glTF
         {
             inline void WriteMessage(wchar_t const* message)
             {
-                std::cout << message << '\n';
+                std::wcout << message << '\n';
             }
 
             inline void WriteMessage(char const* message)
