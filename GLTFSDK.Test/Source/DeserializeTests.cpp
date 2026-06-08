@@ -4,6 +4,7 @@
 #include "stdafx.h"
 
 #include <GLTFSDK/Deserialize.h>
+#include <GLTFSDK/Schema.h>
 #include <GLTFSDK/Validation.h>
 
 using namespace glTF::UnitTest;
@@ -301,6 +302,57 @@ namespace
     ],
     "asset": {"version": "2.0"}
 })";
+
+    // Node transform inputs used by ParseNodeMatrix / ParseNodeScale /
+    // ParseNodeTranslation / ParseNodeRotation. The deserializer is expected
+    // to require these JSON members to be arrays of the spec-mandated size
+    // whose elements are all numeric; anything else must be rejected with
+    // InvalidGLTFException rather than read with array accessors that are
+    // only well-defined on a JSON array of numbers.
+    const char* c_validNodeMatrix = R"({
+    "nodes": [{ "matrix": [1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1] }],
+    "asset": {"version": "2.0"}
+})";
+
+    const char* c_nodeMatrixIsString = R"({
+    "nodes": [{ "matrix": "not-an-array" }],
+    "asset": {"version": "2.0"}
+})";
+
+    const char* c_nodeMatrixIsObject = R"({
+    "nodes": [{ "matrix": {} }],
+    "asset": {"version": "2.0"}
+})";
+
+    const char* c_nodeMatrixWrongSize = R"({
+    "nodes": [{ "matrix": [1,2,3] }],
+    "asset": {"version": "2.0"}
+})";
+
+    const char* c_nodeMatrixNonNumericElement = R"({
+    "nodes": [{ "matrix": [1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,"x"] }],
+    "asset": {"version": "2.0"}
+})";
+
+    const char* c_validNodeScale = R"({
+    "nodes": [{ "scale": [1,1,1] }],
+    "asset": {"version": "2.0"}
+})";
+
+    const char* c_nodeScaleIsString = R"({
+    "nodes": [{ "scale": "xyz" }],
+    "asset": {"version": "2.0"}
+})";
+
+    const char* c_nodeTranslationWrongSize = R"({
+    "nodes": [{ "translation": [0,0] }],
+    "asset": {"version": "2.0"}
+})";
+
+    const char* c_nodeRotationNonNumericElement = R"({
+    "nodes": [{ "rotation": [0,0,0,"w"] }],
+    "asset": {"version": "2.0"}
+})";
 }
 
 namespace Microsoft
@@ -584,6 +636,95 @@ namespace Microsoft
                     Assert::ExpectException<ValidationException>([]()
                     {
                         Deserialize(c_missingDependentPropertyBufferView);
+                    });
+                }
+
+                // Positive regression: a well-formed 16-element node matrix
+                // must still deserialize unchanged (Identity).
+                GLTFSDK_TEST_METHOD(DeserializeTests, DeserializeSuccess_ValidNodeMatrix)
+                {
+                    auto doc = Deserialize(c_validNodeMatrix);
+                    Assert::AreEqual(size_t(1), doc.nodes.Size());
+                    const auto& node = doc.nodes.Front();
+                    Assert::AreEqual(1.0f, node.matrix.values[0]);
+                    Assert::AreEqual(1.0f, node.matrix.values[5]);
+                    Assert::AreEqual(1.0f, node.matrix.values[10]);
+                    Assert::AreEqual(1.0f, node.matrix.values[15]);
+                }
+
+                // Negative regression: a node "matrix" that is a JSON string
+                // (or any non-array JSON value) must throw rather than be
+                // accepted as a 16-element matrix via accessors that are only
+                // defined on arrays.
+                //
+                // The negative tests below pass SchemaFlags::DisableSchemaRoot
+                // because consumers that disable JSON-schema validation for
+                // performance (a common option, since schema validation is
+                // expensive) must still get a clean exception out of the
+                // parser rather than read past the end of a non-array value.
+                GLTFSDK_TEST_METHOD(DeserializeTests, DeserializeFail_NodeMatrixIsString)
+                {
+                    Assert::ExpectException<InvalidGLTFException>([]()
+                    {
+                        Deserialize(c_nodeMatrixIsString, DeserializeFlags::None, SchemaFlags::DisableSchemaRoot);
+                    });
+                }
+
+                GLTFSDK_TEST_METHOD(DeserializeTests, DeserializeFail_NodeMatrixIsObject)
+                {
+                    Assert::ExpectException<InvalidGLTFException>([]()
+                    {
+                        Deserialize(c_nodeMatrixIsObject, DeserializeFlags::None, SchemaFlags::DisableSchemaRoot);
+                    });
+                }
+
+                GLTFSDK_TEST_METHOD(DeserializeTests, DeserializeFail_NodeMatrixWrongSize)
+                {
+                    Assert::ExpectException<InvalidGLTFException>([]()
+                    {
+                        Deserialize(c_nodeMatrixWrongSize, DeserializeFlags::None, SchemaFlags::DisableSchemaRoot);
+                    });
+                }
+
+                GLTFSDK_TEST_METHOD(DeserializeTests, DeserializeFail_NodeMatrixNonNumericElement)
+                {
+                    Assert::ExpectException<InvalidGLTFException>([]()
+                    {
+                        Deserialize(c_nodeMatrixNonNumericElement, DeserializeFlags::None, SchemaFlags::DisableSchemaRoot);
+                    });
+                }
+
+                GLTFSDK_TEST_METHOD(DeserializeTests, DeserializeSuccess_ValidNodeScale)
+                {
+                    auto doc = Deserialize(c_validNodeScale);
+                    Assert::AreEqual(size_t(1), doc.nodes.Size());
+                    const auto& node = doc.nodes.Front();
+                    Assert::AreEqual(1.0f, node.scale.x);
+                    Assert::AreEqual(1.0f, node.scale.y);
+                    Assert::AreEqual(1.0f, node.scale.z);
+                }
+
+                GLTFSDK_TEST_METHOD(DeserializeTests, DeserializeFail_NodeScaleIsString)
+                {
+                    Assert::ExpectException<InvalidGLTFException>([]()
+                    {
+                        Deserialize(c_nodeScaleIsString, DeserializeFlags::None, SchemaFlags::DisableSchemaRoot);
+                    });
+                }
+
+                GLTFSDK_TEST_METHOD(DeserializeTests, DeserializeFail_NodeTranslationWrongSize)
+                {
+                    Assert::ExpectException<InvalidGLTFException>([]()
+                    {
+                        Deserialize(c_nodeTranslationWrongSize, DeserializeFlags::None, SchemaFlags::DisableSchemaRoot);
+                    });
+                }
+
+                GLTFSDK_TEST_METHOD(DeserializeTests, DeserializeFail_NodeRotationNonNumericElement)
+                {
+                    Assert::ExpectException<InvalidGLTFException>([]()
+                    {
+                        Deserialize(c_nodeRotationNonNumericElement, DeserializeFlags::None, SchemaFlags::DisableSchemaRoot);
                     });
                 }
             };

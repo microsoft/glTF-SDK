@@ -16,6 +16,41 @@ using namespace Microsoft::glTF;
 
 namespace
 {
+    // Returns the fixed-size JSON array referenced by 'memberName' from
+    // node 'v', validating that:
+    //   - the member exists and is a JSON array,
+    //   - the array has exactly 'expectedSize' elements,
+    //   - every element is a JSON number.
+    // Throws InvalidGLTFException with the supplied 'arrayDescription' if
+    // any of these conditions are not met. Used by the node transform
+    // parsers (scale/translation/rotation/matrix), which read into
+    // fixed-size float arrays and previously relied on rapidjson::Value
+    // accessors that are only well-defined for arrays of numeric elements.
+    const rapidjson::Value& GetFixedSizeNumericArray(
+        const rapidjson::Value& v,
+        const char* memberName,
+        size_t expectedSize,
+        const char* arrayDescription)
+    {
+        auto it = v.FindMember(memberName);
+        // Caller is expected to have already handled the missing-member case
+        // (these fields are optional with default values in glTF). This
+        // helper only validates the shape when the member is present.
+        const rapidjson::Value& a = it->value;
+        if (!a.IsArray() || a.Size() != expectedSize)
+        {
+            throw InvalidGLTFException(arrayDescription);
+        }
+        for (rapidjson::Value::ConstValueIterator ait = a.Begin(); ait != a.End(); ++ait)
+        {
+            if (!ait->IsNumber())
+            {
+                throw InvalidGLTFException(arrayDescription);
+            }
+        }
+        return a;
+    }
+
     void ParseExtensions(const rapidjson::Value& v, glTFProperty& node, const ExtensionDeserializer& extensionDeserializer)
     {
         const auto& extensionsIt = v.FindMember("extensions");
@@ -297,7 +332,6 @@ namespace
 
     void ParseNodeScale(const rapidjson::Value& v, Node& node)
     {
-        const int scaleCapacity = 3;
         auto it = v.FindMember("scale");
         if (it == v.MemberEnd())
         {
@@ -305,11 +339,8 @@ namespace
             return;
         }
 
-        const rapidjson::Value& a = it->value;
-        if (a.Capacity() != scaleCapacity)
-        {
-            throw InvalidGLTFException("A node must have a scale with 3 elements");
-        }
+        const rapidjson::Value& a = GetFixedSizeNumericArray(v, "scale", 3U,
+            "A node must have a scale with 3 numeric elements");
 
         rapidjson::Value::ConstValueIterator ait = a.Begin();
         node.scale.x = ait++->GetFloat();
@@ -319,7 +350,6 @@ namespace
 
     void ParseNodeTranslation(const rapidjson::Value& v, Node& node)
     {
-        const int translationCapacity = 3;
         auto it = v.FindMember("translation");
         if (it == v.MemberEnd())
         {
@@ -327,11 +357,8 @@ namespace
             return;
         }
 
-        const rapidjson::Value& a = it->value;
-        if (a.Capacity() != translationCapacity)
-        {
-            throw InvalidGLTFException("A node must have a translation with 3 elements");
-        }
+        const rapidjson::Value& a = GetFixedSizeNumericArray(v, "translation", 3U,
+            "A node must have a translation with 3 numeric elements");
 
         rapidjson::Value::ConstValueIterator ait = a.Begin();
         node.translation.x = ait++->GetFloat();
@@ -341,7 +368,6 @@ namespace
 
     void ParseNodeRotation(const rapidjson::Value& v, Node& node)
     {
-        const int rotationCapacity = 4;
         auto it = v.FindMember("rotation");
         if (it == v.MemberEnd())
         {
@@ -349,11 +375,8 @@ namespace
             return;
         }
 
-        const rapidjson::Value& a = it->value;
-        if (a.Capacity() != rotationCapacity)
-        {
-            throw InvalidGLTFException("A node must have a rotation with 4 elements");
-        }
+        const rapidjson::Value& a = GetFixedSizeNumericArray(v, "rotation", 4U,
+            "A node must have a rotation with 4 numeric elements");
 
         rapidjson::Value::ConstValueIterator ait = a.Begin();
         node.rotation.x = ait++->GetFloat();
@@ -373,11 +396,8 @@ namespace
             return;
         }
 
-        const rapidjson::Value& a = it->value;
-        if (a.Capacity() != 16)
-        {
-            throw InvalidGLTFException("A node must have a matrix transform with 16 elements");
-        }
+        const rapidjson::Value& a = GetFixedSizeNumericArray(v, "matrix", 16U,
+            "A node must have a matrix transform with 16 numeric elements");
 
         uint8_t index = 0;
         for (rapidjson::Value::ConstValueIterator ait = a.Begin(); ait != a.End(); ++ait)

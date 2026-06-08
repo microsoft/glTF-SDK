@@ -798,6 +798,61 @@ namespace Microsoft
                     Assert::AreEqual<float>(data[5], -1.f);
                 }
 
+                // Negative regression: an accessor whose declared element
+                // count, when multiplied by its type component count, is not
+                // representable as size_t must be rejected with a
+                // GLTFException rather than silently allocating an
+                // undersized buffer that the sparse-write loop would then
+                // overrun.
+                GLTFSDK_TEST_METHOD(GLTFResourceReaderTests, TestSparseAccessor_RejectsUnrepresentableElementCount)
+                {
+                    Accessor accessor;
+                    accessor.id = "0";
+                    accessor.componentType = COMPONENT_FLOAT;
+                    accessor.type = TYPE_VEC3;
+                    // VEC3 has typeCount = 3. Pick a count whose product
+                    // with 3 overflows size_t (max()/3 + 1) * 3 wraps to a
+                    // small number.
+                    accessor.count = (std::numeric_limits<size_t>::max)() / 3U + 1U;
+                    accessor.sparse.count = 1U;
+                    accessor.sparse.indicesComponentType = COMPONENT_UNSIGNED_INT;
+                    accessor.sparse.indicesBufferViewId = "0";
+                    accessor.sparse.valuesBufferViewId = "1";
+
+                    BufferView indicesView;
+                    indicesView.id = "0";
+                    indicesView.bufferId = "0";
+                    indicesView.byteLength = sizeof(uint32_t);
+                    BufferView valuesView;
+                    valuesView.id = "1";
+                    valuesView.bufferId = "0";
+                    valuesView.byteOffset = sizeof(uint32_t);
+                    valuesView.byteLength = 3U * sizeof(float);
+
+                    Buffer buffer;
+                    buffer.id = "0";
+                    buffer.uri = "buffer.bin";
+                    buffer.byteLength = indicesView.byteLength + valuesView.byteLength;
+
+                    Document doc;
+                    doc.buffers.Append(buffer);
+                    doc.bufferViews.Append(indicesView);
+                    doc.bufferViews.Append(valuesView);
+                    doc.accessors.Append(accessor);
+
+                    auto stream = std::make_shared<StreamReaderWriter>();
+                    auto streamOutput = stream->GetOutputStream("buffer.bin");
+                    uint32_t idx = 0U;
+                    float values[3] = { 0.f, 0.f, 0.f };
+                    streamOutput->write(reinterpret_cast<char*>(&idx), sizeof(idx));
+                    streamOutput->write(reinterpret_cast<char*>(values), sizeof(values));
+
+                    GLTFResourceReader reader(stream);
+                    Assert::ExpectException<GLTFException>([&]()
+                    {
+                        reader.ReadBinaryData<float>(doc, accessor);
+                    });
+                }
             };
         }
     }

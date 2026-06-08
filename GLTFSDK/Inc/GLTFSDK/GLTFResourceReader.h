@@ -11,6 +11,7 @@
 #include <GLTFSDK/Validation.h>
 
 #include <cassert>
+#include <limits>
 
 namespace Microsoft
 {
@@ -126,6 +127,24 @@ namespace Microsoft
             std::vector<float> ReadFloatData(const Document& gltfDocument, const Accessor& accessor) const;
 
         protected:
+            // Computes a * b as size_t, throwing GLTFException when the
+            // mathematical product is not representable in size_t. Used to
+            // size element buffers from values that originate in untrusted
+            // input (e.g. accessor.count, sparse.count, type component
+            // counts) so that an out-of-range value cannot silently wrap
+            // and produce an undersized allocation.
+            template<typename A, typename B>
+            static size_t MultiplyChecked(A a, B b)
+            {
+                const size_t lhs = static_cast<size_t>(a);
+                const size_t rhs = static_cast<size_t>(b);
+                if (rhs != 0U && lhs > (std::numeric_limits<size_t>::max)() / rhs)
+                {
+                    throw GLTFException("Accessor element count is not representable as size_t");
+                }
+                return lhs * rhs;
+            }
+
             template<typename T>
             std::vector<T> ReadAccessor(const Document& gltfDocument, const Accessor& accessor) const
             {
@@ -141,7 +160,7 @@ namespace Microsoft
 
                 if (!bufferView.byteStride || bufferView.byteStride.Get() == elementSize)
                 {
-                    data = ReadBinaryData<T>(buffer, offset, accessor.count * typeCount);
+                    data = ReadBinaryData<T>(buffer, offset, MultiplyChecked(accessor.count, typeCount));
                 }
                 else
                 {
@@ -161,7 +180,7 @@ namespace Microsoft
 
                 if (accessor.bufferViewId.empty())
                 {
-                    baseData.resize(typeCount * accessor.count, T());
+                    baseData.resize(MultiplyChecked(typeCount, accessor.count), T());
                 }
                 else
                 {
@@ -172,7 +191,7 @@ namespace Microsoft
 
                     if (!bufferView.byteStride || bufferView.byteStride.Get() == elementSize)
                     {
-                        baseData = ReadBinaryData<T>(buffer, offset, accessor.count * typeCount);
+                        baseData = ReadBinaryData<T>(buffer, offset, MultiplyChecked(accessor.count, typeCount));
                     }
                     else
                     {
@@ -316,7 +335,7 @@ namespace Microsoft
             std::vector<T> ReadBinaryDataInterleaved(const Buffer& buffer, std::streamoff offset, size_t elementCount, uint8_t typeCount, size_t stride) const
             {
                 const size_t elementSize = sizeof(T) * typeCount;
-                const size_t componentCount = elementCount * typeCount;
+                const size_t componentCount = MultiplyChecked(elementCount, typeCount);
 
                 std::vector<T> data(componentCount);
 
@@ -357,6 +376,19 @@ namespace Microsoft
 
                 const size_t count = accessor.sparse.count;
 
+                // Confirm that the destination base data, which was sized
+                // upstream from accessor.count, was actually allocated with
+                // enough room for accessor.count * typeCount components.
+                // This is the invariant the sparse write loop below relies
+                // on; if it ever did not hold (e.g. a previous unchecked
+                // multiplication had wrapped) the per-index writes would
+                // walk past the end of the heap allocation.
+                const size_t expectedBaseComponentCount = MultiplyChecked(accessor.count, typeCount);
+                if (baseData.size() != expectedBaseComponentCount)
+                {
+                    throw GLTFException("Sparse accessor base data size does not match accessor.count * typeCount");
+                }
+
                 const BufferView& indicesBufferView = gltfDocument.bufferViews.Get(accessor.sparse.indicesBufferViewId);
                 const Buffer& indicesBuffer = gltfDocument.buffers.Get(indicesBufferView.bufferId);
                 const size_t indicesOffset = accessor.sparse.indicesByteOffset + indicesBufferView.byteOffset;
@@ -380,23 +412,56 @@ namespace Microsoft
 
                 if (!valuesBufferView.byteStride || valuesBufferView.byteStride.Get() == elementSize)
                 {
-                    values = ReadBinaryData<T>(valuesBuffer, valuesOffset, count * typeCount);
+                    values = ReadBinaryData<T>(valuesBuffer, valuesOffset, MultiplyChecked(count, typeCount));
                 }
                 else
                 {
                     values = ReadBinaryDataInterleaved<T>(valuesBuffer, valuesOffset, count, typeCount, valuesBufferView.byteStride.Get());
                 }
 
+                // After read the values vector should contain count*typeCount
+                // components; an interleaved/short read should never leave it
+                // smaller. Re-check before indexing so a malformed buffer can
+                // never produce a read past values.end().
+                const size_t expectedValuesComponentCount = MultiplyChecked(count, typeCount);
+                if (values.size() < expectedValuesComponentCount)
+                {
+                    throw GLTFException("Sparse accessor values data is smaller than declared");
+                }
+
+                static_assert(sizeof(I) <= sizeof(size_t), "sizeof(I) <= sizeof(size_t)");
+
                 for (size_t i = 0; i < indices.size(); i++)
                 {
-                    assert(baseData.size() == accessor.count * typeCount);
-                    static_assert(sizeof(I) <= sizeof(size_t), "sizeof(I) < sizeof(size_t)");
-                    if (0 <= indices[i] && static_cast<size_t>(indices[i]) < accessor.count)
+                    const size_t idx = static_cast<size_t>(indices[i]);
+
+                    // Preserve existing behaviour: silently skip a sparse
+                    // index that falls outside the accessor's logical range.
+                    // Existing well-formed assets exercise the in-range
+                    // branch; this guard simply rejects malformed indices.
+                    if (idx >= accessor.count)
                     {
-                        for (size_t j = 0; j < typeCount; j++)
-                        {
-                            baseData[indices[i] * typeCount + j] = values[i * typeCount + j];
-                        }
+                        continue;
+                    }
+
+                    const size_t baseStart = MultiplyChecked(idx, typeCount);
+                    const size_t valueStart = MultiplyChecked(i, typeCount);
+
+                    // Defence in depth: the two invariants above
+                    // (baseData.size() == accessor.count * typeCount, idx <
+                    // accessor.count) imply baseStart + typeCount <=
+                    // baseData.size(); reassert it here so a future change to
+                    // either invariant cannot regress into an out-of-bounds
+                    // write.
+                    if (baseStart > baseData.size() - typeCount ||
+                        valueStart > values.size() - typeCount)
+                    {
+                        throw GLTFException("Sparse accessor write would go out of bounds");
+                    }
+
+                    for (size_t j = 0; j < typeCount; j++)
+                    {
+                        baseData[baseStart + j] = values[valueStart + j];
                     }
                 }
             }
