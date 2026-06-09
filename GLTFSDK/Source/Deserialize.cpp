@@ -92,7 +92,15 @@ namespace
 
     void ParseTextureInfo(const rapidjson::Value& v, TextureInfo& textureInfo, const ExtensionDeserializer& extensionDeserializer)
     {
+        if (!v.IsObject())
+        {
+            throw InvalidGLTFException("TextureInfo must be a JSON object");
+        }
         auto textureIndexIt = FindRequiredMember("index", v);
+        if (!textureIndexIt->value.IsUint())
+        {
+            throw InvalidGLTFException("TextureInfo.index must be an unsigned integer");
+        }
         textureInfo.textureId = std::to_string(textureIndexIt->value.GetUint());
         textureInfo.texCoord = GetMemberValueOrDefault<size_t>(v, "texCoord", 0U);
         ParseProperty(v, textureInfo, extensionDeserializer);

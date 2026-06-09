@@ -947,6 +947,130 @@ namespace Microsoft
                         KHR::Materials::DeserializePBRSpecGloss(R"({"specularFactor": "invalid"})", extensionDeserializer);
                     });
                 }
+
+                // Negative regression: per-element type check on
+                // diffuseFactor / specularFactor. Previously the IsArray and
+                // Size checks were in place but a non-numeric element would
+                // fall through to GetDouble() with unchecked input.
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_DiffuseFactor_NonNumericElement)
+                {
+                    ExtensionDeserializer extensionDeserializer;
+                    Assert::ExpectException<GLTFException>([&extensionDeserializer]()
+                    {
+                        KHR::Materials::DeserializePBRSpecGloss(
+                            R"({"diffuseFactor": [1.0, 1.0, 1.0, "x"]})", extensionDeserializer);
+                    });
+                }
+
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_SpecularFactor_NonNumericElement)
+                {
+                    ExtensionDeserializer extensionDeserializer;
+                    Assert::ExpectException<GLTFException>([&extensionDeserializer]()
+                    {
+                        KHR::Materials::DeserializePBRSpecGloss(
+                            R"({"specularFactor": [1.0, 0.5, "x"]})", extensionDeserializer);
+                    });
+                }
+
+                // Negative regression: sheenColorFactor / specularColorFactor
+                // / attenuationColor must all be JSON arrays of the
+                // spec-mandated size whose elements are JSON numbers.
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_SheenColorFactor_NotArray)
+                {
+                    ExtensionDeserializer extensionDeserializer;
+                    Assert::ExpectException<GLTFException>([&extensionDeserializer]()
+                    {
+                        KHR::Materials::DeserializeSheen(
+                            R"({"sheenColorFactor": "rgb"})", extensionDeserializer);
+                    });
+                }
+
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_SheenColorFactor_WrongSize)
+                {
+                    ExtensionDeserializer extensionDeserializer;
+                    Assert::ExpectException<GLTFException>([&extensionDeserializer]()
+                    {
+                        KHR::Materials::DeserializeSheen(
+                            R"({"sheenColorFactor": [1.0, 0.5]})", extensionDeserializer);
+                    });
+                }
+
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_SheenColorFactor_NonNumericElement)
+                {
+                    ExtensionDeserializer extensionDeserializer;
+                    Assert::ExpectException<GLTFException>([&extensionDeserializer]()
+                    {
+                        KHR::Materials::DeserializeSheen(
+                            R"({"sheenColorFactor": [1.0, 0.5, "x"]})", extensionDeserializer);
+                    });
+                }
+
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_SpecularColorFactor_NotArray)
+                {
+                    ExtensionDeserializer extensionDeserializer;
+                    Assert::ExpectException<GLTFException>([&extensionDeserializer]()
+                    {
+                        KHR::Materials::DeserializeSpecular(
+                            R"({"specularColorFactor": "rgb"})", extensionDeserializer);
+                    });
+                }
+
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_AttenuationColor_NotArray)
+                {
+                    ExtensionDeserializer extensionDeserializer;
+                    Assert::ExpectException<GLTFException>([&extensionDeserializer]()
+                    {
+                        KHR::Materials::DeserializeVolume(
+                            R"({"attenuationColor": "rgb"})", extensionDeserializer);
+                    });
+                }
+
+                // Negative regression: EXT_mesh_gpu_instancing.attributes
+                // must be a JSON object whose values are unsigned integers.
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_MeshGpuInstancingAttributes_NotObject)
+                {
+                    ExtensionDeserializer extensionDeserializer;
+                    Assert::ExpectException<GLTFException>([&extensionDeserializer]()
+                    {
+                        KHR::Nodes::DeserializeMeshGPUInstancing(
+                            R"({"attributes": "TRANSLATION"})", extensionDeserializer);
+                    });
+                }
+
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_MeshGpuInstancingAttributes_NonUintValue)
+                {
+                    ExtensionDeserializer extensionDeserializer;
+                    Assert::ExpectException<GLTFException>([&extensionDeserializer]()
+                    {
+                        KHR::Nodes::DeserializeMeshGPUInstancing(
+                            R"({"attributes": { "TRANSLATION": "not-a-number" } })", extensionDeserializer);
+                    });
+                }
+
+                // Negative regression: TextureInfo (used by every
+                // clearcoatTexture / baseColorTexture / etc. callsite) must
+                // be a JSON object. A JSON string for clearcoatTexture
+                // previously walked attacker-controlled bytes as object
+                // member metadata.
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_ClearcoatTexture_NotObject)
+                {
+                    ExtensionDeserializer extensionDeserializer;
+                    Assert::ExpectException<GLTFException>([&extensionDeserializer]()
+                    {
+                        KHR::Materials::DeserializeClearcoat(
+                            R"({"clearcoatTexture": "not-an-object"})", extensionDeserializer);
+                    });
+                }
+
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_ClearcoatTexture_IndexNotUint)
+                {
+                    ExtensionDeserializer extensionDeserializer;
+                    Assert::ExpectException<GLTFException>([&extensionDeserializer]()
+                    {
+                        KHR::Materials::DeserializeClearcoat(
+                            R"({"clearcoatTexture": { "index": "x" } })", extensionDeserializer);
+                    });
+                }
             };
         }
     }
