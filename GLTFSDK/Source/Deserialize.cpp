@@ -33,9 +33,14 @@ namespace
         const char* arrayDescription)
     {
         auto it = v.FindMember(memberName);
-        // Caller is expected to have already handled the missing-member case
-        // (these fields are optional with default values in glTF). This
-        // helper only validates the shape when the member is present.
+        // Defensive: callers are expected to have already handled the
+        // missing-member case (these fields are optional with default
+        // values in glTF), but dereferencing v.MemberEnd() is undefined
+        // behaviour, so guard inside the helper too.
+        if (it == v.MemberEnd())
+        {
+            throw InvalidGLTFException(arrayDescription);
+        }
         const rapidjson::Value& a = it->value;
         if (!a.IsArray() || a.Size() != expectedSize)
         {

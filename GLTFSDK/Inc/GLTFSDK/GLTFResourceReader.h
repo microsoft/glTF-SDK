@@ -127,20 +127,54 @@ namespace Microsoft
             std::vector<float> ReadFloatData(const Document& gltfDocument, const Accessor& accessor) const;
 
         protected:
+            // Internal: if A is wider than size_t, reject values that
+            // cannot be represented as size_t before the cast loses
+            // information. Two overloads dispatch on sizeof at compile
+            // time so the no-op case is empty (no runtime check, no
+            // "conditional expression is constant" warning).
+            template<typename A>
+            static typename std::enable_if<(sizeof(A) > sizeof(size_t)), void>::type
+            CheckRepresentableAsSizeT(A v)
+            {
+                if (v > static_cast<A>((std::numeric_limits<size_t>::max)()))
+                {
+                    throw GLTFException("Requested component count is not representable as size_t");
+                }
+            }
+            template<typename A>
+            static typename std::enable_if<(sizeof(A) <= sizeof(size_t)), void>::type
+            CheckRepresentableAsSizeT(A)
+            {
+                // Narrower-than-or-equal-to-size_t values always fit; nothing to check.
+            }
+
             // Computes a * b as size_t, throwing GLTFException when the
             // mathematical product is not representable in size_t. Used to
             // size element buffers from values that originate in untrusted
             // input (e.g. accessor.count, sparse.count, type component
             // counts) so that an out-of-range value cannot silently wrap
             // and produce an undersized allocation.
+            //
+            // The arguments must be unsigned integral types. Signed inputs
+            // would silently wrap on the cast to size_t and defeat the
+            // overflow check; types wider than size_t are checked for
+            // representability before the cast.
             template<typename A, typename B>
             static size_t MultiplyChecked(A a, B b)
             {
+                static_assert(std::is_integral<A>::value && std::is_unsigned<A>::value,
+                              "MultiplyChecked requires unsigned integral types");
+                static_assert(std::is_integral<B>::value && std::is_unsigned<B>::value,
+                              "MultiplyChecked requires unsigned integral types");
+
+                CheckRepresentableAsSizeT(a);
+                CheckRepresentableAsSizeT(b);
+
                 const size_t lhs = static_cast<size_t>(a);
                 const size_t rhs = static_cast<size_t>(b);
                 if (rhs != 0U && lhs > (std::numeric_limits<size_t>::max)() / rhs)
                 {
-                    throw GLTFException("Accessor element count is not representable as size_t");
+                    throw GLTFException("Requested component count is not representable as size_t");
                 }
                 return lhs * rhs;
             }
