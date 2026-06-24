@@ -10,18 +10,6 @@ using namespace Microsoft::glTF;
 
 namespace
 {
-    // Throws InvalidGLTFException with 'description' unless 'v' is a JSON
-    // object. Centralises the IsObject check that several extension
-    // deserializers need before calling FindMember/GetObject on a value
-    // whose JSON type is otherwise unverified.
-    void RequireObject(const rapidjson::Value& v, const char* description)
-    {
-        if (!v.IsObject())
-        {
-            throw InvalidGLTFException(description);
-        }
-    }
-
     // Validates that 'v' is a JSON array of exactly 'expectedSize'
     // elements, each of which is a JSON number. Throws
     // InvalidGLTFException with 'description' on any mismatch. Used by
@@ -52,6 +40,7 @@ namespace
         if (extensionsIt != v.MemberEnd())
         {
             const rapidjson::Value& extensionsObject = extensionsIt->value;
+            RequireObject(extensionsObject, "The extensions member must be a JSON object");
             for (const auto& entry : extensionsObject.GetObject())
             {
                 ExtensionPair extensionPair = { entry.name.GetString(), Serialize(entry.value) };
@@ -291,6 +280,7 @@ std::unique_ptr<Extension> GLTFSDK_API KHR::Materials::DeserializePBRSpecGloss(c
     Materials::PBRSpecularGlossiness specGloss;
 
     auto doc = RapidJsonUtils::CreateDocumentFromString(json);
+    RequireObject(doc, "The extension value must be a JSON object");
     const rapidjson::Value& sit = doc;
 
     // Diffuse Factor
@@ -461,6 +451,7 @@ std::unique_ptr<Extension> GLTFSDK_API KHR::Materials::DeserializeClearcoat(cons
     Materials::Clearcoat clearcoat;
 
     auto doc = RapidJsonUtils::CreateDocumentFromString(json);
+    RequireObject(doc, "The extension value must be a JSON object");
     const auto sit = doc.GetObject();
 
     // Clearcoat Factor
@@ -572,6 +563,7 @@ std::unique_ptr<Extension> GLTFSDK_API KHR::Materials::DeserializeVolume(const s
     Materials::Volume volume;
 
     auto doc = RapidJsonUtils::CreateDocumentFromString(json);
+    RequireObject(doc, "The extension value must be a JSON object");
     const auto sit = doc.GetObject();
 
     // Attenuation Color
@@ -696,6 +688,7 @@ std::unique_ptr<Extension> GLTFSDK_API KHR::Materials::DeserializeIridescence(co
     Materials::Iridescence iridescence;
 
     auto doc = RapidJsonUtils::CreateDocumentFromString(json);
+    RequireObject(doc, "The extension value must be a JSON object");
     const auto sit = doc.GetObject();
 
     // Iridescence Factor
@@ -800,6 +793,7 @@ std::unique_ptr<Extension> GLTFSDK_API KHR::Materials::DeserializeTransmission(c
     Materials::Transmission transmission;
 
     auto doc = RapidJsonUtils::CreateDocumentFromString(json);
+    RequireObject(doc, "The extension value must be a JSON object");
     const auto sit = doc.GetObject();
 
     // Transmission Factor
@@ -891,6 +885,7 @@ std::unique_ptr<Extension> GLTFSDK_API KHR::Materials::DeserializeSheen(const st
     Materials::Sheen sheen;
 
     auto doc = RapidJsonUtils::CreateDocumentFromString(json);
+    RequireObject(doc, "The extension value must be a JSON object");
     const auto sit = doc.GetObject();
 
     // Sheen Color Factor
@@ -1001,6 +996,7 @@ std::unique_ptr<Extension> GLTFSDK_API KHR::Materials::DeserializeSpecular(const
     Materials::Specular specular;
 
     auto doc = RapidJsonUtils::CreateDocumentFromString(json);
+    RequireObject(doc, "The extension value must be a JSON object");
     const auto sit = doc.GetObject();
 
     // Specular Factor
@@ -1173,6 +1169,7 @@ std::unique_ptr<Extension> GLTFSDK_API KHR::Nodes::DeserializeMeshGPUInstancing(
     Nodes::MeshGPUInstancing instancing;
 
     auto doc = RapidJsonUtils::CreateDocumentFromString(json);
+    RequireObject(doc, "The extension value must be a JSON object");
     const auto sit = doc.GetObject();
 
     const auto attributesIt = sit.FindMember("attributes");
@@ -1275,6 +1272,7 @@ std::unique_ptr<Extension> GLTFSDK_API KHR::TextureInfos::DeserializeTextureTran
     TextureTransform textureTransform;
 
     auto doc = RapidJsonUtils::CreateDocumentFromString(json);
+    RequireObject(doc, "The extension value must be a JSON object");
     const rapidjson::Value& sit = doc;
 
     // Offset

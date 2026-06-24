@@ -353,6 +353,45 @@ namespace
     "nodes": [{ "rotation": [0,0,0,"w"] }],
     "asset": {"version": "2.0"}
 })";
+
+    // Type-confusion regression inputs: a JSON value of the wrong type (string)
+    // where an object or array is required. With schema validation disabled these
+    // reach the semantic deserializers, which must throw rather than read the
+    // value's storage as a forged object/array member table.
+    const char* c_extensionsMemberIsString = R"({
+    "extensions": "not-an-object",
+    "asset": {"version": "2.0"}
+})";
+
+    const char* c_topLevelArrayMemberIsString = R"({
+    "materials": "not-an-array",
+    "asset": {"version": "2.0"}
+})";
+
+    const char* c_topLevelArrayElementIsString = R"({
+    "materials": ["not-an-object"],
+    "asset": {"version": "2.0"}
+})";
+
+    const char* c_meshPrimitiveAttributesIsString = R"({
+    "meshes": [{ "primitives": [{ "attributes": "not-an-object" }] }],
+    "asset": {"version": "2.0"}
+})";
+
+    const char* c_cameraPerspectiveIsString = R"({
+    "cameras": [{ "type": "perspective", "perspective": "not-an-object" }],
+    "asset": {"version": "2.0"}
+})";
+
+    const char* c_cameraOrthographicIsString = R"({
+    "cameras": [{ "type": "orthographic", "orthographic": "not-an-object" }],
+    "asset": {"version": "2.0"}
+})";
+
+    const char* c_pbrMetallicRoughnessIsString = R"({
+    "materials": [{ "pbrMetallicRoughness": "not-an-object" }],
+    "asset": {"version": "2.0"}
+})";
 }
 
 namespace Microsoft
@@ -725,6 +764,69 @@ namespace Microsoft
                     Assert::ExpectException<InvalidGLTFException>([]()
                     {
                         Deserialize(c_nodeRotationNonNumericElement, DeserializeFlags::None, SchemaFlags::DisableSchemaRoot);
+                    });
+                }
+
+                // Negative regression: members that must be a JSON object or array
+                // but are given a string (or other wrong type) must throw rather
+                // than walk the value's storage as a forged member/element table.
+                // As with the node tests above, these pass SchemaFlags::DisableSchemaRoot
+                // so the type-confusion input reaches the semantic deserializers (a
+                // consumer that disables schema validation must still get a clean
+                // exception, not undefined behaviour).
+                GLTFSDK_TEST_METHOD(DeserializeTests, DeserializeFail_ExtensionsMemberIsString)
+                {
+                    Assert::ExpectException<InvalidGLTFException>([]()
+                    {
+                        Deserialize(c_extensionsMemberIsString, DeserializeFlags::None, SchemaFlags::DisableSchemaRoot);
+                    });
+                }
+
+                GLTFSDK_TEST_METHOD(DeserializeTests, DeserializeFail_TopLevelArrayMemberIsString)
+                {
+                    Assert::ExpectException<InvalidGLTFException>([]()
+                    {
+                        Deserialize(c_topLevelArrayMemberIsString, DeserializeFlags::None, SchemaFlags::DisableSchemaRoot);
+                    });
+                }
+
+                GLTFSDK_TEST_METHOD(DeserializeTests, DeserializeFail_TopLevelArrayElementIsString)
+                {
+                    Assert::ExpectException<InvalidGLTFException>([]()
+                    {
+                        Deserialize(c_topLevelArrayElementIsString, DeserializeFlags::None, SchemaFlags::DisableSchemaRoot);
+                    });
+                }
+
+                GLTFSDK_TEST_METHOD(DeserializeTests, DeserializeFail_MeshPrimitiveAttributesIsString)
+                {
+                    Assert::ExpectException<InvalidGLTFException>([]()
+                    {
+                        Deserialize(c_meshPrimitiveAttributesIsString, DeserializeFlags::None, SchemaFlags::DisableSchemaRoot);
+                    });
+                }
+
+                GLTFSDK_TEST_METHOD(DeserializeTests, DeserializeFail_CameraPerspectiveIsString)
+                {
+                    Assert::ExpectException<InvalidGLTFException>([]()
+                    {
+                        Deserialize(c_cameraPerspectiveIsString, DeserializeFlags::None, SchemaFlags::DisableSchemaRoot);
+                    });
+                }
+
+                GLTFSDK_TEST_METHOD(DeserializeTests, DeserializeFail_CameraOrthographicIsString)
+                {
+                    Assert::ExpectException<InvalidGLTFException>([]()
+                    {
+                        Deserialize(c_cameraOrthographicIsString, DeserializeFlags::None, SchemaFlags::DisableSchemaRoot);
+                    });
+                }
+
+                GLTFSDK_TEST_METHOD(DeserializeTests, DeserializeFail_PbrMetallicRoughnessIsString)
+                {
+                    Assert::ExpectException<InvalidGLTFException>([]()
+                    {
+                        Deserialize(c_pbrMetallicRoughnessIsString, DeserializeFlags::None, SchemaFlags::DisableSchemaRoot);
                     });
                 }
             };

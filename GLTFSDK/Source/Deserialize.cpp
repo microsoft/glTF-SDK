@@ -62,6 +62,7 @@ namespace
         if (extensionsIt != v.MemberEnd())
         {
             const rapidjson::Value& extensionsObject = extensionsIt->value;
+            RequireObject(extensionsObject, "The extensions member must be a JSON object");
             for (const auto& entry : extensionsObject.GetObject())
             {
                 ExtensionPair extensionPair = { entry.name.GetString(), Serialize(entry.value) };
@@ -123,10 +124,17 @@ namespace
         rapidjson::Value::ConstMemberIterator it;
         if (TryFindMember(name, value, it))
         {
+            if (!it->value.IsArray())
+            {
+                throw InvalidGLTFException(std::string(name) + " must be a JSON array");
+            }
+
+            const std::string elementError = std::string(name) + " array elements must be JSON objects";
             size_t index = 0;
 
             for (auto& valueArray : it->value.GetArray())
             {
+                RequireObject(valueArray, elementError.c_str());
                 try
                 {
                     const auto& item = items.Append(fn(valueArray, extensionDeserializer), AppendIdPolicy::GenerateOnEmpty);
@@ -300,6 +308,7 @@ namespace
         rapidjson::Value::ConstMemberIterator it = v.FindMember("attributes");
         if (it != v.MemberEnd())
         {
+            RequireObject(it->value, "MeshPrimitive attributes must be a JSON object");
             const auto& attributes = it->value.GetObject();
 
             for (const auto& attribute : attributes)
@@ -446,6 +455,7 @@ namespace
             {
                 throw InvalidGLTFException("Camera perspective projection undefined");
             }
+            RequireObject(perspectiveIt->value, "Camera perspective must be a JSON object");
 
             Optional<float> aspectRatio;
 
@@ -482,6 +492,7 @@ namespace
             {
                 throw InvalidGLTFException("Camera orthographic projection undefined");
             }
+            RequireObject(orthographicIt->value, "Camera orthographic must be a JSON object");
 
             float xmag = GetValue<float>(FindRequiredMember("xmag", orthographicIt->value)->value);
             float ymag = GetValue<float>(FindRequiredMember("ymag", orthographicIt->value)->value);
@@ -702,6 +713,7 @@ namespace
         auto mit = v.FindMember("pbrMetallicRoughness");
         if (mit != v.MemberEnd())
         {
+            RequireObject(mit->value, "pbrMetallicRoughness must be a JSON object");
             auto& pbrMr = mit->value;
 
             // Diffuse

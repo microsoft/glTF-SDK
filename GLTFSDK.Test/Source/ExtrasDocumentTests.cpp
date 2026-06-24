@@ -102,6 +102,22 @@ namespace Microsoft
                     Assert::AreEqual(444.4f, extraMissing);
                 }
 
+                // Negative regression: GetMemberValueOrDefault on a string-rooted
+                // extras document (not a JSON object) must return the default rather
+                // than read the string's storage as object member metadata. An extras
+                // value may be any JSON type, so a member lookup must tolerate a
+                // non-object root.
+                GLTFSDK_TEST_METHOD(GLTFExtrasDocumentTests, ExtrasDocumentValueGetMemberReturnsDefault)
+                {
+                    Document gltfDoc = Deserialize(test_json_extras_value);
+
+                    ExtrasDocument extrasDoc(gltfDoc.extras.c_str());
+
+                    const auto missing = extrasDoc.GetMemberValueOrDefault<float>("anyMember", 7.5f);
+
+                    Assert::AreEqual(7.5f, missing);
+                }
+
                 GLTFSDK_TEST_METHOD(GLTFExtrasDocumentTests, ExtrasDocumentNone)
                 {
                     Document gltfDoc = Deserialize(test_json_extras_none);

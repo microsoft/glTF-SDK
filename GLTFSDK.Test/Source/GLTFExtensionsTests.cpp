@@ -1071,6 +1071,28 @@ namespace Microsoft
                             R"({"clearcoatTexture": { "index": "x" } })", extensionDeserializer);
                     });
                 }
+
+                // Negative regression: an extension whose JSON value is a string
+                // (not an object) must throw rather than walk the string's bytes as
+                // object member metadata. Covers the shared RequireObject guard at
+                // the top of every KHR extension deserializer.
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_ExtensionValue_NotObject_SpecGloss)
+                {
+                    ExtensionDeserializer extensionDeserializer;
+                    Assert::ExpectException<GLTFException>([&extensionDeserializer]()
+                    {
+                        KHR::Materials::DeserializePBRSpecGloss("\"not-an-object\"", extensionDeserializer);
+                    });
+                }
+
+                GLTFSDK_TEST_METHOD(ExtensionsTests, Extensions_Test_ExtensionValue_NotObject_Clearcoat)
+                {
+                    ExtensionDeserializer extensionDeserializer;
+                    Assert::ExpectException<GLTFException>([&extensionDeserializer]()
+                    {
+                        KHR::Materials::DeserializeClearcoat("\"not-an-object\"", extensionDeserializer);
+                    });
+                }
             };
         }
     }

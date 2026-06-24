@@ -102,6 +102,19 @@ namespace Microsoft
             return it;
         }
 
+        // Throws InvalidGLTFException unless 'v' is a JSON object. Use before any
+        // FindMember/GetObject on a value whose JSON type is otherwise unverified
+        // (extras, extensions, array elements, nested sub-objects): on a non-object
+        // value that member storage is uninitialized and would otherwise be walked
+        // as a forged member table.
+        inline void RequireObject(const rapidjson::Value& v, const char* description)
+        {
+            if (!v.IsObject())
+            {
+                throw InvalidGLTFException(description);
+            }
+        }
+
         template<typename T>
         T GetValueOrDefault(const rapidjson::Value& v, T t = {})
         {
@@ -137,10 +150,16 @@ namespace Microsoft
         template<typename T>
         T GetMemberValueOrDefault(const rapidjson::Value& v, const char* memberName, T t = {})
         {
-            auto it = v.FindMember(memberName);
-            if (it != v.MemberEnd())
+            // FindMember reads object member storage; on a non-object value (e.g. a
+            // string-typed extras root) that storage is uninitialized and dereferenced
+            // as a forged member table. Only look up the member when 'v' is a JSON object.
+            if (v.IsObject())
             {
-                return GetValueOrDefault<T>(it->value, std::move(t));
+                auto it = v.FindMember(memberName);
+                if (it != v.MemberEnd())
+                {
+                    return GetValueOrDefault<T>(it->value, std::move(t));
+                }
             }
             return std::move(t);
         }
