@@ -9,6 +9,7 @@ ExternalProject_Add(RapidJSON
   SOURCE_DIR        "${CMAKE_BINARY_DIR}/RapidJSON-src"
   BINARY_DIR        "${CMAKE_BINARY_DIR}/RapidJSON-build"
   PATCH_COMMAND     "${CMAKE_COMMAND}" -DSOURCE_DIR=${CMAKE_BINARY_DIR}/RapidJSON-src -P "${CMAKE_CURRENT_SOURCE_DIR}/patches/fix-null-allocator-deref.cmake"
+          COMMAND     "${CMAKE_COMMAND}" -DSOURCE_DIR=${CMAKE_BINARY_DIR}/RapidJSON-src -P "${CMAKE_CURRENT_SOURCE_DIR}/patches/fix-string-type-conversion.cmake"
   CONFIGURE_COMMAND ""
   BUILD_COMMAND     ""
   INSTALL_COMMAND   ""
