@@ -16,6 +16,11 @@ on:
 jobs:
   build:
     runs-on: windows-latest
+    env:
+      # CMake 4.x removed compatibility with cmake_minimum_required(VERSION < 3.5).
+      # The vendored RapidJSON source (downloaded at configure time) still declares an
+      # older minimum, so clamp the policy version for its nested/child configures.
+      CMAKE_POLICY_VERSION_MINIMUM: "3.5"
     strategy:
         matrix:
             platform: ${{ fromJson(inputs.platforms) }}
@@ -26,11 +31,11 @@ jobs:
         with:
             submodules: 'true'
       - name: Setup CMake
-        uses: jwlawson/actions-setup-cmake@v2.0.2
+        uses: jwlawson/actions-setup-cmake@v2.2.0
         with:
             cmake-version: ${{ inputs.cmake-version }}
       - name: CMake Configure
-        run: cmake -G "Visual Studio 17 2022" -A ${{ matrix.platform }} -B ./Built/Int/cmake_${{ matrix.platform }} .
+        run: cmake -G "Visual Studio 18 2026" -A ${{ matrix.platform }} -B ./Built/Int/cmake_${{ matrix.platform }} .
       - name: CMake Build
         run: cmake --build . --target install --config ${{ matrix.config }}
         working-directory: ./Built/Int/cmake_${{ matrix.platform }}
