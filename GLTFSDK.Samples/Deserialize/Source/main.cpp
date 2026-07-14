@@ -6,9 +6,7 @@
 #include <GLTFSDK/GLBResourceReader.h>
 #include <GLTFSDK/Deserialize.h>
 
-// Replace this with <filesystem> (and use std::filesystem rather than
-// std::experimental::filesystem) if your toolchain fully supports C++17
-#include <experimental/filesystem>
+#include <filesystem>
 
 #include <fstream>
 #include <sstream>
@@ -28,7 +26,7 @@ namespace
     class StreamReader : public IStreamReader
     {
     public:
-        StreamReader(std::experimental::filesystem::path pathBase) : m_pathBase(std::move(pathBase))
+        StreamReader(std::filesystem::path pathBase) : m_pathBase(std::move(pathBase))
         {
             assert(m_pathBase.has_root_path());
         }
@@ -44,7 +42,7 @@ namespace
             //    if appropriate.
             // 3. Always open the file stream in binary mode. The glTF SDK will handle any text
             //    encoding issues for us.
-            auto streamPath = m_pathBase / std::experimental::filesystem::u8path(filename);
+            auto streamPath = m_pathBase / std::filesystem::u8path(filename);
             auto stream = std::make_shared<std::ifstream>(streamPath, std::ios_base::binary);
 
             // Check if the stream has no errors and is ready for I/O operations
@@ -57,7 +55,7 @@ namespace
         }
 
     private:
-        std::experimental::filesystem::path m_pathBase;
+        std::filesystem::path m_pathBase;
     };
 
     // Uses the Document class to print some basic information about various top-level glTF entities
@@ -185,13 +183,13 @@ namespace
         }
     }
 
-    void PrintInfo(const std::experimental::filesystem::path& path)
+    void PrintInfo(const std::filesystem::path& path)
     {
         // Pass the absolute path, without the filename, to the stream reader
         auto streamReader = std::make_unique<StreamReader>(path.parent_path());
 
-        std::experimental::filesystem::path pathFile = path.filename();
-        std::experimental::filesystem::path pathFileExt = pathFile.extension();
+        std::filesystem::path pathFile = path.filename();
+        std::filesystem::path pathFileExt = pathFile.extension();
 
         std::string manifest;
 
@@ -271,11 +269,11 @@ int main(int argc, char* argv[])
             throw std::runtime_error("Unexpected number of command line arguments");
         }
 
-        std::experimental::filesystem::path path = argv[1U];
+        std::filesystem::path path = argv[1U];
 
         if (path.is_relative())
         {
-            auto pathCurrent = std::experimental::filesystem::current_path();
+            auto pathCurrent = std::filesystem::current_path();
 
             // Convert the relative path into an absolute path by appending the command line argument to the current path
             pathCurrent /= path;
