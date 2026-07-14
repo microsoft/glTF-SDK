@@ -10,7 +10,7 @@ jobs:
     build-windows:
       uses: ./.github/workflows/windows.yml
       with:
-        cmake-version: '3.31.0'
+        cmake-version: '4.2.7'
         platforms: "['x64', 'Win32', 'ARM64']"
         configurations: "['RelWithDebInfo', 'Debug']"
     # MacOS
