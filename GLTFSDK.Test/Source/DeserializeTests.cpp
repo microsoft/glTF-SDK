@@ -392,6 +392,56 @@ namespace
     "materials": [{ "pbrMetallicRoughness": "not-an-object" }],
     "asset": {"version": "2.0"}
 })";
+
+    // Regression inputs for variable-length array members that the deserializer
+    // reads with rapidjson array accessors: node "children" (an array of node
+    // indices) and node/mesh "weights" (arrays of numbers, via the shared
+    // RapidJsonUtils::ToFloatArray helper). A present member of the wrong
+    // container type - or an array containing an element of the wrong type -
+    // must be rejected with InvalidGLTFException rather than read with accessors
+    // that are only well-defined on a JSON array of the expected element type.
+    // These pass SchemaFlags::DisableSchemaRoot so the malformed value reaches
+    // the semantic deserializers (a consumer that disables JSON-schema
+    // validation must still get a clean exception).
+    const char* c_validNodeChildren = R"({
+    "nodes": [{ "children": [1, 2] }, {}, {}],
+    "asset": {"version": "2.0"}
+})";
+
+    const char* c_nodeChildrenIsString = R"({
+    "nodes": [{ "children": "not-an-array" }],
+    "asset": {"version": "2.0"}
+})";
+
+    const char* c_nodeChildrenNonNumericElement = R"({
+    "nodes": [{ "children": ["not-a-node-index"] }],
+    "asset": {"version": "2.0"}
+})";
+
+    const char* c_validNodeWeights = R"({
+    "nodes": [{ "weights": [0.25, 0.75] }],
+    "asset": {"version": "2.0"}
+})";
+
+    const char* c_nodeWeightsIsString = R"({
+    "nodes": [{ "weights": "not-an-array" }],
+    "asset": {"version": "2.0"}
+})";
+
+    const char* c_nodeWeightsNonNumericElement = R"({
+    "nodes": [{ "weights": ["not-a-number"] }],
+    "asset": {"version": "2.0"}
+})";
+
+    const char* c_meshWeightsIsString = R"({
+    "meshes": [{ "weights": "not-an-array" }],
+    "asset": {"version": "2.0"}
+})";
+
+    const char* c_meshWeightsNonNumericElement = R"({
+    "meshes": [{ "weights": ["not-a-number"] }],
+    "asset": {"version": "2.0"}
+})";
 }
 
 namespace Microsoft
@@ -827,6 +877,93 @@ namespace Microsoft
                     Assert::ExpectException<InvalidGLTFException>([]()
                     {
                         Deserialize(c_pbrMetallicRoughnessIsString, DeserializeFlags::None, SchemaFlags::DisableSchemaRoot);
+                    });
+                }
+
+                // Positive regression: a well-formed node "children" array of
+                // node indices must still deserialize to the expected ids.
+                GLTFSDK_TEST_METHOD(DeserializeTests, DeserializeSuccess_ValidNodeChildren)
+                {
+                    auto doc = Deserialize(c_validNodeChildren);
+                    Assert::AreEqual(size_t(3), doc.nodes.Size());
+                    const auto& node = doc.nodes.Front();
+                    Assert::AreEqual(size_t(2), node.children.size());
+                    Assert::AreEqual(std::string("1"), node.children[0]);
+                    Assert::AreEqual(std::string("2"), node.children[1]);
+                }
+
+                // Negative regression: a node "children" member that is a JSON
+                // string (or any non-array value) must throw rather than be read
+                // with array accessors that are only defined on arrays.
+                GLTFSDK_TEST_METHOD(DeserializeTests, DeserializeFail_NodeChildrenIsString)
+                {
+                    Assert::ExpectException<InvalidGLTFException>([]()
+                    {
+                        Deserialize(c_nodeChildrenIsString, DeserializeFlags::None, SchemaFlags::DisableSchemaRoot);
+                    });
+                }
+
+                // Negative regression: a "children" array whose elements are not
+                // node indices must throw rather than read each element as a uint.
+                GLTFSDK_TEST_METHOD(DeserializeTests, DeserializeFail_NodeChildrenNonNumericElement)
+                {
+                    Assert::ExpectException<InvalidGLTFException>([]()
+                    {
+                        Deserialize(c_nodeChildrenNonNumericElement, DeserializeFlags::None, SchemaFlags::DisableSchemaRoot);
+                    });
+                }
+
+                // Positive regression: a well-formed node "weights" array of
+                // numbers must still deserialize. Uses SchemaFlags::DisableSchemaRoot
+                // because node "weights" has a JSON-schema dependency on "mesh";
+                // disabling schema validation exercises the parser's happy path
+                // (RapidJsonUtils::ToFloatArray) directly.
+                GLTFSDK_TEST_METHOD(DeserializeTests, DeserializeSuccess_ValidNodeWeights)
+                {
+                    auto doc = Deserialize(c_validNodeWeights, DeserializeFlags::None, SchemaFlags::DisableSchemaRoot);
+                    Assert::AreEqual(size_t(1), doc.nodes.Size());
+                    const auto& node = doc.nodes.Front();
+                    Assert::AreEqual(size_t(2), node.weights.size());
+                }
+
+                // Negative regression: a node "weights" member that is a JSON
+                // string must throw (shared RapidJsonUtils::ToFloatArray helper).
+                GLTFSDK_TEST_METHOD(DeserializeTests, DeserializeFail_NodeWeightsIsString)
+                {
+                    Assert::ExpectException<InvalidGLTFException>([]()
+                    {
+                        Deserialize(c_nodeWeightsIsString, DeserializeFlags::None, SchemaFlags::DisableSchemaRoot);
+                    });
+                }
+
+                // Negative regression: a node "weights" array whose elements are
+                // not numbers must throw rather than read each element as a number.
+                GLTFSDK_TEST_METHOD(DeserializeTests, DeserializeFail_NodeWeightsNonNumericElement)
+                {
+                    Assert::ExpectException<InvalidGLTFException>([]()
+                    {
+                        Deserialize(c_nodeWeightsNonNumericElement, DeserializeFlags::None, SchemaFlags::DisableSchemaRoot);
+                    });
+                }
+
+                // Negative regression: a mesh "weights" member that is a JSON
+                // string must throw. Mesh weights share the same ToFloatArray
+                // helper as node weights, so the guard must live in the helper.
+                GLTFSDK_TEST_METHOD(DeserializeTests, DeserializeFail_MeshWeightsIsString)
+                {
+                    Assert::ExpectException<InvalidGLTFException>([]()
+                    {
+                        Deserialize(c_meshWeightsIsString, DeserializeFlags::None, SchemaFlags::DisableSchemaRoot);
+                    });
+                }
+
+                // Negative regression: a mesh "weights" array whose elements are
+                // not numbers must throw.
+                GLTFSDK_TEST_METHOD(DeserializeTests, DeserializeFail_MeshWeightsNonNumericElement)
+                {
+                    Assert::ExpectException<InvalidGLTFException>([]()
+                    {
+                        Deserialize(c_meshWeightsNonNumericElement, DeserializeFlags::None, SchemaFlags::DisableSchemaRoot);
                     });
                 }
             };
