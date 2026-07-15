@@ -393,9 +393,20 @@ namespace
         if (it != v.MemberEnd())
         {
             const rapidjson::Value& a = it->value;
-            node.children.reserve(a.Capacity());
+            // children is an array of node indices; anything else must be
+            // rejected before reading array accessors, which are only
+            // well-defined on a JSON array.
+            if (!a.IsArray())
+            {
+                throw InvalidGLTFException("Node children must be a JSON array");
+            }
+            node.children.reserve(a.Size());
             for (rapidjson::Value::ConstValueIterator ait = a.Begin(); ait != a.End(); ++ait)
             {
+                if (!ait->IsUint())
+                {
+                    throw InvalidGLTFException("Node children array elements must be unsigned integers");
+                }
                 node.children.push_back(std::to_string(ait->GetUint()));
             }
         }
