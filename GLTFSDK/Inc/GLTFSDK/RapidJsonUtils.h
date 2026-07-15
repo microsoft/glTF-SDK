@@ -208,8 +208,20 @@ namespace Microsoft
                 const auto& it = v.FindMember(key.c_str());
                 if (it != v.MemberEnd())
                 {
+                    // The member's storage is only well-defined as an array of
+                    // numbers when it actually is one. Reject any other type
+                    // before reading array/number accessors, otherwise a value
+                    // of the wrong JSON type would be walked as a forged array.
+                    if (!it->value.IsArray())
+                    {
+                        throw InvalidGLTFException("The " + key + " member must be a JSON array");
+                    }
                     for (rapidjson::Value::ConstValueIterator ait = it->value.Begin(); ait != it->value.End(); ++ait)
                     {
+                        if (!ait->IsNumber())
+                        {
+                            throw InvalidGLTFException("The " + key + " array elements must be JSON numbers");
+                        }
                         result.push_back(static_cast<float>(ait->GetDouble()));
                     }
                 }
