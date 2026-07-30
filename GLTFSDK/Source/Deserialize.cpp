@@ -736,6 +736,10 @@ namespace
                 {
                     baseColorFactor.push_back(static_cast<float>(ait->GetDouble()));
                 }
+                if (baseColorFactor.size() != 4)
+                {
+                    throw InvalidGLTFException("baseColorFactor must be an array of 4 numeric elements");
+                }
                 material.metallicRoughness.baseColorFactor = Color4(baseColorFactor[0], baseColorFactor[1], baseColorFactor[2], baseColorFactor[3]);
             }
             
@@ -786,6 +790,10 @@ namespace
             for (rapidjson::Value::ConstValueIterator ait = emissionFactorIt->value.Begin(); ait != emissionFactorIt->value.End(); ++ait)
             {
                 emissiveFactor.push_back(static_cast<float>(ait->GetDouble()));
+            }
+            if (emissiveFactor.size() != 3)
+            {
+                throw InvalidGLTFException("emissiveFactor must be an array of 3 numeric elements");
             }
             material.emissiveFactor = Color3(emissiveFactor[0], emissiveFactor[1], emissiveFactor[2]);
         }

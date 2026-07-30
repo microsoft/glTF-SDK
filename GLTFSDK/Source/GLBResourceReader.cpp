@@ -138,8 +138,9 @@ void GLBResourceReader::Init()
         throw InvalidGLTFException("Unsupported GLB Version: " + std::to_string(version));
     }
 
-    // Length has been validated as the actual length of the file, but make sure to include the header bytes in this check
-    if (length < (GLB_HEADER_BYTE_SIZE + jsonChunkLength))
+    // Perform the addition in 64-bit so it cannot wrap for large 32-bit chunk lengths: a wrapped sum could be
+    // smaller than the file length and pass this check incorrectly.
+    if (length < (static_cast<uint64_t>(GLB_HEADER_BYTE_SIZE) + jsonChunkLength))
     {
         throw InvalidGLTFException("File length " + std::to_string(length) + " less than content length " + std::to_string(jsonChunkLength) + 
             " plus header length " + std::to_string(GLB_HEADER_BYTE_SIZE));
@@ -148,7 +149,7 @@ void GLBResourceReader::Init()
     m_json = ReadJson(*m_buffer, jsonChunkLength);
 
     // If length is exactly equal to the json chunk length, plus the header, it means there is no binary buffer chunk
-    if (length == (GLB_HEADER_BYTE_SIZE + jsonChunkLength))
+    if (length == (static_cast<uint64_t>(GLB_HEADER_BYTE_SIZE) + jsonChunkLength))
     {
         return;
     }
@@ -161,8 +162,8 @@ void GLBResourceReader::Init()
         throw InvalidGLTFException("Binary chunk should appear second");
     }
 
-    // Verify that the sum of the sizes of the chunks (plus the headers) matches the size of the file
-    const uint32_t chunkSizeSum = GLB_HEADER_BYTE_SIZE + jsonChunkLength + sizeof(bufferChunkLength) + GLB_CHUNK_TYPE_SIZE +  bufferChunkLength;
+    // Computed in 64-bit so the sum cannot wrap in 32-bit and spuriously match the file length.
+    const uint64_t chunkSizeSum = static_cast<uint64_t>(GLB_HEADER_BYTE_SIZE) + jsonChunkLength + sizeof(bufferChunkLength) + GLB_CHUNK_TYPE_SIZE +  bufferChunkLength;
 
     if (chunkSizeSum != length)
     {
