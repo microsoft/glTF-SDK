@@ -3,10 +3,13 @@
 
 #include "stdafx.h"
 #include <GLTFSDK/Deserialize.h>
+#include <GLTFSDK/Exceptions.h>
 #include <GLTFSDK/GLBResourceReader.h>
 #include <GLTFSDK/GLBResourceWriter.h>
 #include <GLTFSDK/Serialize.h>
 #include "TestUtils.h"
+
+#include <sstream>
 
 using namespace glTF::UnitTest;
 
@@ -36,6 +39,39 @@ namespace Microsoft
 
                     Assert::IsFalse(stream->fail());
                     Assert::IsTrue(doc == roundTrippedDoc);
+                }
+
+                GLTFSDK_TEST_METHOD(GLBResourceWriterTests, GLBReader_RejectsOverflowingJsonChunkLength)
+                {
+                    // A GLB whose JSON chunk length is 0xFFFFFFFF previously passed the header-size check in
+                    // GLBResourceReader::Init because (GLB_HEADER_BYTE_SIZE + jsonChunkLength) was computed in
+                    // 32-bit and wrapped below the file length. The addition is now performed in 64-bit, so the
+                    // invalid chunk length is rejected.
+                    const std::string json = "{\"asset\":{\"version\":\"2.0\"}}";
+
+                    auto writeU32 = [](std::string& s, uint32_t v)
+                    {
+                        s.push_back(static_cast<char>(v & 0xFF));
+                        s.push_back(static_cast<char>((v >> 8) & 0xFF));
+                        s.push_back(static_cast<char>((v >> 16) & 0xFF));
+                        s.push_back(static_cast<char>((v >> 24) & 0xFF));
+                    };
+
+                    std::string glb;
+                    glb += "glTF";                                                    // magic
+                    writeU32(glb, 2);                                                  // version
+                    writeU32(glb, static_cast<uint32_t>(20 + json.size()));           // total length (matches actual stream length)
+                    writeU32(glb, 0xFFFFFFFFu);                                        // JSON chunk length (overflowing)
+                    glb += "JSON";                                                    // JSON chunk type
+                    glb += json;                                                      // JSON payload
+
+                    auto streamReader = std::make_shared<const StreamReaderWriter>();
+                    auto glbStream = std::make_shared<std::stringstream>(glb, std::ios::in | std::ios::out | std::ios::binary);
+
+                    Assert::ExpectException<InvalidGLTFException>([&streamReader, &glbStream]()
+                    {
+                        GLBResourceReader resourceReader(streamReader, glbStream);
+                    });
                 }
             };
         }
