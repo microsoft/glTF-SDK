@@ -4,6 +4,7 @@
 #include "stdafx.h"
 
 #include <GLTFSDK/Deserialize.h>
+#include <GLTFSDK/Schema.h>
 #include <GLTFSDK/Validation.h>
 
 using namespace glTF::UnitTest;
@@ -544,6 +545,37 @@ namespace Microsoft
                             Assert::AreEqual("Unknown componentType 0", ex.what());
                             throw;
                         }
+                    });
+                }
+
+                GLTFSDK_TEST_METHOD(DeserializeTests, DeserializeFail_BaseColorFactorTooFewElements)
+                {
+                    // A baseColorFactor array shorter than 4 elements was previously read past the parsed
+                    // elements when schema validation was disabled. The core parser must reject it regardless
+                    // of schema flags.
+                    const char* json = R"({
+    "asset": { "version": "2.0" },
+    "materials": [ { "pbrMetallicRoughness": { "baseColorFactor": [ 0.5 ] } } ]
+})";
+
+                    Assert::ExpectException<GLTFException>([&json]()
+                    {
+                        Deserialize(json, DeserializeFlags::None, SchemaFlags::DisableSchemaRoot);
+                    });
+                }
+
+                GLTFSDK_TEST_METHOD(DeserializeTests, DeserializeFail_EmissiveFactorTooFewElements)
+                {
+                    // An emissiveFactor array shorter than 3 elements was previously read past the parsed
+                    // elements when schema validation was disabled.
+                    const char* json = R"({
+    "asset": { "version": "2.0" },
+    "materials": [ { "emissiveFactor": [ 0.5 ] } ]
+})";
+
+                    Assert::ExpectException<GLTFException>([&json]()
+                    {
+                        Deserialize(json, DeserializeFlags::None, SchemaFlags::DisableSchemaRoot);
                     });
                 }
 
