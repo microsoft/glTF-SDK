@@ -22,11 +22,11 @@ jobs:
             config: ${{ fromJson(inputs.configurations) }}
     steps:
       - name: Git Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
             submodules: 'true'
       - name: Setup CMake
-        uses: jwlawson/actions-setup-cmake@v2.0.2
+        uses: jwlawson/actions-setup-cmake@802fa1a2c4e212495c05bf94dba2704a92a472be # v2.0.2
         with:
             cmake-version: ${{ inputs.cmake-version }}
       - name: CMake Configure
