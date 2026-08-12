@@ -12,10 +12,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Git Checkout
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup CMake
-        uses: jwlawson/actions-setup-cmake@802fa1a2c4e212495c05bf94dba2704a92a472be # v2.0.2
+        uses: jwlawson/actions-setup-cmake@0d6a7d60b009d01c9e7523be22153ff8f19460d3 # v2.2.0
         with:
             cmake-version: ${{ inputs.cmake-version }}
 
@@ -52,7 +52,7 @@ jobs:
           ASAN_OPTIONS: "detect_leaks=0:halt_on_error=1"
           UBSAN_OPTIONS: "print_stacktrace=1:halt_on_error=1"
 
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         name: "Upload test results"
         if: always()
         with:
