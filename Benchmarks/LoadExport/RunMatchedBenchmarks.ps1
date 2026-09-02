@@ -874,7 +874,7 @@ $lines.Add("- FetchAssets.ps1 verifies every pinned source file's byte length an
 $lines.Add("- After every timed LOAD, resource counts and complete buffer lengths are checked outside the interval.")
 $lines.Add("- After every timed EXPORT/ROUNDTRIP, the output is reloaded with the same SDK and compared with the source Document, all buffer bytes, and all encoded image bytes.")
 $lines.Add("- Output files are SHA-256 hashed only after the timer stops; all measured outputs were deterministic across $Samples samples.")
-$lines.Add("- Results are single-machine, hot-cache observations with 30-point nearest-rank p95 values, not confidence intervals. Filesystem cache, antivirus, thermals, and background activity can affect tails.")
+$lines.Add("- Results are single-machine, hot-cache observations with $Samples-point nearest-rank p95 values, not confidence intervals. Filesystem cache, antivirus, thermals, and background activity can affect tails.")
 $lines.Add("- Peak memory is sampled at process level and includes untimed correctness work, so it is useful only as a coarse matched comparison.")
 $lines.Add("")
 $lines.Add("## Raw evidence")
