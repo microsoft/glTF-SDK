@@ -1,0 +1,166 @@
+diff --git a/include/valijson/adapters/nlohmann_json_adapter.hpp b/include/valijson/adapters/nlohmann_json_adapter.hpp
+index 5fab74b..ddd0978 100644
+--- a/include/valijson/adapters/nlohmann_json_adapter.hpp
++++ b/include/valijson/adapters/nlohmann_json_adapter.hpp
+@@ -37,6 +37,8 @@
+ namespace valijson {
+ namespace adapters {
+ 
++using NlohmannJson = nlohmann::ordered_json;
++
+ class NlohmannJsonAdapter;
+ 
+ typedef std::pair<std::string, NlohmannJsonAdapter> NlohmannJsonObjectMember;
+@@ -66,7 +68,7 @@ class NlohmannJsonArrayValueIterator
+      *
+      * @param   itr  NlohmannJson iterator to store
+      */
+-    NlohmannJsonArrayValueIterator(const nlohmann::json::const_iterator &itr)
++    NlohmannJsonArrayValueIterator(const NlohmannJson::const_iterator &itr)
+         : m_itr(itr)
+     {
+     }
+@@ -131,7 +133,7 @@ class NlohmannJsonArrayValueIterator
+     }
+ 
+   private:
+-    nlohmann::json::const_iterator m_itr;
++    NlohmannJson::const_iterator m_itr;
+ };
+ 
+ 
+@@ -159,7 +161,7 @@ template <class ValueType> class NlohmannJsonObjectMemberIterator
+      *
+      * @param   itr  NlohmannJson iterator to store
+      */
+-    NlohmannJsonObjectMemberIterator(const nlohmann::json::const_iterator &itr)
++    NlohmannJsonObjectMemberIterator(const NlohmannJson::const_iterator &itr)
+         : m_itr(itr)
+     {
+     }
+@@ -222,7 +224,7 @@ template <class ValueType> class NlohmannJsonObjectMemberIterator
+ 
+   private:
+     /// Internal copy of the original NlohmannJson iterator
+-    nlohmann::json::const_iterator m_itr;
++    NlohmannJson::const_iterator m_itr;
+ };
+ 
+ 
+@@ -258,7 +260,7 @@ public:
+      * Note that this constructor will throw an exception if the value is not
+      * an array.
+      */
+-    NlohmannJsonArray(const nlohmann::json &value)
++    NlohmannJsonArray(const NlohmannJson &value)
+       : m_value(value)
+     {
+         if (!value.is_array()) {
+@@ -300,14 +302,14 @@ private:
+      *
+      * Note that the value returned by this function is a singleton.
+      */
+-    static const nlohmann::json & emptyArray()
++    static const NlohmannJson & emptyArray()
+     {
+-        static const nlohmann::json array = nlohmann::json::array();
++        static const NlohmannJson array = NlohmannJson::array();
+         return array;
+     }
+ 
+     /// Reference to the contained value
+-    const nlohmann::json &m_value;
++    const NlohmannJson &m_value;
+ };
+ 
+ /**
+@@ -341,7 +343,7 @@ public:
+      * Note that this constructor will throw an exception if the value is not
+      * an object.
+      */
+-    NlohmannJsonObject(const nlohmann::json &value)
++    NlohmannJsonObject(const NlohmannJson &value)
+       : m_value(value)
+     {
+         if (!value.is_object()) {
+@@ -391,14 +393,14 @@ private:
+      *
+      * Note that the value returned by this function is a singleton.
+      */
+-    static const nlohmann::json & emptyObject()
++    static const NlohmannJson & emptyObject()
+     {
+-        static const nlohmann::json object = nlohmann::json::object();
++        static const NlohmannJson object = NlohmannJson::object();
+         return object;
+     }
+ 
+     /// Reference to the contained object
+-    const nlohmann::json &m_value;
++    const NlohmannJson &m_value;
+ };
+ 
+ 
+@@ -420,7 +422,7 @@ public:
+      *
+      * @param  source  the NlohmannJson value to be copied
+      */
+-    explicit NlohmannJsonFrozenValue(nlohmann::json source)
++    explicit NlohmannJsonFrozenValue(NlohmannJson source)
+       : m_value(std::move(source)) { }
+ 
+     FrozenValue * clone() const override
+@@ -433,7 +435,7 @@ public:
+ private:
+ 
+     /// Stored NlohmannJson value
+-    nlohmann::json m_value;
++    NlohmannJson m_value;
+ };
+ 
+ 
+@@ -461,7 +463,7 @@ public:
+       : m_value(emptyObject()) { }
+ 
+     /// Construct a wrapper for a specific NlohmannJson value
+-    NlohmannJsonValue(const nlohmann::json &value)
++    NlohmannJsonValue(const NlohmannJson &value)
+       : m_value(value) { }
+ 
+     /**
+@@ -634,14 +636,14 @@ public:
+ private:
+ 
+     /// Return a reference to an empty object singleton
+-    static const nlohmann::json & emptyObject()
++    static const NlohmannJson & emptyObject()
+     {
+-        static const nlohmann::json object = nlohmann::json::object();
++        static const NlohmannJson object = NlohmannJson::object();
+         return object;
+     }
+ 
+     /// Reference to the contained NlohmannJson value.
+-    const nlohmann::json &m_value;
++    const NlohmannJson &m_value;
+ };
+ 
+ /**
+@@ -666,7 +668,7 @@ public:
+ 
+     /// Construct a NlohmannJsonAdapter containing a specific Nlohmann Json
+     /// object
+-    NlohmannJsonAdapter(const nlohmann::json &value)
++    NlohmannJsonAdapter(const NlohmannJson &value)
+         : BasicAdapter(NlohmannJsonValue<NlohmannJsonAdapter>{value})
+     {
+     }
+@@ -687,7 +689,7 @@ NlohmannJsonValue<ValueType>::getObjectOptional() const
+ template<>
+ struct AdapterTraits<valijson::adapters::NlohmannJsonAdapter>
+ {
+-    typedef nlohmann::json DocumentType;
++    typedef NlohmannJson DocumentType;
+ 
+     static std::string adapterName()
+     {

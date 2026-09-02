@@ -1,0 +1,770 @@
+diff --git a/include/valijson/validation_results.hpp b/include/valijson/validation_results.hpp
+index b821317..979f99a 100644
+--- a/include/valijson/validation_results.hpp
++++ b/include/valijson/validation_results.hpp
+@@ -31,6 +31,9 @@ public:
+ 
+         /// A detailed description of the validation error.
+         std::string description;
++
++        /// JSON Schema keyword that originated the validation error.
++        std::string keyword;
+     };
+ 
+     /**
+@@ -74,9 +77,20 @@ public:
+      * @param  description  Description of the validation error.
+      */
+     void
+-    pushError(const std::vector<std::string> &context, const std::string &description)
++    pushError(
++            const std::vector<std::string> &context,
++            const std::string &description,
++            const std::string &keyword)
++    {
++        m_errors.push_back({context, description, keyword});
++    }
++
++    void
++    pushError(
++            const std::vector<std::string> &context,
++            const std::string &description)
+     {
+-        m_errors.push_back({context, description});
++        pushError(context, description, "");
+     }
+ 
+     /**
+diff --git a/include/valijson/validation_visitor.hpp b/include/valijson/validation_visitor.hpp
+index 73cee69..7538a05 100644
+--- a/include/valijson/validation_visitor.hpp
++++ b/include/valijson/validation_visitor.hpp
+@@ -128,7 +128,16 @@ public:
+     {
+         bool validated = true;
+         constraint.applyToSubschemas(
+-                ValidateSubschemas(m_target, m_context, true, false, *this, m_results, nullptr, &validated));
++                ValidateSubschemas(
++                        m_target,
++                        m_context,
++                        true,
++                        false,
++                        *this,
++                        m_results,
++                        "allOf",
++                        nullptr,
++                        &validated));
+ 
+         return validated;
+     }
+@@ -161,14 +170,26 @@ public:
+             m_target, m_context, m_strictTypes, m_strictDateTime, childResults, m_regexesCache);
+ 
+         constraint.applyToSubschemas(
+-                ValidateSubschemas(m_target, m_context, false, true, v, childResults, &numValidated, nullptr));
++                ValidateSubschemas(
++                        m_target,
++                        m_context,
++                        false,
++                        true,
++                        v,
++                        childResults,
++                        "anyOf",
++                        &numValidated,
++                        nullptr));
+ 
+         if (numValidated == 0 && m_results) {
+             ValidationResults::Error childError;
+             while (childResults->popError(childError)) {
+-                m_results->pushError( childError.context, childError.description);
++                m_results->pushError(childError);
+             }
+-            m_results->pushError(m_context, "Failed to validate against any schemas allowed by anyOf constraint.");
++            m_results->pushError(
++                    m_context,
++                    "Failed to validate against any schemas allowed by anyOf constraint.",
++                    "anyOf");
+         }
+ 
+         return numValidated > 0;
+@@ -206,9 +227,12 @@ public:
+         if (!validated && m_results) {
+             ValidationResults::Error conditionalError;
+             while (conditionalResults->popError(conditionalError)) {
+-                m_results->pushError(conditionalError.context, conditionalError.description);
++                m_results->pushError(conditionalError);
+             }
+-            m_results->pushError(m_context, "Failed to validate against a conditional schema set by if-then-else constraints.");
++            m_results->pushError(
++                    m_context,
++                    "Failed to validate against a conditional schema set by if-then-else constraints.",
++                    "if");
+         }
+ 
+         return validated;
+@@ -227,7 +251,10 @@ public:
+     {
+         if (!constraint.getValue()->equalTo(m_target, m_strictTypes)) {
+             if (m_results) {
+-                m_results->pushError(m_context, "Failed to match expected value set by 'const' constraint.");
++                m_results->pushError(
++                        m_context,
++                        "Failed to match expected value set by 'const' constraint.",
++                        "const");
+             }
+             return false;
+         }
+@@ -265,7 +292,10 @@ public:
+ 
+         if (!validated) {
+             if (m_results) {
+-                m_results->pushError(m_context, "Failed to any values against subschema in 'contains' constraint.");
++                m_results->pushError(
++                        m_context,
++                        "Failed to any values against subschema in 'contains' constraint.",
++                        "contains");
+             }
+ 
+             return false;
+@@ -342,7 +372,10 @@ public:
+ 
+         if (numValidated == 0) {
+             if (m_results) {
+-                m_results->pushError(m_context, "Failed to match against any enum values.");
++                m_results->pushError(
++                        m_context,
++                        "Failed to match against any enum values.",
++                        "enum");
+             }
+ 
+             return false;
+@@ -391,8 +424,10 @@ public:
+                 return validate_date_range(month, day);
+             } else {
+                 if (m_results) {
+-                    m_results->pushError(m_context,
+-                                         "String should be a valid date");
++                    m_results->pushError(
++                            m_context,
++                            "String should be a valid date",
++                            "format");
+                 }
+                 return false;
+             }
+@@ -405,8 +440,10 @@ public:
+                 return true;
+             } else {
+                 if (m_results) {
+-                    m_results->pushError(m_context,
+-                                         "String should be a valid time");
++                    m_results->pushError(
++                            m_context,
++                            "String should be a valid time",
++                            "format");
+                 }
+                 return false;
+             }
+@@ -422,8 +459,10 @@ public:
+                 return validate_date_range(month, day);
+             } else {
+                 if (m_results) {
+-                    m_results->pushError(m_context,
+-                                         "String should be a valid date-time");
++                    m_results->pushError(
++                            m_context,
++                            "String should be a valid date-time",
++                            "format");
+                 }
+                 return false;
+             }
+@@ -477,7 +516,10 @@ public:
+                     if (!m_results) {
+                         return false;
+                     }
+-                    m_results->pushError(m_context, "Array contains more items than allowed by items constraint.");
++                    m_results->pushError(
++                            m_context,
++                            "Array contains more items than allowed by items constraint.",
++                            "additionalItems");
+                     validated = false;
+                 }
+             }
+@@ -512,8 +554,12 @@ public:
+ 
+                     if (!validator.validateSchema(*additionalItemsSubschema)) {
+                         if (m_results) {
+-                            m_results->pushError(m_context, "Failed to validate item #" + std::to_string(index) +
+-                                    " against additional items schema.");
++                            m_results->pushError(
++                                    m_context,
++                                    "Failed to validate item #" +
++                                    std::to_string(index) +
++                                    " against additional items schema.",
++                                    "additionalItems");
+                             validated = false;
+                         } else {
+                             return false;
+@@ -524,8 +570,13 @@ public:
+                 }
+ 
+             } else if (m_results) {
+-                m_results->pushError(m_context, "Cannot validate item #" + std::to_string(numValidated) +
+-                        " or greater using 'items' constraint or 'additionalItems' constraint.");
++                m_results->pushError(
++                        m_context,
++                        "Cannot validate item #" +
++                        std::to_string(numValidated) +
++                        " or greater using 'items' constraint or "
++                        "'additionalItems' constraint.",
++                        "additionalItems");
+                 validated = false;
+ 
+             } else {
+@@ -555,7 +606,11 @@ public:
+         if (constraint.getExclusiveMaximum()) {
+             if (m_target.asDouble() >= maximum) {
+                 if (m_results) {
+-                    m_results->pushError(m_context, "Expected number less than " + std::to_string(maximum));
++                    m_results->pushError(
++                            m_context,
++                            "Expected number less than " +
++                            std::to_string(maximum),
++                            "maximum");
+                 }
+ 
+                 return false;
+@@ -563,7 +618,11 @@ public:
+ 
+         } else if (m_target.asDouble() > maximum) {
+             if (m_results) {
+-                m_results->pushError(m_context, "Expected number less than or equal to " + std::to_string(maximum));
++                m_results->pushError(
++                        m_context,
++                        "Expected number less than or equal to " +
++                        std::to_string(maximum),
++                        "maximum");
+             }
+ 
+             return false;
+@@ -591,8 +650,11 @@ public:
+         }
+ 
+         if (m_results) {
+-            m_results->pushError(m_context, "Array should contain no more than " + std::to_string(maxItems) +
+-                    " elements.");
++            m_results->pushError(
++                    m_context,
++                    "Array should contain no more than " +
++                    std::to_string(maxItems) + " elements.",
++                    "maxItems");
+         }
+ 
+         return false;
+@@ -619,8 +681,12 @@ public:
+         }
+ 
+         if (m_results) {
+-            m_results->pushError(m_context, "String should be no more than " + std::to_string(maxLength) +
+-                    " characters in length.");
++            m_results->pushError(
++                    m_context,
++                    "String should be no more than " +
++                    std::to_string(maxLength) +
++                    " characters in length.",
++                    "maxLength");
+         }
+ 
+         return false;
+@@ -646,8 +712,11 @@ public:
+         }
+ 
+         if (m_results) {
+-            m_results->pushError(m_context, "Object should have no more than " + std::to_string(maxProperties) +
+-                    " properties.");
++            m_results->pushError(
++                    m_context,
++                    "Object should have no more than " +
++                    std::to_string(maxProperties) + " properties.",
++                    "maxProperties");
+         }
+ 
+         return false;
+@@ -672,14 +741,22 @@ public:
+         if (constraint.getExclusiveMinimum()) {
+             if (m_target.asDouble() <= minimum) {
+                 if (m_results) {
+-                    m_results->pushError(m_context, "Expected number greater than " + std::to_string(minimum));
++                    m_results->pushError(
++                            m_context,
++                            "Expected number greater than " +
++                            std::to_string(minimum),
++                            "minimum");
+                 }
+ 
+                 return false;
+             }
+         } else if (m_target.asDouble() < minimum) {
+             if (m_results) {
+-                m_results->pushError(m_context, "Expected number greater than or equal to " + std::to_string(minimum));
++                m_results->pushError(
++                        m_context,
++                        "Expected number greater than or equal to " +
++                        std::to_string(minimum),
++                        "minimum");
+             }
+ 
+             return false;
+@@ -707,8 +784,11 @@ public:
+         }
+ 
+         if (m_results) {
+-            m_results->pushError(m_context, "Array should contain no fewer than " + std::to_string(minItems) +
+-                    " elements.");
++            m_results->pushError(
++                    m_context,
++                    "Array should contain no fewer than " +
++                    std::to_string(minItems) + " elements.",
++                    "minItems");
+         }
+ 
+         return false;
+@@ -735,8 +815,12 @@ public:
+         }
+ 
+         if (m_results) {
+-            m_results->pushError(m_context, "String should be no fewer than " + std::to_string(minLength) +
+-                    " characters in length.");
++            m_results->pushError(
++                    m_context,
++                    "String should be no fewer than " +
++                    std::to_string(minLength) +
++                    " characters in length.",
++                    "minLength");
+         }
+ 
+         return false;
+@@ -762,8 +846,11 @@ public:
+         }
+ 
+         if (m_results) {
+-            m_results->pushError(m_context, "Object should have no fewer than " + std::to_string(minProperties) +
+-                    " properties.");
++            m_results->pushError(
++                    m_context,
++                    "Object should have no fewer than " +
++                    std::to_string(minProperties) + " properties.",
++                    "minProperties");
+         }
+ 
+         return false;
+@@ -784,8 +871,12 @@ public:
+         if (m_target.maybeDouble()) {
+             if (!m_target.asDouble(d)) {
+                 if (m_results) {
+-                    m_results->pushError(m_context, "Value could not be converted "
+-                            "to a number to check if it is a multiple of " + std::to_string(divisor));
++                    m_results->pushError(
++                            m_context,
++                            "Value could not be converted to a number to check "
++                            "if it is a multiple of " +
++                            std::to_string(divisor),
++                            "multipleOf");
+                 }
+                 return false;
+             }
+@@ -793,8 +884,12 @@ public:
+             int64_t i = 0;
+             if (!m_target.asInteger(i)) {
+                 if (m_results) {
+-                    m_results->pushError(m_context, "Value could not be converted "
+-                            "to a number to check if it is a multiple of " + std::to_string(divisor));
++                    m_results->pushError(
++                            m_context,
++                            "Value could not be converted to a number to check "
++                            "if it is a multiple of " +
++                            std::to_string(divisor),
++                            "multipleOf");
+                 }
+                 return false;
+             }
+@@ -811,7 +906,11 @@ public:
+ 
+         if (fabs(r) > std::numeric_limits<double>::epsilon()) {
+             if (m_results) {
+-                m_results->pushError(m_context, "Value should be a multiple of " + std::to_string(divisor));
++                m_results->pushError(
++                        m_context,
++                        "Value should be a multiple of " +
++                        std::to_string(divisor),
++                        "multipleOf");
+             }
+             return false;
+         }
+@@ -834,7 +933,11 @@ public:
+         if (m_target.maybeInteger()) {
+             if (!m_target.asInteger(i)) {
+                 if (m_results) {
+-                    m_results->pushError(m_context, "Value could not be converted to an integer for multipleOf check");
++                    m_results->pushError(
++                            m_context,
++                            "Value could not be converted to an integer for "
++                            "multipleOf check",
++                            "multipleOf");
+                 }
+                 return false;
+             }
+@@ -842,7 +945,11 @@ public:
+             double d;
+             if (!m_target.asDouble(d)) {
+                 if (m_results) {
+-                    m_results->pushError(m_context, "Value could not be converted to a double for multipleOf check");
++                    m_results->pushError(
++                            m_context,
++                            "Value could not be converted to a double for "
++                            "multipleOf check",
++                            "multipleOf");
+                 }
+                 return false;
+             }
+@@ -857,7 +964,11 @@ public:
+ 
+         if (i % divisor != 0) {
+             if (m_results) {
+-                m_results->pushError(m_context, "Value should be a multiple of " + std::to_string(divisor));
++                m_results->pushError(
++                        m_context,
++                        "Value should be a multiple of " +
++                        std::to_string(divisor),
++                        "multipleOf");
+             }
+             return false;
+         }
+@@ -887,8 +998,11 @@ public:
+         ValidationVisitor<AdapterType, RegexEngine> v(m_target, m_context, m_strictTypes, m_strictDateTime, nullptr, m_regexesCache);
+         if (v.validateSchema(*subschema)) {
+             if (m_results) {
+-                m_results->pushError(m_context,
+-                        "Target should not validate against schema specified in 'not' constraint.");
++                m_results->pushError(
++                        m_context,
++                        "Target should not validate against schema specified "
++                        "in 'not' constraint.",
++                        "not");
+             }
+ 
+             return false;
+@@ -914,23 +1028,36 @@ public:
+             m_target, m_context, m_strictTypes, m_strictDateTime, childResults, m_regexesCache);
+ 
+         constraint.applyToSubschemas(
+-                ValidateSubschemas(m_target, m_context, true, true, v, childResults, &numValidated, nullptr));
++                ValidateSubschemas(
++                        m_target,
++                        m_context,
++                        true,
++                        true,
++                        v,
++                        childResults,
++                        "oneOf",
++                        &numValidated,
++                        nullptr));
+ 
+         if (numValidated == 0) {
+             if (m_results) {
+                 ValidationResults::Error childError;
+                 while (childResults->popError(childError)) {
+-                    m_results->pushError(
+-                            childError.context,
+-                            childError.description);
++                    m_results->pushError(childError);
+                 }
+-                m_results->pushError(m_context, "Failed to validate against any "
+-                        "child schemas allowed by oneOf constraint.");
++                m_results->pushError(
++                        m_context,
++                        "Failed to validate against any child schemas allowed "
++                        "by oneOf constraint.",
++                        "oneOf");
+             }
+             return false;
+         } else if (numValidated != 1) {
+             if (m_results) {
+-                m_results->pushError(m_context, "Failed to validate against exactly one child schema.");
++                m_results->pushError(
++                        m_context,
++                        "Failed to validate against exactly one child schema.",
++                        "oneOf");
+             }
+             return false;
+         }
+@@ -959,7 +1086,10 @@ public:
+ 
+         if (!RegexEngine::search(m_target.asString(), it->second)) {
+             if (m_results) {
+-                m_results->pushError(m_context, "Failed to match regex specified by 'pattern' constraint.");
++                m_results->pushError(
++                        m_context,
++                        "Failed to match regex specified by 'pattern' constraint.",
++                        "pattern");
+             }
+ 
+             return false;
+@@ -1052,9 +1182,13 @@ public:
+                             break;
+                         }
+                     }
+-                    m_results->pushError(m_context, "Object contains a property "
+-                            "that could not be validated using 'properties' "
+-                            "or 'additionalProperties' constraints: '" + unwanted + "'.");
++                    m_results->pushError(
++                            m_context,
++                            "Object contains a property that could not be "
++                            "validated using 'properties' or "
++                            "'additionalProperties' constraints: '" +
++                            unwanted + "'.",
++                            "additionalProperties");
+                 }
+ 
+                 return false;
+@@ -1073,7 +1207,11 @@ public:
+                 ValidationVisitor validator(m.second, newContext, m_strictTypes, m_strictDateTime, m_results, m_regexesCache);
+                 if (!validator.validateSchema(*additionalPropertiesSubschema)) {
+                     if (m_results) {
+-                        m_results->pushError(m_context, "Failed to validate against additional properties schema");
++                        m_results->pushError(
++                                m_context,
++                                "Failed to validate against additional "
++                                "properties schema",
++                                "additionalProperties");
+                     }
+ 
+                     validated = false;
+@@ -1103,6 +1241,15 @@ public:
+                 stringAdapter, m_context, m_strictTypes, m_strictDateTime, nullptr, m_regexesCache);
+ 
+             if (!validator.validateSchema(*constraint.getSubschema())) {
++                if (m_results) {
++                    std::vector<std::string> newContext = m_context;
++                    newContext.push_back("[" + m.first + "]");
++                    m_results->pushError(
++                            newContext,
++                            "Property name failed to validate against the "
++                            "'propertyNames' schema.",
++                            "propertyNames");
++                }
+                 return false;
+             }
+         }
+@@ -1176,7 +1323,11 @@ public:
+             // Perform validation
+             if (!validationVisitor.validateSchema(*itemsSubschema)) {
+                 if (m_results) {
+-                    m_results->pushError(m_context, "Failed to validate item #" + std::to_string(index) + " in array.");
++                    m_results->pushError(
++                            m_context,
++                            "Failed to validate item #" +
++                            std::to_string(index) + " in array.",
++                            "items");
+                     validated = false;
+                 } else {
+                     return false;
+@@ -1215,11 +1366,23 @@ public:
+         {
+             unsigned int numValidated = 0;
+             constraint.applyToSchemaTypes(
+-                    ValidateSubschemas(m_target, m_context, false, true, *this, nullptr, &numValidated, nullptr));
++                    ValidateSubschemas(
++                            m_target,
++                            m_context,
++                            false,
++                            true,
++                            *this,
++                            nullptr,
++                            "type",
++                            &numValidated,
++                            nullptr));
+             if (numValidated > 0) {
+                 return true;
+             } else if (m_results) {
+-                m_results->pushError(m_context, "Value type not permitted by 'type' constraint.");
++                m_results->pushError(
++                        m_context,
++                        "Value type not permitted by 'type' constraint.",
++                        "type");
+             }
+         }
+ 
+@@ -1264,8 +1427,13 @@ public:
+                     if (!m_results) {
+                         return false;
+                     }
+-                    m_results->pushError(m_context, "Elements at indexes #" + std::to_string(outerIndex)
+-                        + " and #" + std::to_string(innerIndex) + " violate uniqueness constraint.");
++                    m_results->pushError(
++                            m_context,
++                            "Elements at indexes #" +
++                            std::to_string(outerIndex) + " and #" +
++                            std::to_string(innerIndex) +
++                            " violate uniqueness constraint.",
++                            "uniqueItems");
+                     validated = false;
+                 }
+                 ++innerIndex;
+@@ -1311,7 +1479,10 @@ private:
+             }
+ 
+             if (m_results) {
+-                m_results->pushError(m_context, "Target value and comparison value are not equal");
++                m_results->pushError(
++                        m_context,
++                        "Target value and comparison value are not equal",
++                        "enum");
+             }
+ 
+             return m_continueOnFailure;
+@@ -1355,8 +1526,11 @@ private:
+                 }
+ 
+                 if (m_results) {
+-                    m_results->pushError(m_context, "Missing required property '" +
+-                            std::string(property.c_str()) + "'.");
++                    m_results->pushError(
++                            m_context,
++                            "Missing required property '" +
++                            std::string(property.c_str()) + "'.",
++                            "required");
+                 }
+ 
+                 return m_continueOnFailure;
+@@ -1405,7 +1579,11 @@ private:
+                         *m_validated = false;
+                     }
+                     if (m_results) {
+-                        m_results->pushError(m_context, "Missing dependency '" + dependencyNameKey + "'.");
++                        m_results->pushError(
++                                m_context,
++                                "Missing dependency '" +
++                                dependencyNameKey + "'.",
++                                "dependencies");
+                     } else {
+                         return false;
+                     }
+@@ -1479,8 +1657,12 @@ private:
+             }
+ 
+             if (m_results) {
+-                m_results->pushError(newContext, "Failed to validate item #" + std::to_string(index) +
+-                    " against corresponding item schema.");
++                m_results->pushError(
++                        newContext,
++                        "Failed to validate item #" +
++                        std::to_string(index) +
++                        " against corresponding item schema.",
++                        "items");
+             }
+ 
+             return m_continueOnFailure;
+@@ -1632,8 +1814,11 @@ private:
+                     }
+ 
+                     if (m_results) {
+-                        m_results->pushError(m_context, "Failed to validate against schema associated with pattern '" +
+-                                patternPropertyStr + "'.");
++                        m_results->pushError(
++                                m_context,
++                                "Failed to validate against schema associated "
++                                "with pattern '" + patternPropertyStr + "'.",
++                                "patternProperties");
+                     }
+ 
+                     if (m_validated) {
+@@ -1722,8 +1907,11 @@ private:
+             }
+ 
+             if (m_results) {
+-                m_results->pushError(m_context, "Failed to validate against schema associated with property name '" +
+-                        propertyNameKey + "'.");
++                m_results->pushError(
++                        m_context,
++                        "Failed to validate against schema associated with "
++                        "property name '" + propertyNameKey + "'.",
++                        "properties");
+             }
+ 
+             if (m_validated) {
+@@ -1777,7 +1965,10 @@ private:
+                     *m_validated = false;
+                 }
+                 if (m_results) {
+-                    m_results->pushError(m_context, "Failed to validate against dependent schema.");
++                    m_results->pushError(
++                            m_context,
++                            "Failed to validate against dependent schema.",
++                            "dependencies");
+                 } else {
+                     return false;
+                 }
+@@ -1818,6 +2009,7 @@ private:
+                 bool continueOnFailure,
+                 ValidationVisitor &validationVisitor,
+                 ValidationResults *results,
++                const std::string &keyword,
+                 unsigned int *numValidated,
+                 bool *validated)
+           : m_adapter(adapter),
+@@ -1826,6 +2018,7 @@ private:
+             m_continueOnFailure(continueOnFailure),
+             m_validationVisitor(validationVisitor),
+             m_results(results),
++            m_keyword(keyword),
+             m_numValidated(numValidated),
+             m_validated(validated) { }
+ 
+@@ -1844,8 +2037,11 @@ private:
+             }
+ 
+             if (m_results) {
+-                m_results->pushError(m_context,
+-                        "Failed to validate against child schema #" + std::to_string(index) + ".");
++                m_results->pushError(
++                        m_context,
++                        "Failed to validate against child schema #" +
++                        std::to_string(index) + ".",
++                        m_keyword);
+             }
+ 
+             return m_continueOnFailure;
+@@ -1858,6 +2054,7 @@ private:
+         bool m_continueOnFailure;
+         ValidationVisitor &m_validationVisitor;
+         ValidationResults * const m_results;
++        const std::string m_keyword;
+         unsigned int * const m_numValidated;
+         bool * const m_validated;
+     };
+@@ -1888,8 +2085,10 @@ private:
+         if (month == 2) {
+             if (day < 0 || day > 29) {
+                 if (m_results) {
+-                    m_results->pushError(m_context,
+-                                         "String should be a valid date-time");
++                    m_results->pushError(
++                            m_context,
++                            "String should be a valid date-time",
++                            "format");
+                 }
+                 return false;
+             }
+@@ -1906,8 +2105,10 @@ private:
+             }
+             if (day < 0 || day > limit) {
+                 if (m_results) {
+-                    m_results->pushError(m_context,
+-                                         "String should be a valid date-time");
++                    m_results->pushError(
++                            m_context,
++                            "String should be a valid date-time",
++                            "format");
+                 }
+                 return false;
+             }
