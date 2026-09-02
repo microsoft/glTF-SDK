@@ -48,4 +48,36 @@ target_include_directories(GLTFSDK
     PRIVATE "${CMAKE_BINARY_DIR}/GeneratedFiles"
 )
 
+target_link_libraries(GLTFSDK
+    PRIVATE
+        nlohmann_json::nlohmann_json
+        ValiJSON::valijson
+)
+
 CreateGLTFInstallTargets(GLTFSDK ${Platform})
+
+install(
+    DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/Inc/GLTFSDK/"
+    DESTINATION "${CMAKE_SOURCE_DIR}/Built/Out/${Platform}/$<CONFIG>/${PROJECT_NAME}/Inc/GLTFSDK"
+    FILES_MATCHING
+        PATTERN "*.h"
+)
+
+install(
+    FILES
+        "${CMAKE_SOURCE_DIR}/LICENSE"
+        "${CMAKE_SOURCE_DIR}/thirdPartyNotices.txt"
+    DESTINATION "${CMAKE_SOURCE_DIR}/Built/Out/${Platform}/$<CONFIG>/${PROJECT_NAME}"
+)
+
+install(
+    FILES "${CMAKE_SOURCE_DIR}/External/json/LICENSE"
+    DESTINATION "${CMAKE_SOURCE_DIR}/Built/Out/${Platform}/$<CONFIG>/${PROJECT_NAME}"
+    RENAME "nlohmann-json-LICENSE"
+)
+
+install(
+    FILES "${CMAKE_SOURCE_DIR}/External/Valijson/LICENSE"
+    DESTINATION "${CMAKE_SOURCE_DIR}/Built/Out/${Platform}/$<CONFIG>/${PROJECT_NAME}"
+    RENAME "Valijson-LICENSE"
+)

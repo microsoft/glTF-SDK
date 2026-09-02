@@ -1,1 +1,2 @@
 External/Valijson/patches/*.patch -whitespace
+GLTFSDK.Test/Resources/JSON-Schema-Test-Suite/** -whitespace

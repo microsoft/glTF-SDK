@@ -3,131 +3,460 @@
 
 #pragma once
 
-#include <GLTFSDK/RapidJsonUtils.h>
+#include <GLTFSDK/Definitions.h>
+
+#include <cstddef>
+#include <cstdint>
+#include <memory>
+#include <string>
+#include <type_traits>
+#include <utility>
 
 namespace Microsoft
 {
     namespace glTF
     {
+        namespace Detail
+        {
+            struct ExtrasUnsupportedTag {};
+            struct ExtrasBooleanTag {};
+            struct ExtrasSignedTag {};
+            struct ExtrasUnsignedTag {};
+            struct ExtrasFloatingTag {};
+            struct ExtrasStringTag {};
+            struct ExtrasCStringTag {};
+
+            template<typename T, typename Enable = void>
+            struct ExtrasTypeTraits
+            {
+                static constexpr bool CanGet = false;
+                static constexpr bool CanSet = false;
+                using Tag = ExtrasUnsupportedTag;
+            };
+
+            template<typename T>
+            struct ExtrasTypeTraits<
+                T,
+                typename std::enable_if<
+                    std::is_same<T, bool>::value>::type>
+            {
+                static constexpr bool CanGet = true;
+                static constexpr bool CanSet = true;
+                using Tag = ExtrasBooleanTag;
+            };
+
+            template<typename T>
+            struct ExtrasTypeTraits<
+                T,
+                typename std::enable_if<
+                    std::is_same<T, std::int32_t>::value ||
+                    std::is_same<T, std::int64_t>::value>::type>
+            {
+                static constexpr bool CanGet = true;
+                static constexpr bool CanSet = true;
+                using Tag = ExtrasSignedTag;
+            };
+
+            template<typename T>
+            struct ExtrasTypeTraits<
+                T,
+                typename std::enable_if<
+                    std::is_same<T, std::uint32_t>::value ||
+                    std::is_same<T, std::uint64_t>::value ||
+                    std::is_same<T, std::size_t>::value>::type>
+            {
+                static constexpr bool CanGet = true;
+                static constexpr bool CanSet = true;
+                using Tag = ExtrasUnsignedTag;
+            };
+
+            template<typename T>
+            struct ExtrasTypeTraits<
+                T,
+                typename std::enable_if<
+                    std::is_same<T, float>::value ||
+                    std::is_same<T, double>::value>::type>
+            {
+                static constexpr bool CanGet = true;
+                static constexpr bool CanSet = true;
+                using Tag = ExtrasFloatingTag;
+            };
+
+            template<typename T>
+            struct ExtrasTypeTraits<
+                T,
+                typename std::enable_if<
+                    std::is_same<T, std::string>::value>::type>
+            {
+                static constexpr bool CanGet = true;
+                static constexpr bool CanSet = true;
+                using Tag = ExtrasStringTag;
+            };
+
+            template<typename T>
+            struct ExtrasTypeTraits<
+                T,
+                typename std::enable_if<
+                    std::is_same<T, const char*>::value ||
+                    std::is_same<T, char*>::value>::type>
+            {
+                static constexpr bool CanGet = false;
+                static constexpr bool CanSet = true;
+                using Tag = ExtrasCStringTag;
+            };
+        }
+
         class ExtrasDocument
         {
         public:
-            ExtrasDocument() = default;
+            ExtrasDocument();
+            explicit ExtrasDocument(const char* extras);
+            explicit ExtrasDocument(
+                const std::string& extras);
+            ~ExtrasDocument();
 
-            ExtrasDocument(const char* extras)
+            ExtrasDocument(ExtrasDocument&& other) noexcept;
+            ExtrasDocument& GLTFSDK_API operator=(
+                ExtrasDocument&& other) noexcept;
+
+            ExtrasDocument(const ExtrasDocument&) = delete;
+            ExtrasDocument& operator=(const ExtrasDocument&) = delete;
+
+            std::string GLTFSDK_API ToJson() const;
+            bool GLTFSDK_API HasMember(const char* member) const;
+
+            template<typename T>
+            T GetValueOrDefault(T defaultValue = {}) const
             {
-                rapidjson::ParseResult result = m_document.Parse(extras);
-
-                if (result.IsError())
-                {
-                    throw GLTFException(std::string("Extras JSON parse error: ") + rapidjson::GetParseError_En(result.Code()));
-                }
+                return GetValueOrDefaultDispatch(
+                    Target::Root,
+                    nullptr,
+                    std::move(defaultValue),
+                    typename Detail::ExtrasTypeTraits<
+                        typename std::decay<T>::type>::Tag());
             }
 
             template<typename T>
-            T GetValueOrDefault(T t = {}) const
+            T GetMemberValueOrDefault(
+                const char* member,
+                T defaultValue = {}) const
             {
-                return glTF::GetValueOrDefault<T>(m_document, std::move(t));
+                return GetValueOrDefaultDispatch(
+                    Target::Member,
+                    member,
+                    std::move(defaultValue),
+                    typename Detail::ExtrasTypeTraits<
+                        typename std::decay<T>::type>::Tag());
             }
 
             template<typename T>
-            T GetMemberValueOrDefault(const char* member, T t = {}) const
+            T GetPointerValueOrDefault(
+                const char* pointer,
+                T defaultValue = {}) const
             {
-                return glTF::GetMemberValueOrDefault<T>(m_document, member, std::move(t));
+                return GetValueOrDefaultDispatch(
+                    Target::Pointer,
+                    pointer,
+                    std::move(defaultValue),
+                    typename Detail::ExtrasTypeTraits<
+                        typename std::decay<T>::type>::Tag());
             }
 
             template<typename T>
-            T GetPointerValueOrDefault(const char* pointer, T t = {}) const
+            void SetValue(const T& value)
             {
-                auto valuePtr = rapidjson::Pointer(pointer).Get(m_document, nullptr);
-
-                if (!valuePtr)
-                {
-                    return std::move(t);
-                }
-                return glTF::GetValueOrDefault<T>(*valuePtr, std::move(t));
+                SetValueDispatch(
+                    Target::Root,
+                    nullptr,
+                    value,
+                    typename Detail::ExtrasTypeTraits<
+                        typename std::decay<T>::type>::Tag());
             }
 
             template<typename T>
-            void SetValue(const T& t)
+            void SetMemberValue(const char* member, const T& value)
             {
-                SetValue(m_document, t, m_document.GetAllocator());
+                SetValueDispatch(
+                    Target::Member,
+                    member,
+                    value,
+                    typename Detail::ExtrasTypeTraits<
+                        typename std::decay<T>::type>::Tag());
             }
 
             template<typename T>
-            void SetMemberValue(const char* member, const T& t)
+            void SetPointerValue(const char* pointer, const T& value)
             {
-                auto& allocator = m_document.GetAllocator();
-
-                if (m_document.IsNull())
-                {
-                    m_document.SetObject();
-                }
-
-                if (m_document.IsObject())
-                {
-                    auto it = m_document.FindMember(member);
-
-                    // If the member doesn't already exist then add it to the document with a null value
-                    if (it == m_document.MemberEnd())
-                    {
-                        it = m_document.AddMember(rapidjson::Value(member, allocator), rapidjson::Value(), allocator).FindMember(member);
-                    }
-
-                    SetValue(it->value, t, allocator);
-                }
-                else
-                {
-                    throw GLTFException("Extras JSON document has already been assigned an incompatible type");
-                }
-            }
-
-            template<typename T>
-            void SetPointerValue(const char* pointer, const T& t)
-            {
-                SetValue(rapidjson::Pointer(pointer).Create(m_document), t, m_document.GetAllocator());
-            }
-
-            const rapidjson::Document& GetDocument() const
-            {
-                return m_document;
+                SetValueDispatch(
+                    Target::Pointer,
+                    pointer,
+                    value,
+                    typename Detail::ExtrasTypeTraits<
+                        typename std::decay<T>::type>::Tag());
             }
 
         private:
-            static void SwapValues(rapidjson::Value& valueOld, rapidjson::Value&& valueNew)
+            enum class Target
             {
-                assert(!valueNew.IsNull());
+                Root,
+                Member,
+                Pointer
+            };
 
-                if (valueOld.IsNull() ||
-                    valueOld.GetType() == valueNew.GetType())
-                {
-                    valueOld.Swap(valueNew);
-                }
-                else
-                {
-                    throw GLTFException("Extras JSON value has already been assigned an incompatible type");
-                }
-            }
-
-            static void SetValue(rapidjson::Value& valueOld, const char* str, rapidjson::Document::AllocatorType& allocator)
+            enum class PrimitiveType
             {
-                SwapValues(valueOld, rapidjson::Value(str, allocator));
+                Boolean,
+                Int32,
+                UInt32,
+                Int64,
+                UInt64,
+                Size,
+                Float,
+                Double,
+                String,
+                CString
+            };
+
+            struct Impl;
+
+            bool GLTFSDK_API TryGetPrimitive(
+                Target target,
+                const char* selector,
+                PrimitiveType type,
+                void* result) const;
+            void GLTFSDK_API SetPrimitive(
+                Target target,
+                const char* selector,
+                PrimitiveType type,
+                const void* value);
+
+            template<typename T>
+            T GetValueOrDefaultDispatch(
+                Target target,
+                const char* selector,
+                T defaultValue,
+                Detail::ExtrasBooleanTag) const
+            {
+                static_assert(
+                    Detail::ExtrasTypeTraits<T>::CanGet,
+                    "Unsupported ExtrasDocument getter type");
+                T result{};
+                return TryGetPrimitive(
+                    target, selector, PrimitiveType::Boolean, &result)
+                    ? result
+                    : std::move(defaultValue);
             }
 
             template<typename T>
-            static void SetValue(rapidjson::Value& valueOld, const T& t, rapidjson::Document::AllocatorType&)
+            T GetValueOrDefaultDispatch(
+                Target target,
+                const char* selector,
+                T defaultValue,
+                Detail::ExtrasSignedTag) const
             {
-                SwapValues(valueOld, rapidjson::Value(t));
+                static_assert(
+                    Detail::ExtrasTypeTraits<T>::CanGet,
+                    "Unsupported ExtrasDocument getter type");
+                T result{};
+                const PrimitiveType type = sizeof(T) == sizeof(std::int32_t)
+                    ? PrimitiveType::Int32
+                    : PrimitiveType::Int64;
+                return TryGetPrimitive(target, selector, type, &result)
+                    ? result
+                    : std::move(defaultValue);
             }
 
-            rapidjson::Document m_document;
-        };
+            template<typename T>
+            T GetValueOrDefaultDispatch(
+                Target target,
+                const char* selector,
+                T defaultValue,
+                Detail::ExtrasUnsignedTag) const
+            {
+                static_assert(
+                    Detail::ExtrasTypeTraits<T>::CanGet,
+                    "Unsupported ExtrasDocument getter type");
+                T result{};
+                const PrimitiveType type =
+                    std::is_same<T, std::size_t>::value
+                    ? PrimitiveType::Size
+                    : sizeof(T) == sizeof(std::uint32_t)
+                        ? PrimitiveType::UInt32
+                        : PrimitiveType::UInt64;
+                return TryGetPrimitive(target, selector, type, &result)
+                    ? result
+                    : std::move(defaultValue);
+            }
 
-        // Explicit specialization of SetValue for std::string (must be defined outside of the class definition)
-        template<>
-        inline void ExtrasDocument::SetValue<std::string>(rapidjson::Value& valueOld, const std::string& str, rapidjson::Document::AllocatorType& allocator)
-        {
-            SwapValues(valueOld, rapidjson::Value(str.c_str(), static_cast<rapidjson::SizeType>(str.length()), allocator));
-        }
+            template<typename T>
+            T GetValueOrDefaultDispatch(
+                Target target,
+                const char* selector,
+                T defaultValue,
+                Detail::ExtrasFloatingTag) const
+            {
+                static_assert(
+                    Detail::ExtrasTypeTraits<T>::CanGet,
+                    "Unsupported ExtrasDocument getter type");
+                T result{};
+                const PrimitiveType type = std::is_same<T, float>::value
+                    ? PrimitiveType::Float
+                    : PrimitiveType::Double;
+                return TryGetPrimitive(target, selector, type, &result)
+                    ? result
+                    : std::move(defaultValue);
+            }
+
+            template<typename T>
+            T GetValueOrDefaultDispatch(
+                Target target,
+                const char* selector,
+                T defaultValue,
+                Detail::ExtrasStringTag) const
+            {
+                static_assert(
+                    Detail::ExtrasTypeTraits<T>::CanGet,
+                    "Unsupported ExtrasDocument getter type");
+                T result;
+                return TryGetPrimitive(
+                    target, selector, PrimitiveType::String, &result)
+                    ? result
+                    : std::move(defaultValue);
+            }
+
+            template<typename T>
+            T GetValueOrDefaultDispatch(
+                Target,
+                const char*,
+                T,
+                Detail::ExtrasUnsupportedTag) const
+            {
+                static_assert(
+                    Detail::ExtrasTypeTraits<T>::CanGet,
+                    "Unsupported ExtrasDocument getter type");
+                return T();
+            }
+
+            template<typename T>
+            void SetValueDispatch(
+                Target target,
+                const char* selector,
+                const T& value,
+                Detail::ExtrasBooleanTag)
+            {
+                static_assert(
+                    Detail::ExtrasTypeTraits<
+                        typename std::decay<T>::type>::CanSet,
+                    "Unsupported ExtrasDocument setter type");
+                SetPrimitive(
+                    target, selector, PrimitiveType::Boolean, &value);
+            }
+
+            template<typename T>
+            void SetValueDispatch(
+                Target target,
+                const char* selector,
+                const T& value,
+                Detail::ExtrasSignedTag)
+            {
+                static_assert(
+                    Detail::ExtrasTypeTraits<
+                        typename std::decay<T>::type>::CanSet,
+                    "Unsupported ExtrasDocument setter type");
+                const PrimitiveType type = sizeof(T) == sizeof(std::int32_t)
+                    ? PrimitiveType::Int32
+                    : PrimitiveType::Int64;
+                SetPrimitive(target, selector, type, &value);
+            }
+
+            template<typename T>
+            void SetValueDispatch(
+                Target target,
+                const char* selector,
+                const T& value,
+                Detail::ExtrasUnsignedTag)
+            {
+                static_assert(
+                    Detail::ExtrasTypeTraits<
+                        typename std::decay<T>::type>::CanSet,
+                    "Unsupported ExtrasDocument setter type");
+                const PrimitiveType type =
+                    std::is_same<
+                        typename std::decay<T>::type,
+                        std::size_t>::value
+                    ? PrimitiveType::Size
+                    : sizeof(T) == sizeof(std::uint32_t)
+                        ? PrimitiveType::UInt32
+                        : PrimitiveType::UInt64;
+                SetPrimitive(target, selector, type, &value);
+            }
+
+            template<typename T>
+            void SetValueDispatch(
+                Target target,
+                const char* selector,
+                const T& value,
+                Detail::ExtrasFloatingTag)
+            {
+                static_assert(
+                    Detail::ExtrasTypeTraits<
+                        typename std::decay<T>::type>::CanSet,
+                    "Unsupported ExtrasDocument setter type");
+                const PrimitiveType type =
+                    std::is_same<typename std::decay<T>::type, float>::value
+                    ? PrimitiveType::Float
+                    : PrimitiveType::Double;
+                SetPrimitive(target, selector, type, &value);
+            }
+
+            template<typename T>
+            void SetValueDispatch(
+                Target target,
+                const char* selector,
+                const T& value,
+                Detail::ExtrasStringTag)
+            {
+                static_assert(
+                    Detail::ExtrasTypeTraits<
+                        typename std::decay<T>::type>::CanSet,
+                    "Unsupported ExtrasDocument setter type");
+                SetPrimitive(
+                    target, selector, PrimitiveType::String, &value);
+            }
+
+            template<typename T>
+            void SetValueDispatch(
+                Target target,
+                const char* selector,
+                const T& value,
+                Detail::ExtrasCStringTag)
+            {
+                static_assert(
+                    Detail::ExtrasTypeTraits<
+                        typename std::decay<T>::type>::CanSet,
+                    "Unsupported ExtrasDocument setter type");
+                const char* stringValue = value;
+                SetPrimitive(
+                    target,
+                    selector,
+                    PrimitiveType::CString,
+                    &stringValue);
+            }
+
+            template<typename T>
+            void SetValueDispatch(
+                Target,
+                const char*,
+                const T&,
+                Detail::ExtrasUnsupportedTag)
+            {
+                static_assert(
+                    Detail::ExtrasTypeTraits<
+                        typename std::decay<T>::type>::CanSet,
+                    "Unsupported ExtrasDocument setter type");
+            }
+
+            std::unique_ptr<Impl> m_impl;
+        };
     }
 }

@@ -4,154 +4,385 @@
 #include <GLTFSDK/ExtensionsKHR.h>
 
 #include <GLTFSDK/Document.h>
-#include <GLTFSDK/RapidJsonUtils.h>
+
+#include "Internal/Json.h"
+
+#include <algorithm>
+#include <initializer_list>
+#include <limits>
+#include <string>
+#include <utility>
+#include <vector>
 
 using namespace Microsoft::glTF;
 
 namespace
 {
-    // Validates that 'v' is a JSON array of exactly 'expectedSize'
-    // elements, each of which is a JSON number. Throws
-    // InvalidGLTFException with 'description' on any mismatch. Used by
-    // every fixed-size numeric array field in the extension
-    // deserializers (e.g. KHR_materials_sheen.sheenColorFactor,
-    // KHR_materials_pbrSpecularGlossiness.diffuseFactor).
-    void RequireFixedSizeNumericArray(
-        const rapidjson::Value& v,
-        size_t expectedSize,
-        const char* description)
+    using JsonValue = Internal::JsonValue;
+
+    float ReadFloat(
+        const JsonValue& value,
+        const std::string& error)
     {
-        if (!v.IsArray() || v.Size() != expectedSize)
+        float result = 0.0F;
+        if (!Internal::TryGetJsonFloat(value, result))
         {
-            throw InvalidGLTFException(description);
+            throw InvalidGLTFException(error);
         }
-        for (rapidjson::Value::ConstValueIterator ait = v.Begin(); ait != v.End(); ++ait)
+        return result;
+    }
+
+    std::uint32_t ReadUInt32(
+        const JsonValue& value,
+        const std::string& error)
+    {
+        std::uint32_t result = 0U;
+        if (!Internal::TryGetJsonUInt32(value, result))
         {
-            if (!ait->IsNumber())
+            throw InvalidGLTFException(error);
+        }
+        return result;
+    }
+
+    std::size_t ReadSize(
+        const JsonValue& value,
+        const std::string& error)
+    {
+        std::size_t result = 0U;
+        if (!Internal::TryGetJsonSize(value, result))
+        {
+            throw InvalidGLTFException(error);
+        }
+        return result;
+    }
+
+    float GetFloatMemberOrDefault(
+        const JsonValue& object,
+        const char* name,
+        float defaultValue)
+    {
+        const auto* value =
+            Internal::FindJsonMember(object, name);
+        return value == nullptr
+            ? defaultValue
+            : ReadFloat(
+                *value,
+                std::string(name) + " must be a finite number");
+    }
+
+    std::vector<float> GetFixedSizeFloatArray(
+        const JsonValue& value,
+        std::size_t expectedSize,
+        const char* error)
+    {
+        if (!Internal::IsJsonArray(value) ||
+            Internal::GetJsonArraySize(value) != expectedSize)
+        {
+            throw InvalidGLTFException(error);
+        }
+
+        std::vector<float> result;
+        result.reserve(expectedSize);
+        for (std::size_t index = 0U;
+             index < expectedSize;
+             ++index)
+        {
+            result.push_back(ReadFloat(
+                Internal::GetJsonArrayElement(
+                    value, index, error),
+                error));
+        }
+        return result;
+    }
+
+    JsonValue CreateFloatArray(
+        std::initializer_list<float> values)
+    {
+        JsonValue array = Internal::CreateJsonArray();
+        for (const float value : values)
+        {
+            Internal::AppendJsonValue(
+                array,
+                Internal::CreateJsonFloat(value));
+        }
+        return array;
+    }
+
+    JsonValue CreateFloatArray(const Color3& value)
+    {
+        return CreateFloatArray({value.r, value.g, value.b});
+    }
+
+    JsonValue CreateFloatArray(const Color4& value)
+    {
+        return CreateFloatArray(
+            {value.r, value.g, value.b, value.a});
+    }
+
+    JsonValue CreateFloatArray(const Vector2& value)
+    {
+        return CreateFloatArray({value.x, value.y});
+    }
+
+    void ParseExtensions(
+        const JsonValue& value,
+        glTFProperty& property,
+        const ExtensionDeserializer& extensionDeserializer)
+    {
+        const auto* extensions =
+            Internal::FindJsonMember(value, "extensions");
+        if (extensions == nullptr)
+        {
+            return;
+        }
+
+        for (const auto& name : Internal::GetJsonObjectMemberNames(
+                 *extensions,
+                 "The extensions member must be a JSON object"))
+        {
+            ExtensionPair extensionPair = {
+                name,
+                Internal::WriteJson(
+                    *Internal::FindJsonMember(*extensions, name))
+            };
+            if (extensionDeserializer.HasHandler(
+                    extensionPair.name, property) ||
+                extensionDeserializer.HasHandler(extensionPair.name))
             {
-                throw InvalidGLTFException(description);
+                property.SetExtension(
+                    extensionDeserializer.Deserialize(
+                        extensionPair, property));
+            }
+            else
+            {
+                property.extensions.emplace(
+                    std::move(extensionPair.name),
+                    std::move(extensionPair.value));
             }
         }
     }
 
-    void ParseExtensions(const rapidjson::Value& v, glTFProperty& node, const ExtensionDeserializer& extensionDeserializer)
+    void ParseExtras(
+        const JsonValue& value,
+        glTFProperty& property)
     {
-        const auto& extensionsIt = v.FindMember("extensions");
-        if (extensionsIt != v.MemberEnd())
+        const auto* extras =
+            Internal::FindJsonMember(value, "extras");
+        if (extras != nullptr)
         {
-            const rapidjson::Value& extensionsObject = extensionsIt->value;
-            RequireObject(extensionsObject, "The extensions member must be a JSON object");
-            for (const auto& entry : extensionsObject.GetObject())
+            property.extras = Internal::WriteJson(*extras);
+        }
+    }
+
+    void ParseProperty(
+        const JsonValue& value,
+        glTFProperty& property,
+        const ExtensionDeserializer& extensionDeserializer)
+    {
+        ParseExtensions(value, property, extensionDeserializer);
+        ParseExtras(value, property);
+    }
+
+    void ParseTextureInfo(
+        const JsonValue& value,
+        TextureInfo& textureInfo,
+        const ExtensionDeserializer& extensionDeserializer)
+    {
+        Internal::RequireJsonObject(
+            value, "TextureInfo must be a JSON object");
+        textureInfo.textureId = std::to_string(ReadUInt32(
+            Internal::RequireJsonMember(
+                value,
+                "index",
+                "TextureInfo.index was not found"),
+            "TextureInfo.index must be an unsigned integer"));
+        const auto* texCoord =
+            Internal::FindJsonMember(value, "texCoord");
+        textureInfo.texCoord = texCoord == nullptr
+            ? 0U
+            : ReadSize(
+                *texCoord,
+                "TextureInfo.texCoord must be an unsigned integer");
+        ParseProperty(value, textureInfo, extensionDeserializer);
+    }
+
+    template<typename T>
+    void AddOptionalIndex(
+        JsonValue& object,
+        const char* name,
+        const std::string& id,
+        const IndexedContainer<const T>& container)
+    {
+        if (!id.empty())
+        {
+            Internal::SetJsonMember(
+                object,
+                name,
+                Internal::CreateJsonSize(container.GetIndex(id)));
+        }
+    }
+
+    void SerializePropertyExtensions(
+        const Document& gltfDocument,
+        const glTFProperty& property,
+        JsonValue& propertyValue,
+        const ExtensionSerializer& extensionSerializer)
+    {
+        const auto registeredExtensions =
+            property.GetExtensions();
+        if (property.extensions.empty() &&
+            registeredExtensions.empty())
+        {
+            return;
+        }
+
+        JsonValue extensions = Internal::CreateJsonObject();
+        std::vector<ExtensionPair> registered;
+        registered.reserve(registeredExtensions.size());
+        for (const auto& extension : registeredExtensions)
+        {
+            auto extensionPair = extensionSerializer.Serialize(
+                extension, property, gltfDocument);
+            if (property.HasUnregisteredExtension(
+                    extensionPair.name))
             {
-                ExtensionPair extensionPair = { entry.name.GetString(), Serialize(entry.value) };
-
-                if (extensionDeserializer.HasHandler(extensionPair.name, node) ||
-                    extensionDeserializer.HasHandler(extensionPair.name))
-                {
-                    node.SetExtension(extensionDeserializer.Deserialize(extensionPair, node));
-                }
-                else
-                {
-                    node.extensions.emplace(std::move(extensionPair.name), std::move(extensionPair.value));
-                }
+                throw GLTFException(
+                    "Registered extension '" +
+                    extensionPair.name +
+                    "' is also present as an unregistered extension.");
             }
-        }
-    }
-
-    void ParseExtras(const rapidjson::Value& v, glTFProperty& node)
-    {
-        rapidjson::Value::ConstMemberIterator it;
-        if (TryFindMember("extras", v, it))
-        {
-            const rapidjson::Value& a = it->value;
-            node.extras = Serialize(a);
-        }
-    }
-
-    void ParseProperty(const rapidjson::Value& v, glTFProperty& node, const ExtensionDeserializer& extensionDeserializer)
-    {
-        ParseExtensions(v, node, extensionDeserializer);
-        ParseExtras(v, node);
-    }
-
-    void ParseTextureInfo(const rapidjson::Value& v, TextureInfo& textureInfo, const ExtensionDeserializer& extensionDeserializer)
-    {
-        RequireObject(v, "TextureInfo must be a JSON object");
-        auto textureIndexIt = FindRequiredMember("index", v);
-        if (!textureIndexIt->value.IsUint())
-        {
-            throw InvalidGLTFException("TextureInfo.index must be an unsigned integer");
-        }
-        textureInfo.textureId = std::to_string(textureIndexIt->value.GetUint());
-        textureInfo.texCoord = GetMemberValueOrDefault<size_t>(v, "texCoord", 0U);
-        ParseProperty(v, textureInfo, extensionDeserializer);
-    }
-
-    void SerializePropertyExtensions(const Document& gltfDocument, const glTFProperty& property, rapidjson::Value& propertyValue, rapidjson::Document::AllocatorType& a, const ExtensionSerializer& extensionSerializer)
-    {
-        auto registeredExtensions = property.GetExtensions();
-
-        if (!property.extensions.empty() || !registeredExtensions.empty())
-        {
-            rapidjson::Value& extensions = RapidJsonUtils::FindOrAddMember(propertyValue, "extensions", a);
-
-            // Add registered extensions
-            for (const auto& extension : registeredExtensions)
+            if (gltfDocument.extensionsUsed.find(
+                    extensionPair.name) ==
+                gltfDocument.extensionsUsed.end())
             {
-                const auto extensionPair = extensionSerializer.Serialize(extension, property, gltfDocument);
-
-                if (property.HasUnregisteredExtension(extensionPair.name))
-                {
-                    throw GLTFException("Registered extension '" + extensionPair.name + "' is also present as an unregistered extension.");
-                }
-
-                if (gltfDocument.extensionsUsed.find(extensionPair.name) == gltfDocument.extensionsUsed.end())
-                {
-                    throw GLTFException("Registered extension '" + extensionPair.name + "' is not present in extensionsUsed");
-                }
-
-                const auto d = RapidJsonUtils::CreateDocumentFromString(extensionPair.value);//TODO: validate the returned document against the extension schema!
-                rapidjson::Value v(rapidjson::kObjectType);
-                v.CopyFrom(d, a);
-                extensions.AddMember(RapidJsonUtils::ToStringValue(extensionPair.name, a), v, a);
+                throw GLTFException(
+                    "Registered extension '" +
+                    extensionPair.name +
+                    "' is not present in extensionsUsed");
             }
-
-            // Add unregistered extensions
-            for (const auto& extension : property.extensions)
-            {
-                const auto d = RapidJsonUtils::CreateDocumentFromString(extension.second);
-                rapidjson::Value v(rapidjson::kObjectType);
-                v.CopyFrom(d, a);
-                extensions.AddMember(RapidJsonUtils::ToStringValue(extension.first, a), v, a);
-            }
+            registered.push_back(std::move(extensionPair));
         }
+        std::sort(
+            registered.begin(),
+            registered.end(),
+            [](const ExtensionPair& left, const ExtensionPair& right)
+            {
+                return left.name < right.name;
+            });
+        for (const auto& extension : registered)
+        {
+            Internal::SetJsonMember(
+                extensions,
+                extension.name,
+                Internal::ParseJson(extension.value));
+        }
+
+        std::vector<std::pair<std::string, std::string>>
+            unregistered(
+                property.extensions.begin(),
+                property.extensions.end());
+        std::sort(
+            unregistered.begin(),
+            unregistered.end(),
+            [](const std::pair<std::string, std::string>& left,
+               const std::pair<std::string, std::string>& right)
+            {
+                return left.first < right.first;
+            });
+        for (const auto& extension : unregistered)
+        {
+            if (gltfDocument.extensionsUsed.find(extension.first) ==
+                gltfDocument.extensionsUsed.end())
+            {
+                throw GLTFException(
+                    "Unregistered extension '" + extension.first +
+                    "' is not present in extensionsUsed");
+            }
+            Internal::SetJsonMember(
+                extensions,
+                extension.first,
+                Internal::ParseJson(extension.second));
+        }
+
+        Internal::SetJsonMember(
+            propertyValue,
+            "extensions",
+            std::move(extensions));
     }
 
-    void SerializePropertyExtras(const glTFProperty& property, rapidjson::Value& propertyValue, rapidjson::Document::AllocatorType& a)
+    void SerializePropertyExtras(
+        const glTFProperty& property,
+        JsonValue& propertyValue)
     {
         if (!property.extras.empty())
         {
-            auto d = RapidJsonUtils::CreateDocumentFromString(property.extras);
-            rapidjson::Value v(rapidjson::kObjectType);
-            v.CopyFrom(d, a);
-            propertyValue.AddMember("extras", v, a);
+            Internal::SetJsonMember(
+                propertyValue,
+                "extras",
+                Internal::ParseJson(property.extras));
         }
     }
 
-    void SerializeProperty(const Document& gltfDocument, const glTFProperty& property, rapidjson::Value& propertyValue, rapidjson::Document::AllocatorType& a, const ExtensionSerializer& extensionSerializer)
+    void SerializeProperty(
+        const Document& gltfDocument,
+        const glTFProperty& property,
+        JsonValue& propertyValue,
+        const ExtensionSerializer& extensionSerializer)
     {
-        SerializePropertyExtensions(gltfDocument, property, propertyValue, a, extensionSerializer);
-        SerializePropertyExtras(property, propertyValue, a);
+        SerializePropertyExtensions(
+            gltfDocument,
+            property,
+            propertyValue,
+            extensionSerializer);
+        SerializePropertyExtras(property, propertyValue);
     }
 
-    void SerializeTextureInfo(const Document& gltfDocument, const TextureInfo& textureInfo, rapidjson::Value& textureValue, rapidjson::Document::AllocatorType& a, const IndexedContainer<const Texture>& textures, const ExtensionSerializer& extensionSerializer)
+    void SerializeTextureInfo(
+        const Document& gltfDocument,
+        const TextureInfo& textureInfo,
+        JsonValue& textureValue,
+        const IndexedContainer<const Texture>& textures,
+        const ExtensionSerializer& extensionSerializer)
     {
-        RapidJsonUtils::AddOptionalMemberIndex("index", textureValue, textureInfo.textureId, textures, a);
-        if (textureInfo.texCoord != 0)
+        AddOptionalIndex(
+            textureValue,
+            "index",
+            textureInfo.textureId,
+            textures);
+        if (textureInfo.texCoord != 0U)
         {
-            textureValue.AddMember("texCoord", ToKnownSizeType(textureInfo.texCoord), a);
+            Internal::SetJsonMember(
+                textureValue,
+                "texCoord",
+                Internal::CreateJsonSize(textureInfo.texCoord));
         }
-        SerializeProperty(gltfDocument, textureInfo, textureValue, a, extensionSerializer);
+        SerializeProperty(
+            gltfDocument,
+            textureInfo,
+            textureValue,
+            extensionSerializer);
+    }
+
+    JsonValue ParseExtensionObject(const std::string& json)
+    {
+        JsonValue value = Internal::ParseJson(json);
+        Internal::RequireJsonObject(
+            value, "The extension value must be a JSON object");
+        return value;
+    }
+
+    std::string GetUInt32MemberAsString(
+        const JsonValue& object,
+        const char* name)
+    {
+        const auto* value =
+            Internal::FindJsonMember(object, name);
+        return value == nullptr
+            ? std::string()
+            : std::to_string(ReadUInt32(
+                *value,
+                std::string(name) +
+                " must be an unsigned integer"));
     }
 }
 
@@ -162,21 +393,42 @@ ExtensionSerializer GLTFSDK_API KHR::GetKHRExtensionSerializer()
     using namespace Nodes;
     using namespace TextureInfos;
 
-    ExtensionSerializer extensionSerializer;
-    extensionSerializer.AddHandler<PBRSpecularGlossiness, Material>(PBRSPECULARGLOSSINESS_NAME, SerializePBRSpecGloss);
-    extensionSerializer.AddHandler<Unlit, Material>(UNLIT_NAME, SerializeUnlit);
-    extensionSerializer.AddHandler<Clearcoat, Material>(CLEARCOAT_NAME, SerializeClearcoat);
-    extensionSerializer.AddHandler<Volume, Material>(VOLUME_NAME, SerializeVolume);
-    extensionSerializer.AddHandler<Iridescence, Material>(IRIDESCENCE_NAME, SerializeIridescence);
-    extensionSerializer.AddHandler<Transmission, Material>(TRANSMISSION_NAME, SerializeTransmission);
-    extensionSerializer.AddHandler<Sheen, Material>(SHEEN_NAME, SerializeSheen);
-    extensionSerializer.AddHandler<Specular, Material>(SPECULAR_NAME, SerializeSpecular);
-    extensionSerializer.AddHandler<DracoMeshCompression, MeshPrimitive>(DRACOMESHCOMPRESSION_NAME, SerializeDracoMeshCompression);
-    extensionSerializer.AddHandler<MeshGPUInstancing, Node>(MESHGPUINSTANCING_NAME, SerializeMeshGPUInstancing);
-    extensionSerializer.AddHandler<TextureTransform, TextureInfo>(TEXTURETRANSFORM_NAME, SerializeTextureTransform);
-    extensionSerializer.AddHandler<TextureTransform, Material::NormalTextureInfo>(TEXTURETRANSFORM_NAME, SerializeTextureTransform);
-    extensionSerializer.AddHandler<TextureTransform, Material::OcclusionTextureInfo>(TEXTURETRANSFORM_NAME, SerializeTextureTransform);
-    return extensionSerializer;
+    ExtensionSerializer serializer;
+    serializer.AddHandler<PBRSpecularGlossiness, Material>(
+        PBRSPECULARGLOSSINESS_NAME, SerializePBRSpecGloss);
+    serializer.AddHandler<Unlit, Material>(
+        UNLIT_NAME, SerializeUnlit);
+    serializer.AddHandler<Clearcoat, Material>(
+        CLEARCOAT_NAME, SerializeClearcoat);
+    serializer.AddHandler<Volume, Material>(
+        VOLUME_NAME, SerializeVolume);
+    serializer.AddHandler<Iridescence, Material>(
+        IRIDESCENCE_NAME, SerializeIridescence);
+    serializer.AddHandler<Transmission, Material>(
+        TRANSMISSION_NAME, SerializeTransmission);
+    serializer.AddHandler<Sheen, Material>(
+        SHEEN_NAME, SerializeSheen);
+    serializer.AddHandler<Specular, Material>(
+        SPECULAR_NAME, SerializeSpecular);
+    serializer.AddHandler<DracoMeshCompression, MeshPrimitive>(
+        DRACOMESHCOMPRESSION_NAME,
+        SerializeDracoMeshCompression);
+    serializer.AddHandler<MeshGPUInstancing, Node>(
+        MESHGPUINSTANCING_NAME,
+        SerializeMeshGPUInstancing);
+    serializer.AddHandler<TextureTransform, TextureInfo>(
+        TEXTURETRANSFORM_NAME, SerializeTextureTransform);
+    serializer.AddHandler<
+        TextureTransform,
+        Material::NormalTextureInfo>(
+            TEXTURETRANSFORM_NAME,
+            SerializeTextureTransform);
+    serializer.AddHandler<
+        TextureTransform,
+        Material::OcclusionTextureInfo>(
+            TEXTURETRANSFORM_NAME,
+            SerializeTextureTransform);
+    return serializer;
 }
 
 ExtensionDeserializer GLTFSDK_API KHR::GetKHRExtensionDeserializer()
@@ -186,1170 +438,1335 @@ ExtensionDeserializer GLTFSDK_API KHR::GetKHRExtensionDeserializer()
     using namespace Nodes;
     using namespace TextureInfos;
 
-    ExtensionDeserializer extensionDeserializer;
-    extensionDeserializer.AddHandler<PBRSpecularGlossiness, Material>(PBRSPECULARGLOSSINESS_NAME, DeserializePBRSpecGloss);
-    extensionDeserializer.AddHandler<Unlit, Material>(UNLIT_NAME, DeserializeUnlit);
-    extensionDeserializer.AddHandler<Clearcoat, Material>(CLEARCOAT_NAME, DeserializeClearcoat);
-    extensionDeserializer.AddHandler<Volume, Material>(VOLUME_NAME, DeserializeVolume);
-    extensionDeserializer.AddHandler<Iridescence, Material>(IRIDESCENCE_NAME, DeserializeIridescence);
-    extensionDeserializer.AddHandler<Transmission, Material>(TRANSMISSION_NAME, DeserializeTransmission);
-    extensionDeserializer.AddHandler<Sheen, Material>(SHEEN_NAME, DeserializeSheen);
-    extensionDeserializer.AddHandler<Specular, Material>(SPECULAR_NAME, DeserializeSpecular);
-    extensionDeserializer.AddHandler<DracoMeshCompression, MeshPrimitive>(DRACOMESHCOMPRESSION_NAME, DeserializeDracoMeshCompression);
-    extensionDeserializer.AddHandler<MeshGPUInstancing, Node>(MESHGPUINSTANCING_NAME, DeserializeMeshGPUInstancing);
-    extensionDeserializer.AddHandler<TextureTransform, TextureInfo>(TEXTURETRANSFORM_NAME, DeserializeTextureTransform);
-    extensionDeserializer.AddHandler<TextureTransform, Material::NormalTextureInfo>(TEXTURETRANSFORM_NAME, DeserializeTextureTransform);
-    extensionDeserializer.AddHandler<TextureTransform, Material::OcclusionTextureInfo>(TEXTURETRANSFORM_NAME, DeserializeTextureTransform);
-    return extensionDeserializer;
+    ExtensionDeserializer deserializer;
+    deserializer.AddHandler<PBRSpecularGlossiness, Material>(
+        PBRSPECULARGLOSSINESS_NAME, DeserializePBRSpecGloss);
+    deserializer.AddHandler<Unlit, Material>(
+        UNLIT_NAME, DeserializeUnlit);
+    deserializer.AddHandler<Clearcoat, Material>(
+        CLEARCOAT_NAME, DeserializeClearcoat);
+    deserializer.AddHandler<Volume, Material>(
+        VOLUME_NAME, DeserializeVolume);
+    deserializer.AddHandler<Iridescence, Material>(
+        IRIDESCENCE_NAME, DeserializeIridescence);
+    deserializer.AddHandler<Transmission, Material>(
+        TRANSMISSION_NAME, DeserializeTransmission);
+    deserializer.AddHandler<Sheen, Material>(
+        SHEEN_NAME, DeserializeSheen);
+    deserializer.AddHandler<Specular, Material>(
+        SPECULAR_NAME, DeserializeSpecular);
+    deserializer.AddHandler<DracoMeshCompression, MeshPrimitive>(
+        DRACOMESHCOMPRESSION_NAME,
+        DeserializeDracoMeshCompression);
+    deserializer.AddHandler<MeshGPUInstancing, Node>(
+        MESHGPUINSTANCING_NAME,
+        DeserializeMeshGPUInstancing);
+    deserializer.AddHandler<TextureTransform, TextureInfo>(
+        TEXTURETRANSFORM_NAME, DeserializeTextureTransform);
+    deserializer.AddHandler<
+        TextureTransform,
+        Material::NormalTextureInfo>(
+            TEXTURETRANSFORM_NAME,
+            DeserializeTextureTransform);
+    deserializer.AddHandler<
+        TextureTransform,
+        Material::OcclusionTextureInfo>(
+            TEXTURETRANSFORM_NAME,
+            DeserializeTextureTransform);
+    return deserializer;
 }
 
-// KHR::Materials::PBRSpecularGlossiness
-
-KHR::Materials::PBRSpecularGlossiness::PBRSpecularGlossiness() :
-    diffuseFactor(1.0f, 1.0f, 1.0f, 1.0f),
-    specularFactor(1.0f, 1.0f, 1.0f),
-    glossinessFactor(1.0f)
+KHR::Materials::PBRSpecularGlossiness::PBRSpecularGlossiness()
+    : diffuseFactor(1.0F, 1.0F, 1.0F, 1.0F),
+      specularFactor(1.0F, 1.0F, 1.0F),
+      glossinessFactor(1.0F)
 {
 }
 
-std::unique_ptr<Extension> KHR::Materials::PBRSpecularGlossiness::Clone() const
+std::unique_ptr<Extension>
+KHR::Materials::PBRSpecularGlossiness::Clone() const
 {
     return std::make_unique<PBRSpecularGlossiness>(*this);
 }
 
-bool KHR::Materials::PBRSpecularGlossiness::IsEqual(const Extension& rhs) const
+bool KHR::Materials::PBRSpecularGlossiness::IsEqual(
+    const Extension& rhs) const
 {
-    const auto other = dynamic_cast<const PBRSpecularGlossiness*>(&rhs);
-
-    return other != nullptr
-        && glTFProperty::Equals(*this, *other)
-        && this->diffuseFactor == other->diffuseFactor
-        && this->diffuseTexture == other->diffuseTexture
-        && this->specularFactor == other->specularFactor
-        && this->glossinessFactor == other->glossinessFactor
-        && this->specularGlossinessTexture == other->specularGlossinessTexture;
+    const auto other =
+        dynamic_cast<const PBRSpecularGlossiness*>(&rhs);
+    return other != nullptr &&
+        glTFProperty::Equals(*this, *other) &&
+        diffuseFactor == other->diffuseFactor &&
+        diffuseTexture == other->diffuseTexture &&
+        specularFactor == other->specularFactor &&
+        glossinessFactor == other->glossinessFactor &&
+        specularGlossinessTexture ==
+            other->specularGlossinessTexture;
 }
 
-std::string GLTFSDK_API KHR::Materials::SerializePBRSpecGloss(const Materials::PBRSpecularGlossiness& specGloss, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
+std::string GLTFSDK_API KHR::Materials::SerializePBRSpecGloss(
+    const Materials::PBRSpecularGlossiness& extension,
+    const Document& gltfDocument,
+    const ExtensionSerializer& extensionSerializer)
 {
-    rapidjson::Document doc;
-    auto& a = doc.GetAllocator();
-    rapidjson::Value KHR_pbrSpecularGlossiness(rapidjson::kObjectType);
+    JsonValue value = Internal::CreateJsonObject();
+    if (extension.diffuseFactor !=
+        Color4(1.0F, 1.0F, 1.0F, 1.0F))
     {
-        if (specGloss.diffuseFactor != Color4(1.0f, 1.0f, 1.0f, 1.0f))
-        {
-            KHR_pbrSpecularGlossiness.AddMember("diffuseFactor", RapidJsonUtils::ToJsonArray(specGloss.diffuseFactor, a), a);
-        }
-
-        if (!specGloss.diffuseTexture.textureId.empty())
-        {
-            rapidjson::Value diffuseTexture(rapidjson::kObjectType);
-            SerializeTextureInfo(gltfDocument, specGloss.diffuseTexture, diffuseTexture, a, gltfDocument.textures, extensionSerializer);
-            KHR_pbrSpecularGlossiness.AddMember("diffuseTexture", diffuseTexture, a);
-        }
-
-        if (specGloss.specularFactor != Color3(1.0f, 1.0f, 1.0f))
-        {
-            KHR_pbrSpecularGlossiness.AddMember("specularFactor", RapidJsonUtils::ToJsonArray(specGloss.specularFactor, a), a);
-        }
-
-        if (specGloss.glossinessFactor != 1.0)
-        {
-            KHR_pbrSpecularGlossiness.AddMember("glossinessFactor", specGloss.glossinessFactor, a);
-        }
-
-        if (!specGloss.specularGlossinessTexture.textureId.empty())
-        {
-            rapidjson::Value specularGlossinessTexture(rapidjson::kObjectType);
-            SerializeTextureInfo(gltfDocument, specGloss.specularGlossinessTexture, specularGlossinessTexture, a, gltfDocument.textures, extensionSerializer);
-            KHR_pbrSpecularGlossiness.AddMember("specularGlossinessTexture", specularGlossinessTexture, a);
-        }
-
-        SerializeProperty(gltfDocument, specGloss, KHR_pbrSpecularGlossiness, a, extensionSerializer);
+        Internal::SetJsonMember(
+            value,
+            "diffuseFactor",
+            CreateFloatArray(extension.diffuseFactor));
     }
-
-    rapidjson::StringBuffer buffer;
-    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-    KHR_pbrSpecularGlossiness.Accept(writer);
-
-    return buffer.GetString();
+    if (!extension.diffuseTexture.textureId.empty())
+    {
+        JsonValue texture = Internal::CreateJsonObject();
+        SerializeTextureInfo(
+            gltfDocument,
+            extension.diffuseTexture,
+            texture,
+            gltfDocument.textures,
+            extensionSerializer);
+        Internal::SetJsonMember(
+            value, "diffuseTexture", std::move(texture));
+    }
+    if (extension.specularFactor !=
+        Color3(1.0F, 1.0F, 1.0F))
+    {
+        Internal::SetJsonMember(
+            value,
+            "specularFactor",
+            CreateFloatArray(extension.specularFactor));
+    }
+    if (extension.glossinessFactor != 1.0F)
+    {
+        Internal::SetJsonMember(
+            value,
+            "glossinessFactor",
+            Internal::CreateJsonFloat(
+                extension.glossinessFactor));
+    }
+    if (!extension.specularGlossinessTexture.textureId.empty())
+    {
+        JsonValue texture = Internal::CreateJsonObject();
+        SerializeTextureInfo(
+            gltfDocument,
+            extension.specularGlossinessTexture,
+            texture,
+            gltfDocument.textures,
+            extensionSerializer);
+        Internal::SetJsonMember(
+            value,
+            "specularGlossinessTexture",
+            std::move(texture));
+    }
+    SerializeProperty(
+        gltfDocument,
+        extension,
+        value,
+        extensionSerializer);
+    return Internal::WriteJson(value);
 }
 
-std::unique_ptr<Extension> GLTFSDK_API KHR::Materials::DeserializePBRSpecGloss(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
+std::unique_ptr<Extension> GLTFSDK_API
+KHR::Materials::DeserializePBRSpecGloss(
+    const std::string& json,
+    const ExtensionDeserializer& extensionDeserializer)
 {
-    Materials::PBRSpecularGlossiness specGloss;
+    Materials::PBRSpecularGlossiness extension;
+    const JsonValue value = ParseExtensionObject(json);
 
-    auto doc = RapidJsonUtils::CreateDocumentFromString(json);
-    RequireObject(doc, "The extension value must be a JSON object");
-    const rapidjson::Value& sit = doc;
-
-    // Diffuse Factor
-    auto diffuseFactIt = sit.FindMember("diffuseFactor");
-    if (diffuseFactIt != sit.MemberEnd())
+    const auto* diffuse =
+        Internal::FindJsonMember(value, "diffuseFactor");
+    if (diffuse != nullptr)
     {
-        RequireFixedSizeNumericArray(diffuseFactIt->value, 4U,
-            "diffuseFactor must be a JSON array of 4 numeric elements");
-        specGloss.diffuseFactor = Color4(
-            static_cast<float>(diffuseFactIt->value[0].GetDouble()),
-            static_cast<float>(diffuseFactIt->value[1].GetDouble()),
-            static_cast<float>(diffuseFactIt->value[2].GetDouble()),
-            static_cast<float>(diffuseFactIt->value[3].GetDouble()));
+        const auto elements = GetFixedSizeFloatArray(
+            *diffuse,
+            4U,
+            "diffuseFactor must be a JSON array of 4 "
+            "numeric elements");
+        extension.diffuseFactor = Color4(
+            elements[0],
+            elements[1],
+            elements[2],
+            elements[3]);
     }
-
-    // Diffuse Texture
-    const auto diffuseTextureIt = sit.FindMember("diffuseTexture");
-    if (diffuseTextureIt != sit.MemberEnd())
+    const auto* diffuseTexture =
+        Internal::FindJsonMember(value, "diffuseTexture");
+    if (diffuseTexture != nullptr)
     {
-        ParseTextureInfo(diffuseTextureIt->value, specGloss.diffuseTexture, extensionDeserializer);
+        ParseTextureInfo(
+            *diffuseTexture,
+            extension.diffuseTexture,
+            extensionDeserializer);
     }
-
-    // Specular Factor
-    auto specularFactIt = sit.FindMember("specularFactor");
-    if (specularFactIt != sit.MemberEnd())
+    const auto* specular =
+        Internal::FindJsonMember(value, "specularFactor");
+    if (specular != nullptr)
     {
-        RequireFixedSizeNumericArray(specularFactIt->value, 3U,
-            "specularFactor must be a JSON array of 3 numeric elements");
-        specGloss.specularFactor = Color3(
-            static_cast<float>(specularFactIt->value[0].GetDouble()),
-            static_cast<float>(specularFactIt->value[1].GetDouble()),
-            static_cast<float>(specularFactIt->value[2].GetDouble()));
+        const auto elements = GetFixedSizeFloatArray(
+            *specular,
+            3U,
+            "specularFactor must be a JSON array of 3 "
+            "numeric elements");
+        extension.specularFactor = Color3(
+            elements[0], elements[1], elements[2]);
     }
-
-    // Glossiness Factor
-    auto glossinessFactorIt = sit.FindMember("glossinessFactor");
-    if (glossinessFactorIt != sit.MemberEnd())
+    extension.glossinessFactor = GetFloatMemberOrDefault(
+        value, "glossinessFactor", 1.0F);
+    const auto* texture =
+        Internal::FindJsonMember(
+            value, "specularGlossinessTexture");
+    if (texture != nullptr)
     {
-        specGloss.glossinessFactor = glossinessFactorIt->value.GetFloat();
+        ParseTextureInfo(
+            *texture,
+            extension.specularGlossinessTexture,
+            extensionDeserializer);
     }
-
-    // SpecularGlossinessTexture
-    const auto specularGlossinessTextureIt = sit.FindMember("specularGlossinessTexture");
-    if (specularGlossinessTextureIt != sit.MemberEnd())
-    {
-        ParseTextureInfo(specularGlossinessTextureIt->value, specGloss.specularGlossinessTexture, extensionDeserializer);
-    }
-
-    ParseProperty(sit, specGloss, extensionDeserializer);
-
-    return std::make_unique<PBRSpecularGlossiness>(specGloss);
+    ParseProperty(
+        value, extension, extensionDeserializer);
+    return std::make_unique<PBRSpecularGlossiness>(
+        extension);
 }
 
-// KHR::Materials::Unlit
-
-std::unique_ptr<Extension> KHR::Materials::Unlit::Clone() const
+std::unique_ptr<Extension>
+KHR::Materials::Unlit::Clone() const
 {
     return std::make_unique<Unlit>(*this);
 }
 
-bool KHR::Materials::Unlit::IsEqual(const Extension& rhs) const
+bool KHR::Materials::Unlit::IsEqual(
+    const Extension& rhs) const
 {
     return dynamic_cast<const Unlit*>(&rhs) != nullptr;
 }
 
-std::string GLTFSDK_API KHR::Materials::SerializeUnlit(const Materials::Unlit& extension, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
+std::string GLTFSDK_API KHR::Materials::SerializeUnlit(
+    const Materials::Unlit& extension,
+    const Document& gltfDocument,
+    const ExtensionSerializer& extensionSerializer)
 {
-    rapidjson::Document doc;
-    auto& a = doc.GetAllocator();
-    rapidjson::Value unlitValue(rapidjson::kObjectType);
-
-    SerializeProperty(gltfDocument, extension, unlitValue, a, extensionSerializer);
-
-    rapidjson::StringBuffer buffer;
-    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-    unlitValue.Accept(writer);
-
-    return buffer.GetString();
+    JsonValue value = Internal::CreateJsonObject();
+    SerializeProperty(
+        gltfDocument,
+        extension,
+        value,
+        extensionSerializer);
+    return Internal::WriteJson(value);
 }
 
-std::unique_ptr<Extension> GLTFSDK_API KHR::Materials::DeserializeUnlit(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
+std::unique_ptr<Extension> GLTFSDK_API
+KHR::Materials::DeserializeUnlit(
+    const std::string& json,
+    const ExtensionDeserializer& extensionDeserializer)
 {
-    Unlit unlit;
-
-    auto doc = RapidJsonUtils::CreateDocumentFromString(json);
-    const rapidjson::Value& objValue = doc;
-
-    ParseProperty(objValue, unlit, extensionDeserializer);
-
-    return std::make_unique<Unlit>(unlit);
+    Materials::Unlit extension;
+    const JsonValue value = ParseExtensionObject(json);
+    ParseProperty(
+        value, extension, extensionDeserializer);
+    return std::make_unique<Unlit>(extension);
 }
 
-// KHR::Materials::Clearcoat
-
-KHR::Materials::Clearcoat::Clearcoat() :
-    factor(0.0f),
-    roughnessFactor(0.0f)
+KHR::Materials::Clearcoat::Clearcoat()
+    : factor(0.0F),
+      roughnessFactor(0.0F)
 {
 }
 
-std::unique_ptr<Extension> KHR::Materials::Clearcoat::Clone() const
+std::unique_ptr<Extension>
+KHR::Materials::Clearcoat::Clone() const
 {
     return std::make_unique<Clearcoat>(*this);
 }
 
-bool KHR::Materials::Clearcoat::IsEqual(const Extension& rhs) const
+bool KHR::Materials::Clearcoat::IsEqual(
+    const Extension& rhs) const
 {
-    const auto other = dynamic_cast<const Clearcoat*>(&rhs);
-
-    return other != nullptr
-        && glTFProperty::Equals(*this, *other)
-        && this->factor == other->factor
-        && this->texture == other->texture
-        && this->roughnessFactor == other->roughnessFactor
-        && this->roughnessTexture == other->roughnessTexture
-        && this->normalTexture == other->normalTexture;
+    const auto other =
+        dynamic_cast<const Clearcoat*>(&rhs);
+    return other != nullptr &&
+        glTFProperty::Equals(*this, *other) &&
+        factor == other->factor &&
+        texture == other->texture &&
+        roughnessFactor == other->roughnessFactor &&
+        roughnessTexture == other->roughnessTexture &&
+        normalTexture == other->normalTexture;
 }
 
-std::string GLTFSDK_API KHR::Materials::SerializeClearcoat(const Materials::Clearcoat& clearcoat, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
+std::string GLTFSDK_API KHR::Materials::SerializeClearcoat(
+    const Materials::Clearcoat& extension,
+    const Document& gltfDocument,
+    const ExtensionSerializer& extensionSerializer)
 {
-    rapidjson::Document doc;
-    auto& a = doc.GetAllocator();
-    rapidjson::Value KHR_clearcoat(rapidjson::kObjectType);
+    JsonValue value = Internal::CreateJsonObject();
+    if (extension.factor != 0.0F)
     {
-        if (clearcoat.factor != 0.0f)
-        {
-            KHR_clearcoat.AddMember("clearcoatFactor", RapidJsonUtils::ToFloatValue(clearcoat.factor), a);
-        }
-
-        if (!clearcoat.texture.textureId.empty())
-        {
-            rapidjson::Value texture(rapidjson::kObjectType);
-            SerializeTextureInfo(gltfDocument, clearcoat.texture, texture, a, gltfDocument.textures, extensionSerializer);
-            KHR_clearcoat.AddMember("clearcoatTexture", texture, a);
-        }
-
-        if (clearcoat.roughnessFactor != 0.0f)
-        {
-            KHR_clearcoat.AddMember("clearcoatRoughnessFactor", RapidJsonUtils::ToFloatValue(clearcoat.roughnessFactor), a);
-        }
-
-        if (!clearcoat.roughnessTexture.textureId.empty())
-        {
-            rapidjson::Value roughnessTexture(rapidjson::kObjectType);
-            SerializeTextureInfo(gltfDocument, clearcoat.roughnessTexture, roughnessTexture, a, gltfDocument.textures, extensionSerializer);
-            KHR_clearcoat.AddMember("clearcoatRoughnessTexture", roughnessTexture, a);
-        }
-
-        if (!clearcoat.normalTexture.textureId.empty())
-        {
-            rapidjson::Value normalTexture(rapidjson::kObjectType);
-            SerializeTextureInfo(gltfDocument, clearcoat.normalTexture, normalTexture, a, gltfDocument.textures, extensionSerializer);
-            KHR_clearcoat.AddMember("clearcoatNormalTexture", normalTexture, a);
-        }
-
-        SerializeProperty(gltfDocument, clearcoat, KHR_clearcoat, a, extensionSerializer);
+        Internal::SetJsonMember(
+            value,
+            "clearcoatFactor",
+            Internal::CreateJsonFloat(extension.factor));
     }
-
-    rapidjson::StringBuffer buffer;
-    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-    KHR_clearcoat.Accept(writer);
-
-    return buffer.GetString();
+    if (!extension.texture.textureId.empty())
+    {
+        JsonValue texture = Internal::CreateJsonObject();
+        SerializeTextureInfo(
+            gltfDocument,
+            extension.texture,
+            texture,
+            gltfDocument.textures,
+            extensionSerializer);
+        Internal::SetJsonMember(
+            value, "clearcoatTexture", std::move(texture));
+    }
+    if (extension.roughnessFactor != 0.0F)
+    {
+        Internal::SetJsonMember(
+            value,
+            "clearcoatRoughnessFactor",
+            Internal::CreateJsonFloat(
+                extension.roughnessFactor));
+    }
+    if (!extension.roughnessTexture.textureId.empty())
+    {
+        JsonValue texture = Internal::CreateJsonObject();
+        SerializeTextureInfo(
+            gltfDocument,
+            extension.roughnessTexture,
+            texture,
+            gltfDocument.textures,
+            extensionSerializer);
+        Internal::SetJsonMember(
+            value,
+            "clearcoatRoughnessTexture",
+            std::move(texture));
+    }
+    if (!extension.normalTexture.textureId.empty())
+    {
+        JsonValue texture = Internal::CreateJsonObject();
+        SerializeTextureInfo(
+            gltfDocument,
+            extension.normalTexture,
+            texture,
+            gltfDocument.textures,
+            extensionSerializer);
+        Internal::SetJsonMember(
+            value,
+            "clearcoatNormalTexture",
+            std::move(texture));
+    }
+    SerializeProperty(
+        gltfDocument,
+        extension,
+        value,
+        extensionSerializer);
+    return Internal::WriteJson(value);
 }
 
-std::unique_ptr<Extension> GLTFSDK_API KHR::Materials::DeserializeClearcoat(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
+std::unique_ptr<Extension> GLTFSDK_API
+KHR::Materials::DeserializeClearcoat(
+    const std::string& json,
+    const ExtensionDeserializer& extensionDeserializer)
 {
-    Materials::Clearcoat clearcoat;
-
-    auto doc = RapidJsonUtils::CreateDocumentFromString(json);
-    RequireObject(doc, "The extension value must be a JSON object");
-    const auto sit = doc.GetObject();
-
-    // Clearcoat Factor
-    const auto factorIt = sit.FindMember("clearcoatFactor");
-    if (factorIt != sit.MemberEnd())
+    Materials::Clearcoat extension;
+    const JsonValue value = ParseExtensionObject(json);
+    extension.factor = GetFloatMemberOrDefault(
+        value, "clearcoatFactor", 0.0F);
+    const auto* texture =
+        Internal::FindJsonMember(value, "clearcoatTexture");
+    if (texture != nullptr)
     {
-        clearcoat.factor = factorIt->value.GetFloat();
+        ParseTextureInfo(
+            *texture,
+            extension.texture,
+            extensionDeserializer);
     }
-
-    // Clearcoat Texture
-    const auto textureIt = sit.FindMember("clearcoatTexture");
-    if (textureIt != sit.MemberEnd())
+    extension.roughnessFactor = GetFloatMemberOrDefault(
+        value, "clearcoatRoughnessFactor", 0.0F);
+    const auto* roughness =
+        Internal::FindJsonMember(
+            value, "clearcoatRoughnessTexture");
+    if (roughness != nullptr)
     {
-        ParseTextureInfo(textureIt->value, clearcoat.texture, extensionDeserializer);
+        ParseTextureInfo(
+            *roughness,
+            extension.roughnessTexture,
+            extensionDeserializer);
     }
-
-    // Clearcoat Roughness Factor
-    const auto roughnessFactorIt = sit.FindMember("clearcoatRoughnessFactor");
-    if (roughnessFactorIt != sit.MemberEnd())
+    const auto* normal =
+        Internal::FindJsonMember(
+            value, "clearcoatNormalTexture");
+    if (normal != nullptr)
     {
-        clearcoat.roughnessFactor = roughnessFactorIt->value.GetFloat();
+        ParseTextureInfo(
+            *normal,
+            extension.normalTexture,
+            extensionDeserializer);
     }
-
-    // Clearcoat Roughness Texture
-    const auto roughnessTextureIt = sit.FindMember("clearcoatRoughnessTexture");
-    if (roughnessTextureIt != sit.MemberEnd())
-    {
-        ParseTextureInfo(roughnessTextureIt->value, clearcoat.roughnessTexture, extensionDeserializer);
-    }
-
-    // Clearcoat Normal Texture
-    const auto normalTextureIt = sit.FindMember("clearcoatNormalTexture");
-    if (normalTextureIt != sit.MemberEnd())
-    {
-        ParseTextureInfo(normalTextureIt->value, clearcoat.normalTexture, extensionDeserializer);
-    }
-
-    ParseProperty(sit, clearcoat, extensionDeserializer);
-
-    return std::make_unique<Clearcoat>(clearcoat);
+    ParseProperty(
+        value, extension, extensionDeserializer);
+    return std::make_unique<Clearcoat>(extension);
 }
 
-// KHR::Materials::Volume
-
-KHR::Materials::Volume::Volume() :
-    attenuationColor(1.0f, 1.0f, 1.0f),
-    attenuationDistance(std::numeric_limits<float>::infinity()),
-    thicknessFactor(0.0f)
+KHR::Materials::Volume::Volume()
+    : attenuationColor(1.0F, 1.0F, 1.0F),
+      attenuationDistance(
+          std::numeric_limits<float>::infinity()),
+      thicknessFactor(0.0F)
 {
 }
 
-std::unique_ptr<Extension> KHR::Materials::Volume::Clone() const
+std::unique_ptr<Extension>
+KHR::Materials::Volume::Clone() const
 {
     return std::make_unique<Volume>(*this);
 }
 
-bool KHR::Materials::Volume::IsEqual(const Extension& rhs) const
+bool KHR::Materials::Volume::IsEqual(
+    const Extension& rhs) const
 {
     const auto other = dynamic_cast<const Volume*>(&rhs);
-
-    return other != nullptr
-        && glTFProperty::Equals(*this, *other)
-        && this->attenuationColor == other->attenuationColor
-        && this->attenuationDistance == other->attenuationDistance
-        && this->thicknessFactor == other->thicknessFactor
-        && this->thicknessTexture == other->thicknessTexture;
+    return other != nullptr &&
+        glTFProperty::Equals(*this, *other) &&
+        attenuationColor == other->attenuationColor &&
+        attenuationDistance == other->attenuationDistance &&
+        thicknessFactor == other->thicknessFactor &&
+        thicknessTexture == other->thicknessTexture;
 }
 
-std::string GLTFSDK_API KHR::Materials::SerializeVolume(const Materials::Volume& volume, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
+std::string GLTFSDK_API KHR::Materials::SerializeVolume(
+    const Materials::Volume& extension,
+    const Document& gltfDocument,
+    const ExtensionSerializer& extensionSerializer)
 {
-    rapidjson::Document doc;
-    auto& a = doc.GetAllocator();
-    rapidjson::Value KHR_volume(rapidjson::kObjectType);
+    JsonValue value = Internal::CreateJsonObject();
+    if (extension.attenuationColor !=
+        Color3(1.0F, 1.0F, 1.0F))
     {
-        if (volume.attenuationColor != Color3(1.0f, 1.0f, 1.0f))
-        {
-            KHR_volume.AddMember("attenuationColor", RapidJsonUtils::ToJsonArray(volume.attenuationColor, a), a);
-        }
-
-        if (volume.attenuationDistance != std::numeric_limits<float>::infinity())
-        {
-            KHR_volume.AddMember("attenuationDistance", RapidJsonUtils::ToFloatValue(volume.attenuationDistance), a);
-        }
-
-        if (volume.thicknessFactor != 0.0f)
-        {
-            KHR_volume.AddMember("thicknessFactor", RapidJsonUtils::ToFloatValue(volume.thicknessFactor), a);
-        }
-
-        if (!volume.thicknessTexture.textureId.empty())
-        {
-            rapidjson::Value thicknessTexture(rapidjson::kObjectType);
-            SerializeTextureInfo(gltfDocument, volume.thicknessTexture, thicknessTexture, a, gltfDocument.textures, extensionSerializer);
-            KHR_volume.AddMember("thicknessTexture", thicknessTexture, a);
-        }
-
-        SerializeProperty(gltfDocument, volume, KHR_volume, a, extensionSerializer);
+        Internal::SetJsonMember(
+            value,
+            "attenuationColor",
+            CreateFloatArray(extension.attenuationColor));
     }
-
-    rapidjson::StringBuffer buffer;
-    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-    KHR_volume.Accept(writer);
-
-    return buffer.GetString();
+    if (extension.attenuationDistance !=
+        std::numeric_limits<float>::infinity())
+    {
+        Internal::SetJsonMember(
+            value,
+            "attenuationDistance",
+            Internal::CreateJsonFloat(
+                extension.attenuationDistance));
+    }
+    if (extension.thicknessFactor != 0.0F)
+    {
+        Internal::SetJsonMember(
+            value,
+            "thicknessFactor",
+            Internal::CreateJsonFloat(
+                extension.thicknessFactor));
+    }
+    if (!extension.thicknessTexture.textureId.empty())
+    {
+        JsonValue texture = Internal::CreateJsonObject();
+        SerializeTextureInfo(
+            gltfDocument,
+            extension.thicknessTexture,
+            texture,
+            gltfDocument.textures,
+            extensionSerializer);
+        Internal::SetJsonMember(
+            value,
+            "thicknessTexture",
+            std::move(texture));
+    }
+    SerializeProperty(
+        gltfDocument,
+        extension,
+        value,
+        extensionSerializer);
+    return Internal::WriteJson(value);
 }
 
-std::unique_ptr<Extension> GLTFSDK_API KHR::Materials::DeserializeVolume(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
+std::unique_ptr<Extension> GLTFSDK_API
+KHR::Materials::DeserializeVolume(
+    const std::string& json,
+    const ExtensionDeserializer& extensionDeserializer)
 {
-    Materials::Volume volume;
-
-    auto doc = RapidJsonUtils::CreateDocumentFromString(json);
-    RequireObject(doc, "The extension value must be a JSON object");
-    const auto sit = doc.GetObject();
-
-    // Attenuation Color
-    const auto attenuationColorIt = sit.FindMember("attenuationColor");
-    if (attenuationColorIt != sit.MemberEnd())
+    Materials::Volume extension;
+    const JsonValue value = ParseExtensionObject(json);
+    const auto* color =
+        Internal::FindJsonMember(value, "attenuationColor");
+    if (color != nullptr)
     {
-        RequireFixedSizeNumericArray(attenuationColorIt->value, 3U,
-            "attenuationColor must be a JSON array of 3 numeric elements");
-        volume.attenuationColor = Color3(
-            static_cast<float>(attenuationColorIt->value[0].GetDouble()),
-            static_cast<float>(attenuationColorIt->value[1].GetDouble()),
-            static_cast<float>(attenuationColorIt->value[2].GetDouble()));
+        const auto elements = GetFixedSizeFloatArray(
+            *color,
+            3U,
+            "attenuationColor must be a JSON array of 3 "
+            "numeric elements");
+        extension.attenuationColor = Color3(
+            elements[0], elements[1], elements[2]);
     }
-
-    // Attenuation Distance
-    const auto attenuationDistanceIt = sit.FindMember("attenuationDistance");
-    if (attenuationDistanceIt != sit.MemberEnd())
+    extension.attenuationDistance = GetFloatMemberOrDefault(
+        value,
+        "attenuationDistance",
+        std::numeric_limits<float>::infinity());
+    extension.thicknessFactor = GetFloatMemberOrDefault(
+        value, "thicknessFactor", 0.0F);
+    const auto* texture =
+        Internal::FindJsonMember(value, "thicknessTexture");
+    if (texture != nullptr)
     {
-        volume.attenuationDistance = attenuationDistanceIt->value.GetFloat();
+        ParseTextureInfo(
+            *texture,
+            extension.thicknessTexture,
+            extensionDeserializer);
     }
-
-    // Thickness Factor
-    const auto thicknessFactorIt = sit.FindMember("thicknessFactor");
-    if (thicknessFactorIt != sit.MemberEnd())
-    {
-        volume.thicknessFactor = thicknessFactorIt->value.GetFloat();
-    }
-
-    // Thickness Texture
-    const auto thicknessTextureIt = sit.FindMember("thicknessTexture");
-    if (thicknessTextureIt != sit.MemberEnd())
-    {
-        ParseTextureInfo(thicknessTextureIt->value, volume.thicknessTexture, extensionDeserializer);
-    }
-
-    ParseProperty(sit, volume, extensionDeserializer);
-
-    return std::make_unique<Volume>(volume);
+    ParseProperty(
+        value, extension, extensionDeserializer);
+    return std::make_unique<Volume>(extension);
 }
 
-// KHR::Materials::Iridescence
-
-KHR::Materials::Iridescence::Iridescence() :
-    factor(0.0f),
-    ior(1.3f),
-    thicknessMin(100.0f),
-    thicknessMax(400.0f)
+KHR::Materials::Iridescence::Iridescence()
+    : factor(0.0F),
+      ior(1.3F),
+      thicknessMin(100.0F),
+      thicknessMax(400.0F)
 {
 }
 
-std::unique_ptr<Extension> KHR::Materials::Iridescence::Clone() const
+std::unique_ptr<Extension>
+KHR::Materials::Iridescence::Clone() const
 {
     return std::make_unique<Iridescence>(*this);
 }
 
-bool KHR::Materials::Iridescence::IsEqual(const Extension& rhs) const
+bool KHR::Materials::Iridescence::IsEqual(
+    const Extension& rhs) const
 {
-    const auto other = dynamic_cast<const Iridescence*>(&rhs);
-
-    return other != nullptr
-        && glTFProperty::Equals(*this, *other)
-        && this->factor == other->factor
-        && this->texture == other->texture
-        && this->ior == other->ior
-        && this->thicknessMin == other->thicknessMin
-        && this->thicknessMax == other->thicknessMax
-        && this->thicknessTexture == other->thicknessTexture;
+    const auto other =
+        dynamic_cast<const Iridescence*>(&rhs);
+    return other != nullptr &&
+        glTFProperty::Equals(*this, *other) &&
+        factor == other->factor &&
+        texture == other->texture &&
+        ior == other->ior &&
+        thicknessMin == other->thicknessMin &&
+        thicknessMax == other->thicknessMax &&
+        thicknessTexture == other->thicknessTexture;
 }
 
-std::string GLTFSDK_API KHR::Materials::SerializeIridescence(const Materials::Iridescence& iridescence, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
+std::string GLTFSDK_API KHR::Materials::SerializeIridescence(
+    const Materials::Iridescence& extension,
+    const Document& gltfDocument,
+    const ExtensionSerializer& extensionSerializer)
 {
-    rapidjson::Document doc;
-    auto& a = doc.GetAllocator();
-    rapidjson::Value KHR_iridescence(rapidjson::kObjectType);
+    JsonValue value = Internal::CreateJsonObject();
+    if (extension.factor != 0.0F)
     {
-        if (iridescence.factor != 0.0f)
-        {
-            KHR_iridescence.AddMember("iridescenceFactor", RapidJsonUtils::ToFloatValue(iridescence.factor), a);
-        }
-
-        if (!iridescence.texture.textureId.empty())
-        {
-            rapidjson::Value texture(rapidjson::kObjectType);
-            SerializeTextureInfo(gltfDocument, iridescence.texture, texture, a, gltfDocument.textures, extensionSerializer);
-            KHR_iridescence.AddMember("iridescenceTexture", texture, a);
-        }
-
-        if (iridescence.ior != 1.3f)
-        {
-            KHR_iridescence.AddMember("iridescenceIor", RapidJsonUtils::ToFloatValue(iridescence.ior), a);
-        }
-
-        if (iridescence.thicknessMin != 100.0f)
-        {
-            KHR_iridescence.AddMember("iridescenceThicknessMinimum", RapidJsonUtils::ToFloatValue(iridescence.thicknessMin), a);
-        }
-
-        if (iridescence.thicknessMax != 400.0f)
-        {
-            KHR_iridescence.AddMember("iridescenceThicknessMaximum", RapidJsonUtils::ToFloatValue(iridescence.thicknessMax), a);
-        }
-
-        if (!iridescence.thicknessTexture.textureId.empty())
-        {
-            rapidjson::Value thicknessTexture(rapidjson::kObjectType);
-            SerializeTextureInfo(gltfDocument, iridescence.thicknessTexture, thicknessTexture, a, gltfDocument.textures, extensionSerializer);
-            KHR_iridescence.AddMember("iridescenceThicknessTexture", thicknessTexture, a);
-        }
-
-        SerializeProperty(gltfDocument, iridescence, KHR_iridescence, a, extensionSerializer);
+        Internal::SetJsonMember(
+            value,
+            "iridescenceFactor",
+            Internal::CreateJsonFloat(extension.factor));
     }
-
-    rapidjson::StringBuffer buffer;
-    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-    KHR_iridescence.Accept(writer);
-
-    return buffer.GetString();
+    if (!extension.texture.textureId.empty())
+    {
+        JsonValue texture = Internal::CreateJsonObject();
+        SerializeTextureInfo(
+            gltfDocument,
+            extension.texture,
+            texture,
+            gltfDocument.textures,
+            extensionSerializer);
+        Internal::SetJsonMember(
+            value,
+            "iridescenceTexture",
+            std::move(texture));
+    }
+    if (extension.ior != 1.3F)
+    {
+        Internal::SetJsonMember(
+            value,
+            "iridescenceIor",
+            Internal::CreateJsonFloat(extension.ior));
+    }
+    if (extension.thicknessMin != 100.0F)
+    {
+        Internal::SetJsonMember(
+            value,
+            "iridescenceThicknessMinimum",
+            Internal::CreateJsonFloat(
+                extension.thicknessMin));
+    }
+    if (extension.thicknessMax != 400.0F)
+    {
+        Internal::SetJsonMember(
+            value,
+            "iridescenceThicknessMaximum",
+            Internal::CreateJsonFloat(
+                extension.thicknessMax));
+    }
+    if (!extension.thicknessTexture.textureId.empty())
+    {
+        JsonValue texture = Internal::CreateJsonObject();
+        SerializeTextureInfo(
+            gltfDocument,
+            extension.thicknessTexture,
+            texture,
+            gltfDocument.textures,
+            extensionSerializer);
+        Internal::SetJsonMember(
+            value,
+            "iridescenceThicknessTexture",
+            std::move(texture));
+    }
+    SerializeProperty(
+        gltfDocument,
+        extension,
+        value,
+        extensionSerializer);
+    return Internal::WriteJson(value);
 }
 
-std::unique_ptr<Extension> GLTFSDK_API KHR::Materials::DeserializeIridescence(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
+std::unique_ptr<Extension> GLTFSDK_API
+KHR::Materials::DeserializeIridescence(
+    const std::string& json,
+    const ExtensionDeserializer& extensionDeserializer)
 {
-    Materials::Iridescence iridescence;
-
-    auto doc = RapidJsonUtils::CreateDocumentFromString(json);
-    RequireObject(doc, "The extension value must be a JSON object");
-    const auto sit = doc.GetObject();
-
-    // Iridescence Factor
-    const auto factorIt = sit.FindMember("iridescenceFactor");
-    if (factorIt != sit.MemberEnd())
+    Materials::Iridescence extension;
+    const JsonValue value = ParseExtensionObject(json);
+    extension.factor = GetFloatMemberOrDefault(
+        value, "iridescenceFactor", 0.0F);
+    const auto* texture =
+        Internal::FindJsonMember(
+            value, "iridescenceTexture");
+    if (texture != nullptr)
     {
-        iridescence.factor = factorIt->value.GetFloat();
+        ParseTextureInfo(
+            *texture,
+            extension.texture,
+            extensionDeserializer);
     }
-
-    // Iridescence Texture
-    const auto textureIt = sit.FindMember("iridescenceTexture");
-    if (textureIt != sit.MemberEnd())
+    extension.ior = GetFloatMemberOrDefault(
+        value, "iridescenceIor", 1.3F);
+    extension.thicknessMin = GetFloatMemberOrDefault(
+        value, "iridescenceThicknessMinimum", 100.0F);
+    extension.thicknessMax = GetFloatMemberOrDefault(
+        value, "iridescenceThicknessMaximum", 400.0F);
+    const auto* thickness =
+        Internal::FindJsonMember(
+            value, "iridescenceThicknessTexture");
+    if (thickness != nullptr)
     {
-        ParseTextureInfo(textureIt->value, iridescence.texture, extensionDeserializer);
+        ParseTextureInfo(
+            *thickness,
+            extension.thicknessTexture,
+            extensionDeserializer);
     }
-
-    // IOR
-    const auto iorIt = sit.FindMember("iridescenceIor");
-    if (iorIt != sit.MemberEnd())
-    {
-        iridescence.ior = iorIt->value.GetFloat();
-    }
-
-    // Thickness Minimum
-    const auto thicknessMinIt = sit.FindMember("iridescenceThicknessMinimum");
-    if (thicknessMinIt != sit.MemberEnd())
-    {
-        iridescence.thicknessMin = thicknessMinIt->value.GetFloat();
-    }
-
-    // Thickness Maximum
-    const auto thicknessMaxIt = sit.FindMember("iridescenceThicknessMaximum");
-    if (thicknessMaxIt != sit.MemberEnd())
-    {
-        iridescence.thicknessMax = thicknessMaxIt->value.GetFloat();
-    }
-
-    // Thickness Texture
-    const auto thicknessTextureIt = sit.FindMember("iridescenceThicknessTexture");
-    if (thicknessTextureIt != sit.MemberEnd())
-    {
-        ParseTextureInfo(thicknessTextureIt->value, iridescence.thicknessTexture, extensionDeserializer);
-    }
-
-    ParseProperty(sit, iridescence, extensionDeserializer);
-
-    return std::make_unique<Iridescence>(iridescence);
+    ParseProperty(
+        value, extension, extensionDeserializer);
+    return std::make_unique<Iridescence>(extension);
 }
 
-// KHR::Materials::Transmission
-
-KHR::Materials::Transmission::Transmission() :
-    factor(0.0f)
+KHR::Materials::Transmission::Transmission()
+    : factor(0.0F)
 {
 }
 
-std::unique_ptr<Extension> KHR::Materials::Transmission::Clone() const
+std::unique_ptr<Extension>
+KHR::Materials::Transmission::Clone() const
 {
     return std::make_unique<Transmission>(*this);
 }
 
-bool KHR::Materials::Transmission::IsEqual(const Extension& rhs) const
+bool KHR::Materials::Transmission::IsEqual(
+    const Extension& rhs) const
 {
-    const auto other = dynamic_cast<const Transmission*>(&rhs);
-
-    return other != nullptr
-        && glTFProperty::Equals(*this, *other)
-        && this->factor == other->factor
-        && this->texture == other->texture;
+    const auto other =
+        dynamic_cast<const Transmission*>(&rhs);
+    return other != nullptr &&
+        glTFProperty::Equals(*this, *other) &&
+        factor == other->factor &&
+        texture == other->texture;
 }
 
-std::string GLTFSDK_API KHR::Materials::SerializeTransmission(const Materials::Transmission& transmission, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
+std::string GLTFSDK_API KHR::Materials::SerializeTransmission(
+    const Materials::Transmission& extension,
+    const Document& gltfDocument,
+    const ExtensionSerializer& extensionSerializer)
 {
-    rapidjson::Document doc;
-    auto& a = doc.GetAllocator();
-    rapidjson::Value KHR_transmission(rapidjson::kObjectType);
+    JsonValue value = Internal::CreateJsonObject();
+    if (extension.factor != 0.0F)
     {
-        if (transmission.factor != 0.0f)
-        {
-            KHR_transmission.AddMember("transmissionFactor", RapidJsonUtils::ToFloatValue(transmission.factor), a);
-        }
-
-        if (!transmission.texture.textureId.empty())
-        {
-            rapidjson::Value texture(rapidjson::kObjectType);
-            SerializeTextureInfo(gltfDocument, transmission.texture, texture, a, gltfDocument.textures, extensionSerializer);
-            KHR_transmission.AddMember("transmissionTexture", texture, a);
-        }
-
-        SerializeProperty(gltfDocument, transmission, KHR_transmission, a, extensionSerializer);
+        Internal::SetJsonMember(
+            value,
+            "transmissionFactor",
+            Internal::CreateJsonFloat(extension.factor));
     }
-
-    rapidjson::StringBuffer buffer;
-    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-    KHR_transmission.Accept(writer);
-
-    return buffer.GetString();
-}
-
-std::unique_ptr<Extension> GLTFSDK_API KHR::Materials::DeserializeTransmission(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
-{
-    Materials::Transmission transmission;
-
-    auto doc = RapidJsonUtils::CreateDocumentFromString(json);
-    RequireObject(doc, "The extension value must be a JSON object");
-    const auto sit = doc.GetObject();
-
-    // Transmission Factor
-    const auto factorIt = sit.FindMember("transmissionFactor");
-    if (factorIt != sit.MemberEnd())
+    if (!extension.texture.textureId.empty())
     {
-        transmission.factor = factorIt->value.GetFloat();
+        JsonValue texture = Internal::CreateJsonObject();
+        SerializeTextureInfo(
+            gltfDocument,
+            extension.texture,
+            texture,
+            gltfDocument.textures,
+            extensionSerializer);
+        Internal::SetJsonMember(
+            value,
+            "transmissionTexture",
+            std::move(texture));
     }
-
-    // Transmission Texture
-    const auto textureIt = sit.FindMember("transmissionTexture");
-    if (textureIt != sit.MemberEnd())
-    {
-        ParseTextureInfo(textureIt->value, transmission.texture, extensionDeserializer);
-    }
-
-    ParseProperty(sit, transmission, extensionDeserializer);
-
-    return std::make_unique<Transmission>(transmission);
+    SerializeProperty(
+        gltfDocument,
+        extension,
+        value,
+        extensionSerializer);
+    return Internal::WriteJson(value);
 }
 
-// KHR::Materials::Sheen
+std::unique_ptr<Extension> GLTFSDK_API
+KHR::Materials::DeserializeTransmission(
+    const std::string& json,
+    const ExtensionDeserializer& extensionDeserializer)
+{
+    Materials::Transmission extension;
+    const JsonValue value = ParseExtensionObject(json);
+    extension.factor = GetFloatMemberOrDefault(
+        value, "transmissionFactor", 0.0F);
+    const auto* texture =
+        Internal::FindJsonMember(
+            value, "transmissionTexture");
+    if (texture != nullptr)
+    {
+        ParseTextureInfo(
+            *texture,
+            extension.texture,
+            extensionDeserializer);
+    }
+    ParseProperty(
+        value, extension, extensionDeserializer);
+    return std::make_unique<Transmission>(extension);
+}
 
-KHR::Materials::Sheen::Sheen() :
-    colorFactor(0.0f, 0.0f, 0.0f),
-    roughnessFactor(0.0f)
+KHR::Materials::Sheen::Sheen()
+    : colorFactor(0.0F, 0.0F, 0.0F),
+      roughnessFactor(0.0F)
 {
 }
 
-std::unique_ptr<Extension> KHR::Materials::Sheen::Clone() const
+std::unique_ptr<Extension>
+KHR::Materials::Sheen::Clone() const
 {
     return std::make_unique<Sheen>(*this);
 }
 
-bool KHR::Materials::Sheen::IsEqual(const Extension& rhs) const
+bool KHR::Materials::Sheen::IsEqual(
+    const Extension& rhs) const
 {
     const auto other = dynamic_cast<const Sheen*>(&rhs);
-
-    return other != nullptr
-        && glTFProperty::Equals(*this, *other)
-        && this->colorFactor == other->colorFactor
-        && this->colorTexture == other->colorTexture
-        && this->roughnessFactor == other->roughnessFactor
-        && this->roughnessTexture == other->roughnessTexture;
+    return other != nullptr &&
+        glTFProperty::Equals(*this, *other) &&
+        colorFactor == other->colorFactor &&
+        colorTexture == other->colorTexture &&
+        roughnessFactor == other->roughnessFactor &&
+        roughnessTexture == other->roughnessTexture;
 }
 
-std::string GLTFSDK_API KHR::Materials::SerializeSheen(const Materials::Sheen& sheen, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
+std::string GLTFSDK_API KHR::Materials::SerializeSheen(
+    const Materials::Sheen& extension,
+    const Document& gltfDocument,
+    const ExtensionSerializer& extensionSerializer)
 {
-    rapidjson::Document doc;
-    auto& a = doc.GetAllocator();
-    rapidjson::Value KHR_sheen(rapidjson::kObjectType);
+    JsonValue value = Internal::CreateJsonObject();
+    if (extension.colorFactor !=
+        Color3(0.0F, 0.0F, 0.0F))
     {
-        if (sheen.colorFactor != Color3(0.0f, 0.0f, 0.0f))
-        {
-            KHR_sheen.AddMember("sheenColorFactor", RapidJsonUtils::ToJsonArray(sheen.colorFactor, a), a);
-        }
-
-        if (!sheen.colorTexture.textureId.empty())
-        {
-            rapidjson::Value colorTexture(rapidjson::kObjectType);
-            SerializeTextureInfo(gltfDocument, sheen.colorTexture, colorTexture, a, gltfDocument.textures, extensionSerializer);
-            KHR_sheen.AddMember("sheenColorTexture", colorTexture, a);
-        }
-
-        if (sheen.roughnessFactor != 0.0f)
-        {
-            KHR_sheen.AddMember("sheenRoughnessFactor", RapidJsonUtils::ToFloatValue(sheen.roughnessFactor), a);
-        }
-
-        if (!sheen.roughnessTexture.textureId.empty())
-        {
-            rapidjson::Value roughnessTexture(rapidjson::kObjectType);
-            SerializeTextureInfo(gltfDocument, sheen.roughnessTexture, roughnessTexture, a, gltfDocument.textures, extensionSerializer);
-            KHR_sheen.AddMember("sheenRoughnessTexture", roughnessTexture, a);
-        }
-
-        SerializeProperty(gltfDocument, sheen, KHR_sheen, a, extensionSerializer);
+        Internal::SetJsonMember(
+            value,
+            "sheenColorFactor",
+            CreateFloatArray(extension.colorFactor));
     }
-
-    rapidjson::StringBuffer buffer;
-    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-    KHR_sheen.Accept(writer);
-
-    return buffer.GetString();
+    if (!extension.colorTexture.textureId.empty())
+    {
+        JsonValue texture = Internal::CreateJsonObject();
+        SerializeTextureInfo(
+            gltfDocument,
+            extension.colorTexture,
+            texture,
+            gltfDocument.textures,
+            extensionSerializer);
+        Internal::SetJsonMember(
+            value,
+            "sheenColorTexture",
+            std::move(texture));
+    }
+    if (extension.roughnessFactor != 0.0F)
+    {
+        Internal::SetJsonMember(
+            value,
+            "sheenRoughnessFactor",
+            Internal::CreateJsonFloat(
+                extension.roughnessFactor));
+    }
+    if (!extension.roughnessTexture.textureId.empty())
+    {
+        JsonValue texture = Internal::CreateJsonObject();
+        SerializeTextureInfo(
+            gltfDocument,
+            extension.roughnessTexture,
+            texture,
+            gltfDocument.textures,
+            extensionSerializer);
+        Internal::SetJsonMember(
+            value,
+            "sheenRoughnessTexture",
+            std::move(texture));
+    }
+    SerializeProperty(
+        gltfDocument,
+        extension,
+        value,
+        extensionSerializer);
+    return Internal::WriteJson(value);
 }
 
-std::unique_ptr<Extension> GLTFSDK_API KHR::Materials::DeserializeSheen(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
+std::unique_ptr<Extension> GLTFSDK_API
+KHR::Materials::DeserializeSheen(
+    const std::string& json,
+    const ExtensionDeserializer& extensionDeserializer)
 {
-    Materials::Sheen sheen;
-
-    auto doc = RapidJsonUtils::CreateDocumentFromString(json);
-    RequireObject(doc, "The extension value must be a JSON object");
-    const auto sit = doc.GetObject();
-
-    // Sheen Color Factor
-    const auto colorFactorIt = sit.FindMember("sheenColorFactor");
-    if (colorFactorIt != sit.MemberEnd())
+    Materials::Sheen extension;
+    const JsonValue value = ParseExtensionObject(json);
+    const auto* color =
+        Internal::FindJsonMember(value, "sheenColorFactor");
+    if (color != nullptr)
     {
-        RequireFixedSizeNumericArray(colorFactorIt->value, 3U,
-            "sheenColorFactor must be a JSON array of 3 numeric elements");
-        sheen.colorFactor = Color3(
-            static_cast<float>(colorFactorIt->value[0].GetDouble()),
-            static_cast<float>(colorFactorIt->value[1].GetDouble()),
-            static_cast<float>(colorFactorIt->value[2].GetDouble()));
+        const auto elements = GetFixedSizeFloatArray(
+            *color,
+            3U,
+            "sheenColorFactor must be a JSON array of 3 "
+            "numeric elements");
+        extension.colorFactor = Color3(
+            elements[0], elements[1], elements[2]);
     }
-
-    // Sheen Color Texture
-    const auto colorTextureIt = sit.FindMember("sheenColorTexture");
-    if (colorTextureIt != sit.MemberEnd())
+    const auto* colorTexture =
+        Internal::FindJsonMember(value, "sheenColorTexture");
+    if (colorTexture != nullptr)
     {
-        ParseTextureInfo(colorTextureIt->value, sheen.colorTexture, extensionDeserializer);
+        ParseTextureInfo(
+            *colorTexture,
+            extension.colorTexture,
+            extensionDeserializer);
     }
-
-    // Sheen Roughness Factor
-    const auto roughnessFactorIt = sit.FindMember("sheenRoughnessFactor");
-    if (roughnessFactorIt != sit.MemberEnd())
+    extension.roughnessFactor = GetFloatMemberOrDefault(
+        value, "sheenRoughnessFactor", 0.0F);
+    const auto* roughness =
+        Internal::FindJsonMember(
+            value, "sheenRoughnessTexture");
+    if (roughness != nullptr)
     {
-        sheen.roughnessFactor = roughnessFactorIt->value.GetFloat();
+        ParseTextureInfo(
+            *roughness,
+            extension.roughnessTexture,
+            extensionDeserializer);
     }
-
-    // Sheen Roughness Texture
-    const auto roughnessTextureIt = sit.FindMember("sheenRoughnessTexture");
-    if (roughnessTextureIt != sit.MemberEnd())
-    {
-        ParseTextureInfo(roughnessTextureIt->value, sheen.roughnessTexture, extensionDeserializer);
-    }
-
-    ParseProperty(sit, sheen, extensionDeserializer);
-
-    return std::make_unique<Sheen>(sheen);
+    ParseProperty(
+        value, extension, extensionDeserializer);
+    return std::make_unique<Sheen>(extension);
 }
 
-// KHR::Materials::Specular
-
-KHR::Materials::Specular::Specular() :
-    factor(0.0f),
-    colorFactor(1.0f, 1.0f, 1.0f)
+KHR::Materials::Specular::Specular()
+    : factor(0.0F),
+      colorFactor(1.0F, 1.0F, 1.0F)
 {
 }
 
-std::unique_ptr<Extension> KHR::Materials::Specular::Clone() const
+std::unique_ptr<Extension>
+KHR::Materials::Specular::Clone() const
 {
     return std::make_unique<Specular>(*this);
 }
 
-bool KHR::Materials::Specular::IsEqual(const Extension& rhs) const
+bool KHR::Materials::Specular::IsEqual(
+    const Extension& rhs) const
 {
-    const auto other = dynamic_cast<const Specular*>(&rhs);
-
-    return other != nullptr
-        && glTFProperty::Equals(*this, *other)
-        && this->colorFactor == other->colorFactor
-        && this->colorTexture == other->colorTexture
-        && this->factor == other->factor
-        && this->texture == other->texture;
+    const auto other =
+        dynamic_cast<const Specular*>(&rhs);
+    return other != nullptr &&
+        glTFProperty::Equals(*this, *other) &&
+        colorFactor == other->colorFactor &&
+        colorTexture == other->colorTexture &&
+        factor == other->factor &&
+        texture == other->texture;
 }
 
-std::string GLTFSDK_API KHR::Materials::SerializeSpecular(const Materials::Specular& specular, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
+std::string GLTFSDK_API KHR::Materials::SerializeSpecular(
+    const Materials::Specular& extension,
+    const Document& gltfDocument,
+    const ExtensionSerializer& extensionSerializer)
 {
-    rapidjson::Document doc;
-    auto& a = doc.GetAllocator();
-    rapidjson::Value KHR_specular(rapidjson::kObjectType);
+    JsonValue value = Internal::CreateJsonObject();
+    if (extension.factor != 0.0F)
     {
-        if (specular.factor != 0.0f)
-        {
-            KHR_specular.AddMember("specularFactor", RapidJsonUtils::ToFloatValue(specular.factor), a);
-        }
-
-        if (!specular.texture.textureId.empty())
-        {
-            rapidjson::Value texture(rapidjson::kObjectType);
-            SerializeTextureInfo(gltfDocument, specular.texture, texture, a, gltfDocument.textures, extensionSerializer);
-            KHR_specular.AddMember("specularTexture", texture, a);
-        }
-
-        if (specular.colorFactor != Color3(1.0f, 1.0f, 1.0f))
-        {
-            KHR_specular.AddMember("specularColorFactor", RapidJsonUtils::ToJsonArray(specular.colorFactor, a), a);
-        }
-
-        if (!specular.colorTexture.textureId.empty())
-        {
-            rapidjson::Value colorTexture(rapidjson::kObjectType);
-            SerializeTextureInfo(gltfDocument, specular.colorTexture, colorTexture, a, gltfDocument.textures, extensionSerializer);
-            KHR_specular.AddMember("specularColorTexture", colorTexture, a);
-        }
-
-        SerializeProperty(gltfDocument, specular, KHR_specular, a, extensionSerializer);
+        Internal::SetJsonMember(
+            value,
+            "specularFactor",
+            Internal::CreateJsonFloat(extension.factor));
     }
-
-    rapidjson::StringBuffer buffer;
-    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-    KHR_specular.Accept(writer);
-
-    return buffer.GetString();
+    if (!extension.texture.textureId.empty())
+    {
+        JsonValue texture = Internal::CreateJsonObject();
+        SerializeTextureInfo(
+            gltfDocument,
+            extension.texture,
+            texture,
+            gltfDocument.textures,
+            extensionSerializer);
+        Internal::SetJsonMember(
+            value, "specularTexture", std::move(texture));
+    }
+    if (extension.colorFactor !=
+        Color3(1.0F, 1.0F, 1.0F))
+    {
+        Internal::SetJsonMember(
+            value,
+            "specularColorFactor",
+            CreateFloatArray(extension.colorFactor));
+    }
+    if (!extension.colorTexture.textureId.empty())
+    {
+        JsonValue texture = Internal::CreateJsonObject();
+        SerializeTextureInfo(
+            gltfDocument,
+            extension.colorTexture,
+            texture,
+            gltfDocument.textures,
+            extensionSerializer);
+        Internal::SetJsonMember(
+            value,
+            "specularColorTexture",
+            std::move(texture));
+    }
+    SerializeProperty(
+        gltfDocument,
+        extension,
+        value,
+        extensionSerializer);
+    return Internal::WriteJson(value);
 }
 
-std::unique_ptr<Extension> GLTFSDK_API KHR::Materials::DeserializeSpecular(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
+std::unique_ptr<Extension> GLTFSDK_API
+KHR::Materials::DeserializeSpecular(
+    const std::string& json,
+    const ExtensionDeserializer& extensionDeserializer)
 {
-    Materials::Specular specular;
-
-    auto doc = RapidJsonUtils::CreateDocumentFromString(json);
-    RequireObject(doc, "The extension value must be a JSON object");
-    const auto sit = doc.GetObject();
-
-    // Specular Factor
-    const auto factorIt = sit.FindMember("specularFactor");
-    if (factorIt != sit.MemberEnd())
+    Materials::Specular extension;
+    const JsonValue value = ParseExtensionObject(json);
+    extension.factor = GetFloatMemberOrDefault(
+        value, "specularFactor", 0.0F);
+    const auto* texture =
+        Internal::FindJsonMember(value, "specularTexture");
+    if (texture != nullptr)
     {
-        specular.factor = factorIt->value.GetFloat();
+        ParseTextureInfo(
+            *texture,
+            extension.texture,
+            extensionDeserializer);
     }
-
-    // Specular Texture
-    const auto textureIt = sit.FindMember("specularTexture");
-    if (textureIt != sit.MemberEnd())
+    const auto* color =
+        Internal::FindJsonMember(value, "specularColorFactor");
+    if (color != nullptr)
     {
-        ParseTextureInfo(textureIt->value, specular.texture, extensionDeserializer);
+        const auto elements = GetFixedSizeFloatArray(
+            *color,
+            3U,
+            "specularColorFactor must be a JSON array of 3 "
+            "numeric elements");
+        extension.colorFactor = Color3(
+            elements[0], elements[1], elements[2]);
     }
-
-    // Specular Color Factor
-    const auto colorFactorIt = sit.FindMember("specularColorFactor");
-    if (colorFactorIt != sit.MemberEnd())
+    const auto* colorTexture =
+        Internal::FindJsonMember(
+            value, "specularColorTexture");
+    if (colorTexture != nullptr)
     {
-        RequireFixedSizeNumericArray(colorFactorIt->value, 3U,
-            "specularColorFactor must be a JSON array of 3 numeric elements");
-        specular.colorFactor = Color3(
-            static_cast<float>(colorFactorIt->value[0].GetDouble()),
-            static_cast<float>(colorFactorIt->value[1].GetDouble()),
-            static_cast<float>(colorFactorIt->value[2].GetDouble()));
+        ParseTextureInfo(
+            *colorTexture,
+            extension.colorTexture,
+            extensionDeserializer);
     }
-
-    // Specular Color Texture
-    const auto colorTextureIt = sit.FindMember("specularColorTexture");
-    if (colorTextureIt != sit.MemberEnd())
-    {
-        ParseTextureInfo(colorTextureIt->value, specular.colorTexture, extensionDeserializer);
-    }
-
-    ParseProperty(sit, specular, extensionDeserializer);
-
-    return std::make_unique<Specular>(specular);
+    ParseProperty(
+        value, extension, extensionDeserializer);
+    return std::make_unique<Specular>(extension);
 }
 
-// KHR::MeshPrimitives::DracoMeshCompression
-
-std::unique_ptr<Extension> KHR::MeshPrimitives::DracoMeshCompression::Clone() const
+std::unique_ptr<Extension>
+KHR::MeshPrimitives::DracoMeshCompression::Clone() const
 {
     return std::make_unique<DracoMeshCompression>(*this);
 }
 
-bool KHR::MeshPrimitives::DracoMeshCompression::IsEqual(const Extension& rhs) const
+bool KHR::MeshPrimitives::DracoMeshCompression::IsEqual(
+    const Extension& rhs) const
 {
-    const auto other = dynamic_cast<const DracoMeshCompression*>(&rhs);
-
-    return other != nullptr
-        && glTFProperty::Equals(*this, *other)
-        && this->bufferViewId == other->bufferViewId
-        && this->attributes == other->attributes;
+    const auto other =
+        dynamic_cast<const DracoMeshCompression*>(&rhs);
+    return other != nullptr &&
+        glTFProperty::Equals(*this, *other) &&
+        bufferViewId == other->bufferViewId &&
+        attributes == other->attributes;
 }
 
-std::string GLTFSDK_API KHR::MeshPrimitives::SerializeDracoMeshCompression(const MeshPrimitives::DracoMeshCompression& dracoMeshCompression, const Document& glTFdoc, const ExtensionSerializer& extensionSerializer)
+std::string GLTFSDK_API
+KHR::MeshPrimitives::SerializeDracoMeshCompression(
+    const MeshPrimitives::DracoMeshCompression& extension,
+    const Document& gltfDocument,
+    const ExtensionSerializer& extensionSerializer)
 {
-    rapidjson::Document doc;
-    auto& a = doc.GetAllocator();
-    rapidjson::Value KHR_draco_mesh_compression(rapidjson::kObjectType);
+    JsonValue value = Internal::CreateJsonObject();
+    AddOptionalIndex(
+        value,
+        "bufferView",
+        extension.bufferViewId,
+        gltfDocument.bufferViews);
+
+    JsonValue attributes = Internal::CreateJsonObject();
+    std::vector<std::pair<std::string, std::uint32_t>>
+        sorted(
+            extension.attributes.begin(),
+            extension.attributes.end());
+    std::sort(
+        sorted.begin(),
+        sorted.end(),
+        [](const std::pair<std::string, std::uint32_t>& left,
+           const std::pair<std::string, std::uint32_t>& right)
+        {
+            return left.first < right.first;
+        });
+    for (const auto& attribute : sorted)
     {
-        if (!dracoMeshCompression.bufferViewId.empty())
-        {
-            RapidJsonUtils::AddOptionalMemberIndex("bufferView", KHR_draco_mesh_compression, dracoMeshCompression.bufferViewId, glTFdoc.bufferViews, a);
-        }
-
-        rapidjson::Value attributesValue(rapidjson::kObjectType);
-
-        for (const auto& attribute : dracoMeshCompression.attributes)
-        {
-            rapidjson::Value attributeValue;
-            attributeValue.SetUint(attribute.second);
-            attributesValue.AddMember(RapidJsonUtils::ToStringValue(attribute.first, a), attributeValue, a);
-        }
-
-        KHR_draco_mesh_compression.AddMember(RapidJsonUtils::ToStringValue("attributes", a), attributesValue, a);
-
-        SerializeProperty(glTFdoc, dracoMeshCompression, KHR_draco_mesh_compression, a, extensionSerializer);
+        Internal::SetJsonMember(
+            attributes,
+            attribute.first,
+            Internal::CreateJsonUInt32(attribute.second));
     }
-
-    rapidjson::StringBuffer buffer;
-    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-    KHR_draco_mesh_compression.Accept(writer);
-
-    return buffer.GetString();
+    Internal::SetJsonMember(
+        value, "attributes", std::move(attributes));
+    SerializeProperty(
+        gltfDocument,
+        extension,
+        value,
+        extensionSerializer);
+    return Internal::WriteJson(value);
 }
 
-std::unique_ptr<Extension> GLTFSDK_API KHR::MeshPrimitives::DeserializeDracoMeshCompression(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
+std::unique_ptr<Extension> GLTFSDK_API
+KHR::MeshPrimitives::DeserializeDracoMeshCompression(
+    const std::string& json,
+    const ExtensionDeserializer& extensionDeserializer)
 {
-    auto extension = std::make_unique<DracoMeshCompression>();
+    auto extension =
+        std::make_unique<DracoMeshCompression>();
+    const JsonValue value = ParseExtensionObject(json);
+    extension->bufferViewId =
+        GetUInt32MemberAsString(value, "bufferView");
 
-    auto doc = RapidJsonUtils::CreateDocumentFromString(json);
-    const rapidjson::Value& v = doc;
-
-    extension->bufferViewId = GetMemberValueAsString<uint32_t>(v, "bufferView");
-
-    rapidjson::Value::ConstMemberIterator it = v.FindMember("attributes");
-    if (it != v.MemberEnd())
+    const auto* attributes =
+        Internal::FindJsonMember(value, "attributes");
+    if (attributes != nullptr)
     {
-        if (!it->value.IsObject())
+        for (const auto& name :
+             Internal::GetJsonObjectMemberNames(
+                 *attributes,
+                 "Member attributes of " +
+                 std::string(DRACOMESHCOMPRESSION_NAME) +
+                 " is not an object."))
         {
-            throw GLTFException("Member attributes of " + std::string(DRACOMESHCOMPRESSION_NAME) + " is not an object.");
-        }
-        const auto& attributes = it->value.GetObject();
-
-        for (const auto& attribute : attributes)
-        {
-            auto name = attribute.name.GetString();
-
-            if (!attribute.value.IsInt())
-            {
-                throw GLTFException("Attribute " + std::string(name) + " of " + std::string(DRACOMESHCOMPRESSION_NAME) + " is not a number.");
-            }
-            extension->attributes.emplace(name, attribute.value.Get<uint32_t>());
+            extension->attributes.emplace(
+                name,
+                ReadUInt32(
+                    *Internal::FindJsonMember(
+                        *attributes, name),
+                    "Attribute " + name + " of " +
+                    std::string(DRACOMESHCOMPRESSION_NAME) +
+                    " is not an unsigned integer."));
         }
     }
-
-    ParseProperty(v, *extension, extensionDeserializer);
-
+    ParseProperty(
+        value, *extension, extensionDeserializer);
     return extension;
 }
-
-// KHR::Nodes::MeshGPUInstancing
 
 KHR::Nodes::MeshGPUInstancing::MeshGPUInstancing()
 {
 }
 
-std::unique_ptr<Extension> KHR::Nodes::MeshGPUInstancing::Clone() const
+std::unique_ptr<Extension>
+KHR::Nodes::MeshGPUInstancing::Clone() const
 {
     return std::make_unique<MeshGPUInstancing>(*this);
 }
 
-bool KHR::Nodes::MeshGPUInstancing::IsEqual(const Extension& rhs) const
+bool KHR::Nodes::MeshGPUInstancing::IsEqual(
+    const Extension& rhs) const
 {
-    const auto other = dynamic_cast<const MeshGPUInstancing*>(&rhs);
-
-    return other != nullptr
-        && glTFProperty::Equals(*this, *other);
+    const auto other =
+        dynamic_cast<const MeshGPUInstancing*>(&rhs);
+    return other != nullptr &&
+        glTFProperty::Equals(*this, *other);
 }
 
-std::string GLTFSDK_API KHR::Nodes::SerializeMeshGPUInstancing(const Nodes::MeshGPUInstancing& instancing, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
+std::string GLTFSDK_API
+KHR::Nodes::SerializeMeshGPUInstancing(
+    const Nodes::MeshGPUInstancing& extension,
+    const Document& gltfDocument,
+    const ExtensionSerializer& extensionSerializer)
 {
-    rapidjson::Document doc;
-    auto& a = doc.GetAllocator();
-    rapidjson::Value EXT_instancing(rapidjson::kObjectType);
-
-    rapidjson::Value attributes(rapidjson::kObjectType);
-
-    for (const auto& attribute : instancing.attributes)
-    {
-        attributes.AddMember(RapidJsonUtils::ToStringValue(attribute.first, a), rapidjson::Value(ToKnownSizeType(gltfDocument.accessors.GetIndex(attribute.second))), a);
-    }
-
-    EXT_instancing.AddMember("attributes", attributes, a);
-
-    SerializeProperty(gltfDocument, instancing, EXT_instancing, a, extensionSerializer);
-
-    rapidjson::StringBuffer buffer;
-    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-    EXT_instancing.Accept(writer);
-
-    return buffer.GetString();
-}
-
-std::unique_ptr<Extension> GLTFSDK_API KHR::Nodes::DeserializeMeshGPUInstancing(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
-{
-    Nodes::MeshGPUInstancing instancing;
-
-    auto doc = RapidJsonUtils::CreateDocumentFromString(json);
-    RequireObject(doc, "The extension value must be a JSON object");
-    const auto sit = doc.GetObject();
-
-    const auto attributesIt = sit.FindMember("attributes");
-    if (attributesIt != sit.MemberEnd())
-    {
-        RequireObject(attributesIt->value,
-            "EXT_mesh_gpu_instancing.attributes must be a JSON object");
-        const auto& attributes = attributesIt->value.GetObject();
-
-        for (const auto& attribute : attributes)
+    JsonValue value = Internal::CreateJsonObject();
+    JsonValue attributes = Internal::CreateJsonObject();
+    std::vector<std::pair<std::string, std::string>>
+        sorted(
+            extension.attributes.begin(),
+            extension.attributes.end());
+    std::sort(
+        sorted.begin(),
+        sorted.end(),
+        [](const std::pair<std::string, std::string>& left,
+           const std::pair<std::string, std::string>& right)
         {
-            if (!attribute.value.IsUint())
-            {
-                throw InvalidGLTFException(
-                    "EXT_mesh_gpu_instancing.attributes values must be unsigned integers");
-            }
-            auto name = attribute.name.GetString();
-            instancing.attributes[name] = std::to_string(attribute.value.Get<uint32_t>());
+            return left.first < right.first;
+        });
+    for (const auto& attribute : sorted)
+    {
+        Internal::SetJsonMember(
+            attributes,
+            attribute.first,
+            Internal::CreateJsonSize(
+                gltfDocument.accessors.GetIndex(
+                    attribute.second)));
+    }
+    Internal::SetJsonMember(
+        value, "attributes", std::move(attributes));
+    SerializeProperty(
+        gltfDocument,
+        extension,
+        value,
+        extensionSerializer);
+    return Internal::WriteJson(value);
+}
+
+std::unique_ptr<Extension> GLTFSDK_API
+KHR::Nodes::DeserializeMeshGPUInstancing(
+    const std::string& json,
+    const ExtensionDeserializer& extensionDeserializer)
+{
+    Nodes::MeshGPUInstancing extension;
+    const JsonValue value = ParseExtensionObject(json);
+    const auto* attributes =
+        Internal::FindJsonMember(value, "attributes");
+    if (attributes != nullptr)
+    {
+        for (const auto& name :
+             Internal::GetJsonObjectMemberNames(
+                 *attributes,
+                 "EXT_mesh_gpu_instancing.attributes must be "
+                 "a JSON object"))
+        {
+            extension.attributes[name] = std::to_string(
+                ReadUInt32(
+                    *Internal::FindJsonMember(
+                        *attributes, name),
+                    "EXT_mesh_gpu_instancing.attributes values "
+                    "must be unsigned integers"));
         }
     }
-
-    ParseProperty(sit, instancing, extensionDeserializer);
-
-    return std::make_unique<MeshGPUInstancing>(instancing);
+    ParseProperty(
+        value, extension, extensionDeserializer);
+    return std::make_unique<MeshGPUInstancing>(extension);
 }
 
-// KHR::TextureInfos::TextureTransform
-
-KHR::TextureInfos::TextureTransform::TextureTransform() :
-    offset(Vector2::ZERO),
-    rotation(0.0f),
-    scale(Vector2::ONE),
-    texCoord()
+KHR::TextureInfos::TextureTransform::TextureTransform()
+    : offset(Vector2::ZERO),
+      rotation(0.0F),
+      scale(Vector2::ONE),
+      texCoord()
 {
 }
 
-KHR::TextureInfos::TextureTransform::TextureTransform(const TextureTransform& textureTransform) :
-    offset(textureTransform.offset),
-    rotation(textureTransform.rotation),
-    scale(textureTransform.scale),
-    texCoord(textureTransform.texCoord)
+KHR::TextureInfos::TextureTransform::TextureTransform(
+    const TextureTransform& other)
+    : offset(other.offset),
+      rotation(other.rotation),
+      scale(other.scale),
+      texCoord(other.texCoord)
 {
 }
 
-std::unique_ptr<Extension> KHR::TextureInfos::TextureTransform::Clone() const
+std::unique_ptr<Extension>
+KHR::TextureInfos::TextureTransform::Clone() const
 {
     return std::make_unique<TextureTransform>(*this);
 }
 
-bool KHR::TextureInfos::TextureTransform::IsEqual(const Extension& rhs) const
+bool KHR::TextureInfos::TextureTransform::IsEqual(
+    const Extension& rhs) const
 {
-    const auto other = dynamic_cast<const TextureTransform*>(&rhs);
-
-    return other != nullptr
-        && glTFProperty::Equals(*this, *other)
-        && this->offset == other->offset
-        && this->rotation == other->rotation
-        && this->scale == other->scale
-        && this->texCoord == other->texCoord;
+    const auto other =
+        dynamic_cast<const TextureTransform*>(&rhs);
+    return other != nullptr &&
+        glTFProperty::Equals(*this, *other) &&
+        offset == other->offset &&
+        rotation == other->rotation &&
+        scale == other->scale &&
+        texCoord == other->texCoord;
 }
 
-std::string GLTFSDK_API KHR::TextureInfos::SerializeTextureTransform(const TextureTransform& textureTransform, const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
+std::string GLTFSDK_API
+KHR::TextureInfos::SerializeTextureTransform(
+    const TextureTransform& extension,
+    const Document& gltfDocument,
+    const ExtensionSerializer& extensionSerializer)
 {
-    rapidjson::Document doc;
-    auto& a = doc.GetAllocator();
-    rapidjson::Value KHR_textureTransform(rapidjson::kObjectType);
+    JsonValue value = Internal::CreateJsonObject();
+    if (extension.offset != Vector2::ZERO)
     {
-        if (textureTransform.offset != Vector2::ZERO)
-        {
-            KHR_textureTransform.AddMember("offset", RapidJsonUtils::ToJsonArray(textureTransform.offset, a), a);
-        }
-
-        if (textureTransform.rotation != 0.0f)
-        {
-            KHR_textureTransform.AddMember("rotation", textureTransform.rotation, a);
-        }
-
-        if (textureTransform.scale != Vector2::ONE)
-        {
-            KHR_textureTransform.AddMember("scale", RapidJsonUtils::ToJsonArray(textureTransform.scale, a), a);
-        }
-
-        if (textureTransform.texCoord)
-        {
-            KHR_textureTransform.AddMember("texCoord", ToKnownSizeType(textureTransform.texCoord.Get()), a);
-        }
-
-        SerializeProperty(gltfDocument, textureTransform, KHR_textureTransform, a, extensionSerializer);
+        Internal::SetJsonMember(
+            value,
+            "offset",
+            CreateFloatArray(extension.offset));
     }
-
-    glTF::rapidjson::StringBuffer buffer;
-    glTF::rapidjson::Writer<glTF::rapidjson::StringBuffer> writer(buffer);
-    KHR_textureTransform.Accept(writer);
-
-    return buffer.GetString();
+    if (extension.rotation != 0.0F)
+    {
+        Internal::SetJsonMember(
+            value,
+            "rotation",
+            Internal::CreateJsonFloat(extension.rotation));
+    }
+    if (extension.scale != Vector2::ONE)
+    {
+        Internal::SetJsonMember(
+            value,
+            "scale",
+            CreateFloatArray(extension.scale));
+    }
+    if (extension.texCoord)
+    {
+        Internal::SetJsonMember(
+            value,
+            "texCoord",
+            Internal::CreateJsonSize(
+                extension.texCoord.Get()));
+    }
+    SerializeProperty(
+        gltfDocument,
+        extension,
+        value,
+        extensionSerializer);
+    return Internal::WriteJson(value);
 }
 
-std::unique_ptr<Extension> GLTFSDK_API KHR::TextureInfos::DeserializeTextureTransform(const std::string& json, const ExtensionDeserializer& extensionDeserializer)
+std::unique_ptr<Extension> GLTFSDK_API
+KHR::TextureInfos::DeserializeTextureTransform(
+    const std::string& json,
+    const ExtensionDeserializer& extensionDeserializer)
 {
-    TextureTransform textureTransform;
+    TextureTransform extension;
+    const JsonValue value = ParseExtensionObject(json);
 
-    auto doc = RapidJsonUtils::CreateDocumentFromString(json);
-    RequireObject(doc, "The extension value must be a JSON object");
-    const rapidjson::Value& sit = doc;
-
-    // Offset
-    auto offsetIt = sit.FindMember("offset");
-    if (offsetIt != sit.MemberEnd())
+    const auto* offset =
+        Internal::FindJsonMember(value, "offset");
+    if (offset != nullptr)
     {
-        if (!offsetIt->value.IsArray())
+        if (!Internal::IsJsonArray(*offset))
         {
-            throw GLTFException("Offset member of " + std::string(TEXTURETRANSFORM_NAME) + " must be an array.");
+            throw GLTFException(
+                "Offset member of " +
+                std::string(TEXTURETRANSFORM_NAME) +
+                " must be an array.");
         }
-        if (offsetIt->value.Size() != 2)
+        if (Internal::GetJsonArraySize(*offset) != 2U)
         {
-            throw GLTFException("Offset member of " + std::string(TEXTURETRANSFORM_NAME) + " must have two values.");
+            throw GLTFException(
+                "Offset member of " +
+                std::string(TEXTURETRANSFORM_NAME) +
+                " must have two values.");
         }
-
-        std::vector<float> offset;
-        for (rapidjson::Value::ConstValueIterator ait = offsetIt->value.Begin(); ait != offsetIt->value.End(); ++ait)
-        {
-            if (!ait->IsNumber())
-            {
-                throw GLTFException("Offset member of " + std::string(TEXTURETRANSFORM_NAME) + " must contain numeric values.");
-            }
-            offset.push_back(static_cast<float>(ait->GetDouble()));
-        }
-        textureTransform.offset.x = offset[0];
-        textureTransform.offset.y = offset[1];
+        extension.offset.x = ReadFloat(
+            Internal::GetJsonArrayElement(
+                *offset, 0U, "Offset value is missing"),
+            "Offset member of " +
+            std::string(TEXTURETRANSFORM_NAME) +
+            " must contain numeric values.");
+        extension.offset.y = ReadFloat(
+            Internal::GetJsonArrayElement(
+                *offset, 1U, "Offset value is missing"),
+            "Offset member of " +
+            std::string(TEXTURETRANSFORM_NAME) +
+            " must contain numeric values.");
     }
 
-    // Rotation
-    auto rotationIt = sit.FindMember("rotation");
-    if (rotationIt != sit.MemberEnd())
+    const auto* rotation =
+        Internal::FindJsonMember(value, "rotation");
+    if (rotation != nullptr)
     {
-        if (!rotationIt->value.IsNumber())
-        {
-            throw GLTFException("Rotation member of " + std::string(TEXTURETRANSFORM_NAME) + " must be a number.");
-        }
-        textureTransform.rotation = rotationIt->value.GetFloat();
+        extension.rotation = ReadFloat(
+            *rotation,
+            "Rotation member of " +
+            std::string(TEXTURETRANSFORM_NAME) +
+            " must be a number.");
     }
 
-    // Scale
-    auto scaleIt = sit.FindMember("scale");
-    if (scaleIt != sit.MemberEnd())
+    const auto* scale =
+        Internal::FindJsonMember(value, "scale");
+    if (scale != nullptr)
     {
-        if (!scaleIt->value.IsArray())
+        if (!Internal::IsJsonArray(*scale))
         {
-            throw GLTFException("Scale member of " + std::string(TEXTURETRANSFORM_NAME) + " must be an array.");
+            throw GLTFException(
+                "Scale member of " +
+                std::string(TEXTURETRANSFORM_NAME) +
+                " must be an array.");
         }
-        if (scaleIt->value.Size() != 2)
+        if (Internal::GetJsonArraySize(*scale) != 2U)
         {
-            throw GLTFException("Scale member of " + std::string(TEXTURETRANSFORM_NAME) + " must have two values.");
+            throw GLTFException(
+                "Scale member of " +
+                std::string(TEXTURETRANSFORM_NAME) +
+                " must have two values.");
         }
-
-        std::vector<float> scale;
-        for (rapidjson::Value::ConstValueIterator ait = scaleIt->value.Begin(); ait != scaleIt->value.End(); ++ait)
-        {
-            if (!ait->IsNumber())
-            {
-                throw GLTFException("Scale member of " + std::string(TEXTURETRANSFORM_NAME) + " must contain numeric values.");
-            }
-            scale.push_back(static_cast<float>(ait->GetDouble()));
-        }
-        textureTransform.scale.x = scale[0];
-        textureTransform.scale.y = scale[1];
+        extension.scale.x = ReadFloat(
+            Internal::GetJsonArrayElement(
+                *scale, 0U, "Scale value is missing"),
+            "Scale member of " +
+            std::string(TEXTURETRANSFORM_NAME) +
+            " must contain numeric values.");
+        extension.scale.y = ReadFloat(
+            Internal::GetJsonArrayElement(
+                *scale, 1U, "Scale value is missing"),
+            "Scale member of " +
+            std::string(TEXTURETRANSFORM_NAME) +
+            " must contain numeric values.");
     }
 
-    // TexCoord
-    auto texCoordIt = sit.FindMember("texCoord");
-    if (texCoordIt != sit.MemberEnd())
+    const auto* texCoord =
+        Internal::FindJsonMember(value, "texCoord");
+    if (texCoord != nullptr)
     {
-        if (!texCoordIt->value.IsUint())
+        try
         {
-            throw GLTFException("TexCoord member of " + std::string(TEXTURETRANSFORM_NAME) + " must be an unsigned integer.");
+            extension.texCoord = ReadSize(
+                *texCoord,
+                "TexCoord member of " +
+                std::string(TEXTURETRANSFORM_NAME) +
+                " must be an unsigned integer.");
         }
-        textureTransform.texCoord = static_cast<size_t>(texCoordIt->value.GetUint());
+        catch (const InvalidGLTFException& exception)
+        {
+            throw GLTFException(exception.what());
+        }
     }
 
-    ParseProperty(sit, textureTransform, extensionDeserializer);
-
-    return std::make_unique<TextureTransform>(textureTransform);
+    ParseProperty(
+        value, extension, extensionDeserializer);
+    return std::make_unique<TextureTransform>(extension);
 }

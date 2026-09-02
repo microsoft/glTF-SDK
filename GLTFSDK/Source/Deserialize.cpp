@@ -6,952 +6,1660 @@
 #include <GLTFSDK/Constants.h>
 #include <GLTFSDK/ExtensionHandlers.h>
 #include <GLTFSDK/GLTF.h>
-#include <GLTFSDK/RapidJsonUtils.h>
-#include <GLTFSDK/Serialize.h>
 #include <GLTFSDK/SchemaValidation.h>
 
+#include "Internal/Json.h"
+#include "Internal/JsonSchema.h"
+
+#include <cstdint>
 #include <iostream>
+#include <string>
+#include <unordered_set>
+#include <utility>
+#include <vector>
 
 using namespace Microsoft::glTF;
 
 namespace
 {
-    // Returns the fixed-size JSON array referenced by 'memberName' from
-    // node 'v', validating that:
-    //   - the member exists and is a JSON array,
-    //   - the array has exactly 'expectedSize' elements,
-    //   - every element is a JSON number.
-    // Throws InvalidGLTFException with the supplied 'arrayDescription' if
-    // any of these conditions are not met. Used by the node transform
-    // parsers (scale/translation/rotation/matrix), which read into
-    // fixed-size float arrays and previously relied on rapidjson::Value
-    // accessors that are only well-defined for arrays of numeric elements.
-    const rapidjson::Value& GetFixedSizeNumericArray(
-        const rapidjson::Value& v,
+    using JsonValue = Internal::JsonValue;
+
+    std::string ReadString(
+        const JsonValue& value,
+        const std::string& error)
+    {
+        std::string result;
+        if (!Internal::TryGetJsonString(value, result))
+        {
+            throw InvalidGLTFException(error);
+        }
+        return result;
+    }
+
+    bool ReadBoolean(
+        const JsonValue& value,
+        const std::string& error)
+    {
+        bool result = false;
+        if (!Internal::TryGetJsonBoolean(value, result))
+        {
+            throw InvalidGLTFException(error);
+        }
+        return result;
+    }
+
+    std::int32_t ReadInt32(
+        const JsonValue& value,
+        const std::string& error)
+    {
+        std::int32_t result = 0;
+        if (!Internal::TryGetJsonInt32(value, result))
+        {
+            throw InvalidGLTFException(error);
+        }
+        return result;
+    }
+
+    std::uint32_t ReadUInt32(
+        const JsonValue& value,
+        const std::string& error)
+    {
+        std::uint32_t result = 0U;
+        if (!Internal::TryGetJsonUInt32(value, result))
+        {
+            throw InvalidGLTFException(error);
+        }
+        return result;
+    }
+
+    std::size_t ReadSize(
+        const JsonValue& value,
+        const std::string& error)
+    {
+        std::size_t result = 0U;
+        if (!Internal::TryGetJsonSize(value, result))
+        {
+            throw InvalidGLTFException(error);
+        }
+        return result;
+    }
+
+    float ReadFloat(
+        const JsonValue& value,
+        const std::string& error)
+    {
+        float result = 0.0F;
+        if (!Internal::TryGetJsonFloat(value, result))
+        {
+            throw InvalidGLTFException(error);
+        }
+        return result;
+    }
+
+    std::string GetStringMemberOrDefault(
+        const JsonValue& object,
+        const char* name,
+        std::string defaultValue = {})
+    {
+        const auto* value = Internal::FindJsonMember(object, name);
+        if (value == nullptr)
+        {
+            return defaultValue;
+        }
+
+        std::string result;
+        if (!Internal::TryGetJsonString(*value, result))
+        {
+            throw InvalidGLTFException(
+                std::string(name) + " must be a string");
+        }
+        return result;
+    }
+
+    bool GetBooleanMemberOrDefault(
+        const JsonValue& object,
+        const char* name,
+        bool defaultValue)
+    {
+        const auto* value = Internal::FindJsonMember(object, name);
+        if (value == nullptr)
+        {
+            return defaultValue;
+        }
+
+        bool result = false;
+        if (!Internal::TryGetJsonBoolean(*value, result))
+        {
+            throw InvalidGLTFException(
+                std::string(name) + " must be a boolean");
+        }
+        return result;
+    }
+
+    std::int32_t GetInt32MemberOrDefault(
+        const JsonValue& object,
+        const char* name,
+        std::int32_t defaultValue)
+    {
+        const auto* value = Internal::FindJsonMember(object, name);
+        if (value == nullptr)
+        {
+            return defaultValue;
+        }
+
+        std::int32_t result = 0;
+        if (!Internal::TryGetJsonInt32(*value, result))
+        {
+            throw InvalidGLTFException(
+                std::string(name) + " must be a signed integer");
+        }
+        return result;
+    }
+
+    std::uint32_t GetUInt32MemberOrDefault(
+        const JsonValue& object,
+        const char* name,
+        std::uint32_t defaultValue)
+    {
+        const auto* value = Internal::FindJsonMember(object, name);
+        if (value == nullptr)
+        {
+            return defaultValue;
+        }
+
+        std::uint32_t result = 0U;
+        if (!Internal::TryGetJsonUInt32(*value, result))
+        {
+            throw InvalidGLTFException(
+                std::string(name) + " must be an unsigned integer");
+        }
+        return result;
+    }
+
+    std::size_t GetSizeMemberOrDefault(
+        const JsonValue& object,
+        const char* name,
+        std::size_t defaultValue = 0U)
+    {
+        const auto* value = Internal::FindJsonMember(object, name);
+        if (value == nullptr)
+        {
+            return defaultValue;
+        }
+
+        std::size_t result = 0U;
+        if (!Internal::TryGetJsonSize(*value, result))
+        {
+            throw InvalidGLTFException(
+                std::string(name) + " must be an unsigned integer");
+        }
+        return result;
+    }
+
+    float GetFloatMemberOrDefault(
+        const JsonValue& object,
+        const char* name,
+        float defaultValue)
+    {
+        const auto* value = Internal::FindJsonMember(object, name);
+        if (value == nullptr)
+        {
+            return defaultValue;
+        }
+
+        float result = 0.0F;
+        if (!Internal::TryGetJsonFloat(*value, result))
+        {
+            throw InvalidGLTFException(
+                std::string(name) + " must be a finite number");
+        }
+        return result;
+    }
+
+    std::string GetUInt32MemberAsString(
+        const JsonValue& object,
+        const char* name)
+    {
+        const auto* value = Internal::FindJsonMember(object, name);
+        if (value == nullptr)
+        {
+            return {};
+        }
+        return std::to_string(ReadUInt32(
+            *value,
+            std::string(name) + " must be an unsigned integer"));
+    }
+
+    std::string GetSizeMemberAsString(
+        const JsonValue& object,
+        const char* name)
+    {
+        const auto* value = Internal::FindJsonMember(object, name);
+        if (value == nullptr)
+        {
+            return {};
+        }
+        return std::to_string(ReadSize(
+            *value,
+            std::string(name) + " must be an unsigned integer"));
+    }
+
+    std::vector<float> GetFloatArrayMember(
+        const JsonValue& object,
+        const char* name,
+        const std::string& arrayError,
+        const std::string& elementError)
+    {
+        const auto* value = Internal::FindJsonMember(object, name);
+        if (value == nullptr)
+        {
+            return {};
+        }
+
+        Internal::RequireJsonArray(*value, arrayError);
+        std::vector<float> result;
+        const std::size_t size = Internal::GetJsonArraySize(*value);
+        result.reserve(size);
+        for (std::size_t index = 0U; index < size; ++index)
+        {
+            result.push_back(ReadFloat(
+                Internal::GetJsonArrayElement(
+                    *value, index, elementError),
+                elementError));
+        }
+        return result;
+    }
+
+    std::vector<float> GetFixedSizeFloatArray(
+        const JsonValue& object,
         const char* memberName,
-        size_t expectedSize,
-        const char* arrayDescription)
+        std::size_t expectedSize,
+        const char* error)
     {
-        auto it = v.FindMember(memberName);
-        // Defensive: callers are expected to have already handled the
-        // missing-member case (these fields are optional with default
-        // values in glTF), but dereferencing v.MemberEnd() is undefined
-        // behaviour, so guard inside the helper too.
-        if (it == v.MemberEnd())
+        const auto* value =
+            Internal::FindJsonMember(object, memberName);
+        if (value == nullptr ||
+            !Internal::IsJsonArray(*value) ||
+            Internal::GetJsonArraySize(*value) != expectedSize)
         {
-            throw InvalidGLTFException(arrayDescription);
+            throw InvalidGLTFException(error);
         }
-        const rapidjson::Value& a = it->value;
-        if (!a.IsArray() || a.Size() != expectedSize)
+
+        std::vector<float> result;
+        result.reserve(expectedSize);
+        for (std::size_t index = 0U;
+             index < expectedSize;
+             ++index)
         {
-            throw InvalidGLTFException(arrayDescription);
-        }
-        for (rapidjson::Value::ConstValueIterator ait = a.Begin(); ait != a.End(); ++ait)
-        {
-            if (!ait->IsNumber())
+            float element = 0.0F;
+            if (!Internal::TryGetJsonFloat(
+                    Internal::GetJsonArrayElement(
+                        *value, index, error),
+                    element))
             {
-                throw InvalidGLTFException(arrayDescription);
+                throw InvalidGLTFException(error);
+            }
+            result.push_back(element);
+        }
+        return result;
+    }
+
+    void ParseExtensions(
+        const JsonValue& value,
+        glTFProperty& property,
+        const ExtensionDeserializer& extensionDeserializer)
+    {
+        const auto* extensions =
+            Internal::FindJsonMember(value, "extensions");
+        if (extensions == nullptr)
+        {
+            return;
+        }
+
+        for (const auto& name : Internal::GetJsonObjectMemberNames(
+                 *extensions,
+                 "The extensions member must be a JSON object"))
+        {
+            const auto* extension =
+                Internal::FindJsonMember(*extensions, name);
+            ExtensionPair extensionPair = {
+                name,
+                Internal::WriteJson(*extension)
+            };
+
+            if (extensionDeserializer.HasHandler(
+                    extensionPair.name, property) ||
+                extensionDeserializer.HasHandler(extensionPair.name))
+            {
+                property.SetExtension(
+                    extensionDeserializer.Deserialize(
+                        extensionPair, property));
+            }
+            else
+            {
+                property.extensions.emplace(
+                    std::move(extensionPair.name),
+                    std::move(extensionPair.value));
             }
         }
-        return a;
     }
 
-    void ParseExtensions(const rapidjson::Value& v, glTFProperty& node, const ExtensionDeserializer& extensionDeserializer)
+    void ParseExtras(
+        const JsonValue& value,
+        glTFProperty& property)
     {
-        const auto& extensionsIt = v.FindMember("extensions");
-        if (extensionsIt != v.MemberEnd())
+        const auto* extras =
+            Internal::FindJsonMember(value, "extras");
+        if (extras != nullptr)
         {
-            const rapidjson::Value& extensionsObject = extensionsIt->value;
-            RequireObject(extensionsObject, "The extensions member must be a JSON object");
-            for (const auto& entry : extensionsObject.GetObject())
-            {
-                ExtensionPair extensionPair = { entry.name.GetString(), Serialize(entry.value) };
-
-                if (extensionDeserializer.HasHandler(extensionPair.name, node) ||
-                    extensionDeserializer.HasHandler(extensionPair.name))
-                {
-                    node.SetExtension(extensionDeserializer.Deserialize(extensionPair, node));
-                }
-                else
-                {
-                    node.extensions.emplace(std::move(extensionPair.name), std::move(extensionPair.value));
-                }
-            }
+            property.extras = Internal::WriteJson(*extras);
         }
     }
 
-    void ParseExtras(const rapidjson::Value& v, glTFProperty& node)
+    void ParseProperty(
+        const JsonValue& value,
+        glTFProperty& property,
+        const ExtensionDeserializer& extensionDeserializer)
     {
-        rapidjson::Value::ConstMemberIterator it;
-        if (TryFindMember("extras", v, it))
-        {
-            const rapidjson::Value& a = it->value;
-            node.extras = Serialize(a);
-        }
+        ParseExtensions(value, property, extensionDeserializer);
+        ParseExtras(value, property);
     }
 
-    void ParseProperty(const rapidjson::Value& v, glTFProperty& node, const ExtensionDeserializer& extensionDeserializer)
+    void ParseTextureInfo(
+        const JsonValue& value,
+        TextureInfo& textureInfo,
+        const ExtensionDeserializer& extensionDeserializer)
     {
-        ParseExtensions(v, node, extensionDeserializer);
-        ParseExtras(v, node);
-    }
-
-    void ParseTextureInfo(const rapidjson::Value& v, TextureInfo& textureInfo, const ExtensionDeserializer& extensionDeserializer)
-    {
-        if (!v.IsObject())
-        {
-            throw InvalidGLTFException("TextureInfo must be a JSON object");
-        }
-        auto textureIndexIt = FindRequiredMember("index", v);
-        if (!textureIndexIt->value.IsUint())
-        {
-            throw InvalidGLTFException("TextureInfo.index must be an unsigned integer");
-        }
-        textureInfo.textureId = std::to_string(textureIndexIt->value.GetUint());
-        textureInfo.texCoord = GetMemberValueOrDefault<size_t>(v, "texCoord", 0U);
-        ParseProperty(v, textureInfo, extensionDeserializer);
+        Internal::RequireJsonObject(
+            value, "TextureInfo must be a JSON object");
+        const auto& index = Internal::RequireJsonMember(
+            value,
+            "index",
+            "TextureInfo.index was not found");
+        textureInfo.textureId = std::to_string(ReadUInt32(
+            index,
+            "TextureInfo.index must be an unsigned integer"));
+        textureInfo.texCoord =
+            GetSizeMemberOrDefault(value, "texCoord", 0U);
+        ParseProperty(value, textureInfo, extensionDeserializer);
     }
 
     template<typename T>
     IndexedContainer<const T> DeserializeToIndexedContainer(
         const char* name,
-        const rapidjson::Value& value,
+        const JsonValue& value,
         const ExtensionDeserializer& extensionDeserializer,
-        T(*fn)(const rapidjson::Value&, const ExtensionDeserializer&))
+        T(*parse)(const JsonValue&, const ExtensionDeserializer&))
     {
         IndexedContainer<const T> items;
-
-        rapidjson::Value::ConstMemberIterator it;
-        if (TryFindMember(name, value, it))
+        const auto* array = Internal::FindJsonMember(value, name);
+        if (array == nullptr)
         {
-            if (!it->value.IsArray())
+            return items;
+        }
+
+        const std::string arrayError =
+            std::string(name) + " must be a JSON array";
+        Internal::RequireJsonArray(*array, arrayError);
+        const std::string elementError =
+            std::string(name) +
+            " array elements must be JSON objects";
+        const std::size_t size = Internal::GetJsonArraySize(*array);
+
+        for (std::size_t index = 0U; index < size; ++index)
+        {
+            const auto& element = Internal::GetJsonArrayElement(
+                *array, index, elementError);
+            Internal::RequireJsonObject(element, elementError);
+            try
             {
-                throw InvalidGLTFException(std::string(name) + " must be a JSON array");
+                const auto& item = items.Append(
+                    parse(element, extensionDeserializer),
+                    AppendIdPolicy::GenerateOnEmpty);
+                (void)item;
+                assert(item.id == std::to_string(index));
             }
-
-            const std::string elementError = std::string(name) + " array elements must be JSON objects";
-            size_t index = 0;
-
-            for (auto& valueArray : it->value.GetArray())
+            catch (const InvalidGLTFException& exception)
             {
-                RequireObject(valueArray, elementError.c_str());
-                try
-                {
-                    const auto& item = items.Append(fn(valueArray, extensionDeserializer), AppendIdPolicy::GenerateOnEmpty);
-                    const auto& itemId = item.id;
-
-                    (void)itemId;   // To disable unused-variable warnings when assert is compiled away.
-                    assert(itemId == std::to_string(index));
-                }
-                catch (const InvalidGLTFException& e)
-                {
-                    std::cerr << "Could not parse " << name << "[" << index << "]: " << e.what() << "\n";
-                    throw;
-                }
-
-                ++index;
+                std::cerr
+                    << "Could not parse " << name << "[" << index
+                    << "]: " << exception.what() << "\n";
+                throw;
             }
         }
 
         return items;
     }
 
-    Asset ParseAsset(const rapidjson::Value& assetValue, const ExtensionDeserializer& extensionDeserializer)
+    Asset ParseAsset(
+        const JsonValue& value,
+        const ExtensionDeserializer& extensionDeserializer)
     {
         Asset asset;
-
-        asset.copyright = GetMemberValueOrDefault<std::string>(assetValue, "copyright");
-        asset.generator = GetMemberValueOrDefault<std::string>(assetValue, "generator");
-        asset.version = FindRequiredMember("version", assetValue)->value.GetString();
-        asset.minVersion = GetMemberValueOrDefault<std::string>(assetValue, "minVersion");
-
-        ParseProperty(assetValue, asset, extensionDeserializer);
-
+        asset.copyright =
+            GetStringMemberOrDefault(value, "copyright");
+        asset.generator =
+            GetStringMemberOrDefault(value, "generator");
+        asset.version = ReadString(
+            Internal::RequireJsonMember(
+                value, "version", "The member version was not found"),
+            "Asset version must be a string");
+        asset.minVersion =
+            GetStringMemberOrDefault(value, "minVersion");
+        ParseProperty(value, asset, extensionDeserializer);
         return asset;
     }
 
-    Accessor ParseAccessor(const rapidjson::Value& v, const ExtensionDeserializer& extensionDeserializer)
+    Accessor ParseAccessor(
+        const JsonValue& value,
+        const ExtensionDeserializer& extensionDeserializer)
     {
         Accessor accessor;
-        accessor.name = GetMemberValueOrDefault<std::string>(v, "name");
+        accessor.name = GetStringMemberOrDefault(value, "name");
 
-        rapidjson::Value::ConstMemberIterator it;
-
-        if (TryFindMember("sparse", v, it)) 
+        const auto* sparse =
+            Internal::FindJsonMember(value, "sparse");
+        if (sparse != nullptr)
         {
-            const rapidjson::Value& sparseMember = it->value;
-            const rapidjson::Value& sparseIndicesMember = FindRequiredMember("indices", sparseMember)->value;
-            const rapidjson::Value& sparseValuesMember = FindRequiredMember("values", sparseMember)->value;
+            Internal::RequireJsonObject(
+                *sparse, "Accessor sparse must be a JSON object");
+            const auto& sparseIndices = Internal::RequireJsonMember(
+                *sparse,
+                "indices",
+                "The member indices was not found");
+            const auto& sparseValues = Internal::RequireJsonMember(
+                *sparse,
+                "values",
+                "The member values was not found");
+            Internal::RequireJsonObject(
+                sparseIndices,
+                "Accessor sparse indices must be a JSON object");
+            Internal::RequireJsonObject(
+                sparseValues,
+                "Accessor sparse values must be a JSON object");
 
-            accessor.sparse.count = GetValue<size_t>(FindRequiredMember("count", sparseMember)->value);
+            accessor.sparse.count = ReadSize(
+                Internal::RequireJsonMember(
+                    *sparse,
+                    "count",
+                    "The member count was not found"),
+                "Accessor sparse count must be an unsigned integer");
+            accessor.sparse.indicesBufferViewId = std::to_string(
+                ReadUInt32(
+                    Internal::RequireJsonMember(
+                        sparseIndices,
+                        "bufferView",
+                        "The member bufferView was not found"),
+                    "Accessor sparse indices bufferView must be an "
+                    "unsigned integer"));
+            accessor.sparse.indicesComponentType =
+                Accessor::GetComponentType(ReadUInt32(
+                    Internal::RequireJsonMember(
+                        sparseIndices,
+                        "componentType",
+                        "The member componentType was not found"),
+                    "Accessor sparse indices componentType must be an "
+                    "unsigned integer"));
+            accessor.sparse.indicesByteOffset =
+                GetSizeMemberOrDefault(
+                    sparseIndices, "byteOffset");
+            accessor.sparse.valuesBufferViewId = std::to_string(
+                ReadUInt32(
+                    Internal::RequireJsonMember(
+                        sparseValues,
+                        "bufferView",
+                        "The member bufferView was not found"),
+                    "Accessor sparse values bufferView must be an "
+                    "unsigned integer"));
+            accessor.sparse.valuesByteOffset =
+                GetSizeMemberOrDefault(
+                    sparseValues, "byteOffset");
 
-            accessor.sparse.indicesBufferViewId = std::to_string(FindRequiredMember("bufferView", sparseIndicesMember)->value.GetUint());
-            accessor.sparse.indicesComponentType = Accessor::GetComponentType(FindRequiredMember("componentType", sparseIndicesMember)->value.GetUint());
-            accessor.sparse.indicesByteOffset = GetMemberValueOrDefault<size_t>(sparseIndicesMember, "byteOffset");
-
-            accessor.sparse.valuesBufferViewId = std::to_string(FindRequiredMember("bufferView", sparseValuesMember)->value.GetUint());
-            accessor.sparse.valuesByteOffset = GetMemberValueOrDefault<size_t>(sparseValuesMember, "byteOffset");
-
-            if (TryFindMember("bufferView", v, it))
+            const auto* bufferView =
+                Internal::FindJsonMember(value, "bufferView");
+            if (bufferView != nullptr)
             {
-                accessor.bufferViewId = std::to_string(it->value.GetUint());
+                accessor.bufferViewId = std::to_string(ReadUInt32(
+                    *bufferView,
+                    "Accessor bufferView must be an unsigned integer"));
             }
         }
         else
         {
-            accessor.bufferViewId = GetMemberValueAsString<size_t>(v, "bufferView");
+            accessor.bufferViewId =
+                GetSizeMemberAsString(value, "bufferView");
         }
 
-        accessor.byteOffset = GetMemberValueOrDefault<size_t>(v, "byteOffset");
-        accessor.componentType = Accessor::GetComponentType(FindRequiredMember("componentType", v)->value.GetUint());
-        accessor.normalized = GetMemberValueOrDefault<bool>(v, "normalized", false);
-        accessor.count = GetValue<size_t>(FindRequiredMember("count", v)->value);
-        accessor.type = Accessor::ParseType(FindRequiredMember("type", v)->value.GetString());
+        accessor.byteOffset =
+            GetSizeMemberOrDefault(value, "byteOffset");
+        accessor.componentType = Accessor::GetComponentType(
+            ReadUInt32(
+                Internal::RequireJsonMember(
+                    value,
+                    "componentType",
+                    "The member componentType was not found"),
+                "Accessor componentType must be an unsigned integer"));
+        accessor.normalized =
+            GetBooleanMemberOrDefault(value, "normalized", false);
+        accessor.count = ReadSize(
+            Internal::RequireJsonMember(
+                value, "count", "The member count was not found"),
+            "Accessor count must be an unsigned integer");
+        accessor.type = Accessor::ParseType(ReadString(
+            Internal::RequireJsonMember(
+                value, "type", "The member type was not found"),
+            "Accessor type must be a string"));
 
-        if (TryFindMember("min", v, it))
-        {
-            for (rapidjson::Value::ConstValueIterator ait = it->value.Begin(); ait != it->value.End(); ++ait)
-            {
-                accessor.min.push_back(static_cast<float>(ait->GetDouble()));
-            }
-        }
+        accessor.min = GetFloatArrayMember(
+            value,
+            "min",
+            "Accessor min must be a JSON array",
+            "Accessor min array elements must be JSON numbers");
+        accessor.max = GetFloatArrayMember(
+            value,
+            "max",
+            "Accessor max must be a JSON array",
+            "Accessor max array elements must be JSON numbers");
 
-        if (TryFindMember("max", v, it))
-        {
-            for (rapidjson::Value::ConstValueIterator ait = it->value.Begin(); ait != it->value.End(); ++ait)
-            {
-                accessor.max.push_back(static_cast<float>(ait->GetDouble()));
-            }
-        }
-
-        ParseProperty(v, accessor, extensionDeserializer);
-
+        ParseProperty(value, accessor, extensionDeserializer);
         return accessor;
     }
 
-    BufferView ParseBufferView(const rapidjson::Value& v, const ExtensionDeserializer& extensionDeserializer)
+    BufferView ParseBufferView(
+        const JsonValue& value,
+        const ExtensionDeserializer& extensionDeserializer)
     {
-        BufferView bv;
+        BufferView bufferView;
+        bufferView.name = GetStringMemberOrDefault(value, "name");
+        bufferView.bufferId = std::to_string(ReadUInt32(
+            Internal::RequireJsonMember(
+                value, "buffer", "The member buffer was not found"),
+            "BufferView buffer must be an unsigned integer"));
+        bufferView.byteOffset =
+            GetSizeMemberOrDefault(value, "byteOffset");
+        bufferView.byteLength = ReadSize(
+            Internal::RequireJsonMember(
+                value,
+                "byteLength",
+                "The member byteLength was not found"),
+            "BufferView byteLength must be an unsigned integer");
 
-        bv.name = GetMemberValueOrDefault<std::string>(v, "name");
-        bv.bufferId = std::to_string(FindRequiredMember("buffer", v)->value.GetUint());
-        bv.byteOffset = GetMemberValueOrDefault<size_t>(v, "byteOffset");
-        bv.byteLength = GetValue<size_t>(FindRequiredMember("byteLength", v)->value);
-
-        auto itByteStride = v.FindMember("byteStride");
-        if (itByteStride != v.MemberEnd())
+        const auto* byteStride =
+            Internal::FindJsonMember(value, "byteStride");
+        if (byteStride != nullptr)
         {
-            bv.byteStride = itByteStride->value.GetUint();
+            bufferView.byteStride = ReadUInt32(
+                *byteStride,
+                "BufferView byteStride must be an unsigned integer");
         }
 
-        // When target is not provided, the bufferView contains animation or skin data
-        auto itTarget = v.FindMember("target");
-        if (itTarget != v.MemberEnd())
+        const auto* target =
+            Internal::FindJsonMember(value, "target");
+        if (target != nullptr)
         {
-            bv.target = static_cast<BufferViewTarget>(itTarget->value.GetUint());
+            bufferView.target = static_cast<BufferViewTarget>(
+                ReadUInt32(
+                    *target,
+                    "BufferView target must be an unsigned integer"));
         }
 
-        ParseProperty(v, bv, extensionDeserializer);
-
-        return bv;
+        ParseProperty(value, bufferView, extensionDeserializer);
+        return bufferView;
     }
 
-    Scene ParseScene(const rapidjson::Value& v, const ExtensionDeserializer& extensionDeserializer)
+    Scene ParseScene(
+        const JsonValue& value,
+        const ExtensionDeserializer& extensionDeserializer)
     {
         Scene scene;
-        scene.name = GetMemberValueOrDefault<std::string>(v, "name");
+        scene.name = GetStringMemberOrDefault(value, "name");
 
-        rapidjson::Value::ConstMemberIterator it = v.FindMember("nodes");
-        if (it != v.MemberEnd())
+        const auto* nodes =
+            Internal::FindJsonMember(value, "nodes");
+        if (nodes != nullptr)
         {
-            const rapidjson::Value& a = it->value;
-            scene.nodes.reserve(a.Capacity());
-            for (rapidjson::Value::ConstValueIterator ait = a.Begin(); ait != a.End(); ++ait)
+            Internal::RequireJsonArray(
+                *nodes, "Scene nodes must be a JSON array");
+            const std::size_t size =
+                Internal::GetJsonArraySize(*nodes);
+            scene.nodes.reserve(size);
+            for (std::size_t index = 0U; index < size; ++index)
             {
-                scene.nodes.push_back(std::to_string(ait->GetUint()));
+                scene.nodes.push_back(std::to_string(ReadUInt32(
+                    Internal::GetJsonArrayElement(
+                        *nodes,
+                        index,
+                        "Scene node index is missing"),
+                    "Scene node indices must be unsigned integers")));
             }
         }
 
-        ParseProperty(v, scene, extensionDeserializer);
-
+        ParseProperty(value, scene, extensionDeserializer);
         return scene;
     }
 
-    MorphTarget ParseTarget(const rapidjson::Value& v)
+    MorphTarget ParseTarget(const JsonValue& value)
     {
         MorphTarget target;
-        target.positionsAccessorId = GetMemberValueAsString<uint32_t>(v, ACCESSOR_POSITION);
-        target.normalsAccessorId = GetMemberValueAsString<uint32_t>(v, ACCESSOR_NORMAL);
-        target.tangentsAccessorId = GetMemberValueAsString<uint32_t>(v, ACCESSOR_TANGENT);
-
+        target.positionsAccessorId =
+            GetUInt32MemberAsString(value, ACCESSOR_POSITION);
+        target.normalsAccessorId =
+            GetUInt32MemberAsString(value, ACCESSOR_NORMAL);
+        target.tangentsAccessorId =
+            GetUInt32MemberAsString(value, ACCESSOR_TANGENT);
         return target;
     }
 
-    void ParseTargets(const rapidjson::Value& v, MeshPrimitive& primitive)
+    void ParseTargets(
+        const JsonValue& value,
+        MeshPrimitive& primitive)
     {
-        rapidjson::Value::ConstMemberIterator it = v.FindMember("targets");
-        if (it != v.MemberEnd())
+        const auto* targets =
+            Internal::FindJsonMember(value, "targets");
+        if (targets == nullptr)
         {
-            const rapidjson::Value& a = it->value;
-            primitive.targets.reserve(a.Capacity());
-            for (rapidjson::Value::ConstValueIterator ait = a.Begin(); ait != a.End(); ++ait)
-            {
-                primitive.targets.push_back(ParseTarget(*ait));
-            }
+            return;
+        }
+
+        Internal::RequireJsonArray(
+            *targets, "MeshPrimitive targets must be a JSON array");
+        const std::size_t size =
+            Internal::GetJsonArraySize(*targets);
+        primitive.targets.reserve(size);
+        for (std::size_t index = 0U; index < size; ++index)
+        {
+            const auto& target = Internal::GetJsonArrayElement(
+                *targets,
+                index,
+                "MeshPrimitive target is missing");
+            Internal::RequireJsonObject(
+                target,
+                "MeshPrimitive targets array elements must be JSON objects");
+            primitive.targets.push_back(ParseTarget(target));
         }
     }
 
-    MeshPrimitive ParseMeshPrimitive(const rapidjson::Value& v, const ExtensionDeserializer& extensionDeserializer)
+    MeshPrimitive ParseMeshPrimitive(
+        const JsonValue& value,
+        const ExtensionDeserializer& extensionDeserializer)
     {
         MeshPrimitive primitive;
-
-        rapidjson::Value::ConstMemberIterator it = v.FindMember("attributes");
-        if (it != v.MemberEnd())
+        const auto* attributes =
+            Internal::FindJsonMember(value, "attributes");
+        if (attributes != nullptr)
         {
-            RequireObject(it->value, "MeshPrimitive attributes must be a JSON object");
-            const auto& attributes = it->value.GetObject();
-
-            for (const auto& attribute : attributes)
+            for (const auto& name :
+                 Internal::GetJsonObjectMemberNames(
+                     *attributes,
+                     "MeshPrimitive attributes must be a JSON object"))
             {
-                auto name = attribute.name.GetString();
-                primitive.attributes[name] = std::to_string(attribute.value.Get<uint32_t>());
+                primitive.attributes[name] = std::to_string(
+                    ReadUInt32(
+                        *Internal::FindJsonMember(*attributes, name),
+                        "MeshPrimitive attribute indices must be "
+                        "unsigned integers"));
             }
         }
 
-        primitive.indicesAccessorId = GetMemberValueAsString<uint32_t>(v, "indices");
-        primitive.materialId = GetMemberValueAsString<uint32_t>(v, "material");
-        primitive.mode = static_cast<MeshMode>(GetMemberValueOrDefault<int>(v, "mode", MESH_TRIANGLES));
-        ParseTargets(v, primitive);
-
-        ParseProperty(v, primitive, extensionDeserializer);
-
+        primitive.indicesAccessorId =
+            GetUInt32MemberAsString(value, "indices");
+        primitive.materialId =
+            GetUInt32MemberAsString(value, "material");
+        const std::int32_t mode = GetInt32MemberOrDefault(
+            value, "mode", MESH_TRIANGLES);
+        if (mode < MESH_POINTS || mode > MESH_TRIANGLE_FAN)
+        {
+            throw InvalidGLTFException(
+                "MeshPrimitive mode is outside the valid enum range");
+        }
+        primitive.mode = static_cast<MeshMode>(mode);
+        ParseTargets(value, primitive);
+        ParseProperty(value, primitive, extensionDeserializer);
         return primitive;
     }
 
-    Mesh ParseMesh(const rapidjson::Value& v, const ExtensionDeserializer& extensionDeserializer)
+    Mesh ParseMesh(
+        const JsonValue& value,
+        const ExtensionDeserializer& extensionDeserializer)
     {
         Mesh mesh;
-        mesh.name = GetMemberValueOrDefault<std::string>(v, "name");
+        mesh.name = GetStringMemberOrDefault(value, "name");
 
-        rapidjson::Value::ConstMemberIterator it = v.FindMember("primitives");
-
-        if (it != v.MemberEnd())
+        const auto* primitives =
+            Internal::FindJsonMember(value, "primitives");
+        if (primitives != nullptr)
         {
-            const rapidjson::Value& a = it->value;
-            mesh.primitives.reserve(a.Capacity());
-            for (rapidjson::Value::ConstValueIterator ait = a.Begin(); ait != a.End(); ++ait)
+            Internal::RequireJsonArray(
+                *primitives,
+                "Mesh primitives must be a JSON array");
+            const std::size_t size =
+                Internal::GetJsonArraySize(*primitives);
+            mesh.primitives.reserve(size);
+            for (std::size_t index = 0U; index < size; ++index)
             {
-                mesh.primitives.push_back(ParseMeshPrimitive(*ait, extensionDeserializer));
+                const auto& primitive =
+                    Internal::GetJsonArrayElement(
+                        *primitives,
+                        index,
+                        "Mesh primitive is missing");
+                Internal::RequireJsonObject(
+                    primitive,
+                    "Mesh primitives array elements must be JSON objects");
+                mesh.primitives.push_back(
+                    ParseMeshPrimitive(
+                        primitive, extensionDeserializer));
             }
         }
 
-        mesh.weights = RapidJsonUtils::ToFloatArray(v, "weights");
-
-        ParseProperty(v, mesh, extensionDeserializer);
-
+        mesh.weights = GetFloatArrayMember(
+            value,
+            "weights",
+            "The weights member must be a JSON array",
+            "The weights array elements must be JSON numbers");
+        ParseProperty(value, mesh, extensionDeserializer);
         return mesh;
     }
 
-    void ParseNodeScale(const rapidjson::Value& v, Node& node)
+    void ParseNodeScale(
+        const JsonValue& value,
+        Node& node)
     {
-        auto it = v.FindMember("scale");
-        if (it == v.MemberEnd())
+        if (Internal::FindJsonMember(value, "scale") == nullptr)
         {
             node.scale = Vector3::ONE;
             return;
         }
 
-        const rapidjson::Value& a = GetFixedSizeNumericArray(v, "scale", 3U,
+        const auto elements = GetFixedSizeFloatArray(
+            value,
+            "scale",
+            3U,
             "A node must have a scale with 3 numeric elements");
-
-        rapidjson::Value::ConstValueIterator ait = a.Begin();
-        node.scale.x = ait++->GetFloat();
-        node.scale.y = ait++->GetFloat();
-        node.scale.z = ait->GetFloat();
+        node.scale = Vector3(
+            elements[0], elements[1], elements[2]);
     }
 
-    void ParseNodeTranslation(const rapidjson::Value& v, Node& node)
+    void ParseNodeTranslation(
+        const JsonValue& value,
+        Node& node)
     {
-        auto it = v.FindMember("translation");
-        if (it == v.MemberEnd())
+        if (Internal::FindJsonMember(
+                value, "translation") == nullptr)
         {
             node.translation = Vector3::ZERO;
             return;
         }
 
-        const rapidjson::Value& a = GetFixedSizeNumericArray(v, "translation", 3U,
+        const auto elements = GetFixedSizeFloatArray(
+            value,
+            "translation",
+            3U,
             "A node must have a translation with 3 numeric elements");
-
-        rapidjson::Value::ConstValueIterator ait = a.Begin();
-        node.translation.x = ait++->GetFloat();
-        node.translation.y = ait++->GetFloat();
-        node.translation.z = ait->GetFloat();
+        node.translation = Vector3(
+            elements[0], elements[1], elements[2]);
     }
 
-    void ParseNodeRotation(const rapidjson::Value& v, Node& node)
+    void ParseNodeRotation(
+        const JsonValue& value,
+        Node& node)
     {
-        auto it = v.FindMember("rotation");
-        if (it == v.MemberEnd())
+        if (Internal::FindJsonMember(value, "rotation") == nullptr)
         {
-            node.rotation = Quaternion(0.0f, 0.0f, 0.0f, 1.0f);
+            node.rotation =
+                Quaternion(0.0F, 0.0F, 0.0F, 1.0F);
             return;
         }
 
-        const rapidjson::Value& a = GetFixedSizeNumericArray(v, "rotation", 4U,
+        const auto elements = GetFixedSizeFloatArray(
+            value,
+            "rotation",
+            4U,
             "A node must have a rotation with 4 numeric elements");
-
-        rapidjson::Value::ConstValueIterator ait = a.Begin();
-        node.rotation.x = ait++->GetFloat();
-        node.rotation.y = ait++->GetFloat();
-        node.rotation.z = ait++->GetFloat();
-        node.rotation.w = ait->GetFloat();
+        node.rotation = Quaternion(
+            elements[0],
+            elements[1],
+            elements[2],
+            elements[3]);
     }
 
-    void ParseNodeMatrix(const rapidjson::Value& v, Node& node)
+    void ParseNodeMatrix(
+        const JsonValue& value,
+        Node& node)
     {
-        auto it = v.FindMember("matrix");
-        if (it == v.MemberEnd())
+        if (Internal::FindJsonMember(value, "matrix") == nullptr)
         {
-            ParseNodeScale(v, node);
-            ParseNodeTranslation(v, node);
-            ParseNodeRotation(v, node);
+            ParseNodeScale(value, node);
+            ParseNodeTranslation(value, node);
+            ParseNodeRotation(value, node);
             return;
         }
 
-        const rapidjson::Value& a = GetFixedSizeNumericArray(v, "matrix", 16U,
-            "A node must have a matrix transform with 16 numeric elements");
-
-        uint8_t index = 0;
-        for (rapidjson::Value::ConstValueIterator ait = a.Begin(); ait != a.End(); ++ait)
+        const auto elements = GetFixedSizeFloatArray(
+            value,
+            "matrix",
+            16U,
+            "A node must have a matrix transform with 16 numeric "
+            "elements");
+        for (std::size_t index = 0U;
+             index < elements.size();
+             ++index)
         {
-            node.matrix.values[index] = static_cast<float>(ait->GetDouble());
-            index++;
+            node.matrix.values[index] = elements[index];
         }
     }
 
-    void ParseNodeChildren(const rapidjson::Value& v, Node& node)
+    void ParseNodeChildren(
+        const JsonValue& value,
+        Node& node)
     {
-        rapidjson::Value::ConstMemberIterator it = v.FindMember("children");
-        if (it != v.MemberEnd())
+        const auto* children =
+            Internal::FindJsonMember(value, "children");
+        if (children == nullptr)
         {
-            const rapidjson::Value& a = it->value;
-            // children is an array of node indices; anything else must be
-            // rejected before reading array accessors, which are only
-            // well-defined on a JSON array.
-            if (!a.IsArray())
-            {
-                throw InvalidGLTFException("Node children must be a JSON array");
-            }
-            node.children.reserve(a.Size());
-            for (rapidjson::Value::ConstValueIterator ait = a.Begin(); ait != a.End(); ++ait)
-            {
-                if (!ait->IsUint())
-                {
-                    throw InvalidGLTFException("Node children array elements must be unsigned integers");
-                }
-                node.children.push_back(std::to_string(ait->GetUint()));
-            }
+            return;
+        }
+
+        Internal::RequireJsonArray(
+            *children,
+            "Node children must be a JSON array");
+        const std::size_t size =
+            Internal::GetJsonArraySize(*children);
+        node.children.reserve(size);
+        for (std::size_t index = 0U; index < size; ++index)
+        {
+            node.children.push_back(std::to_string(ReadUInt32(
+                Internal::GetJsonArrayElement(
+                    *children,
+                    index,
+                    "Node child index is missing"),
+                "Node children array elements must be unsigned integers")));
         }
     }
 
-    Camera ParseCamera(const rapidjson::Value& v, const ExtensionDeserializer& extensionDeserializer)
+    Camera ParseCamera(
+        const JsonValue& value,
+        const ExtensionDeserializer& extensionDeserializer)
     {
         std::unique_ptr<Projection> projection;
-        std::string projectionType = FindRequiredMember("type", v)->value.GetString();
+        const std::string projectionType = ReadString(
+            Internal::RequireJsonMember(
+                value, "type", "The member type was not found"),
+            "Camera type must be a string");
 
         if (projectionType == "perspective")
         {
-            auto perspectiveIt = v.FindMember("perspective");
-            if (perspectiveIt == v.MemberEnd())
+            const auto* perspectiveValue =
+                Internal::FindJsonMember(value, "perspective");
+            if (perspectiveValue == nullptr)
             {
-                throw InvalidGLTFException("Camera perspective projection undefined");
+                throw InvalidGLTFException(
+                    "Camera perspective projection undefined");
             }
-            RequireObject(perspectiveIt->value, "Camera perspective must be a JSON object");
+            Internal::RequireJsonObject(
+                *perspectiveValue,
+                "Camera perspective must be a JSON object");
 
             Optional<float> aspectRatio;
-
-            auto itAspectRatio = perspectiveIt->value.FindMember("aspectRatio");
-            if (itAspectRatio != perspectiveIt->value.MemberEnd())
+            const auto* aspect =
+                Internal::FindJsonMember(
+                    *perspectiveValue, "aspectRatio");
+            if (aspect != nullptr)
             {
-                aspectRatio = itAspectRatio->value.GetFloat();
+                aspectRatio = ReadFloat(
+                    *aspect,
+                    "Camera perspective aspectRatio must be a number");
             }
 
-            float yfov = GetValue<float>(FindRequiredMember("yfov", perspectiveIt->value)->value);
-            float znear = GetValue<float>(FindRequiredMember("znear", perspectiveIt->value)->value);
+            const float yfov = ReadFloat(
+                Internal::RequireJsonMember(
+                    *perspectiveValue,
+                    "yfov",
+                    "The member yfov was not found"),
+                "Camera perspective yfov must be a number");
+            const float znear = ReadFloat(
+                Internal::RequireJsonMember(
+                    *perspectiveValue,
+                    "znear",
+                    "The member znear was not found"),
+                "Camera perspective znear must be a number");
 
             Optional<float> zfar;
-
-            auto itZFar = perspectiveIt->value.FindMember("zfar");
-            if (itZFar != perspectiveIt->value.MemberEnd())
+            const auto* farValue =
+                Internal::FindJsonMember(
+                    *perspectiveValue, "zfar");
+            if (farValue != nullptr)
             {
-                zfar = itZFar->value.GetFloat();
+                zfar = ReadFloat(
+                    *farValue,
+                    "Camera perspective zfar must be a number");
             }
 
-            auto perspective = std::make_unique<Perspective>(znear, yfov);
-
+            auto perspective =
+                std::make_unique<Perspective>(znear, yfov);
             perspective->zfar = zfar;
             perspective->aspectRatio = aspectRatio;
-
-            ParseProperty(perspectiveIt->value, *perspective, extensionDeserializer);
-
+            ParseProperty(
+                *perspectiveValue,
+                *perspective,
+                extensionDeserializer);
             projection = std::move(perspective);
         }
         else if (projectionType == "orthographic")
         {
-            auto orthographicIt = v.FindMember("orthographic");
-            if (orthographicIt == v.MemberEnd())
+            const auto* orthographicValue =
+                Internal::FindJsonMember(value, "orthographic");
+            if (orthographicValue == nullptr)
             {
-                throw InvalidGLTFException("Camera orthographic projection undefined");
+                throw InvalidGLTFException(
+                    "Camera orthographic projection undefined");
             }
-            RequireObject(orthographicIt->value, "Camera orthographic must be a JSON object");
+            Internal::RequireJsonObject(
+                *orthographicValue,
+                "Camera orthographic must be a JSON object");
 
-            float xmag = GetValue<float>(FindRequiredMember("xmag", orthographicIt->value)->value);
-            float ymag = GetValue<float>(FindRequiredMember("ymag", orthographicIt->value)->value);
-            float zfar = GetValue<float>(FindRequiredMember("zfar", orthographicIt->value)->value);
-            float znear = GetValue<float>(FindRequiredMember("znear", orthographicIt->value)->value);
-            projection = std::make_unique<Orthographic>(zfar, znear, xmag, ymag);
-
-            ParseProperty(orthographicIt->value, *projection, extensionDeserializer);
+            const float xmag = ReadFloat(
+                Internal::RequireJsonMember(
+                    *orthographicValue,
+                    "xmag",
+                    "The member xmag was not found"),
+                "Camera orthographic xmag must be a number");
+            const float ymag = ReadFloat(
+                Internal::RequireJsonMember(
+                    *orthographicValue,
+                    "ymag",
+                    "The member ymag was not found"),
+                "Camera orthographic ymag must be a number");
+            const float zfar = ReadFloat(
+                Internal::RequireJsonMember(
+                    *orthographicValue,
+                    "zfar",
+                    "The member zfar was not found"),
+                "Camera orthographic zfar must be a number");
+            const float znear = ReadFloat(
+                Internal::RequireJsonMember(
+                    *orthographicValue,
+                    "znear",
+                    "The member znear was not found"),
+                "Camera orthographic znear must be a number");
+            projection = std::make_unique<Orthographic>(
+                zfar, znear, xmag, ymag);
+            ParseProperty(
+                *orthographicValue,
+                *projection,
+                extensionDeserializer);
         }
 
-        // Camera constructor will throw a GLTFException when projection is null (i.e. source manifest specified an invalid projection type)
         Camera camera(std::move(projection));
-        camera.name = GetMemberValueOrDefault<std::string>(v, "name");
-
+        camera.name = GetStringMemberOrDefault(value, "name");
         if (!camera.projection->IsValid())
         {
-            throw InvalidGLTFException("Camera's projection is not valid");
+            throw InvalidGLTFException(
+                "Camera's projection is not valid");
         }
-
-        ParseProperty(v, camera, extensionDeserializer);
-
+        ParseProperty(value, camera, extensionDeserializer);
         return camera;
     }
 
-    Node ParseNode(const rapidjson::Value& v, const ExtensionDeserializer& extensionDeserializer)
+    Node ParseNode(
+        const JsonValue& value,
+        const ExtensionDeserializer& extensionDeserializer)
     {
         Node node;
-        node.name = GetMemberValueOrDefault<std::string>(v, "name");
-
-        ParseNodeChildren(v, node);
-        node.meshId = GetMemberValueAsString<uint32_t>(v, "mesh");
-        node.skinId = GetMemberValueAsString<uint32_t>(v, "skin");
-        node.cameraId = GetMemberValueAsString<uint32_t>(v, "camera");
-        ParseNodeMatrix(v, node);
-        node.weights = RapidJsonUtils::ToFloatArray(v, "weights");
-
-        ParseProperty(v, node, extensionDeserializer);
-
+        node.name = GetStringMemberOrDefault(value, "name");
+        ParseNodeChildren(value, node);
+        node.meshId = GetUInt32MemberAsString(value, "mesh");
+        node.skinId = GetUInt32MemberAsString(value, "skin");
+        node.cameraId = GetUInt32MemberAsString(value, "camera");
+        ParseNodeMatrix(value, node);
+        node.weights = GetFloatArrayMember(
+            value,
+            "weights",
+            "The weights member must be a JSON array",
+            "The weights array elements must be JSON numbers");
+        ParseProperty(value, node, extensionDeserializer);
         return node;
     }
 
-    Buffer ParseBuffer(const rapidjson::Value& v, const ExtensionDeserializer& extensionDeserializer)
+    Buffer ParseBuffer(
+        const JsonValue& value,
+        const ExtensionDeserializer& extensionDeserializer)
     {
         Buffer buffer;
-
-        buffer.byteLength = GetValue<size_t>(FindRequiredMember("byteLength", v)->value);
-        buffer.uri = GetMemberValueOrDefault<std::string>(v, "uri");
-
-        ParseProperty(v, buffer, extensionDeserializer);
-
+        buffer.byteLength = ReadSize(
+            Internal::RequireJsonMember(
+                value,
+                "byteLength",
+                "The member byteLength was not found"),
+            "Buffer byteLength must be an unsigned integer");
+        buffer.uri = GetStringMemberOrDefault(value, "uri");
+        ParseProperty(value, buffer, extensionDeserializer);
         return buffer;
     }
 
-    Sampler ParseSampler(const rapidjson::Value& v, const ExtensionDeserializer& extensionDeserializer)
+    Sampler ParseSampler(
+        const JsonValue& value,
+        const ExtensionDeserializer& extensionDeserializer)
     {
         Sampler sampler;
+        sampler.name = GetStringMemberOrDefault(value, "name");
+        sampler.wrapT = Sampler::GetSamplerWrapMode(
+            GetUInt32MemberOrDefault(
+                value,
+                "wrapT",
+                static_cast<std::uint32_t>(
+                    WrapMode::Wrap_REPEAT)));
+        sampler.wrapS = Sampler::GetSamplerWrapMode(
+            GetUInt32MemberOrDefault(
+                value,
+                "wrapS",
+                static_cast<std::uint32_t>(
+                    WrapMode::Wrap_REPEAT)));
 
-        sampler.name = GetMemberValueOrDefault<std::string>(v, "name");
-        sampler.wrapT = Sampler::GetSamplerWrapMode(GetMemberValueOrDefault<unsigned int>(v, "wrapT", static_cast<unsigned int>(WrapMode::Wrap_REPEAT)));
-        sampler.wrapS = Sampler::GetSamplerWrapMode(GetMemberValueOrDefault<unsigned int>(v, "wrapS", static_cast<unsigned int>(WrapMode::Wrap_REPEAT)));
-
-        auto itMin = v.FindMember("minFilter");
-        if (itMin != v.MemberEnd())
+        const auto* minFilter =
+            Internal::FindJsonMember(value, "minFilter");
+        if (minFilter != nullptr)
         {
-            sampler.minFilter = Sampler::GetSamplerMinFilterMode(itMin->value.GetUint());
+            sampler.minFilter =
+                Sampler::GetSamplerMinFilterMode(ReadUInt32(
+                    *minFilter,
+                    "Sampler minFilter must be an unsigned integer"));
         }
 
-        auto itMag = v.FindMember("magFilter");
-        if (itMag != v.MemberEnd())
+        const auto* magFilter =
+            Internal::FindJsonMember(value, "magFilter");
+        if (magFilter != nullptr)
         {
-            sampler.magFilter = Sampler::GetSamplerMagFilterMode(itMag->value.GetUint());
+            sampler.magFilter =
+                Sampler::GetSamplerMagFilterMode(ReadUInt32(
+                    *magFilter,
+                    "Sampler magFilter must be an unsigned integer"));
         }
 
-        ParseProperty(v, sampler, extensionDeserializer);
-
+        ParseProperty(value, sampler, extensionDeserializer);
         return sampler;
     }
 
-    AnimationTarget ParseAnimationTarget(const rapidjson::Value& v, const ExtensionDeserializer& extensionDeserializer)
+    AnimationTarget ParseAnimationTarget(
+        const JsonValue& value,
+        const ExtensionDeserializer& extensionDeserializer)
     {
         try
         {
             AnimationTarget target;
-
-            target.nodeId = GetMemberValueAsString<uint32_t>(v, "node");
-
-            auto it = v.FindMember("path");
-            if (it != v.MemberEnd())
+            target.nodeId =
+                GetUInt32MemberAsString(value, "node");
+            const auto* path =
+                Internal::FindJsonMember(value, "path");
+            if (path != nullptr)
             {
-                target.path = ParseTargetPath(it->value.GetString());
+                target.path = ParseTargetPath(ReadString(
+                    *path,
+                    "Animation target path must be a string"));
             }
-
-            ParseProperty(v, target, extensionDeserializer);
-
+            ParseProperty(
+                value, target, extensionDeserializer);
             return target;
         }
-        catch (const InvalidGLTFException& e)
+        catch (const InvalidGLTFException& exception)
         {
-            std::cerr << "Could not parse animation target\n" << e.what() << "\n";
+            std::cerr
+                << "Could not parse animation target\n"
+                << exception.what() << "\n";
             throw;
         }
     }
 
-    AnimationChannel ParseAnimationChannel(const rapidjson::Value& v, const ExtensionDeserializer& extensionDeserializer)
+    AnimationChannel ParseAnimationChannel(
+        const JsonValue& value,
+        const ExtensionDeserializer& extensionDeserializer)
     {
         try
         {
             AnimationChannel channel;
-
-            channel.samplerId = GetMemberValueAsString<uint32_t>(v, "sampler");
-            channel.target = ParseAnimationTarget(FindRequiredMember("target", v)->value, extensionDeserializer);
-
-            ParseProperty(v, channel, extensionDeserializer);
-
+            channel.samplerId =
+                GetUInt32MemberAsString(value, "sampler");
+            const auto& target = Internal::RequireJsonMember(
+                value,
+                "target",
+                "The member target was not found");
+            Internal::RequireJsonObject(
+                target,
+                "Animation channel target must be a JSON object");
+            channel.target = ParseAnimationTarget(
+                target, extensionDeserializer);
+            ParseProperty(
+                value, channel, extensionDeserializer);
             return channel;
         }
-        catch (const InvalidGLTFException& e)
+        catch (const InvalidGLTFException& exception)
         {
-            std::cerr << "Could not parse channel\n" << e.what() << "\n";
+            std::cerr
+                << "Could not parse channel\n"
+                << exception.what() << "\n";
             throw;
         }
     }
 
-    AnimationSampler ParseAnimationSampler(const rapidjson::Value& v, const ExtensionDeserializer& extensionDeserializer)
+    AnimationSampler ParseAnimationSampler(
+        const JsonValue& value,
+        const ExtensionDeserializer& extensionDeserializer)
     {
         AnimationSampler sampler;
+        sampler.inputAccessorId =
+            GetUInt32MemberAsString(value, "input");
+        sampler.outputAccessorId =
+            GetUInt32MemberAsString(value, "output");
 
-        sampler.inputAccessorId = GetMemberValueAsString<uint32_t>(v, "input");
-        sampler.outputAccessorId = GetMemberValueAsString<uint32_t>(v, "output");
-
-        auto it = v.FindMember("interpolation");
-        if (it != v.MemberEnd())
+        const auto* interpolation =
+            Internal::FindJsonMember(value, "interpolation");
+        if (interpolation != nullptr)
         {
-            sampler.interpolation = ParseInterpolationType(it->value.GetString());
+            sampler.interpolation = ParseInterpolationType(
+                ReadString(
+                    *interpolation,
+                    "Animation interpolation must be a string"));
         }
 
-        ParseProperty(v, sampler, extensionDeserializer);
-
+        ParseProperty(value, sampler, extensionDeserializer);
         return sampler;
     }
 
-    Animation ParseAnimation(const rapidjson::Value& v, const ExtensionDeserializer& extensionDeserializer)
+    Animation ParseAnimation(
+        const JsonValue& value,
+        const ExtensionDeserializer& extensionDeserializer)
     {
-        Animation anim;
-        anim.name = GetMemberValueOrDefault<std::string>(v, "name");
-
-        anim.channels = DeserializeToIndexedContainer<AnimationChannel>("channels", v, extensionDeserializer, ParseAnimationChannel);
-
-        anim.samplers = DeserializeToIndexedContainer<AnimationSampler>("samplers", v, extensionDeserializer, ParseAnimationSampler);
-
-        ParseProperty(v, anim, extensionDeserializer);
-
-        return anim;
+        Animation animation;
+        animation.name = GetStringMemberOrDefault(value, "name");
+        animation.channels =
+            DeserializeToIndexedContainer<AnimationChannel>(
+                "channels",
+                value,
+                extensionDeserializer,
+                ParseAnimationChannel);
+        animation.samplers =
+            DeserializeToIndexedContainer<AnimationSampler>(
+                "samplers",
+                value,
+                extensionDeserializer,
+                ParseAnimationSampler);
+        ParseProperty(value, animation, extensionDeserializer);
+        return animation;
     }
 
-    Skin ParseSkin(const rapidjson::Value& v, const ExtensionDeserializer& extensionDeserializer)
+    Skin ParseSkin(
+        const JsonValue& value,
+        const ExtensionDeserializer& extensionDeserializer)
     {
         Skin skin;
+        skin.name = GetStringMemberOrDefault(value, "name");
+        skin.inverseBindMatricesAccessorId =
+            GetUInt32MemberAsString(
+                value, "inverseBindMatrices");
+        skin.skeletonId =
+            GetUInt32MemberAsString(value, "skeleton");
 
-        skin.name = GetMemberValueOrDefault<std::string>(v, "name");
-        skin.inverseBindMatricesAccessorId = GetMemberValueAsString<uint32_t>(v, "inverseBindMatrices");
-        skin.skeletonId = GetMemberValueAsString<uint32_t>(v, "skeleton");
-
-        rapidjson::Value::ConstMemberIterator it = v.FindMember("joints");
-        if (it != v.MemberEnd())
+        const auto* joints =
+            Internal::FindJsonMember(value, "joints");
+        if (joints != nullptr)
         {
-            const rapidjson::Value& a = it->value;
-            skin.jointIds.reserve(a.Capacity());
-            for (rapidjson::Value::ConstValueIterator ait = a.Begin(); ait != a.End(); ++ait)
+            Internal::RequireJsonArray(
+                *joints, "Skin joints must be a JSON array");
+            const std::size_t size =
+                Internal::GetJsonArraySize(*joints);
+            skin.jointIds.reserve(size);
+            for (std::size_t index = 0U; index < size; ++index)
             {
-                skin.jointIds.push_back(std::to_string(ait->GetInt()));
+                skin.jointIds.push_back(std::to_string(ReadUInt32(
+                    Internal::GetJsonArrayElement(
+                        *joints,
+                        index,
+                        "Skin joint index is missing"),
+                    "Skin joint indices must be unsigned integers")));
             }
         }
 
-        ParseProperty(v, skin, extensionDeserializer);
-
+        ParseProperty(value, skin, extensionDeserializer);
         return skin;
     }
 
-    void ParseExtensionsUsed(const rapidjson::Document& d, Document& gltfDocument)
+    void ParseStringSet(
+        const JsonValue& document,
+        const char* memberName,
+        std::unordered_set<std::string>& values)
     {
-        rapidjson::Value::ConstMemberIterator it;
-        if (TryFindMember("extensionsUsed", d, it))
+        const auto* array =
+            Internal::FindJsonMember(document, memberName);
+        if (array == nullptr)
         {
-            const rapidjson::Value& a = it->value;
-            for (rapidjson::Value::ConstValueIterator ait = a.Begin(); ait != a.End(); ++ait)
-            {
-                gltfDocument.extensionsUsed.insert(ait->GetString());
-            }
+            return;
         }
-    }
 
-    void ParseExtensionsRequired(const rapidjson::Document& d, Document& gltfDocument)
-    {
-        rapidjson::Value::ConstMemberIterator it;
-        if (TryFindMember("extensionsRequired", d, it))
+        Internal::RequireJsonArray(
+            *array,
+            std::string(memberName) + " must be a JSON array");
+        const std::size_t size =
+            Internal::GetJsonArraySize(*array);
+        for (std::size_t index = 0U; index < size; ++index)
         {
-            const rapidjson::Value& a = it->value;
-            for (rapidjson::Value::ConstValueIterator ait = a.Begin(); ait != a.End(); ++ait)
-            {
-                gltfDocument.extensionsRequired.insert(ait->GetString());
-            }
+            values.insert(ReadString(
+                Internal::GetJsonArrayElement(
+                    *array,
+                    index,
+                    std::string(memberName) +
+                    " element is missing"),
+                std::string(memberName) +
+                " elements must be strings"));
         }
     }
 
     void ValidateMaterial(Material& material)
     {
-        if (material.occlusionTexture.strength > 1 || material.occlusionTexture.strength < 0)
+        if (material.occlusionTexture.strength > 1.0F ||
+            material.occlusionTexture.strength < 0.0F)
         {
-            throw InvalidGLTFException("Material " + material.name + " has invalid occlusionStrength (value out of range [0,1])");
+            throw InvalidGLTFException(
+                "Material " + material.name +
+                " has invalid occlusionStrength "
+                "(value out of range [0,1])");
         }
     }
 
-    Material ParseMaterial(const rapidjson::Value& v, const ExtensionDeserializer& extensionDeserializer)
+    Material ParseMaterial(
+        const JsonValue& value,
+        const ExtensionDeserializer& extensionDeserializer)
     {
         Material material;
 
-        auto mit = v.FindMember("pbrMetallicRoughness");
-        if (mit != v.MemberEnd())
+        const auto* metallicRoughness =
+            Internal::FindJsonMember(
+                value, "pbrMetallicRoughness");
+        if (metallicRoughness != nullptr)
         {
-            RequireObject(mit->value, "pbrMetallicRoughness must be a JSON object");
-            auto& pbrMr = mit->value;
+            Internal::RequireJsonObject(
+                *metallicRoughness,
+                "pbrMetallicRoughness must be a JSON object");
 
-            // Diffuse
-            auto baseColorFactorIt = pbrMr.FindMember("baseColorFactor");
-            if (baseColorFactorIt != pbrMr.MemberEnd())
+            if (Internal::FindJsonMember(
+                    *metallicRoughness,
+                    "baseColorFactor") != nullptr)
             {
-                std::vector<float> baseColorFactor;
-                for (rapidjson::Value::ConstValueIterator ait = baseColorFactorIt->value.Begin(); ait != baseColorFactorIt->value.End(); ++ait)
-                {
-                    baseColorFactor.push_back(static_cast<float>(ait->GetDouble()));
-                }
-                if (baseColorFactor.size() != 4)
-                {
-                    throw InvalidGLTFException("baseColorFactor must be an array of 4 numeric elements");
-                }
-                material.metallicRoughness.baseColorFactor = Color4(baseColorFactor[0], baseColorFactor[1], baseColorFactor[2], baseColorFactor[3]);
+                const auto elements = GetFixedSizeFloatArray(
+                    *metallicRoughness,
+                    "baseColorFactor",
+                    4U,
+                    "baseColorFactor must be an array of 4 "
+                    "numeric elements");
+                material.metallicRoughness.baseColorFactor =
+                    Color4(
+                        elements[0],
+                        elements[1],
+                        elements[2],
+                        elements[3]);
             }
-            
-            auto baseColorTextureIt = pbrMr.FindMember("baseColorTexture");
-            if (baseColorTextureIt != pbrMr.MemberEnd())
+
+            const auto* baseColorTexture =
+                Internal::FindJsonMember(
+                    *metallicRoughness,
+                    "baseColorTexture");
+            if (baseColorTexture != nullptr)
             {
-                ParseTextureInfo(baseColorTextureIt->value, material.metallicRoughness.baseColorTexture, extensionDeserializer);
+                ParseTextureInfo(
+                    *baseColorTexture,
+                    material.metallicRoughness.baseColorTexture,
+                    extensionDeserializer);
             }
 
-            material.metallicRoughness.metallicFactor = GetMemberValueOrDefault<float>(pbrMr, "metallicFactor", 1.0f);
-            material.metallicRoughness.roughnessFactor = GetMemberValueOrDefault<float>(pbrMr, "roughnessFactor", 1.0f);
+            material.metallicRoughness.metallicFactor =
+                GetFloatMemberOrDefault(
+                    *metallicRoughness,
+                    "metallicFactor",
+                    1.0F);
+            material.metallicRoughness.roughnessFactor =
+                GetFloatMemberOrDefault(
+                    *metallicRoughness,
+                    "roughnessFactor",
+                    1.0F);
 
-            auto metallicRoughnessTextureIt = pbrMr.FindMember("metallicRoughnessTexture");
-            if (metallicRoughnessTextureIt != pbrMr.MemberEnd())
+            const auto* metallicRoughnessTexture =
+                Internal::FindJsonMember(
+                    *metallicRoughness,
+                    "metallicRoughnessTexture");
+            if (metallicRoughnessTexture != nullptr)
             {
-                ParseTextureInfo(metallicRoughnessTextureIt->value, material.metallicRoughness.metallicRoughnessTexture, extensionDeserializer);
+                ParseTextureInfo(
+                    *metallicRoughnessTexture,
+                    material.metallicRoughness
+                        .metallicRoughnessTexture,
+                    extensionDeserializer);
             }
         }
 
-        // Normal
-        auto normalTextureIt = v.FindMember("normalTexture");
-        if (normalTextureIt != v.MemberEnd())
+        const auto* normalTexture =
+            Internal::FindJsonMember(value, "normalTexture");
+        if (normalTexture != nullptr)
         {
-            ParseTextureInfo(normalTextureIt->value, material.normalTexture, extensionDeserializer);
-            material.normalTexture.scale = GetMemberValueOrDefault<float>(normalTextureIt->value, "scale", 1.0f);
+            ParseTextureInfo(
+                *normalTexture,
+                material.normalTexture,
+                extensionDeserializer);
+            material.normalTexture.scale =
+                GetFloatMemberOrDefault(
+                    *normalTexture, "scale", 1.0F);
         }
 
-        // Occlusion
-        auto occlusionTextureIt = v.FindMember("occlusionTexture");
-        if (occlusionTextureIt != v.MemberEnd())
+        const auto* occlusionTexture =
+            Internal::FindJsonMember(value, "occlusionTexture");
+        if (occlusionTexture != nullptr)
         {
-            ParseTextureInfo(occlusionTextureIt->value, material.occlusionTexture, extensionDeserializer);
-            material.occlusionTexture.strength = GetMemberValueOrDefault<float>(occlusionTextureIt->value, "strength", 1.0f);
+            ParseTextureInfo(
+                *occlusionTexture,
+                material.occlusionTexture,
+                extensionDeserializer);
+            material.occlusionTexture.strength =
+                GetFloatMemberOrDefault(
+                    *occlusionTexture, "strength", 1.0F);
         }
 
-        // Emissive Texture
-        auto emissionTextureIt = v.FindMember("emissiveTexture");
-        if (emissionTextureIt != v.MemberEnd())
+        const auto* emissiveTexture =
+            Internal::FindJsonMember(value, "emissiveTexture");
+        if (emissiveTexture != nullptr)
         {
-            ParseTextureInfo(emissionTextureIt->value, material.emissiveTexture, extensionDeserializer);
+            ParseTextureInfo(
+                *emissiveTexture,
+                material.emissiveTexture,
+                extensionDeserializer);
         }
 
-        // Emissive Factor
-        auto emissionFactorIt = v.FindMember("emissiveFactor");
-        if (emissionFactorIt != v.MemberEnd())
+        if (Internal::FindJsonMember(
+                value, "emissiveFactor") != nullptr)
         {
-            std::vector<float> emissiveFactor;
-            for (rapidjson::Value::ConstValueIterator ait = emissionFactorIt->value.Begin(); ait != emissionFactorIt->value.End(); ++ait)
-            {
-                emissiveFactor.push_back(static_cast<float>(ait->GetDouble()));
-            }
-            if (emissiveFactor.size() != 3)
-            {
-                throw InvalidGLTFException("emissiveFactor must be an array of 3 numeric elements");
-            }
-            material.emissiveFactor = Color3(emissiveFactor[0], emissiveFactor[1], emissiveFactor[2]);
+            const auto elements = GetFixedSizeFloatArray(
+                value,
+                "emissiveFactor",
+                3U,
+                "emissiveFactor must be an array of 3 "
+                "numeric elements");
+            material.emissiveFactor = Color3(
+                elements[0], elements[1], elements[2]);
         }
 
-        // Alpha Mode
-        auto alphaModeIt = v.FindMember("alphaMode");
-        if (alphaModeIt != v.MemberEnd())
+        const auto* alphaMode =
+            Internal::FindJsonMember(value, "alphaMode");
+        if (alphaMode != nullptr)
         {
-            material.alphaMode = ParseAlphaMode(alphaModeIt->value.GetString());
+            material.alphaMode = ParseAlphaMode(ReadString(
+                *alphaMode,
+                "Material alphaMode must be a string"));
         }
 
-        // Alpha Cutoff
-        material.alphaCutoff = GetMemberValueOrDefault<float>(v, "alphaCutoff", 0.5f);
+        material.alphaCutoff =
+            GetFloatMemberOrDefault(
+                value, "alphaCutoff", 0.5F);
+        material.name =
+            GetStringMemberOrDefault(value, "name");
+        material.doubleSided =
+            GetBooleanMemberOrDefault(
+                value, "doubleSided", false);
 
-        // Name
-        material.name = GetMemberValueOrDefault<std::string>(v, "name");
-
-        // Double Sided
-        material.doubleSided = GetMemberValueOrDefault<bool>(v, "doubleSided", false);
-
-        ParseProperty(v, material, extensionDeserializer);
-
+        ParseProperty(value, material, extensionDeserializer);
         ValidateMaterial(material);
-
         return material;
     }
 
-    Texture ParseTexture(const rapidjson::Value& v, const ExtensionDeserializer& extensionDeserializer)
+    Texture ParseTexture(
+        const JsonValue& value,
+        const ExtensionDeserializer& extensionDeserializer)
     {
-        // Parse texture fields or assign default values see:
-        // https://github.com/KhronosGroup/glTF/blob/master/specification/README.md
-
         Texture texture;
-
-        texture.name = GetMemberValueOrDefault<std::string>(v, "name");
-        texture.imageId = GetMemberValueAsString<uint32_t>(v, "source");
-        texture.samplerId = GetMemberValueAsString<uint32_t>(v, "sampler");
-
-        ParseProperty(v, texture, extensionDeserializer);
-
+        texture.name = GetStringMemberOrDefault(value, "name");
+        texture.imageId =
+            GetUInt32MemberAsString(value, "source");
+        texture.samplerId =
+            GetUInt32MemberAsString(value, "sampler");
+        ParseProperty(value, texture, extensionDeserializer);
         return texture;
     }
 
-    Image ParseImage(const rapidjson::Value& v, const ExtensionDeserializer& extensionDeserializer)
+    Image ParseImage(
+        const JsonValue& value,
+        const ExtensionDeserializer& extensionDeserializer)
     {
-        // Parse image fields or assign default values see:
-        // https://github.com/KhronosGroup/glTF/blob/master/specification/README.md
-
         Image image;
-
-        image.name = GetMemberValueOrDefault<std::string>(v, "name");
-        image.uri = GetMemberValueOrDefault<std::string>(v, "uri");
-        image.bufferViewId = GetMemberValueAsString<uint32_t>(v, "bufferView");
-        image.mimeType = GetMemberValueOrDefault<std::string>(v, "mimeType");
-
-        ParseProperty(v, image, extensionDeserializer);
-
+        image.name = GetStringMemberOrDefault(value, "name");
+        image.uri = GetStringMemberOrDefault(value, "uri");
+        image.bufferViewId =
+            GetUInt32MemberAsString(value, "bufferView");
+        image.mimeType =
+            GetStringMemberOrDefault(value, "mimeType");
+        ParseProperty(value, image, extensionDeserializer);
         return image;
     }
 
-    Document DeserializeInternal(const rapidjson::Document& document, const ExtensionDeserializer& extensionDeserializer, SchemaFlags schemaFlags)
+    Document DeserializeInternal(
+        const JsonValue& document,
+        const ExtensionDeserializer& extensionDeserializer,
+        SchemaFlags schemaFlags)
     {
-        ValidateDocumentAgainstSchema(document, SCHEMA_URI_GLTF, GetDefaultSchemaLocator(schemaFlags));
+        Internal::RequireJsonObject(
+            document,
+            "glTF document must be a JSON object");
+        Internal::ValidateJsonAgainstSchema(
+            document,
+            SCHEMA_URI_GLTF,
+            GetDefaultSchemaLocator(schemaFlags));
 
         Document gltfDocument;
-
-        rapidjson::Value::ConstMemberIterator it;
-        if (TryFindMember("asset", document, it))
+        const auto* asset =
+            Internal::FindJsonMember(document, "asset");
+        if (asset != nullptr)
         {
-            gltfDocument.asset = ParseAsset(it->value, extensionDeserializer);
+            Internal::RequireJsonObject(
+                *asset, "Asset must be a JSON object");
+            gltfDocument.asset =
+                ParseAsset(*asset, extensionDeserializer);
         }
 
-        gltfDocument.accessors   = DeserializeToIndexedContainer<Accessor>("accessors", document, extensionDeserializer, ParseAccessor);
-        gltfDocument.animations  = DeserializeToIndexedContainer<Animation>("animations", document, extensionDeserializer, ParseAnimation);
-        gltfDocument.buffers     = DeserializeToIndexedContainer<Buffer>("buffers", document, extensionDeserializer, ParseBuffer);
-        gltfDocument.bufferViews = DeserializeToIndexedContainer<BufferView>("bufferViews", document, extensionDeserializer, ParseBufferView);
-        gltfDocument.cameras     = DeserializeToIndexedContainer<Camera>("cameras", document, extensionDeserializer, ParseCamera);
-        gltfDocument.images      = DeserializeToIndexedContainer<Image>("images", document, extensionDeserializer, ParseImage);
-        gltfDocument.materials   = DeserializeToIndexedContainer<Material>("materials", document, extensionDeserializer, ParseMaterial);
-        gltfDocument.meshes      = DeserializeToIndexedContainer<Mesh>("meshes", document, extensionDeserializer, ParseMesh);
-        gltfDocument.nodes       = DeserializeToIndexedContainer<Node>("nodes", document, extensionDeserializer, ParseNode);
-        gltfDocument.samplers    = DeserializeToIndexedContainer<Sampler>("samplers", document, extensionDeserializer, ParseSampler);
-        gltfDocument.scenes      = DeserializeToIndexedContainer<Scene>("scenes", document, extensionDeserializer, ParseScene);
-        gltfDocument.skins       = DeserializeToIndexedContainer<Skin>("skins", document, extensionDeserializer, ParseSkin);
-        gltfDocument.textures    = DeserializeToIndexedContainer<Texture>("textures", document, extensionDeserializer, ParseTexture);
+        gltfDocument.accessors =
+            DeserializeToIndexedContainer<Accessor>(
+                "accessors",
+                document,
+                extensionDeserializer,
+                ParseAccessor);
+        gltfDocument.animations =
+            DeserializeToIndexedContainer<Animation>(
+                "animations",
+                document,
+                extensionDeserializer,
+                ParseAnimation);
+        gltfDocument.buffers =
+            DeserializeToIndexedContainer<Buffer>(
+                "buffers",
+                document,
+                extensionDeserializer,
+                ParseBuffer);
+        gltfDocument.bufferViews =
+            DeserializeToIndexedContainer<BufferView>(
+                "bufferViews",
+                document,
+                extensionDeserializer,
+                ParseBufferView);
+        gltfDocument.cameras =
+            DeserializeToIndexedContainer<Camera>(
+                "cameras",
+                document,
+                extensionDeserializer,
+                ParseCamera);
+        gltfDocument.images =
+            DeserializeToIndexedContainer<Image>(
+                "images",
+                document,
+                extensionDeserializer,
+                ParseImage);
+        gltfDocument.materials =
+            DeserializeToIndexedContainer<Material>(
+                "materials",
+                document,
+                extensionDeserializer,
+                ParseMaterial);
+        gltfDocument.meshes =
+            DeserializeToIndexedContainer<Mesh>(
+                "meshes",
+                document,
+                extensionDeserializer,
+                ParseMesh);
+        gltfDocument.nodes =
+            DeserializeToIndexedContainer<Node>(
+                "nodes",
+                document,
+                extensionDeserializer,
+                ParseNode);
+        gltfDocument.samplers =
+            DeserializeToIndexedContainer<Sampler>(
+                "samplers",
+                document,
+                extensionDeserializer,
+                ParseSampler);
+        gltfDocument.scenes =
+            DeserializeToIndexedContainer<Scene>(
+                "scenes",
+                document,
+                extensionDeserializer,
+                ParseScene);
+        gltfDocument.skins =
+            DeserializeToIndexedContainer<Skin>(
+                "skins",
+                document,
+                extensionDeserializer,
+                ParseSkin);
+        gltfDocument.textures =
+            DeserializeToIndexedContainer<Texture>(
+                "textures",
+                document,
+                extensionDeserializer,
+                ParseTexture);
 
-        ParseProperty(document, gltfDocument, extensionDeserializer);
+        ParseProperty(
+            document, gltfDocument, extensionDeserializer);
 
-        if (TryFindMember("scene", document, it))
+        const auto* scene =
+            Internal::FindJsonMember(document, "scene");
+        if (scene != nullptr)
         {
-            gltfDocument.defaultSceneId = std::to_string(it->value.GetUint());
+            gltfDocument.defaultSceneId =
+                std::to_string(ReadUInt32(
+                    *scene,
+                    "Default scene must be an unsigned integer"));
         }
 
-        ParseExtensionsUsed(document, gltfDocument);
-        ParseExtensionsRequired(document, gltfDocument);
+        ParseStringSet(
+            document,
+            "extensionsUsed",
+            gltfDocument.extensionsUsed);
+        ParseStringSet(
+            document,
+            "extensionsRequired",
+            gltfDocument.extensionsRequired);
 
         return gltfDocument;
     }
 
-    bool HasFlag(DeserializeFlags flags, DeserializeFlags flag)
+    bool HasFlag(
+        DeserializeFlags flags,
+        DeserializeFlags flag)
     {
-        return ((flags & flag) == flag);
+        return (flags & flag) == flag;
     }
 }
 
-Document GLTFSDK_API Microsoft::glTF::Deserialize(const std::string& json, DeserializeFlags flags, SchemaFlags schemaFlags)
+Document GLTFSDK_API Microsoft::glTF::Deserialize(
+    const std::string& json,
+    DeserializeFlags flags,
+    SchemaFlags schemaFlags)
 {
-    return Deserialize(json, ExtensionDeserializer(), flags, schemaFlags);
+    return Deserialize(
+        json,
+        ExtensionDeserializer(),
+        flags,
+        schemaFlags);
 }
 
-Document GLTFSDK_API Microsoft::glTF::Deserialize(const std::string& json, const ExtensionDeserializer& extensionDeserializer, DeserializeFlags flags, SchemaFlags schemaFlags)
+Document GLTFSDK_API Microsoft::glTF::Deserialize(
+    const std::string& json,
+    const ExtensionDeserializer& extensionDeserializer,
+    DeserializeFlags flags,
+    SchemaFlags schemaFlags)
 {
-    const auto document = HasFlag(flags, DeserializeFlags::IgnoreByteOrderMark) ?
-        RapidJsonUtils::CreateDocumentFromEncodedString(json) :
-        RapidJsonUtils::CreateDocumentFromString(json);
-
-    return DeserializeInternal(document, extensionDeserializer, schemaFlags);
+    const auto document = Internal::ParseJson(
+        json,
+        HasFlag(
+            flags,
+            DeserializeFlags::IgnoreByteOrderMark));
+    return DeserializeInternal(
+        document,
+        extensionDeserializer,
+        schemaFlags);
 }
 
-Document GLTFSDK_API Microsoft::glTF::Deserialize(std::istream& jsonStream, DeserializeFlags flags, SchemaFlags schemaFlags)
+Document GLTFSDK_API Microsoft::glTF::Deserialize(
+    std::istream& jsonStream,
+    DeserializeFlags flags,
+    SchemaFlags schemaFlags)
 {
-    return Deserialize(jsonStream, ExtensionDeserializer(), flags, schemaFlags);
+    return Deserialize(
+        jsonStream,
+        ExtensionDeserializer(),
+        flags,
+        schemaFlags);
 }
 
-Document GLTFSDK_API Microsoft::glTF::Deserialize(std::istream& jsonStream, const ExtensionDeserializer& extensionDeserializer, DeserializeFlags flags, SchemaFlags schemaFlags)
+Document GLTFSDK_API Microsoft::glTF::Deserialize(
+    std::istream& jsonStream,
+    const ExtensionDeserializer& extensionDeserializer,
+    DeserializeFlags flags,
+    SchemaFlags schemaFlags)
 {
-    const auto document = HasFlag(flags, DeserializeFlags::IgnoreByteOrderMark) ?
-        RapidJsonUtils::CreateDocumentFromEncodedStream(jsonStream) :
-        RapidJsonUtils::CreateDocumentFromStream(jsonStream);
-
-    return DeserializeInternal(document, extensionDeserializer, schemaFlags);
+    const auto document = Internal::ParseJson(
+        jsonStream,
+        HasFlag(
+            flags,
+            DeserializeFlags::IgnoreByteOrderMark));
+    return DeserializeInternal(
+        document,
+        extensionDeserializer,
+        schemaFlags);
 }
 
-DeserializeFlags Microsoft::glTF::operator|(DeserializeFlags lhs, DeserializeFlags rhs)
+DeserializeFlags Microsoft::glTF::operator|(
+    DeserializeFlags lhs,
+    DeserializeFlags rhs)
 {
     const auto result =
         static_cast<std::underlying_type_t<DeserializeFlags>>(lhs) |
         static_cast<std::underlying_type_t<DeserializeFlags>>(rhs);
-
     return static_cast<DeserializeFlags>(result);
 }
 
-DeserializeFlags& Microsoft::glTF::operator|=(DeserializeFlags& lhs, DeserializeFlags rhs)
+DeserializeFlags& Microsoft::glTF::operator|=(
+    DeserializeFlags& lhs,
+    DeserializeFlags rhs)
 {
     lhs = lhs | rhs;
     return lhs;
 }
 
-DeserializeFlags Microsoft::glTF::operator&(DeserializeFlags lhs, DeserializeFlags rhs)
+DeserializeFlags Microsoft::glTF::operator&(
+    DeserializeFlags lhs,
+    DeserializeFlags rhs)
 {
     const auto result =
         static_cast<std::underlying_type_t<DeserializeFlags>>(lhs) &
         static_cast<std::underlying_type_t<DeserializeFlags>>(rhs);
-
     return static_cast<DeserializeFlags>(result);
 }
 
-DeserializeFlags& Microsoft::glTF::operator&=(DeserializeFlags& lhs, DeserializeFlags rhs)
+DeserializeFlags& Microsoft::glTF::operator&=(
+    DeserializeFlags& lhs,
+    DeserializeFlags rhs)
 {
     lhs = lhs & rhs;
     return lhs;

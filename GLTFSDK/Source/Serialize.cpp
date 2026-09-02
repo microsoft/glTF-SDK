@@ -6,12 +6,24 @@
 #include <GLTFSDK/Document.h>
 #include <GLTFSDK/ExtensionHandlers.h>
 #include <GLTFSDK/GLTF.h>
-#include <GLTFSDK/RapidJsonUtils.h>
+
+#include "Internal/Json.h"
+
+#include <algorithm>
+#include <array>
+#include <initializer_list>
+#include <string>
+#include <type_traits>
+#include <unordered_set>
+#include <utility>
+#include <vector>
 
 using namespace Microsoft::glTF;
 
 namespace
 {
+    using JsonValue = Internal::JsonValue;
+
     std::string AccessorTypeToString(AccessorType type)
     {
         switch (type)
@@ -67,7 +79,8 @@ namespace
         }
     }
 
-    std::string InterpolationTypeToString(InterpolationType interpolationType)
+    std::string InterpolationTypeToString(
+        InterpolationType interpolationType)
     {
         switch (interpolationType)
         {
@@ -82,100 +95,286 @@ namespace
         }
     }
 
-    void SerializePropertyExtensions(const Document& doc, const glTFProperty& property, rapidjson::Value& propertyValue, rapidjson::Document::AllocatorType& a, const ExtensionSerializer& extensionSerializer)
+    template<typename Iterator>
+    JsonValue CreateFloatArray(
+        Iterator begin,
+        Iterator end)
     {
-        auto registeredExtensions = property.GetExtensions();
-
-        if (!property.extensions.empty() || !registeredExtensions.empty())
+        JsonValue array = Internal::CreateJsonArray();
+        for (Iterator iterator = begin; iterator != end; ++iterator)
         {
-            rapidjson::Value& extensions = RapidJsonUtils::FindOrAddMember(propertyValue, "extensions", a);
+            Internal::AppendJsonValue(
+                array,
+                Internal::CreateJsonFloat(*iterator));
+        }
+        return array;
+    }
 
-            // Add registered extensions
-            for (const auto& extension : registeredExtensions)
-            {
-                const auto extensionPair = extensionSerializer.Serialize(extension, property, doc);
+    JsonValue CreateFloatArray(const std::vector<float>& values)
+    {
+        return CreateFloatArray(values.begin(), values.end());
+    }
 
-                if (property.HasUnregisteredExtension(extensionPair.name))
-                {
-                    throw GLTFException("Registered extension '" + extensionPair.name + "' is also present as an unregistered extension.");
-                }
+    template<std::size_t Size>
+    JsonValue CreateFloatArray(
+        const std::array<float, Size>& values)
+    {
+        return CreateFloatArray(values.begin(), values.end());
+    }
 
-                if (doc.extensionsUsed.find(extensionPair.name) == doc.extensionsUsed.end())
-                {
-                    throw GLTFException("Registered extension '" + extensionPair.name + "' is not present in extensionsUsed");
-                }
+    JsonValue CreateFloatArray(
+        std::initializer_list<float> values)
+    {
+        return CreateFloatArray(values.begin(), values.end());
+    }
 
-                const auto d = RapidJsonUtils::CreateDocumentFromString(extensionPair.value);//TODO: validate the returned document against the extension schema!
-                rapidjson::Value v(rapidjson::kObjectType);
-                v.CopyFrom(d, a);
-                extensions.AddMember(RapidJsonUtils::ToStringValue(extensionPair.name, a), v, a);
-            }
+    JsonValue CreateFloatArray(const Color3& value)
+    {
+        return CreateFloatArray({value.r, value.g, value.b});
+    }
 
-            // Add unregistered extensions
-            for (const auto& extension : property.extensions)
-            {
-                if (doc.extensionsUsed.find(extension.first) == doc.extensionsUsed.end())
-                {
-                    throw GLTFException("Unregistered extension '" + extension.first + "' is not present in extensionsUsed");
-                }
+    JsonValue CreateFloatArray(const Color4& value)
+    {
+        return CreateFloatArray(
+            {value.r, value.g, value.b, value.a});
+    }
 
-                const auto d = RapidJsonUtils::CreateDocumentFromString(extension.second);//TODO: validate the returned document against the extension schema!
-                rapidjson::Value v(rapidjson::kObjectType);
-                v.CopyFrom(d, a);
-                extensions.AddMember(RapidJsonUtils::ToStringValue(extension.first, a), v, a);
-            }
+    JsonValue CreateFloatArray(const Vector3& value)
+    {
+        return CreateFloatArray({value.x, value.y, value.z});
+    }
+
+    JsonValue CreateFloatArray(const Quaternion& value)
+    {
+        return CreateFloatArray(
+            {value.x, value.y, value.z, value.w});
+    }
+
+    void AddOptionalString(
+        JsonValue& object,
+        const char* name,
+        const std::string& value)
+    {
+        if (!value.empty())
+        {
+            Internal::SetJsonMember(
+                object,
+                name,
+                Internal::CreateJsonString(value));
         }
     }
 
-    void SerializePropertyExtras(const glTFProperty& property, rapidjson::Value& propertyValue, rapidjson::Document::AllocatorType& a)
+    template<typename T>
+    void AddOptionalIndex(
+        JsonValue& object,
+        const char* name,
+        const std::string& id,
+        const IndexedContainer<const T>& container)
+    {
+        if (!id.empty())
+        {
+            Internal::SetJsonMember(
+                object,
+                name,
+                Internal::CreateJsonSize(container.GetIndex(id)));
+        }
+    }
+
+    void AddFloatArray(
+        JsonValue& object,
+        const char* name,
+        const std::vector<float>& values)
+    {
+        if (!values.empty())
+        {
+            Internal::SetJsonMember(
+                object,
+                name,
+                CreateFloatArray(values));
+        }
+    }
+
+    void SerializePropertyExtensions(
+        const Document& document,
+        const glTFProperty& property,
+        JsonValue& propertyValue,
+        const ExtensionSerializer& extensionSerializer)
+    {
+        const auto registeredExtensions =
+            property.GetExtensions();
+        if (property.extensions.empty() &&
+            registeredExtensions.empty())
+        {
+            return;
+        }
+
+        JsonValue extensions = Internal::CreateJsonObject();
+        std::vector<ExtensionPair> serializedRegistered;
+        serializedRegistered.reserve(registeredExtensions.size());
+        for (const auto& extension : registeredExtensions)
+        {
+            auto extensionPair =
+                extensionSerializer.Serialize(
+                    extension, property, document);
+            if (property.HasUnregisteredExtension(
+                    extensionPair.name))
+            {
+                throw GLTFException(
+                    "Registered extension '" +
+                    extensionPair.name +
+                    "' is also present as an unregistered extension.");
+            }
+            if (document.extensionsUsed.find(extensionPair.name) ==
+                document.extensionsUsed.end())
+            {
+                throw GLTFException(
+                    "Registered extension '" +
+                    extensionPair.name +
+                    "' is not present in extensionsUsed");
+            }
+            serializedRegistered.push_back(
+                std::move(extensionPair));
+        }
+        std::sort(
+            serializedRegistered.begin(),
+            serializedRegistered.end(),
+            [](const ExtensionPair& left, const ExtensionPair& right)
+            {
+                return left.name < right.name;
+            });
+        for (const auto& extensionPair : serializedRegistered)
+        {
+            Internal::SetJsonMember(
+                extensions,
+                extensionPair.name,
+                Internal::ParseJson(extensionPair.value));
+        }
+
+        std::vector<std::pair<std::string, std::string>>
+            serializedUnregistered(
+                property.extensions.begin(),
+                property.extensions.end());
+        std::sort(
+            serializedUnregistered.begin(),
+            serializedUnregistered.end(),
+            [](const std::pair<std::string, std::string>& left,
+               const std::pair<std::string, std::string>& right)
+            {
+                return left.first < right.first;
+            });
+        for (const auto& extension : serializedUnregistered)
+        {
+            if (document.extensionsUsed.find(extension.first) ==
+                document.extensionsUsed.end())
+            {
+                throw GLTFException(
+                    "Unregistered extension '" +
+                    extension.first +
+                    "' is not present in extensionsUsed");
+            }
+            Internal::SetJsonMember(
+                extensions,
+                extension.first,
+                Internal::ParseJson(extension.second));
+        }
+
+        Internal::SetJsonMember(
+            propertyValue,
+            "extensions",
+            std::move(extensions));
+    }
+
+    void SerializePropertyExtras(
+        const glTFProperty& property,
+        JsonValue& propertyValue)
     {
         if (!property.extras.empty())
         {
-            auto d = RapidJsonUtils::CreateDocumentFromString(property.extras);
-            rapidjson::Value v(rapidjson::kObjectType);
-            v.CopyFrom(d, a);
-            propertyValue.AddMember("extras", v, a);
+            Internal::SetJsonMember(
+                propertyValue,
+                "extras",
+                Internal::ParseJson(property.extras));
         }
     }
 
-    void SerializeProperty(const Document& doc, const glTFProperty& property, rapidjson::Value& propertyValue, rapidjson::Document::AllocatorType& a, const ExtensionSerializer& extensionSerializer)
+    void SerializeProperty(
+        const Document& document,
+        const glTFProperty& property,
+        JsonValue& propertyValue,
+        const ExtensionSerializer& extensionSerializer)
     {
-        SerializePropertyExtensions(doc, property, propertyValue, a, extensionSerializer);
-        SerializePropertyExtras(property, propertyValue, a);
+        SerializePropertyExtensions(
+            document,
+            property,
+            propertyValue,
+            extensionSerializer);
+        SerializePropertyExtras(property, propertyValue);
     }
 
-    void SerializeTextureInfo(const Document& doc, const TextureInfo& textureInfo, rapidjson::Value& textureValue, rapidjson::Document::AllocatorType& a, const IndexedContainer<const Texture>& textures, const ExtensionSerializer& extensionSerializer)
+    void SerializeTextureInfo(
+        const Document& document,
+        const TextureInfo& textureInfo,
+        JsonValue& textureValue,
+        const IndexedContainer<const Texture>& textures,
+        const ExtensionSerializer& extensionSerializer)
     {
-        RapidJsonUtils::AddOptionalMemberIndex("index", textureValue, textureInfo.textureId, textures, a);
-        if (textureInfo.texCoord != 0)
+        AddOptionalIndex(
+            textureValue,
+            "index",
+            textureInfo.textureId,
+            textures);
+        if (textureInfo.texCoord != 0U)
         {
-            textureValue.AddMember("texCoord", ToKnownSizeType(textureInfo.texCoord), a);
+            Internal::SetJsonMember(
+                textureValue,
+                "texCoord",
+                Internal::CreateJsonSize(textureInfo.texCoord));
         }
-        SerializeProperty(doc, textureInfo, textureValue, a, extensionSerializer);
+        SerializeProperty(
+            document,
+            textureInfo,
+            textureValue,
+            extensionSerializer);
     }
 
-    void SerializeAsset(const Document& gltfDocument, rapidjson::Document& document, const ExtensionSerializer& extensionSerializer)
+    void SerializeAsset(
+        const Document& gltfDocument,
+        JsonValue& document,
+        const ExtensionSerializer& extensionSerializer)
     {
-        rapidjson::Document::AllocatorType& a = document.GetAllocator();
-        rapidjson::Value assetValue(rapidjson::kObjectType);
-
-        RapidJsonUtils::AddOptionalMember("copyright", assetValue, gltfDocument.asset.copyright, a);
-        RapidJsonUtils::AddOptionalMember("generator", assetValue, gltfDocument.asset.generator, a);
-        assetValue.AddMember("version", RapidJsonUtils::ToStringValue(gltfDocument.asset.version, a), a);
-        RapidJsonUtils::AddOptionalMember("minVersion", assetValue, gltfDocument.asset.minVersion, a);
-
-        SerializeProperty(gltfDocument, gltfDocument.asset, assetValue, a, extensionSerializer);
-
-        document.AddMember("asset", assetValue, a);
+        JsonValue asset = Internal::CreateJsonObject();
+        AddOptionalString(
+            asset, "copyright", gltfDocument.asset.copyright);
+        AddOptionalString(
+            asset, "generator", gltfDocument.asset.generator);
+        Internal::SetJsonMember(
+            asset,
+            "version",
+            Internal::CreateJsonString(
+                gltfDocument.asset.version));
+        AddOptionalString(
+            asset, "minVersion", gltfDocument.asset.minVersion);
+        SerializeProperty(
+            gltfDocument,
+            gltfDocument.asset,
+            asset,
+            extensionSerializer);
+        Internal::SetJsonMember(
+            document, "asset", std::move(asset));
     }
 
-    void SerializeDefaultScene(const Document& gltfDocument, rapidjson::Document& document)
+    void SerializeDefaultScene(
+        const Document& gltfDocument,
+        JsonValue& document)
     {
-        rapidjson::Document::AllocatorType& a = document.GetAllocator();
-
         if (gltfDocument.HasDefaultScene())
         {
-            document.AddMember("scene", ToKnownSizeType(gltfDocument.scenes.GetIndex(gltfDocument.defaultSceneId)), a);
+            Internal::SetJsonMember(
+                document,
+                "scene",
+                Internal::CreateJsonSize(
+                    gltfDocument.scenes.GetIndex(
+                        gltfDocument.defaultSceneId)));
         }
     }
 
@@ -184,735 +383,1203 @@ namespace
         const char* name,
         const IndexedContainer<const T>& indexedContainer,
         const Document& gltfDocument,
-        rapidjson::Document& document,
-        const ExtensionSerializer& ext,
-        rapidjson::Value(*fn)(const T&, const Document&, rapidjson::Document&, const ExtensionSerializer&))
+        JsonValue& document,
+        const ExtensionSerializer& extensionSerializer,
+        JsonValue(*serialize)(
+            const T&,
+            const Document&,
+            const ExtensionSerializer&))
     {
-        if (indexedContainer.Size() > 0)
+        if (indexedContainer.Size() == 0U)
         {
-            rapidjson::Document::AllocatorType& a = document.GetAllocator();
-            rapidjson::Value containerItems(rapidjson::kArrayType);
-            for (const auto& containerElement : indexedContainer.Elements())
-            {
-                rapidjson::Value value = fn(containerElement, gltfDocument, document, ext);
-                containerItems.PushBack(value, a);
-            }
-
-            document.AddMember(rapidjson::StringRef(name), containerItems, a);
+            return;
         }
+
+        JsonValue values = Internal::CreateJsonArray();
+        for (const auto& element : indexedContainer.Elements())
+        {
+            Internal::AppendJsonValue(
+                values,
+                serialize(
+                    element,
+                    gltfDocument,
+                    extensionSerializer));
+        }
+        Internal::SetJsonMember(
+            document, name, std::move(values));
     }
 
-    rapidjson::Value SerializeAccessor(const Accessor& accessor, const Document& gltfDocument, rapidjson::Document& document, const ExtensionSerializer& extensionSerializer)
+    JsonValue SerializeAccessor(
+        const Accessor& accessor,
+        const Document& gltfDocument,
+        const ExtensionSerializer& extensionSerializer)
     {
-        rapidjson::Document::AllocatorType& a = document.GetAllocator();
-
-        rapidjson::Value accessorValue;
-        accessorValue.SetObject();
-
-        RapidJsonUtils::AddOptionalMember("name", accessorValue, accessor.name, a);
+        JsonValue value = Internal::CreateJsonObject();
+        AddOptionalString(value, "name", accessor.name);
 
         if (accessor.sparse.count > 0U)
         {
             if (!accessor.bufferViewId.empty())
             {
-                accessorValue.AddMember("bufferView", ToKnownSizeType(gltfDocument.bufferViews.GetIndex(accessor.bufferViewId)), a);
+                Internal::SetJsonMember(
+                    value,
+                    "bufferView",
+                    Internal::CreateJsonSize(
+                        gltfDocument.bufferViews.GetIndex(
+                            accessor.bufferViewId)));
             }
 
-            rapidjson::Value sparseRoot(rapidjson::kObjectType);
-            rapidjson::Value indices(rapidjson::kObjectType);
-            rapidjson::Value values(rapidjson::kObjectType);
+            JsonValue sparse = Internal::CreateJsonObject();
+            JsonValue indices = Internal::CreateJsonObject();
+            JsonValue values = Internal::CreateJsonObject();
 
-            indices.AddMember("bufferView", ToKnownSizeType(gltfDocument.bufferViews.GetIndex(accessor.sparse.indicesBufferViewId)), a);
+            Internal::SetJsonMember(
+                indices,
+                "bufferView",
+                Internal::CreateJsonSize(
+                    gltfDocument.bufferViews.GetIndex(
+                        accessor.sparse.indicesBufferViewId)));
             if (accessor.sparse.indicesByteOffset != 0U)
             {
-                indices.AddMember("byteOffset", ToKnownSizeType(accessor.sparse.indicesByteOffset), a);
+                Internal::SetJsonMember(
+                    indices,
+                    "byteOffset",
+                    Internal::CreateJsonSize(
+                        accessor.sparse.indicesByteOffset));
             }
-            indices.AddMember("componentType", accessor.sparse.indicesComponentType, a);
+            Internal::SetJsonMember(
+                indices,
+                "componentType",
+                Internal::CreateJsonInt32(
+                    accessor.sparse.indicesComponentType));
 
-            values.AddMember("bufferView", ToKnownSizeType(gltfDocument.bufferViews.GetIndex(accessor.sparse.valuesBufferViewId)), a);
+            Internal::SetJsonMember(
+                values,
+                "bufferView",
+                Internal::CreateJsonSize(
+                    gltfDocument.bufferViews.GetIndex(
+                        accessor.sparse.valuesBufferViewId)));
             if (accessor.sparse.valuesByteOffset != 0U)
             {
-                values.AddMember("byteOffset", ToKnownSizeType(accessor.sparse.valuesByteOffset), a);
+                Internal::SetJsonMember(
+                    values,
+                    "byteOffset",
+                    Internal::CreateJsonSize(
+                        accessor.sparse.valuesByteOffset));
             }
 
-            sparseRoot.AddMember("count", ToKnownSizeType(accessor.sparse.count), a);
-            sparseRoot.AddMember("indices", indices, a);
-            sparseRoot.AddMember("values", values, a);
-
-            accessorValue.AddMember("sparse", sparseRoot, a);
+            Internal::SetJsonMember(
+                sparse,
+                "count",
+                Internal::CreateJsonSize(accessor.sparse.count));
+            Internal::SetJsonMember(
+                sparse, "indices", std::move(indices));
+            Internal::SetJsonMember(
+                sparse, "values", std::move(values));
+            Internal::SetJsonMember(
+                value, "sparse", std::move(sparse));
         }
         else
         {
-            RapidJsonUtils::AddOptionalMemberIndex("bufferView", accessorValue, accessor.bufferViewId, gltfDocument.bufferViews, a);
+            AddOptionalIndex(
+                value,
+                "bufferView",
+                accessor.bufferViewId,
+                gltfDocument.bufferViews);
         }
 
         if (accessor.byteOffset != 0U)
         {
-            accessorValue.AddMember("byteOffset", ToKnownSizeType(accessor.byteOffset), a);
+            Internal::SetJsonMember(
+                value,
+                "byteOffset",
+                Internal::CreateJsonSize(accessor.byteOffset));
         }
-
-        // Normalized
         if (accessor.normalized)
         {
-            accessorValue.AddMember("normalized", accessor.normalized, a);
+            Internal::SetJsonMember(
+                value,
+                "normalized",
+                Internal::CreateJsonBoolean(true));
         }
 
-        accessorValue.AddMember("componentType", accessor.componentType, a);
-        accessorValue.AddMember("count", ToKnownSizeType(accessor.count), a);
-        accessorValue.AddMember("type", RapidJsonUtils::ToStringValue(AccessorTypeToString(accessor.type), a), a);
-
-        rapidjson::Value max(rapidjson::kArrayType);
-        rapidjson::Value min(rapidjson::kArrayType);
+        Internal::SetJsonMember(
+            value,
+            "componentType",
+            Internal::CreateJsonInt32(accessor.componentType));
+        Internal::SetJsonMember(
+            value,
+            "count",
+            Internal::CreateJsonSize(accessor.count));
+        Internal::SetJsonMember(
+            value,
+            "type",
+            Internal::CreateJsonString(
+                AccessorTypeToString(accessor.type)));
 
         if (!accessor.max.empty())
         {
-            accessorValue.AddMember("max", RapidJsonUtils::ToJsonArray(accessor.max, a), a);
+            Internal::SetJsonMember(
+                value, "max", CreateFloatArray(accessor.max));
         }
-
         if (!accessor.min.empty())
         {
-            accessorValue.AddMember("min", RapidJsonUtils::ToJsonArray(accessor.min, a), a);
+            Internal::SetJsonMember(
+                value, "min", CreateFloatArray(accessor.min));
         }
 
-        SerializeProperty(gltfDocument, accessor, accessorValue, a, extensionSerializer);
-
-        return accessorValue;
+        SerializeProperty(
+            gltfDocument,
+            accessor,
+            value,
+            extensionSerializer);
+        return value;
     }
 
-    rapidjson::Value SerializeAnimation(const Animation& animation, const Document& gltfDocument, rapidjson::Document& document, const ExtensionSerializer& extensionSerializer)
+    JsonValue SerializeAnimation(
+        const Animation& animation,
+        const Document& gltfDocument,
+        const ExtensionSerializer& extensionSerializer)
     {
-        rapidjson::Document::AllocatorType& a = document.GetAllocator();
-
-        rapidjson::Value animationValue(rapidjson::kObjectType);
-        rapidjson::Value channelValues(rapidjson::kArrayType);
-        rapidjson::Value samplerValues(rapidjson::kArrayType);
-
+        JsonValue channels = Internal::CreateJsonArray();
         for (const auto& channel : animation.channels.Elements())
         {
-            rapidjson::Value channelValue(rapidjson::kObjectType);
-            rapidjson::Value targetValue(rapidjson::kObjectType);
-
-            RapidJsonUtils::AddOptionalMemberIndex("node", targetValue, channel.target.nodeId, gltfDocument.nodes, a);
-            targetValue.AddMember("path", RapidJsonUtils::ToStringValue(TargetPathToString(channel.target.path), a), a);
-
-            channelValue.AddMember("sampler", ToKnownSizeType(animation.samplers.GetIndex(channel.samplerId)), a);
-            channelValue.AddMember("target", targetValue, a);
-
-            SerializeProperty(gltfDocument, channel, channelValue, a, extensionSerializer);
-
-            channelValues.PushBack(channelValue, a);
+            JsonValue channelValue =
+                Internal::CreateJsonObject();
+            JsonValue target = Internal::CreateJsonObject();
+            AddOptionalIndex(
+                target,
+                "node",
+                channel.target.nodeId,
+                gltfDocument.nodes);
+            Internal::SetJsonMember(
+                target,
+                "path",
+                Internal::CreateJsonString(
+                    TargetPathToString(channel.target.path)));
+            Internal::SetJsonMember(
+                channelValue,
+                "sampler",
+                Internal::CreateJsonSize(
+                    animation.samplers.GetIndex(
+                        channel.samplerId)));
+            Internal::SetJsonMember(
+                channelValue, "target", std::move(target));
+            SerializeProperty(
+                gltfDocument,
+                channel,
+                channelValue,
+                extensionSerializer);
+            Internal::AppendJsonValue(
+                channels, std::move(channelValue));
         }
 
+        JsonValue samplers = Internal::CreateJsonArray();
         for (const auto& sampler : animation.samplers.Elements())
         {
-            rapidjson::Value samplerValue(rapidjson::kObjectType);
-            samplerValue.AddMember("input", ToKnownSizeType(gltfDocument.accessors.GetIndex(sampler.inputAccessorId)), a);
-            RapidJsonUtils::AddOptionalMember("interpolation", samplerValue, InterpolationTypeToString(sampler.interpolation), a);
-            samplerValue.AddMember("output", ToKnownSizeType(gltfDocument.accessors.GetIndex(sampler.outputAccessorId)), a);
-
-            SerializeProperty(gltfDocument, sampler, samplerValue, a, extensionSerializer);
-
-            samplerValues.PushBack(samplerValue, a);
+            JsonValue samplerValue =
+                Internal::CreateJsonObject();
+            Internal::SetJsonMember(
+                samplerValue,
+                "input",
+                Internal::CreateJsonSize(
+                    gltfDocument.accessors.GetIndex(
+                        sampler.inputAccessorId)));
+            AddOptionalString(
+                samplerValue,
+                "interpolation",
+                InterpolationTypeToString(
+                    sampler.interpolation));
+            Internal::SetJsonMember(
+                samplerValue,
+                "output",
+                Internal::CreateJsonSize(
+                    gltfDocument.accessors.GetIndex(
+                        sampler.outputAccessorId)));
+            SerializeProperty(
+                gltfDocument,
+                sampler,
+                samplerValue,
+                extensionSerializer);
+            Internal::AppendJsonValue(
+                samplers, std::move(samplerValue));
         }
 
-        animationValue.AddMember("channels", channelValues, a);
-        animationValue.AddMember("samplers", samplerValues, a);
-        RapidJsonUtils::AddOptionalMember("name", animationValue, animation.name, a);
-
-        SerializeProperty(gltfDocument, animation, animationValue, a, extensionSerializer);
-
-        return animationValue;
+        JsonValue value = Internal::CreateJsonObject();
+        Internal::SetJsonMember(
+            value, "channels", std::move(channels));
+        Internal::SetJsonMember(
+            value, "samplers", std::move(samplers));
+        AddOptionalString(value, "name", animation.name);
+        SerializeProperty(
+            gltfDocument,
+            animation,
+            value,
+            extensionSerializer);
+        return value;
     }
 
-    rapidjson::Value SerializeBufferView(const BufferView& bufferView, const Document& gltfDocument, rapidjson::Document& document, const ExtensionSerializer& extensionSerializer)
+    JsonValue SerializeBufferView(
+        const BufferView& bufferView,
+        const Document& gltfDocument,
+        const ExtensionSerializer& extensionSerializer)
     {
-        rapidjson::Document::AllocatorType& a = document.GetAllocator();
-
-        rapidjson::Value bufferViewValue;
-        bufferViewValue.SetObject();
-
-        RapidJsonUtils::AddOptionalMember("name", bufferViewValue, bufferView.name, a);
-        bufferViewValue.AddMember("buffer", ToKnownSizeType(gltfDocument.buffers.GetIndex(bufferView.bufferId)), a);
-        bufferViewValue.AddMember("byteOffset", ToKnownSizeType(bufferView.byteOffset), a);
-        bufferViewValue.AddMember("byteLength", ToKnownSizeType(bufferView.byteLength), a);
-
+        JsonValue value = Internal::CreateJsonObject();
+        AddOptionalString(value, "name", bufferView.name);
+        Internal::SetJsonMember(
+            value,
+            "buffer",
+            Internal::CreateJsonSize(
+                gltfDocument.buffers.GetIndex(
+                    bufferView.bufferId)));
+        Internal::SetJsonMember(
+            value,
+            "byteOffset",
+            Internal::CreateJsonSize(bufferView.byteOffset));
+        Internal::SetJsonMember(
+            value,
+            "byteLength",
+            Internal::CreateJsonSize(bufferView.byteLength));
         if (bufferView.byteStride)
         {
-            bufferViewValue.AddMember("byteStride", ToKnownSizeType(bufferView.byteStride.Get()), a);
+            Internal::SetJsonMember(
+                value,
+                "byteStride",
+                Internal::CreateJsonSize(
+                    bufferView.byteStride.Get()));
         }
-
         if (bufferView.target)
         {
-            bufferViewValue.AddMember("target", bufferView.target.Get(), a);
+            Internal::SetJsonMember(
+                value,
+                "target",
+                Internal::CreateJsonInt32(
+                    bufferView.target.Get()));
         }
-
-        SerializeProperty(gltfDocument, bufferView, bufferViewValue, a, extensionSerializer);
-
-        return bufferViewValue;
+        SerializeProperty(
+            gltfDocument,
+            bufferView,
+            value,
+            extensionSerializer);
+        return value;
     }
 
-    rapidjson::Value SerializeBuffer(const Buffer& buffer, const Document& gltfDocument, rapidjson::Document& document, const ExtensionSerializer& extensionSerializer)
+    JsonValue SerializeBuffer(
+        const Buffer& buffer,
+        const Document& gltfDocument,
+        const ExtensionSerializer& extensionSerializer)
     {
-        rapidjson::Document::AllocatorType& a = document.GetAllocator();
-        rapidjson::Value bufferValue(rapidjson::kObjectType);
-
-        bufferValue.AddMember("byteLength", ToKnownSizeType(buffer.byteLength), a);
-        RapidJsonUtils::AddOptionalMember("uri", bufferValue, buffer.uri, a);
-
-        SerializeProperty(gltfDocument, buffer, bufferValue, a, extensionSerializer);
-
-        return bufferValue;
+        JsonValue value = Internal::CreateJsonObject();
+        Internal::SetJsonMember(
+            value,
+            "byteLength",
+            Internal::CreateJsonSize(buffer.byteLength));
+        AddOptionalString(value, "uri", buffer.uri);
+        SerializeProperty(
+            gltfDocument,
+            buffer,
+            value,
+            extensionSerializer);
+        return value;
     }
 
-    rapidjson::Value SerializeImage(const Image& image, const Document& gltfDocument, rapidjson::Document& document, const ExtensionSerializer& extensionSerializer)
+    JsonValue SerializeImage(
+        const Image& image,
+        const Document& gltfDocument,
+        const ExtensionSerializer& extensionSerializer)
     {
         if (image.uri.empty())
         {
-            if (image.bufferViewId.empty() || image.mimeType.empty())
+            if (image.bufferViewId.empty() ||
+                image.mimeType.empty())
             {
-                throw InvalidGLTFException("Invalid image: " + image.id + ". Images must have either a uri or a bufferView and a mimeType.");
+                throw InvalidGLTFException(
+                    "Invalid image: " + image.id +
+                    ". Images must have either a uri or a "
+                    "bufferView and a mimeType.");
             }
         }
         else if (!image.bufferViewId.empty())
         {
-            throw InvalidGLTFException("Invalid image: " + image.id + ". Images can only have a uri or a bufferView, but not both.");
+            throw InvalidGLTFException(
+                "Invalid image: " + image.id +
+                ". Images can only have a uri or a bufferView, "
+                "but not both.");
         }
 
-        rapidjson::Document::AllocatorType& a = document.GetAllocator();
-        rapidjson::Value imageValue(rapidjson::kObjectType);
-
-        RapidJsonUtils::AddOptionalMember("name", imageValue, image.name, a);
-        RapidJsonUtils::AddOptionalMember("uri", imageValue, image.uri, a);
-        RapidJsonUtils::AddOptionalMemberIndex("bufferView", imageValue, image.bufferViewId, gltfDocument.bufferViews, a);
-        RapidJsonUtils::AddOptionalMember("mimeType", imageValue, image.mimeType, a);
-
-        SerializeProperty(gltfDocument, image, imageValue, a, extensionSerializer);
-
-        return imageValue;
+        JsonValue value = Internal::CreateJsonObject();
+        AddOptionalString(value, "name", image.name);
+        AddOptionalString(value, "uri", image.uri);
+        AddOptionalIndex(
+            value,
+            "bufferView",
+            image.bufferViewId,
+            gltfDocument.bufferViews);
+        AddOptionalString(value, "mimeType", image.mimeType);
+        SerializeProperty(
+            gltfDocument,
+            image,
+            value,
+            extensionSerializer);
+        return value;
     }
 
-    rapidjson::Value SerializeMaterial(const Material& material, const Document& gltfDocument, rapidjson::Document& document, const ExtensionSerializer& extensionSerializer)
+    JsonValue SerializeMaterial(
+        const Material& material,
+        const Document& gltfDocument,
+        const ExtensionSerializer& extensionSerializer)
     {
-        rapidjson::Document::AllocatorType& a = document.GetAllocator();
-        rapidjson::Value materialValue(rapidjson::kObjectType);
+        JsonValue value = Internal::CreateJsonObject();
+        JsonValue metallicRoughness =
+            Internal::CreateJsonObject();
+
+        if (material.metallicRoughness.baseColorFactor !=
+            Color4(1.0F, 1.0F, 1.0F, 1.0F))
         {
-            rapidjson::Value pbrMetallicRoughness(rapidjson::kObjectType);
-            {
-                if (material.metallicRoughness.baseColorFactor != Color4(1.0f, 1.0f, 1.0f, 1.0f))
-                {
-                    pbrMetallicRoughness.AddMember("baseColorFactor", RapidJsonUtils::ToJsonArray(material.metallicRoughness.baseColorFactor, a), a);
-                }
-
-                if (!material.metallicRoughness.baseColorTexture.textureId.empty())
-                {
-                    rapidjson::Value baseColorTexture(rapidjson::kObjectType);
-                    SerializeTextureInfo(gltfDocument, material.metallicRoughness.baseColorTexture, baseColorTexture, a, gltfDocument.textures, extensionSerializer);
-                    pbrMetallicRoughness.AddMember("baseColorTexture", baseColorTexture, a);
-                }
-
-                if (material.metallicRoughness.metallicFactor != 1.0f)
-                {
-                    pbrMetallicRoughness.AddMember("metallicFactor", material.metallicRoughness.metallicFactor, a);
-                }
-
-                if (material.metallicRoughness.roughnessFactor != 1.0f)
-                {
-                    pbrMetallicRoughness.AddMember("roughnessFactor", material.metallicRoughness.roughnessFactor, a);
-                }
-
-                if (!material.metallicRoughness.metallicRoughnessTexture.textureId.empty())
-                {
-                    rapidjson::Value metallicRoughnessTexture(rapidjson::kObjectType);
-                    SerializeTextureInfo(gltfDocument, material.metallicRoughness.metallicRoughnessTexture, metallicRoughnessTexture, a, gltfDocument.textures, extensionSerializer);
-                    pbrMetallicRoughness.AddMember("metallicRoughnessTexture", metallicRoughnessTexture, a);
-                }
-            }
-
-            if (0 < pbrMetallicRoughness.MemberCount())
-            {
-                materialValue.AddMember("pbrMetallicRoughness", pbrMetallicRoughness, a);
-            }
-
-            // Normal
-            if (!material.normalTexture.textureId.empty())
-            {
-                rapidjson::Value normalTexture(rapidjson::kObjectType);
-                SerializeTextureInfo(gltfDocument, material.normalTexture, normalTexture, a, gltfDocument.textures, extensionSerializer);
-                if (material.normalTexture.scale != 1.0f)
-                {
-                    normalTexture.AddMember("scale", material.normalTexture.scale, a);
-                }
-                materialValue.AddMember("normalTexture", normalTexture, a);
-            }
-
-            // Occlusion
-            if (!material.occlusionTexture.textureId.empty())
-            {
-                rapidjson::Value occlusionTexture(rapidjson::kObjectType);
-                SerializeTextureInfo(gltfDocument, material.occlusionTexture, occlusionTexture, a, gltfDocument.textures, extensionSerializer);
-                if (material.occlusionTexture.strength != 1.0f)
-                {
-                    occlusionTexture.AddMember("strength", material.occlusionTexture.strength, a);
-                }
-                materialValue.AddMember("occlusionTexture", occlusionTexture, a);
-            }
-
-            // Emissive Texture
-            if (!material.emissiveTexture.textureId.empty())
-            {
-                rapidjson::Value emissiveTexture(rapidjson::kObjectType);
-                SerializeTextureInfo(gltfDocument, material.emissiveTexture, emissiveTexture, a, gltfDocument.textures, extensionSerializer);
-                materialValue.AddMember("emissiveTexture", emissiveTexture, a);
-            }
-
-            //// Emissive Factor
-            if (material.emissiveFactor != Color3(0.0f, 0.0f, 0.0f))
-            {
-                materialValue.AddMember("emissiveFactor", RapidJsonUtils::ToJsonArray(material.emissiveFactor, a), a);
-            }
-
-            // Alpha Mode : do not serialize default value (opaque) or currently-unsupported value (unknown)
-            if (material.alphaMode != ALPHA_OPAQUE && material.alphaMode != ALPHA_UNKNOWN)
-            {
-                materialValue.AddMember("alphaMode", RapidJsonUtils::ToStringValue(AlphaModeToString(material.alphaMode), a), a);
-            }
-
-            // Alpha Cutoff
-            if (material.alphaCutoff != 0.5f)
-            {
-                materialValue.AddMember("alphaCutoff", material.alphaCutoff, a);
-            }
-
-            // Name
-            RapidJsonUtils::AddOptionalMember("name", materialValue, material.name, a);
-
-            // Double Sided
-            if (material.doubleSided)
-            {
-                materialValue.AddMember("doubleSided", material.doubleSided, a);
-            }
-
-            SerializeProperty(gltfDocument, material, materialValue, a, extensionSerializer);
+            Internal::SetJsonMember(
+                metallicRoughness,
+                "baseColorFactor",
+                CreateFloatArray(
+                    material.metallicRoughness
+                        .baseColorFactor));
         }
-
-        return materialValue;
-    }
-
-    rapidjson::Value SerializeTarget(const MorphTarget& target, const Document& gltfDocument, rapidjson::Document& document)
-    {
-        rapidjson::Value targetValue(rapidjson::kObjectType);
-        rapidjson::Document::AllocatorType& a = document.GetAllocator();
-
-        RapidJsonUtils::AddOptionalMemberIndex(ACCESSOR_POSITION, targetValue, target.positionsAccessorId, gltfDocument.accessors, a);
-        RapidJsonUtils::AddOptionalMemberIndex(ACCESSOR_NORMAL, targetValue, target.normalsAccessorId, gltfDocument.accessors, a);
-        RapidJsonUtils::AddOptionalMemberIndex(ACCESSOR_TANGENT, targetValue, target.tangentsAccessorId, gltfDocument.accessors, a);
-
-        return targetValue;
-    }
-
-    void SerializeTargets(const MeshPrimitive& primitive, rapidjson::Value& primitiveValue, const Document& gltfDocument, rapidjson::Document& document)
-    {
-        if (!primitive.targets.empty())
+        if (!material.metallicRoughness
+                 .baseColorTexture.textureId.empty())
         {
-            rapidjson::Document::AllocatorType& a = document.GetAllocator();
-            rapidjson::Value targets(rapidjson::kArrayType);
-            for (const auto& morphTarget : primitive.targets)
-            {
-                rapidjson::Value targetValue = SerializeTarget(morphTarget, gltfDocument, document);
-                targets.PushBack(targetValue, a);
-            }
-            primitiveValue.AddMember("targets", targets, a);
+            JsonValue texture = Internal::CreateJsonObject();
+            SerializeTextureInfo(
+                gltfDocument,
+                material.metallicRoughness.baseColorTexture,
+                texture,
+                gltfDocument.textures,
+                extensionSerializer);
+            Internal::SetJsonMember(
+                metallicRoughness,
+                "baseColorTexture",
+                std::move(texture));
         }
+        if (material.metallicRoughness.metallicFactor != 1.0F)
+        {
+            Internal::SetJsonMember(
+                metallicRoughness,
+                "metallicFactor",
+                Internal::CreateJsonFloat(
+                    material.metallicRoughness
+                        .metallicFactor));
+        }
+        if (material.metallicRoughness.roughnessFactor != 1.0F)
+        {
+            Internal::SetJsonMember(
+                metallicRoughness,
+                "roughnessFactor",
+                Internal::CreateJsonFloat(
+                    material.metallicRoughness
+                        .roughnessFactor));
+        }
+        if (!material.metallicRoughness
+                 .metallicRoughnessTexture.textureId.empty())
+        {
+            JsonValue texture = Internal::CreateJsonObject();
+            SerializeTextureInfo(
+                gltfDocument,
+                material.metallicRoughness
+                    .metallicRoughnessTexture,
+                texture,
+                gltfDocument.textures,
+                extensionSerializer);
+            Internal::SetJsonMember(
+                metallicRoughness,
+                "metallicRoughnessTexture",
+                std::move(texture));
+        }
+        if (!Internal::GetJsonObjectMemberNames(
+                metallicRoughness,
+                "pbrMetallicRoughness must be an object").empty())
+        {
+            Internal::SetJsonMember(
+                value,
+                "pbrMetallicRoughness",
+                std::move(metallicRoughness));
+        }
+
+        if (!material.normalTexture.textureId.empty())
+        {
+            JsonValue texture = Internal::CreateJsonObject();
+            SerializeTextureInfo(
+                gltfDocument,
+                material.normalTexture,
+                texture,
+                gltfDocument.textures,
+                extensionSerializer);
+            if (material.normalTexture.scale != 1.0F)
+            {
+                Internal::SetJsonMember(
+                    texture,
+                    "scale",
+                    Internal::CreateJsonFloat(
+                        material.normalTexture.scale));
+            }
+            Internal::SetJsonMember(
+                value,
+                "normalTexture",
+                std::move(texture));
+        }
+
+        if (!material.occlusionTexture.textureId.empty())
+        {
+            JsonValue texture = Internal::CreateJsonObject();
+            SerializeTextureInfo(
+                gltfDocument,
+                material.occlusionTexture,
+                texture,
+                gltfDocument.textures,
+                extensionSerializer);
+            if (material.occlusionTexture.strength != 1.0F)
+            {
+                Internal::SetJsonMember(
+                    texture,
+                    "strength",
+                    Internal::CreateJsonFloat(
+                        material.occlusionTexture.strength));
+            }
+            Internal::SetJsonMember(
+                value,
+                "occlusionTexture",
+                std::move(texture));
+        }
+
+        if (!material.emissiveTexture.textureId.empty())
+        {
+            JsonValue texture = Internal::CreateJsonObject();
+            SerializeTextureInfo(
+                gltfDocument,
+                material.emissiveTexture,
+                texture,
+                gltfDocument.textures,
+                extensionSerializer);
+            Internal::SetJsonMember(
+                value,
+                "emissiveTexture",
+                std::move(texture));
+        }
+
+        if (material.emissiveFactor !=
+            Color3(0.0F, 0.0F, 0.0F))
+        {
+            Internal::SetJsonMember(
+                value,
+                "emissiveFactor",
+                CreateFloatArray(material.emissiveFactor));
+        }
+        if (material.alphaMode != ALPHA_OPAQUE &&
+            material.alphaMode != ALPHA_UNKNOWN)
+        {
+            Internal::SetJsonMember(
+                value,
+                "alphaMode",
+                Internal::CreateJsonString(
+                    AlphaModeToString(material.alphaMode)));
+        }
+        if (material.alphaCutoff != 0.5F)
+        {
+            Internal::SetJsonMember(
+                value,
+                "alphaCutoff",
+                Internal::CreateJsonFloat(
+                    material.alphaCutoff));
+        }
+        AddOptionalString(value, "name", material.name);
+        if (material.doubleSided)
+        {
+            Internal::SetJsonMember(
+                value,
+                "doubleSided",
+                Internal::CreateJsonBoolean(true));
+        }
+
+        SerializeProperty(
+            gltfDocument,
+            material,
+            value,
+            extensionSerializer);
+        return value;
     }
 
-    rapidjson::Value SerializeMesh(const Mesh& mesh, const Document& gltfDocument, rapidjson::Document& document, const ExtensionSerializer& extensionSerializer)
+    JsonValue SerializeTarget(
+        const MorphTarget& target,
+        const Document& gltfDocument)
     {
-        rapidjson::Document::AllocatorType& a = document.GetAllocator();
+        JsonValue value = Internal::CreateJsonObject();
+        AddOptionalIndex(
+            value,
+            ACCESSOR_POSITION,
+            target.positionsAccessorId,
+            gltfDocument.accessors);
+        AddOptionalIndex(
+            value,
+            ACCESSOR_NORMAL,
+            target.normalsAccessorId,
+            gltfDocument.accessors);
+        AddOptionalIndex(
+            value,
+            ACCESSOR_TANGENT,
+            target.tangentsAccessorId,
+            gltfDocument.accessors);
+        return value;
+    }
 
-        rapidjson::Value meshValue(rapidjson::kObjectType);
-        rapidjson::Value primitiveValues(rapidjson::kArrayType);
+    void SerializeTargets(
+        const MeshPrimitive& primitive,
+        JsonValue& primitiveValue,
+        const Document& gltfDocument)
+    {
+        if (primitive.targets.empty())
+        {
+            return;
+        }
 
+        JsonValue targets = Internal::CreateJsonArray();
+        for (const auto& target : primitive.targets)
+        {
+            Internal::AppendJsonValue(
+                targets,
+                SerializeTarget(target, gltfDocument));
+        }
+        Internal::SetJsonMember(
+            primitiveValue,
+            "targets",
+            std::move(targets));
+    }
+
+    JsonValue SerializeMesh(
+        const Mesh& mesh,
+        const Document& gltfDocument,
+        const ExtensionSerializer& extensionSerializer)
+    {
+        JsonValue primitiveValues =
+            Internal::CreateJsonArray();
         for (const auto& primitive : mesh.primitives)
         {
-            rapidjson::Value attributes(rapidjson::kObjectType);
-
-            for (const auto& attribute : primitive.attributes)
+            JsonValue attributes =
+                Internal::CreateJsonObject();
+            std::vector<std::pair<std::string, std::string>>
+                sortedAttributes(
+                    primitive.attributes.begin(),
+                    primitive.attributes.end());
+            std::sort(
+                sortedAttributes.begin(),
+                sortedAttributes.end(),
+                [](const std::pair<std::string, std::string>& left,
+                   const std::pair<std::string, std::string>& right)
+                {
+                    return left.first < right.first;
+                });
+            for (const auto& attribute : sortedAttributes)
             {
-                attributes.AddMember(RapidJsonUtils::ToStringValue(attribute.first, a), rapidjson::Value(ToKnownSizeType(gltfDocument.accessors.GetIndex(attribute.second))), a);
+                Internal::SetJsonMember(
+                    attributes,
+                    attribute.first,
+                    Internal::CreateJsonSize(
+                        gltfDocument.accessors.GetIndex(
+                            attribute.second)));
             }
 
-            rapidjson::Value primitiveValue(rapidjson::kObjectType);
-
-            primitiveValue.AddMember("attributes", attributes, a);
-            RapidJsonUtils::AddOptionalMemberIndex("indices", primitiveValue, primitive.indicesAccessorId, gltfDocument.accessors, a);
-            RapidJsonUtils::AddOptionalMemberIndex("material", primitiveValue, primitive.materialId, gltfDocument.materials, a);
-
+            JsonValue primitiveValue =
+                Internal::CreateJsonObject();
+            Internal::SetJsonMember(
+                primitiveValue,
+                "attributes",
+                std::move(attributes));
+            AddOptionalIndex(
+                primitiveValue,
+                "indices",
+                primitive.indicesAccessorId,
+                gltfDocument.accessors);
+            AddOptionalIndex(
+                primitiveValue,
+                "material",
+                primitive.materialId,
+                gltfDocument.materials);
             if (primitive.mode != MESH_TRIANGLES)
             {
-                primitiveValue.AddMember("mode", primitive.mode, a);
+                Internal::SetJsonMember(
+                    primitiveValue,
+                    "mode",
+                    Internal::CreateJsonInt32(primitive.mode));
             }
-
-            SerializeTargets(primitive, primitiveValue, gltfDocument, document);
-
-            SerializeProperty(gltfDocument, primitive, primitiveValue, a, extensionSerializer);
-
-            primitiveValues.PushBack(primitiveValue, a);
+            SerializeTargets(
+                primitive,
+                primitiveValue,
+                gltfDocument);
+            SerializeProperty(
+                gltfDocument,
+                primitive,
+                primitiveValue,
+                extensionSerializer);
+            Internal::AppendJsonValue(
+                primitiveValues,
+                std::move(primitiveValue));
         }
 
-        RapidJsonUtils::AddArrayMember(meshValue, "weights", mesh.weights, a);
-
-        RapidJsonUtils::AddOptionalMember("name", meshValue, mesh.name, a);
-        meshValue.AddMember("primitives", primitiveValues, a);
-
-        SerializeProperty(gltfDocument, mesh, meshValue, a, extensionSerializer);
-
-        return meshValue;
+        JsonValue value = Internal::CreateJsonObject();
+        AddFloatArray(value, "weights", mesh.weights);
+        AddOptionalString(value, "name", mesh.name);
+        Internal::SetJsonMember(
+            value,
+            "primitives",
+            std::move(primitiveValues));
+        SerializeProperty(
+            gltfDocument,
+            mesh,
+            value,
+            extensionSerializer);
+        return value;
     }
 
-    rapidjson::Value SerializeNode(const Node& node, const Document& gltfDocument, rapidjson::Document& document, const ExtensionSerializer& extensionSerializer)
+    JsonValue SerializeNode(
+        const Node& node,
+        const Document& gltfDocument,
+        const ExtensionSerializer& extensionSerializer)
     {
-        rapidjson::Document::AllocatorType& a = document.GetAllocator();
-
-        rapidjson::Value nodeValue(rapidjson::kObjectType);
-
+        JsonValue value = Internal::CreateJsonObject();
         if (!node.children.empty())
         {
-            rapidjson::Value nodeChildren(rapidjson::kArrayType);
+            JsonValue children = Internal::CreateJsonArray();
+            for (const auto& childId : node.children)
             {
-                for (const auto& childId : node.children)
-                {
-                    nodeChildren.PushBack(ToKnownSizeType(gltfDocument.nodes.GetIndex(childId)), a);
-                }
+                Internal::AppendJsonValue(
+                    children,
+                    Internal::CreateJsonSize(
+                        gltfDocument.nodes.GetIndex(childId)));
             }
-            nodeValue.AddMember("children", nodeChildren, a);
+            Internal::SetJsonMember(
+                value, "children", std::move(children));
         }
 
         if (!node.HasValidTransformType())
         {
-            throw DocumentException("Node " + node.id + " doesn't have a valid transform type");
+            throw DocumentException(
+                "Node " + node.id +
+                " doesn't have a valid transform type");
         }
 
-        if (node.GetTransformationType() == Microsoft::glTF::TransformationType::TRANSFORMATION_MATRIX)
+        if (node.GetTransformationType() ==
+            TransformationType::TRANSFORMATION_MATRIX)
         {
-            nodeValue.AddMember("matrix", RapidJsonUtils::ToJsonArray<float, 16>(node.matrix.values, a), a);
+            Internal::SetJsonMember(
+                value,
+                "matrix",
+                CreateFloatArray(node.matrix.values));
         }
-        else if (node.GetTransformationType() == Microsoft::glTF::TransformationType::TRANSFORMATION_TRS)
+        else if (node.GetTransformationType() ==
+                 TransformationType::TRANSFORMATION_TRS)
         {
             if (node.translation != Vector3::ZERO)
             {
-                nodeValue.AddMember("translation", RapidJsonUtils::ToJsonArray(node.translation, a), a);
+                Internal::SetJsonMember(
+                    value,
+                    "translation",
+                    CreateFloatArray(node.translation));
             }
             if (node.rotation != Quaternion::IDENTITY)
             {
-                nodeValue.AddMember("rotation", RapidJsonUtils::ToJsonArray(node.rotation, a), a);
+                Internal::SetJsonMember(
+                    value,
+                    "rotation",
+                    CreateFloatArray(node.rotation));
             }
             if (node.scale != Vector3::ONE)
             {
-                nodeValue.AddMember("scale", RapidJsonUtils::ToJsonArray(node.scale, a), a);
+                Internal::SetJsonMember(
+                    value,
+                    "scale",
+                    CreateFloatArray(node.scale));
             }
         }
 
-        RapidJsonUtils::AddOptionalMemberIndex("mesh", nodeValue, node.meshId, gltfDocument.meshes, a);
-        RapidJsonUtils::AddOptionalMemberIndex("skin", nodeValue, node.skinId, gltfDocument.skins, a);
-
-        if (!node.cameraId.empty())
-        {
-            nodeValue.AddMember("camera", ToKnownSizeType(gltfDocument.cameras.GetIndex(node.cameraId)), a);
-        }
-
-        RapidJsonUtils::AddArrayMember(nodeValue, "weights", node.weights, a);
-
-        RapidJsonUtils::AddOptionalMember("name", nodeValue, node.name, a);
-
-        SerializeProperty(gltfDocument, node, nodeValue, a, extensionSerializer);
-
-        return nodeValue;
+        AddOptionalIndex(
+            value,
+            "mesh",
+            node.meshId,
+            gltfDocument.meshes);
+        AddOptionalIndex(
+            value,
+            "skin",
+            node.skinId,
+            gltfDocument.skins);
+        AddOptionalIndex(
+            value,
+            "camera",
+            node.cameraId,
+            gltfDocument.cameras);
+        AddFloatArray(value, "weights", node.weights);
+        AddOptionalString(value, "name", node.name);
+        SerializeProperty(
+            gltfDocument,
+            node,
+            value,
+            extensionSerializer);
+        return value;
     }
 
-    rapidjson::Value SerializeCamera(const Camera& camera, const Document& gltfDocument, rapidjson::Document& document, const ExtensionSerializer& extensionSerializer)
+    JsonValue SerializeCamera(
+        const Camera& camera,
+        const Document& gltfDocument,
+        const ExtensionSerializer& extensionSerializer)
     {
-        rapidjson::Document::AllocatorType& a = document.GetAllocator();
-        rapidjson::Value cameraValue(rapidjson::kObjectType);
-        rapidjson::Value projectionValue(rapidjson::kObjectType);
+        JsonValue value = Internal::CreateJsonObject();
+        JsonValue projection = Internal::CreateJsonObject();
+        const ProjectionType type =
+            camera.projection->GetProjectionType();
 
-        const ProjectionType projectionType = camera.projection->GetProjectionType();
-
-        if (projectionType == PROJECTION_PERSPECTIVE)
+        if (type == PROJECTION_PERSPECTIVE)
         {
             const auto& perspective = camera.GetPerspective();
-
-            projectionValue.AddMember("znear", RapidJsonUtils::ToFloatValue(perspective.znear), a);
-            projectionValue.AddMember("yfov", RapidJsonUtils::ToFloatValue(perspective.yfov), a);
-
+            Internal::SetJsonMember(
+                projection,
+                "znear",
+                Internal::CreateJsonFloat(perspective.znear));
+            Internal::SetJsonMember(
+                projection,
+                "yfov",
+                Internal::CreateJsonFloat(perspective.yfov));
             if (perspective.zfar)
             {
-                projectionValue.AddMember("zfar", RapidJsonUtils::ToFloatValue(perspective.zfar.Get()), a);
+                Internal::SetJsonMember(
+                    projection,
+                    "zfar",
+                    Internal::CreateJsonFloat(
+                        perspective.zfar.Get()));
             }
-
             if (perspective.aspectRatio)
             {
-                projectionValue.AddMember("aspectRatio", RapidJsonUtils::ToFloatValue(perspective.aspectRatio.Get()), a);
+                Internal::SetJsonMember(
+                    projection,
+                    "aspectRatio",
+                    Internal::CreateJsonFloat(
+                        perspective.aspectRatio.Get()));
             }
-
-            SerializeProperty(gltfDocument, perspective, projectionValue, a, extensionSerializer);
-
-            cameraValue.AddMember("perspective", projectionValue, a);
-            cameraValue.AddMember("type", RapidJsonUtils::ToStringValue("perspective", a), a);
+            SerializeProperty(
+                gltfDocument,
+                perspective,
+                projection,
+                extensionSerializer);
+            Internal::SetJsonMember(
+                value,
+                "perspective",
+                std::move(projection));
+            Internal::SetJsonMember(
+                value,
+                "type",
+                Internal::CreateJsonString("perspective"));
         }
-        else if (projectionType == PROJECTION_ORTHOGRAPHIC)
+        else if (type == PROJECTION_ORTHOGRAPHIC)
         {
-            const auto& orthographic = camera.GetOrthographic();
-
-            projectionValue.AddMember("xmag", RapidJsonUtils::ToFloatValue(orthographic.xmag), a);
-            projectionValue.AddMember("ymag", RapidJsonUtils::ToFloatValue(orthographic.ymag), a);
-            projectionValue.AddMember("znear", RapidJsonUtils::ToFloatValue(orthographic.znear), a);
-            projectionValue.AddMember("zfar", RapidJsonUtils::ToFloatValue(orthographic.zfar), a);
-
-            SerializeProperty(gltfDocument, orthographic, projectionValue, a, extensionSerializer);
-
-            cameraValue.AddMember("orthographic", projectionValue, a);
-            cameraValue.AddMember("type", RapidJsonUtils::ToStringValue("orthographic", a), a);
+            const auto& orthographic =
+                camera.GetOrthographic();
+            Internal::SetJsonMember(
+                projection,
+                "xmag",
+                Internal::CreateJsonFloat(orthographic.xmag));
+            Internal::SetJsonMember(
+                projection,
+                "ymag",
+                Internal::CreateJsonFloat(orthographic.ymag));
+            Internal::SetJsonMember(
+                projection,
+                "znear",
+                Internal::CreateJsonFloat(orthographic.znear));
+            Internal::SetJsonMember(
+                projection,
+                "zfar",
+                Internal::CreateJsonFloat(orthographic.zfar));
+            SerializeProperty(
+                gltfDocument,
+                orthographic,
+                projection,
+                extensionSerializer);
+            Internal::SetJsonMember(
+                value,
+                "orthographic",
+                std::move(projection));
+            Internal::SetJsonMember(
+                value,
+                "type",
+                Internal::CreateJsonString("orthographic"));
         }
         else
         {
-            throw DocumentException("Camera " + camera.id + " doesn't have a valid projection type");
+            throw DocumentException(
+                "Camera " + camera.id +
+                " doesn't have a valid projection type");
         }
 
-        SerializeProperty(gltfDocument, camera, cameraValue, a, extensionSerializer);
-
-        RapidJsonUtils::AddOptionalMember("name", cameraValue, camera.name, a);
-
-        return cameraValue;
+        SerializeProperty(
+            gltfDocument,
+            camera,
+            value,
+            extensionSerializer);
+        AddOptionalString(value, "name", camera.name);
+        return value;
     }
 
-    rapidjson::Value SerializeSampler(const Sampler& sampler, const Document& gltfDocument, rapidjson::Document& document, const ExtensionSerializer& extensionSerializer)
+    JsonValue SerializeSampler(
+        const Sampler& sampler,
+        const Document& gltfDocument,
+        const ExtensionSerializer& extensionSerializer)
     {
-        rapidjson::Document::AllocatorType& a = document.GetAllocator();
-        rapidjson::Value samplerValue(rapidjson::kObjectType);
-
+        JsonValue value = Internal::CreateJsonObject();
+        AddOptionalString(value, "name", sampler.name);
+        if (sampler.magFilter)
         {
-            RapidJsonUtils::AddOptionalMember("name", samplerValue, sampler.name, a);
-
-            if (sampler.magFilter)
-            {
-                samplerValue.AddMember("magFilter", sampler.magFilter.Get(), a);
-            }
-
-            if (sampler.minFilter)
-            {
-                samplerValue.AddMember("minFilter", sampler.minFilter.Get(), a);
-            }
-
-            if (sampler.wrapS != WrapMode::Wrap_REPEAT)
-            {
-                samplerValue.AddMember("wrapS", sampler.wrapS, a);
-            }
-
-            if (sampler.wrapT != WrapMode::Wrap_REPEAT)
-            {
-                samplerValue.AddMember("wrapT", sampler.wrapT, a);
-            }
-
-            SerializeProperty(gltfDocument, sampler, samplerValue, a, extensionSerializer);
+            Internal::SetJsonMember(
+                value,
+                "magFilter",
+                Internal::CreateJsonInt32(
+                    sampler.magFilter.Get()));
         }
-
-        return samplerValue;
+        if (sampler.minFilter)
+        {
+            Internal::SetJsonMember(
+                value,
+                "minFilter",
+                Internal::CreateJsonInt32(
+                    sampler.minFilter.Get()));
+        }
+        if (sampler.wrapS != WrapMode::Wrap_REPEAT)
+        {
+            Internal::SetJsonMember(
+                value,
+                "wrapS",
+                Internal::CreateJsonInt32(sampler.wrapS));
+        }
+        if (sampler.wrapT != WrapMode::Wrap_REPEAT)
+        {
+            Internal::SetJsonMember(
+                value,
+                "wrapT",
+                Internal::CreateJsonInt32(sampler.wrapT));
+        }
+        SerializeProperty(
+            gltfDocument,
+            sampler,
+            value,
+            extensionSerializer);
+        return value;
     }
 
-    rapidjson::Value SerializeScene(const Scene& scene, const Document& gltfDocument, rapidjson::Document& document, const ExtensionSerializer& extensionSerializer)
+    JsonValue SerializeScene(
+        const Scene& scene,
+        const Document& gltfDocument,
+        const ExtensionSerializer& extensionSerializer)
     {
-        rapidjson::Document::AllocatorType& a = document.GetAllocator();
-        rapidjson::Value sceneValue(rapidjson::kObjectType);
-
+        JsonValue value = Internal::CreateJsonObject();
         if (!scene.nodes.empty())
         {
-            rapidjson::Value nodesArray(rapidjson::kArrayType);
+            JsonValue nodes = Internal::CreateJsonArray();
             for (const auto& nodeId : scene.nodes)
             {
-                nodesArray.PushBack(ToKnownSizeType(gltfDocument.nodes.GetIndex(nodeId)), a);
+                Internal::AppendJsonValue(
+                    nodes,
+                    Internal::CreateJsonSize(
+                        gltfDocument.nodes.GetIndex(nodeId)));
             }
-            sceneValue.AddMember("nodes", nodesArray, a);
+            Internal::SetJsonMember(
+                value, "nodes", std::move(nodes));
         }
-
-        RapidJsonUtils::AddOptionalMember("name", sceneValue, scene.name, a);
-
-        SerializeProperty(gltfDocument, scene, sceneValue, a, extensionSerializer);
-
-        return sceneValue;
+        AddOptionalString(value, "name", scene.name);
+        SerializeProperty(
+            gltfDocument,
+            scene,
+            value,
+            extensionSerializer);
+        return value;
     }
 
-    rapidjson::Value SerializeSkin(const Skin& skin, const Document& gltfDocument, rapidjson::Document& document, const ExtensionSerializer& extensionSerializer)
+    JsonValue SerializeSkin(
+        const Skin& skin,
+        const Document& gltfDocument,
+        const ExtensionSerializer& extensionSerializer)
     {
-        rapidjson::Document::AllocatorType& a = document.GetAllocator();
-        rapidjson::Value skinValue(rapidjson::kObjectType);
+        JsonValue value = Internal::CreateJsonObject();
+        AddOptionalIndex(
+            value,
+            "inverseBindMatrices",
+            skin.inverseBindMatricesAccessorId,
+            gltfDocument.accessors);
+        AddOptionalIndex(
+            value,
+            "skeleton",
+            skin.skeletonId,
+            gltfDocument.nodes);
+        if (!skin.jointIds.empty())
         {
-            RapidJsonUtils::AddOptionalMemberIndex("inverseBindMatrices", skinValue, skin.inverseBindMatricesAccessorId, gltfDocument.accessors, a);
-            RapidJsonUtils::AddOptionalMemberIndex("skeleton", skinValue, skin.skeletonId, gltfDocument.nodes, a);
-
-            if (!skin.jointIds.empty())
+            JsonValue joints = Internal::CreateJsonArray();
+            for (const auto& jointId : skin.jointIds)
             {
-                rapidjson::Value jointIds(rapidjson::kArrayType);
-                {
-                    for (const auto& jointId : skin.jointIds)
-                    {
-                        jointIds.PushBack(ToKnownSizeType(gltfDocument.nodes.GetIndex(jointId)), a);
-                    }
-                }
-                skinValue.AddMember("joints", jointIds, a);
+                Internal::AppendJsonValue(
+                    joints,
+                    Internal::CreateJsonSize(
+                        gltfDocument.nodes.GetIndex(jointId)));
             }
-
-            RapidJsonUtils::AddOptionalMember("name", skinValue, skin.name, a);
-
-            SerializeProperty(gltfDocument, skin, skinValue, a, extensionSerializer);
+            Internal::SetJsonMember(
+                value, "joints", std::move(joints));
         }
-        return skinValue;
+        AddOptionalString(value, "name", skin.name);
+        SerializeProperty(
+            gltfDocument,
+            skin,
+            value,
+            extensionSerializer);
+        return value;
     }
 
-    rapidjson::Value SerializeTexture(const Texture& texture, const Document& gltfDocument, rapidjson::Document& document, const ExtensionSerializer& extensionSerializer)
+    JsonValue SerializeTexture(
+        const Texture& texture,
+        const Document& gltfDocument,
+        const ExtensionSerializer& extensionSerializer)
     {
-        rapidjson::Document::AllocatorType& a = document.GetAllocator();
-        rapidjson::Value textureValue(rapidjson::kObjectType);
-
-        RapidJsonUtils::AddOptionalMember("name", textureValue, texture.name, a);
-        RapidJsonUtils::AddOptionalMemberIndex("sampler", textureValue, texture.samplerId, gltfDocument.samplers, a);
-        RapidJsonUtils::AddOptionalMemberIndex("source", textureValue, texture.imageId, gltfDocument.images, a);
-
-        SerializeProperty(gltfDocument, texture, textureValue, a, extensionSerializer);
-
-        return textureValue;
+        JsonValue value = Internal::CreateJsonObject();
+        AddOptionalString(value, "name", texture.name);
+        AddOptionalIndex(
+            value,
+            "sampler",
+            texture.samplerId,
+            gltfDocument.samplers);
+        AddOptionalIndex(
+            value,
+            "source",
+            texture.imageId,
+            gltfDocument.images);
+        SerializeProperty(
+            gltfDocument,
+            texture,
+            value,
+            extensionSerializer);
+        return value;
     }
 
-    void SerializeExtensions(const Document& gltfDocument, rapidjson::Document& document, const ExtensionSerializer& extensionSerializer)
+    void SerializeRootProperty(
+        const Document& gltfDocument,
+        JsonValue& document,
+        const ExtensionSerializer& extensionSerializer)
     {
-        rapidjson::Document::AllocatorType& a = document.GetAllocator();
-        rapidjson::Value extensionValue(rapidjson::kObjectType);
+        SerializeProperty(
+            gltfDocument,
+            gltfDocument,
+            document,
+            extensionSerializer);
+    }
 
-        SerializePropertyExtensions(gltfDocument, gltfDocument, extensionValue, a, extensionSerializer);
-
-        if (extensionValue.HasMember("extensions"))
+    void SerializeStringSet(
+        const char* name,
+        const std::unordered_set<std::string>& values,
+        JsonValue& document)
+    {
+        if (values.empty())
         {
-            auto& value = extensionValue.FindMember("extensions")->value;
-            document.AddMember("extensions", value, a);
+            return;
         }
-    }
 
-    void SerializeStringSet(const std::string& key, const std::unordered_set<std::string> set, rapidjson::Document& document)
-    {
-        if (!set.empty())
+        JsonValue array = Internal::CreateJsonArray();
+        std::vector<std::string> sortedValues(
+            values.begin(), values.end());
+        std::sort(sortedValues.begin(), sortedValues.end());
+        for (const auto& value : sortedValues)
         {
-            rapidjson::Document::AllocatorType& a = document.GetAllocator();
-            rapidjson::Value extensions(rapidjson::kArrayType);
-            for (const auto& element : set)
-            {
-                extensions.PushBack(RapidJsonUtils::ToStringValue(element, a), a);
-            }
-            document.AddMember(RapidJsonUtils::ToStringValue(key, a), extensions, a);
+            Internal::AppendJsonValue(
+                array,
+                Internal::CreateJsonString(value));
         }
+        Internal::SetJsonMember(
+            document, name, std::move(array));
     }
 
-    void SerializeExtensionsUsed(const Document& gltfDocument, rapidjson::Document& document)
+    JsonValue CreateJsonDocument(
+        const Document& gltfDocument,
+        const ExtensionSerializer& extensionSerializer)
     {
-        SerializeStringSet("extensionsUsed", gltfDocument.extensionsUsed, document);
-    }
-
-    void SerializeExtensionsRequired(const Document& gltfDocument, rapidjson::Document& document)
-    {
-        for (auto& extensionName : gltfDocument.extensionsRequired)
-        {
-            if (gltfDocument.extensionsUsed.find(extensionName) == gltfDocument.extensionsUsed.end())
-            {
-                throw GLTFException("required extension '" + extensionName + "' not present in extensionsUsed.");
-            }
-        }
-        
-        SerializeStringSet("extensionsRequired", gltfDocument.extensionsRequired, document);
-    }
-
-    rapidjson::Document CreateJsonDocument(const Document& gltfDocument, const ExtensionSerializer& extensionSerializer)
-    {
-        rapidjson::Document document(rapidjson::kObjectType);
-
-        SerializeAsset(gltfDocument, document, extensionSerializer);
-
-        SerializeIndexedContainer<Accessor>("accessors", gltfDocument.accessors, gltfDocument, document, extensionSerializer, SerializeAccessor);
-        SerializeIndexedContainer<Animation>("animations", gltfDocument.animations, gltfDocument, document, extensionSerializer, SerializeAnimation);
-        SerializeIndexedContainer<BufferView>("bufferViews", gltfDocument.bufferViews, gltfDocument, document, extensionSerializer, SerializeBufferView);
-        SerializeIndexedContainer<Buffer>("buffers", gltfDocument.buffers, gltfDocument, document, extensionSerializer, SerializeBuffer);
-        SerializeIndexedContainer<Camera>("cameras", gltfDocument.cameras, gltfDocument, document, extensionSerializer, SerializeCamera);
-        SerializeIndexedContainer<Image>("images", gltfDocument.images, gltfDocument, document, extensionSerializer, SerializeImage);
-        SerializeIndexedContainer<Material>("materials", gltfDocument.materials, gltfDocument, document, extensionSerializer, SerializeMaterial);
-        SerializeIndexedContainer<Mesh>("meshes", gltfDocument.meshes, gltfDocument, document, extensionSerializer, SerializeMesh);
-        SerializeIndexedContainer<Node>("nodes", gltfDocument.nodes, gltfDocument, document, extensionSerializer, SerializeNode);
-        SerializeIndexedContainer<Sampler>("samplers", gltfDocument.samplers, gltfDocument, document, extensionSerializer, SerializeSampler);
-        SerializeIndexedContainer<Scene>("scenes", gltfDocument.scenes, gltfDocument, document, extensionSerializer, SerializeScene);
-        SerializeIndexedContainer<Skin>("skins", gltfDocument.skins, gltfDocument, document, extensionSerializer, SerializeSkin);
-        SerializeIndexedContainer<Texture>("textures", gltfDocument.textures, gltfDocument, document, extensionSerializer, SerializeTexture);
+        JsonValue document = Internal::CreateJsonObject();
+        SerializeAsset(
+            gltfDocument, document, extensionSerializer);
+        SerializeIndexedContainer<Accessor>(
+            "accessors",
+            gltfDocument.accessors,
+            gltfDocument,
+            document,
+            extensionSerializer,
+            SerializeAccessor);
+        SerializeIndexedContainer<Animation>(
+            "animations",
+            gltfDocument.animations,
+            gltfDocument,
+            document,
+            extensionSerializer,
+            SerializeAnimation);
+        SerializeIndexedContainer<BufferView>(
+            "bufferViews",
+            gltfDocument.bufferViews,
+            gltfDocument,
+            document,
+            extensionSerializer,
+            SerializeBufferView);
+        SerializeIndexedContainer<Buffer>(
+            "buffers",
+            gltfDocument.buffers,
+            gltfDocument,
+            document,
+            extensionSerializer,
+            SerializeBuffer);
+        SerializeIndexedContainer<Camera>(
+            "cameras",
+            gltfDocument.cameras,
+            gltfDocument,
+            document,
+            extensionSerializer,
+            SerializeCamera);
+        SerializeIndexedContainer<Image>(
+            "images",
+            gltfDocument.images,
+            gltfDocument,
+            document,
+            extensionSerializer,
+            SerializeImage);
+        SerializeIndexedContainer<Material>(
+            "materials",
+            gltfDocument.materials,
+            gltfDocument,
+            document,
+            extensionSerializer,
+            SerializeMaterial);
+        SerializeIndexedContainer<Mesh>(
+            "meshes",
+            gltfDocument.meshes,
+            gltfDocument,
+            document,
+            extensionSerializer,
+            SerializeMesh);
+        SerializeIndexedContainer<Node>(
+            "nodes",
+            gltfDocument.nodes,
+            gltfDocument,
+            document,
+            extensionSerializer,
+            SerializeNode);
+        SerializeIndexedContainer<Sampler>(
+            "samplers",
+            gltfDocument.samplers,
+            gltfDocument,
+            document,
+            extensionSerializer,
+            SerializeSampler);
+        SerializeIndexedContainer<Scene>(
+            "scenes",
+            gltfDocument.scenes,
+            gltfDocument,
+            document,
+            extensionSerializer,
+            SerializeScene);
+        SerializeIndexedContainer<Skin>(
+            "skins",
+            gltfDocument.skins,
+            gltfDocument,
+            document,
+            extensionSerializer,
+            SerializeSkin);
+        SerializeIndexedContainer<Texture>(
+            "textures",
+            gltfDocument.textures,
+            gltfDocument,
+            document,
+            extensionSerializer,
+            SerializeTexture);
 
         SerializeDefaultScene(gltfDocument, document);
+        SerializeRootProperty(
+            gltfDocument, document, extensionSerializer);
+        SerializeStringSet(
+            "extensionsUsed",
+            gltfDocument.extensionsUsed,
+            document);
 
-        SerializeExtensions(gltfDocument, document, extensionSerializer);
-
-        SerializeExtensionsUsed(gltfDocument, document);
-        SerializeExtensionsRequired(gltfDocument, document);
-
+        for (const auto& extensionName :
+             gltfDocument.extensionsRequired)
+        {
+            if (gltfDocument.extensionsUsed.find(extensionName) ==
+                gltfDocument.extensionsUsed.end())
+            {
+                throw GLTFException(
+                    "required extension '" + extensionName +
+                    "' not present in extensionsUsed.");
+            }
+        }
+        SerializeStringSet(
+            "extensionsRequired",
+            gltfDocument.extensionsRequired,
+            document);
         return document;
     }
 
     bool HasFlag(SerializeFlags flags, SerializeFlags flag)
     {
-        return ((flags & flag) == flag);
+        return (flags & flag) == flag;
     }
 }
 
-std::string GLTFSDK_API Microsoft::glTF::Serialize(const Document& gltfDocument, SerializeFlags flags)
+std::string GLTFSDK_API Microsoft::glTF::Serialize(
+    const Document& gltfDocument,
+    SerializeFlags flags)
 {
-    return Serialize(gltfDocument, ExtensionSerializer(), flags);
+    return Serialize(
+        gltfDocument,
+        ExtensionSerializer(),
+        flags);
 }
 
-std::string GLTFSDK_API Microsoft::glTF::Serialize(const Document& gltfDocument, const ExtensionSerializer& extensionSerializer, SerializeFlags flags)
+std::string GLTFSDK_API Microsoft::glTF::Serialize(
+    const Document& gltfDocument,
+    const ExtensionSerializer& extensionSerializer,
+    SerializeFlags flags)
 {
-    auto doc = CreateJsonDocument(gltfDocument, extensionSerializer);
-
-    rapidjson::StringBuffer stringBuffer;
-    if (HasFlag(flags, SerializeFlags::Pretty))
-    {
-        rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(stringBuffer);
-        doc.Accept(writer);
-    }
-    else
-    {
-        rapidjson::Writer<rapidjson::StringBuffer> writer(stringBuffer);
-        doc.Accept(writer);
-    }
-
-    return stringBuffer.GetString();
+    const auto document =
+        CreateJsonDocument(
+            gltfDocument, extensionSerializer);
+    return Internal::WriteJson(
+        document,
+        HasFlag(flags, SerializeFlags::Pretty));
 }
 
-SerializeFlags Microsoft::glTF::operator|(SerializeFlags lhs, SerializeFlags rhs)
+SerializeFlags Microsoft::glTF::operator|(
+    SerializeFlags lhs,
+    SerializeFlags rhs)
 {
     const auto result =
         static_cast<std::underlying_type_t<SerializeFlags>>(lhs) |
         static_cast<std::underlying_type_t<SerializeFlags>>(rhs);
-
     return static_cast<SerializeFlags>(result);
 }
 
-SerializeFlags& Microsoft::glTF::operator|=(SerializeFlags& lhs, SerializeFlags rhs)
+SerializeFlags& Microsoft::glTF::operator|=(
+    SerializeFlags& lhs,
+    SerializeFlags rhs)
 {
     lhs = lhs | rhs;
     return lhs;
 }
 
-SerializeFlags Microsoft::glTF::operator&(SerializeFlags lhs, SerializeFlags rhs)
+SerializeFlags Microsoft::glTF::operator&(
+    SerializeFlags lhs,
+    SerializeFlags rhs)
 {
     const auto result =
         static_cast<std::underlying_type_t<SerializeFlags>>(lhs) &
         static_cast<std::underlying_type_t<SerializeFlags>>(rhs);
-
     return static_cast<SerializeFlags>(result);
 }
 
-SerializeFlags& Microsoft::glTF::operator&=(SerializeFlags& lhs, SerializeFlags rhs)
+SerializeFlags& Microsoft::glTF::operator&=(
+    SerializeFlags& lhs,
+    SerializeFlags rhs)
 {
     lhs = lhs & rhs;
     return lhs;

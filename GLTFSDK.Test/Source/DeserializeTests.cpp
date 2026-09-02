@@ -5,17 +5,22 @@
 
 #include <GLTFSDK/Deserialize.h>
 #include <GLTFSDK/Schema.h>
+#include <GLTFSDK/Serialize.h>
 #include <GLTFSDK/Validation.h>
+
+#include <cmath>
+#include <limits>
+#include <sstream>
+#include <string>
 
 using namespace glTF::UnitTest;
 
 namespace
 {
     // Malformed glTF JSON inputs that trigger schema dependency validation errors.
-    // These exercise the EndMissingDependentProperties code path in RapidJSON's
-    // schema validator which previously crashed with a null pointer dereference
-    // (CWE-476) when GetInvalidSchemaPointer().GetAllocator() was called on a
-    // pointer with a null allocator.
+    // These preserve the CWE-476 regression for missing schema dependencies:
+    // validation must throw cleanly rather than dereference invalid diagnostic
+    // state.
 
     // Root-level dependency: "scene" requires "scenes" to be present
     const char* c_missingDependentPropertyScenes = R"({
@@ -394,9 +399,7 @@ namespace
 })";
 
     // Regression inputs for variable-length array members that the deserializer
-    // reads with rapidjson array accessors: node "children" (an array of node
-    // indices) and node/mesh "weights" (arrays of numbers, via the shared
-    // RapidJsonUtils::ToFloatArray helper). A present member of the wrong
+    // reads as node indices or numeric weights. A present member of the wrong
     // container type - or an array containing an element of the wrong type -
     // must be rejected with InvalidGLTFException rather than read with accessors
     // that are only well-defined on a JSON array of the expected element type.
@@ -739,10 +742,9 @@ namespace Microsoft
                     Assert::AreEqual(doc.samplers[1].wrapT, Wrap_CLAMP_TO_EDGE, L"Sampler wrapT property was not deserialized correctly");
                 }
 
-                // Regression test for CWE-476: null pointer dereference in RapidJSON
-                // schema validator's EndMissingDependentProperties(). A missing
-                // dependent property must throw ValidationException rather than
-                // crashing with a null pointer dereference.
+                // Regression test for CWE-476: a missing dependent property must
+                // throw ValidationException rather than crash while constructing
+                // validation diagnostics.
                 GLTFSDK_TEST_METHOD(DeserializeTests, DeserializeFail_MissingDependentPropertyScenes)
                 {
                     Assert::ExpectException<ValidationException>([]()
@@ -947,8 +949,8 @@ namespace Microsoft
                 // Positive regression: a well-formed node "weights" array of
                 // numbers must still deserialize. Uses SchemaFlags::DisableSchemaRoot
                 // because node "weights" has a JSON-schema dependency on "mesh";
-                // disabling schema validation exercises the parser's happy path
-                // (RapidJsonUtils::ToFloatArray) directly.
+                // disabling schema validation exercises the parser's numeric-array
+                // path directly.
                 GLTFSDK_TEST_METHOD(DeserializeTests, DeserializeSuccess_ValidNodeWeights)
                 {
                     auto doc = Deserialize(c_validNodeWeights, DeserializeFlags::None, SchemaFlags::DisableSchemaRoot);
@@ -958,7 +960,7 @@ namespace Microsoft
                 }
 
                 // Negative regression: a node "weights" member that is a JSON
-                // string must throw (shared RapidJsonUtils::ToFloatArray helper).
+                // string must throw.
                 GLTFSDK_TEST_METHOD(DeserializeTests, DeserializeFail_NodeWeightsIsString)
                 {
                     Assert::ExpectException<InvalidGLTFException>([]()
@@ -996,6 +998,191 @@ namespace Microsoft
                     {
                         Deserialize(c_meshWeightsNonNumericElement, DeserializeFlags::None, SchemaFlags::DisableSchemaRoot);
                     });
+                }
+
+                GLTFSDK_TEST_METHOD(DeserializeTests, DeserializeSuccess_UInt32Boundary)
+                {
+                    const std::string json =
+                        R"({"asset":{"version":"2.0"},"scene":4294967295})";
+                    const auto fromString = Deserialize(
+                        json,
+                        DeserializeFlags::None,
+                        SchemaFlags::DisableSchemaRoot);
+                    std::stringstream stream(json);
+                    const auto fromStream = Deserialize(
+                        stream,
+                        DeserializeFlags::None,
+                        SchemaFlags::DisableSchemaRoot);
+
+                    Assert::IsTrue(
+                        fromString.defaultSceneId == "4294967295");
+                    Assert::IsTrue(fromString == fromStream);
+                }
+
+                GLTFSDK_TEST_METHOD(DeserializeTests, DeserializeFail_UInt32RangeAndIntegrality)
+                {
+                    const char* invalidValues[] = {
+                        "4294967296",
+                        "-1",
+                        "1.0"
+                    };
+
+                    for (const auto* value : invalidValues)
+                    {
+                        const std::string json =
+                            R"({"asset":{"version":"2.0"},"scene":)" +
+                            std::string(value) + "}";
+                        Assert::ExpectException<InvalidGLTFException>(
+                            [&json]()
+                            {
+                                Deserialize(
+                                    json,
+                                    DeserializeFlags::None,
+                                    SchemaFlags::DisableSchemaRoot);
+                            });
+                    }
+                }
+
+                GLTFSDK_TEST_METHOD(DeserializeTests, DeserializeSuccess_SizeBoundary)
+                {
+                    const std::size_t expected =
+                        std::numeric_limits<std::size_t>::max();
+                    const std::string json =
+                        R"({"asset":{"version":"2.0"},"buffers":[{"byteLength":)" +
+                        std::to_string(expected) + "}]}";
+                    const auto document = Deserialize(
+                        json,
+                        DeserializeFlags::None,
+                        SchemaFlags::DisableSchemaRoot);
+
+                    Assert::IsTrue(
+                        document.buffers.Front().byteLength == expected);
+                }
+
+                GLTFSDK_TEST_METHOD(DeserializeTests, DeserializeFail_SizeRangeAndIntegrality)
+                {
+                    const std::string overflow =
+                        sizeof(std::size_t) == sizeof(std::uint64_t)
+                        ? "18446744073709551616"
+                        : "4294967296";
+                    const std::string values[] = {
+                        overflow,
+                        "-1",
+                        "1.0"
+                    };
+
+                    for (const auto& value : values)
+                    {
+                        const std::string json =
+                            R"({"asset":{"version":"2.0"},"buffers":[{"byteLength":)" +
+                            value + "}]}";
+                        Assert::ExpectException<InvalidGLTFException>(
+                            [&json]()
+                            {
+                                Deserialize(
+                                    json,
+                                    DeserializeFlags::None,
+                                    SchemaFlags::DisableSchemaRoot);
+                            });
+                    }
+                }
+
+                GLTFSDK_TEST_METHOD(DeserializeTests, DeserializeFail_OptionalWrongScalarCategories)
+                {
+                    const char* documents[] = {
+                        R"({"asset":{"version":"2.0","generator":1}})",
+                        R"({"asset":{"version":"2.0"},"accessors":[{"componentType":5123,"count":1,"type":"SCALAR","normalized":1}]})",
+                        R"({"asset":{"version":"2.0"},"materials":[{"alphaCutoff":"0.5"}]})"
+                    };
+
+                    for (const auto* json : documents)
+                    {
+                        Assert::ExpectException<InvalidGLTFException>(
+                            [json]()
+                            {
+                                Deserialize(
+                                    json,
+                                    DeserializeFlags::None,
+                                    SchemaFlags::DisableSchemaRoot);
+                            });
+                    }
+                }
+
+                GLTFSDK_TEST_METHOD(DeserializeTests, DeserializeNumeric_FloatExponentAndNegativeZero)
+                {
+                    const auto document = Deserialize(
+                        R"({"asset":{"version":"2.0"},"nodes":[{"scale":[1e2,-0.0,1]}]})",
+                        DeserializeFlags::None,
+                        SchemaFlags::DisableSchemaRoot);
+                    const auto& scale = document.nodes.Front().scale;
+
+                    Assert::IsTrue(scale.x == 100.0F);
+                    Assert::IsTrue(scale.y == 0.0F);
+                    Assert::IsTrue(std::signbit(scale.y));
+                    Assert::IsTrue(scale.z == 1.0F);
+                }
+
+                GLTFSDK_TEST_METHOD(DeserializeTests, DeserializeFail_FloatOverflow)
+                {
+                    Assert::ExpectException<InvalidGLTFException>([]()
+                    {
+                        Deserialize(
+                            R"({"asset":{"version":"2.0"},"nodes":[{"scale":[1e100,1,1]}]})",
+                            DeserializeFlags::None,
+                            SchemaFlags::DisableSchemaRoot);
+                    });
+                }
+
+                GLTFSDK_TEST_METHOD(DeserializeTests, DeserializeFail_MeshModeRangeAndIntegrality)
+                {
+                    const char* invalidModes[] = {
+                        "-1",
+                        "7",
+                        "1.0"
+                    };
+
+                    for (const auto* mode : invalidModes)
+                    {
+                        const std::string json =
+                            R"({"asset":{"version":"2.0"},"meshes":[{"primitives":[{"attributes":{},"mode":)" +
+                            std::string(mode) + "}]}]}";
+                        Assert::ExpectException<InvalidGLTFException>(
+                            [&json]()
+                            {
+                                Deserialize(
+                                    json,
+                                    DeserializeFlags::None,
+                                    SchemaFlags::DisableSchemaRoot);
+                            });
+                    }
+                }
+
+                GLTFSDK_TEST_METHOD(DeserializeTests, DeserializeSuccess_UniqueExtensionExtrasRoundTrip)
+                {
+                    const std::string json = R"({
+                        "asset": {
+                            "version": "2.0",
+                            "extras": {
+                                "first": 1,
+                                "second": [true, "value"]
+                            }
+                        },
+                        "materials": [{
+                            "extensions": {
+                                "CUSTOM_unique": {
+                                    "factor": 0.49803921580314636,
+                                    "nested": {"enabled": true}
+                                }
+                            }
+                        }],
+                        "extensionsUsed": ["CUSTOM_unique"]
+                    })";
+
+                    const auto original = Deserialize(json);
+                    const auto serialized = Serialize(original);
+                    const auto roundTrip = Deserialize(serialized);
+
+                    Assert::IsTrue(original == roundTrip);
                 }
             };
         }

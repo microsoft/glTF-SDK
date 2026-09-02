@@ -1,9 +1,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-#include <GLTFSDK/RapidJsonUtils.h>
+#pragma once
+
+#include <GLTFSDK/Definitions.h>
 
 #include <memory>
+#include <string>
 
 namespace Microsoft
 {
@@ -13,9 +16,13 @@ namespace Microsoft
         {
         public:
             virtual ~ISchemaLocator() = default;
-            virtual const char* GetSchemaContent(const std::string& uri) const = 0;
+            virtual const char* GetSchemaContent(
+                const std::string& uri) const = 0;
         };
 
-        void GLTFSDK_API ValidateDocumentAgainstSchema(const rapidjson::Document& d, const std::string& schemaUri, std::unique_ptr<const ISchemaLocator> schemaLocator);
+        void GLTFSDK_API ValidateDocumentAgainstSchema(
+            const std::string& documentJson,
+            const std::string& schemaUri,
+            std::unique_ptr<const ISchemaLocator> schemaLocator);
     }
 }

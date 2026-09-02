@@ -30,16 +30,19 @@ target_include_directories(GLTFSDK.Test
     PUBLIC "${CMAKE_CURRENT_LIST_DIR}/Inc"
     PRIVATE "${CMAKE_SOURCE_DIR}/Built/Int"
     PRIVATE "${CMAKE_CURRENT_LIST_DIR}"
+    PRIVATE "${CMAKE_SOURCE_DIR}/GLTFSDK/Source"
 )
 
 target_link_libraries(GLTFSDK.Test
-    PRIVATE     GLTFSDK GLTFSDK.TestUtils GTest::gtest_main
+    PRIVATE     GLTFSDK GLTFSDK.TestUtils GTest::gtest_main ValiJSON::valijson
 )
 
 add_custom_command(TARGET GLTFSDK.Test
     POST_BUILD
     COMMAND "${CMAKE_COMMAND}" -E copy_directory "${CMAKE_CURRENT_LIST_DIR}/Resources" "${PROJECT_BINARY_DIR}/$<CONFIG>/Resources/"
 )
+
+add_test(NAME GLTFSDK.Test COMMAND GLTFSDK.Test)
 
 AddGLTFIOSAppProperties(GLTFSDK.Test)
 CreateGLTFInstallTargets(GLTFSDK.Test ${Platform})

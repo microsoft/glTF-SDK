@@ -27,6 +27,36 @@ namespace
     using namespace Microsoft::glTF;
     using namespace Microsoft::glTF::Test;
 
+    void ExpectDeserializeFailureForStringAndStream(
+        const std::string& json,
+        SchemaFlags schemaFlags = SchemaFlags::DisableSchemaRoot)
+    {
+        Assert::ExpectException<GLTFException>([&]()
+        {
+            Deserialize(
+                json,
+                DeserializeFlags::None,
+                schemaFlags);
+        });
+        Assert::ExpectException<GLTFException>([&]()
+        {
+            std::stringstream stream(json);
+            Deserialize(
+                stream,
+                DeserializeFlags::None,
+                schemaFlags);
+        });
+    }
+
+    std::string DeepPublicDocument(std::size_t nestedArrayCount)
+    {
+        return R"({"asset":{"version":"2.0"},"deep":)" +
+            std::string(nestedArrayCount, '[') +
+            "0" +
+            std::string(nestedArrayCount, ']') +
+            "}";
+    }
+
     Document ImportAndParseGLB(std::shared_ptr<IStreamReader> streamReader, const std::shared_ptr<std::istream>& glbStream)
     {
         GLBResourceReader resourceReader(streamReader, glbStream);
@@ -652,6 +682,73 @@ namespace Microsoft
                         // If the IgnoreByteOrderMark flag isn't specified then a BOM should result in Deserialize throwing an exception
                         Deserialize(ss, DeserializeFlags::None);
                     });
+                }
+
+                GLTFSDK_TEST_METHOD(GLTFTests, UnicodeByteOrderMarkCompact)
+                {
+                    const std::string compact =
+                        R"({"asset":{"version":"2.0"}})";
+                    const std::string withBom =
+                        std::string("\xEF\xBB\xBF") + compact;
+
+                    const auto expected = Deserialize(compact);
+                    const auto fromString = Deserialize(
+                        withBom,
+                        DeserializeFlags::IgnoreByteOrderMark);
+                    std::stringstream stream(withBom);
+                    const auto fromStream = Deserialize(
+                        stream,
+                        DeserializeFlags::IgnoreByteOrderMark);
+
+                    Assert::IsTrue(expected == fromString);
+                    Assert::IsTrue(expected == fromStream);
+                }
+
+                GLTFSDK_TEST_METHOD(GLTFTests, StrictPublicParsingMatrix)
+                {
+                    ExpectDeserializeFailureForStringAndStream(
+                        R"({"asset":{"version":"2.0"}} trailing)");
+                    ExpectDeserializeFailureForStringAndStream(
+                        R"({"asset":{"version":"2.0"},})");
+                    ExpectDeserializeFailureForStringAndStream(
+                        R"({"asset":/*comment*/{"version":"2.0"}})");
+                    ExpectDeserializeFailureForStringAndStream(
+                        R"({"asset":{"version":"2.0"},"value":NaN})");
+                    ExpectDeserializeFailureForStringAndStream(
+                        R"({"asset":{"version":"2.0"},"value":Infinity})");
+                }
+
+                GLTFSDK_TEST_METHOD(GLTFTests, StrictPublicRejectsDuplicateAndUtf8WithSchemaDisabled)
+                {
+                    ExpectDeserializeFailureForStringAndStream(
+                        R"({"asset":{"version":"2.0"},"asset":{"version":"2.0"}})");
+
+                    std::string invalidUtf8 =
+                        R"({"asset":{"version":"2.0","generator":")";
+                    invalidUtf8.push_back(static_cast<char>(0xC3));
+                    invalidUtf8.push_back(static_cast<char>(0x28));
+                    invalidUtf8 += R"("}})";
+                    ExpectDeserializeFailureForStringAndStream(
+                        invalidUtf8);
+                }
+
+                GLTFSDK_TEST_METHOD(GLTFTests, StrictPublicDepthBoundary)
+                {
+                    const auto atLimit = DeepPublicDocument(255U);
+                    const auto overLimit = DeepPublicDocument(256U);
+
+                    const auto fromString = Deserialize(
+                        atLimit,
+                        DeserializeFlags::None,
+                        SchemaFlags::DisableSchemaRoot);
+                    std::stringstream stream(atLimit);
+                    const auto fromStream = Deserialize(
+                        stream,
+                        DeserializeFlags::None,
+                        SchemaFlags::DisableSchemaRoot);
+                    Assert::IsTrue(fromString == fromStream);
+
+                    ExpectDeserializeFailureForStringAndStream(overLimit);
                 }
 
                 GLTFSDK_TEST_METHOD(GLTFTests, SchemaFlagsNone)

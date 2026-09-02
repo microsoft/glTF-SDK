@@ -7,7 +7,7 @@
 #include <GLTFSDK/Extension.h>
 #include <GLTFSDK/ExtensionHandlers.h>
 #include <GLTFSDK/ExtensionsKHR.h>
-#include <GLTFSDK/RapidJsonUtils.h>
+#include <GLTFSDK/ExtrasDocument.h>
 #include <GLTFSDK/Serialize.h>
 #include <GLTFSDK/SchemaValidation.h>
 
@@ -121,29 +121,34 @@ R"({
 
     std::string SerializeTestExtension(const TestExtension& extension)
     {
-        rapidjson::Document doc;
-
-        doc.SetObject();
-        doc.AddMember("flag", extension.flag, doc.GetAllocator());
-
-        rapidjson::StringBuffer sb;
-        rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
-
-        doc.Accept(writer);
-
-        return sb.GetString();
+        ExtrasDocument document;
+        document.SetMemberValue("flag", extension.flag);
+        return document.ToJson();
     }
 
     std::unique_ptr<Extension> DeserializeTestExtension(const std::string& json, bool isValidationRequired)
     {
-        rapidjson::Document documentExtension = RapidJsonUtils::CreateDocumentFromString(json);
-
         if (isValidationRequired)
         {
-            ValidateDocumentAgainstSchema(documentExtension, TestExtensionSchemaUri, TextExtensionSchemaLocator::Create());
+            ValidateDocumentAgainstSchema(
+                json,
+                TestExtensionSchemaUri,
+                TextExtensionSchemaLocator::Create());
         }
 
-        return std::make_unique<TestExtension>(documentExtension["flag"].GetBool());
+        ExtrasDocument document(json);
+        const bool falseDefault =
+            document.GetMemberValueOrDefault<bool>("flag", false);
+        const bool trueDefault =
+            document.GetMemberValueOrDefault<bool>("flag", true);
+        if (!document.HasMember("flag") ||
+            falseDefault != trueDefault)
+        {
+            throw InvalidGLTFException(
+                "TestExtension.flag must be a boolean");
+        }
+
+        return std::make_unique<TestExtension>(falseDefault);
     }
 
     constexpr const char expectedExtensionAddHandler[] =
