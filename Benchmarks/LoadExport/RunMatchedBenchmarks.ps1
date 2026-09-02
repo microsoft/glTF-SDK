@@ -219,7 +219,7 @@ function Format-Percent {
     if ($null -eq $Value) {
         return "n/a"
     }
-    return $Value.Value.ToString("F2") + "%"
+    return ([double]$Value).ToString("F2") + "%"
 }
 
 $candidateRepo = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot "..\.."))
@@ -270,6 +270,26 @@ $baselineCommit = Invoke-GitValue -Repository $baselineBuild.sourceDirectory -Ar
 $candidateCommit = Invoke-GitValue -Repository $candidateBuild.sourceDirectory -Arguments @("rev-parse", "HEAD")
 $baselineBranch = Invoke-GitValue -Repository $baselineBuild.sourceDirectory -Arguments @("branch", "--show-current")
 $candidateBranch = Invoke-GitValue -Repository $candidateBuild.sourceDirectory -Arguments @("branch", "--show-current")
+$baselineBenchmarkSource = Join-Path $baselineBuild.sourceDirectory "Benchmarks\LoadExport\LoadExportBenchmarks.cpp"
+$candidateBenchmarkSource = Join-Path $candidateBuild.sourceDirectory "Benchmarks\LoadExport\LoadExportBenchmarks.cpp"
+$baselineBenchmarkSourceHash = (Get-FileHash $baselineBenchmarkSource -Algorithm SHA256).Hash
+$candidateBenchmarkSourceHash = (Get-FileHash $candidateBenchmarkSource -Algorithm SHA256).Hash
+if ($baselineBenchmarkSourceHash -ne $candidateBenchmarkSourceHash) {
+    throw "The two branches do not contain byte-identical benchmark workload sources"
+}
+
+$baselineAssetManifest = Join-Path $baselineBuild.sourceDirectory "Benchmarks\LoadExport\assets.json"
+$baselineAssetManifestHash = (Get-FileHash $baselineAssetManifest -Algorithm SHA256).Hash
+$candidateAssetManifestHash = (Get-FileHash $manifestPath -Algorithm SHA256).Hash
+if ($baselineAssetManifestHash -ne $candidateAssetManifestHash) {
+    throw "The two branches do not contain byte-identical asset manifests"
+}
+
+& git -C $baselineBuild.sourceDirectory merge-base --is-ancestor `
+    3193f83265a70585093f13d651167b763979ade1 $baselineCommit
+if ($LASTEXITCODE -ne 0) {
+    throw "RapidJSON benchmark branch is not based on the exact required Release/1.9.5 commit"
+}
 
 $implementations = @(
     [pscustomobject]@{
@@ -385,6 +405,18 @@ function Invoke-BenchmarkCycle {
     }
     $completedAt = (Get-Date).ToUniversalTime()
     $exitCode = $process.ExitCode
+    if ($null -eq $exitCode) {
+        $completedMarker = if (Test-Path $stdoutPath -PathType Leaf) {
+            (Get-Content $stdoutPath -Raw) -match "cycle completed"
+        }
+        else {
+            $false
+        }
+        if (($Phase -eq "measured" -and (Test-Path $cycleCsv -PathType Leaf)) -or
+            $completedMarker) {
+            $exitCode = 0
+        }
+    }
     if ($exitCode -ne 0) {
         $stderr = if (Test-Path $stderrPath) { Get-Content $stderrPath -Raw } else { "" }
         $stdout = if (Test-Path $stdoutPath) { Get-Content $stdoutPath -Raw } else { "" }
@@ -689,6 +721,8 @@ $environment = [ordered]@{
     workItemOrder = "The same deterministic std::shuffle seed is used for both implementations in each cycle"
     cachePolicy = "Five alternating warm-up cycles precede measured hot-cache cycles; every timed load still opens and reads source files"
     percentile = "Nearest-rank median and p95"
+    runnerSourceSha256 = (Get-FileHash $PSCommandPath -Algorithm SHA256).Hash
+    assetManifestSha256 = $candidateAssetManifestHash
     timingBoundaries = [ordered]@{
         load = "Before source IStreamReader/file open through manifest read, SDK Deserialize, complete buffer reads, and encoded image-byte reads; destructors close input streams before the timer stops"
         export = "Loaded representation through SDK Serialize, SDK resource writes, GLB Flush or glTF manifest write, and destruction/flush/close of all output streams"
@@ -714,9 +748,7 @@ $environment = [ordered]@{
         executable = $baselineExecutable
         executableBytes = (Get-Item $baselineExecutable).Length
         executableSha256 = (Get-FileHash $baselineExecutable -Algorithm SHA256).Hash
-        benchmarkSourceSha256 = (Get-FileHash `
-            (Join-Path $baselineBuild.sourceDirectory "Benchmarks\LoadExport\LoadExportBenchmarks.cpp") `
-            -Algorithm SHA256).Hash
+        benchmarkSourceSha256 = $baselineBenchmarkSourceHash
         build = $baselineBuild
     }
     candidate = [ordered]@{
@@ -726,9 +758,7 @@ $environment = [ordered]@{
         executable = $candidateExecutable
         executableBytes = (Get-Item $candidateExecutable).Length
         executableSha256 = (Get-FileHash $candidateExecutable -Algorithm SHA256).Hash
-        benchmarkSourceSha256 = (Get-FileHash `
-            (Join-Path $candidateBuild.sourceDirectory "Benchmarks\LoadExport\LoadExportBenchmarks.cpp") `
-            -Algorithm SHA256).Hash
+        benchmarkSourceSha256 = $candidateBenchmarkSourceHash
         build = $candidateBuild
     }
     assetManifest = $manifest
