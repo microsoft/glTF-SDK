@@ -56,3 +56,5 @@
 
 | ID | Discovered work | Evidence / disposition |
 |----|-----------------|------------------------|
+| U-07 | Remove unused deserializer scalar helpers rejected by Clang `-Werror` | Discovered 2026-09-01 in remote CI run `33575874769`: Android armeabi-v7a RelWithDebInfo failed because `ReadBoolean` and `ReadInt32` in `Deserialize.cpp` are unused under Clang. Delete the dead helpers, rerun local validation, push a fix-forward commit, and verify the complete replacement CI run. |
+| U-08 | Keep byte-exact JSON baseline fixtures LF-only on Windows checkouts | Discovered 2026-09-01 in remote CI run `33575874769`: all Windows host jobs built successfully but five golden tests failed after Git converted pretty fixtures to CRLF. Add a path-scoped `eol=lf` rule, validate from a fresh checkout-equivalent fixture copy, and verify the replacement CI run. |

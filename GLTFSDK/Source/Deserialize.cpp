@@ -36,30 +36,6 @@ namespace
         return result;
     }
 
-    bool ReadBoolean(
-        const JsonValue& value,
-        const std::string& error)
-    {
-        bool result = false;
-        if (!Internal::TryGetJsonBoolean(value, result))
-        {
-            throw InvalidGLTFException(error);
-        }
-        return result;
-    }
-
-    std::int32_t ReadInt32(
-        const JsonValue& value,
-        const std::string& error)
-    {
-        std::int32_t result = 0;
-        if (!Internal::TryGetJsonInt32(value, result))
-        {
-            throw InvalidGLTFException(error);
-        }
-        return result;
-    }
-
     std::uint32_t ReadUInt32(
         const JsonValue& value,
         const std::string& error)
