@@ -51,10 +51,10 @@ Use the same MSVC generator/toolset, x64 architecture, and Release
 configuration in both worktrees:
 
 ```powershell
-cmake -S E:\Base3D\glTF-SDK-perf-1.9.5 -B E:\Base3D\glTF-SDK-perf-1.9.5\Built\Int\load-export -A x64 -DENABLE_UNIT_TESTS=ON -DENABLE_SAMPLES=OFF -DENABLE_BENCHMARKS=ON
+cmake -S E:\Base3D\glTF-SDK-perf-1.9.5 -B E:\Base3D\glTF-SDK-perf-1.9.5\Built\Int\load-export -A x64 -DCMAKE_FIND_USE_PACKAGE_REGISTRY=FALSE -DCMAKE_FIND_USE_SYSTEM_PACKAGE_REGISTRY=FALSE -DENABLE_UNIT_TESTS=ON -DENABLE_SAMPLES=OFF -DENABLE_BENCHMARKS=ON
 cmake --build E:\Base3D\glTF-SDK-perf-1.9.5\Built\Int\load-export --config Release --target GLTFSDK.LoadExportBenchmarks GLTFSDK.Test --parallel
 
-cmake -S E:\Base3D\glTF-SDK -B E:\Base3D\glTF-SDK\Built\Int\load-export -A x64 -DENABLE_UNIT_TESTS=ON -DENABLE_SAMPLES=OFF -DENABLE_BENCHMARKS=ON
+cmake -S E:\Base3D\glTF-SDK -B E:\Base3D\glTF-SDK\Built\Int\load-export -A x64 -DCMAKE_FIND_USE_PACKAGE_REGISTRY=FALSE -DCMAKE_FIND_USE_SYSTEM_PACKAGE_REGISTRY=FALSE -DENABLE_UNIT_TESTS=ON -DENABLE_SAMPLES=OFF -DENABLE_BENCHMARKS=ON
 cmake --build E:\Base3D\glTF-SDK\Built\Int\load-export --config Release --target GLTFSDK.LoadExportBenchmarks GLTFSDK.Test --parallel
 ```
 
@@ -69,7 +69,7 @@ cycle. All output goes to disk.
 powershell -ExecutionPolicy Bypass -File .\Benchmarks\LoadExport\RunMatchedBenchmarks.ps1 `
   -BaselineBuildDir E:\Base3D\glTF-SDK-perf-1.9.5\Built\Int\load-export `
   -CandidateBuildDir E:\Base3D\glTF-SDK\Built\Int\load-export `
-  -Warmups 5 -Samples 30
+  -Warmups 5 -Samples 100
 ```
 
 The script rejects toolchain/configuration mismatches and writes raw CSV,
