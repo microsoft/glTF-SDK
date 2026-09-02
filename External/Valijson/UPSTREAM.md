@@ -90,15 +90,17 @@ maintenance artifacts:
      `2C95D14243C5E157A73BF2FCCC94E50D80CB7676805FABB475DF7609717E99AB`
    - Imported-tree hash after application:
      `8099487F6B16F6E2C75CF98495A69F1E0D008456447844B2619C41AE454D3CBE`
-4. `patches/0004-initialize-subschema-optionals.patch`
+4. `patches/0004-replace-subschema-metadata-optionals.patch`
    - SHA-256:
-     `255ABF80833861DA15CDAE626F78FD4CE550E5CE8D03113CBE8583418F96D513`
+     `DB84BDB68CDA077CAE5D8BB14AEED0AD693EC2F82447811A60619AADEEC0C28F`
    - Final imported-tree hash after all patches:
-     `FCC3050BDDFBCB3CD6C3E0D665B43B800FEFDF2102005B65B4F30F7C4CDCAC14`
-   - Directly initializes metadata optionals in both `Subschema`
-     constructors. This is the upstream issue 124 failure pattern, reproduced
-     by GCC 13 RelWithDebInfo while destroying the shared empty subschema;
-     constructor-body assignment was insufficient under optimization.
+     `19A7B2F4CE1E26C518DB0EFFBCDDF5ED275F6191D192A317BF8687B594766C41`
+   - Replaces the three `Subschema` metadata compatibility optionals with
+     nullable `std::unique_ptr<std::string>` storage while preserving the
+     public Valijson behavior. This removes the upstream issue 124 failure
+     pattern reproduced by GCC 13 RelWithDebInfo while destroying the shared
+     empty subschema; both constructor-body assignment and direct `nullopt`
+     construction remained vulnerable under optimization.
 
 From the repository root, reapply the first patch to a pristine import with:
 
@@ -110,7 +112,7 @@ git -c core.autocrlf=false apply --directory=External/Valijson `
 git -c core.autocrlf=false apply --directory=External/Valijson `
   External/Valijson/patches/0003-structured-validation-keywords.patch
 git -c core.autocrlf=false apply --directory=External/Valijson `
-  External/Valijson/patches/0004-initialize-subschema-optionals.patch
+  External/Valijson/patches/0004-replace-subschema-metadata-optionals.patch
 ```
 
 Verify each patch before application with the same command plus
@@ -142,7 +144,7 @@ The final shipped subset contains 48 files: 46 headers plus `LICENSE` and
 `Authors`. Its deterministic tree SHA-256 is:
 
 ```text
-11D0213602BBA0C4AF5B40CE4B09164BA8E09A4E614BB0E542F262292E736F8D
+D2DCF0FDC3CAF51E3667BB13C4B9944909A72476DB7E2FD630BC55C04E9AF2AE
 ```
 
 After applying the four patches, reproduce the pruning from the repository

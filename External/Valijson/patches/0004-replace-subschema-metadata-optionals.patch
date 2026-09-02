@@ -1,0 +1,67 @@
+diff --git a/include/valijson/subschema.hpp b/include/valijson/subschema.hpp
+--- a/include/valijson/subschema.hpp
++++ b/include/valijson/subschema.hpp
+@@ -5,7 +5,6 @@
+ #include <vector>
+ 
+ #include <valijson/constraints/constraint.hpp>
+-#include <valijson/internal/optional.hpp>
+ #include <valijson/exceptions.hpp>
+ 
+ namespace valijson {
+@@ -97,13 +96,7 @@ public:
+     Subschema(CustomAlloc allocFn, CustomFree freeFn)
+       : m_allocFn(allocFn)
+       , m_freeFn(freeFn)
+-      , m_alwaysInvalid(false)
+-    {
+-        // explicitly initialise optionals. See: https://github.com/tristanpenman/valijson/issues/124
+-        m_description = opt::nullopt;
+-        m_id = opt::nullopt;
+-        m_title = opt::nullopt;
+-    }
++      , m_alwaysInvalid(false) { }
+ 
+     /**
+      * @brief  Clean up and free all memory managed by the Subschema
+@@ -286,12 +279,12 @@ public:
+      */
+     void setDescription(const std::string &description)
+     {
+-        m_description = description;
++        m_description.reset(new std::string(description));
+     }
+ 
+     void setId(const std::string &id)
+     {
+-        m_id = id;
++        m_id.reset(new std::string(id));
+     }
+ 
+     /**
+@@ -306,7 +299,7 @@ public:
+      */
+     void setTitle(const std::string &title)
+     {
+-        m_title = title;
++        m_title.reset(new std::string(title));
+     }
+ 
+ protected:
+@@ -323,13 +316,13 @@ private:
+     std::vector<Constraint::OwningPointer> m_constraints;
+ 
+     /// Schema description (optional)
+-    opt::optional<std::string> m_description;
++    std::unique_ptr<std::string> m_description;
+ 
+     /// ID to apply when resolving the schema URI
+-    opt::optional<std::string> m_id;
++    std::unique_ptr<std::string> m_id;
+ 
+     /// Title string associated with the schema (optional)
+-    opt::optional<std::string> m_title;
++    std::unique_ptr<std::string> m_title;
+ };
+ 
+ } // namespace valijson

@@ -35,7 +35,7 @@ Repository patches, in order:
 1. `0001-ordered-nlohmann-adapter.patch`
 2. `0002-draft04-uri-and-reference-resolution.patch`
 3. `0003-structured-validation-keywords.patch`
-4. `0004-initialize-subschema-optionals.patch`
+4. `0004-replace-subschema-metadata-optionals.patch`
 
 Exact patch hashes, intermediate/final tree hashes, import commands, and
 reapplication instructions are maintained in
