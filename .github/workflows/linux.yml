@@ -60,9 +60,23 @@ jobs:
           --parallel
 
       - name: Running Unit Tests
-        run: >
-          ./GLTFSDK.Test
-          --gtest_output=xml:GLTFSDK.Test.log
+        run: |
+          set +e
+          ./GLTFSDK.Test --gtest_output=xml:GLTFSDK.Test.log
+          status=$?
+          if [ "$status" -ne 0 ] && [ "${{ matrix.config }}" = "RelWithDebInfo" ]; then
+            if ! command -v gdb >/dev/null 2>&1; then
+              sudo apt-get update -qq
+              sudo apt-get install -y gdb
+            fi
+            gdb --batch \
+              -ex "set pagination off" \
+              -ex run \
+              -ex "thread apply all bt full" \
+              --args ./GLTFSDK.Test \
+              --gtest_filter=DeserializeTests.ValidationSuccess_ValidPrimitiveNoIndices__none
+          fi
+          exit "$status"
         working-directory: ./Built/Out/${{ matrix.platform }}/${{ matrix.config }}/GLTFSDK.Test
 
       - name: Configure Installed Consumer
