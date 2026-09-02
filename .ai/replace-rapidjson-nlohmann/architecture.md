@@ -194,7 +194,7 @@ External/Valijson/
 |   |-- 0001-ordered-nlohmann-adapter.patch
 |   |-- 0002-draft04-uri-and-reference-resolution.patch
 |   |-- 0003-structured-validation-keywords.patch
-|   `-- 0004-initialize-default-subschema-optionals.patch
+|   `-- 0004-initialize-subschema-optionals.patch
 `-- include/
     |-- compat/
     |   `-- optional.hpp
@@ -774,7 +774,7 @@ There is no runtime fallback or dual-engine release mode.
 - `External/Valijson/patches/0001-ordered-nlohmann-adapter.patch`
 - `External/Valijson/patches/0002-draft04-uri-and-reference-resolution.patch`
 - `External/Valijson/patches/0003-structured-validation-keywords.patch`
-- `External/Valijson/patches/0004-initialize-default-subschema-optionals.patch`
+- `External/Valijson/patches/0004-initialize-subschema-optionals.patch`
 - `External/Valijson/include/valijson/**`
 - `GLTFSDK/Source/Internal/Json.h`
 - `GLTFSDK/Source/Internal/JsonSchema.h`

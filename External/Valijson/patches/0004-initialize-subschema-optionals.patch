@@ -1,0 +1,33 @@
+diff --git a/include/valijson/subschema.hpp b/include/valijson/subschema.hpp
+--- a/include/valijson/subschema.hpp
++++ b/include/valijson/subschema.hpp
+@@ -83,7 +83,10 @@ public:
+     Subschema()
+       : m_allocFn([](size_t size) { return ::operator new(size, std::nothrow); })
+       , m_freeFn(::operator delete)
+-      , m_alwaysInvalid(false) { }
++      , m_alwaysInvalid(false)
++      , m_description(opt::nullopt)
++      , m_id(opt::nullopt)
++      , m_title(opt::nullopt) { }
+ 
+     /**
+      * @brief  Construct a new Subschema using custom memory management
+@@ -99,13 +102,10 @@ public:
+     Subschema(CustomAlloc allocFn, CustomFree freeFn)
+       : m_allocFn(allocFn)
+       , m_freeFn(freeFn)
+-      , m_alwaysInvalid(false)
+-    {
+-        // explicitly initialise optionals. See: https://github.com/tristanpenman/valijson/issues/124
+-        m_description = opt::nullopt;
+-        m_id = opt::nullopt;
+-        m_title = opt::nullopt;
+-    }
++      , m_alwaysInvalid(false)
++      , m_description(opt::nullopt)
++      , m_id(opt::nullopt)
++      , m_title(opt::nullopt) { }
+ 
+     /**
+      * @brief  Clean up and free all memory managed by the Subschema

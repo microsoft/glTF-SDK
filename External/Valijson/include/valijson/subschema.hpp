@@ -84,12 +84,9 @@ public:
       : m_allocFn([](size_t size) { return ::operator new(size, std::nothrow); })
       , m_freeFn(::operator delete)
       , m_alwaysInvalid(false)
-    {
-        // Explicitly initialise optionals. See: https://github.com/tristanpenman/valijson/issues/124
-        m_description = opt::nullopt;
-        m_id = opt::nullopt;
-        m_title = opt::nullopt;
-    }
+      , m_description(opt::nullopt)
+      , m_id(opt::nullopt)
+      , m_title(opt::nullopt) { }
 
     /**
      * @brief  Construct a new Subschema using custom memory management
@@ -104,12 +101,9 @@ public:
       : m_allocFn(allocFn)
       , m_freeFn(freeFn)
       , m_alwaysInvalid(false)
-    {
-        // explicitly initialise optionals. See: https://github.com/tristanpenman/valijson/issues/124
-        m_description = opt::nullopt;
-        m_id = opt::nullopt;
-        m_title = opt::nullopt;
-    }
+      , m_description(opt::nullopt)
+      , m_id(opt::nullopt)
+      , m_title(opt::nullopt) { }
 
     /**
      * @brief  Clean up and free all memory managed by the Subschema

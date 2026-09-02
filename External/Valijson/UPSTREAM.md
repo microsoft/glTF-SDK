@@ -90,14 +90,15 @@ maintenance artifacts:
      `2C95D14243C5E157A73BF2FCCC94E50D80CB7676805FABB475DF7609717E99AB`
    - Imported-tree hash after application:
      `8099487F6B16F6E2C75CF98495A69F1E0D008456447844B2619C41AE454D3CBE`
-4. `patches/0004-initialize-default-subschema-optionals.patch`
+4. `patches/0004-initialize-subschema-optionals.patch`
    - SHA-256:
-     `AC1D5602770AE0DEA29B9FEBD6FCC5182866713D8CD1FB41184955EE5937B47C`
+     `255ABF80833861DA15CDAE626F78FD4CE550E5CE8D03113CBE8583418F96D513`
    - Final imported-tree hash after all patches:
-     `47A029CA079D795922A92482BA8A451486E94E539750AC7F1036D0C9532D30B2`
-   - Explicitly initializes metadata optionals in the default `Subschema`
-     constructor. This is the upstream issue 124 failure pattern, reproduced
-     by GCC 13 RelWithDebInfo while destroying the shared empty subschema.
+     `FCC3050BDDFBCB3CD6C3E0D665B43B800FEFDF2102005B65B4F30F7C4CDCAC14`
+   - Directly initializes metadata optionals in both `Subschema`
+     constructors. This is the upstream issue 124 failure pattern, reproduced
+     by GCC 13 RelWithDebInfo while destroying the shared empty subschema;
+     constructor-body assignment was insufficient under optimization.
 
 From the repository root, reapply the first patch to a pristine import with:
 
@@ -109,7 +110,7 @@ git -c core.autocrlf=false apply --directory=External/Valijson `
 git -c core.autocrlf=false apply --directory=External/Valijson `
   External/Valijson/patches/0003-structured-validation-keywords.patch
 git -c core.autocrlf=false apply --directory=External/Valijson `
-  External/Valijson/patches/0004-initialize-default-subschema-optionals.patch
+  External/Valijson/patches/0004-initialize-subschema-optionals.patch
 ```
 
 Verify each patch before application with the same command plus
@@ -141,7 +142,7 @@ The final shipped subset contains 48 files: 46 headers plus `LICENSE` and
 `Authors`. Its deterministic tree SHA-256 is:
 
 ```text
-13FA74916D7D9D424841C64569F905CC95FFFF4327874032D6C227C197395AC9
+11D0213602BBA0C4AF5B40CE4B09164BA8E09A4E614BB0E542F262292E736F8D
 ```
 
 After applying the four patches, reproduce the pruning from the repository

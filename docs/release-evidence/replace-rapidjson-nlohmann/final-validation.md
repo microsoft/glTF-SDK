@@ -61,9 +61,9 @@ CTest runs then each passed 1/1, executing the complete unit-test binary.
 Remote optimized Linux diagnostics subsequently reproduced upstream Valijson
 issue 124 while destroying the shared empty `Subschema`: its default
 constructor did not explicitly disengage three C++14 compatibility optionals.
-Patch `0004-initialize-default-subschema-optionals.patch` applies the upstream
-workaround to that constructor, and a patterned-allocation regression test
-locks the behavior. After the correction, full MSVC Debug,
+Patch `0004-initialize-subschema-optionals.patch` applies the upstream
+workaround as direct construction in both constructors, and a
+patterned-allocation regression test locks the behavior. After the correction, full MSVC Debug,
 MSVC RelWithDebInfo, and optimized Clang suites each pass 505/505 locally.
 
 ## Offline and package gates
