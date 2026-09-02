@@ -4,10 +4,11 @@ Validation date: 2026-09-01
 
 ## Status
 
-All available local gates pass. Linux, macOS, iOS, Android, and Linux
-ASAN/UBSAN are CI-only on this Windows host and remain pending until T-36
-pushes `Release/2.0.0`. This report must be updated with the remote ref and
-workflow results before T-35 and T-36 are closed.
+All local and remote gates pass. The final implementation SHA
+`d28ffe663fe9aaabdd6b34fc19fb834727d938c2` was pushed normally to
+`origin/Release/2.0.0`, the remote ref matched, and GitHub Actions run
+[`33579694425`](https://github.com/SergioRZMasson/glTF-SDK/actions/runs/33579694425)
+completed successfully with all 21 required jobs passing.
 
 ## Source and toolchain
 
@@ -110,12 +111,31 @@ The committed workflows define Debug and RelWithDebInfo gates for:
 - Linux Clang ASAN/UBSAN full and malformed/deep focused suites; and
 - Windows x64, Win32, and ARM64 package/consumer coverage.
 
-Remote run URLs and final conclusions: **pending T-36 push**.
+Remote run:
+[`33579694425`](https://github.com/SergioRZMasson/glTF-SDK/actions/runs/33579694425),
+`completed/success`, 21/21 jobs.
 
 ## Commit and remote evidence
 
-- Commit series: **pending T-36**
-- Local completion SHA: **pending T-36**
-- Remote `Release/2.0.0` SHA: **pending T-36**
-- Push result: **pending T-36**
-- Required CI result: **pending T-36**
+- `1516cd6` — Vendor private JSON dependencies
+- `c9e8b63` — Add JSON migration baselines
+- `d56dceb` — Replace RapidJSON with ordered JSON
+- `bec4ce5` — Expand release validation matrix
+- `0009ca0` — Document the 2.0 JSON migration
+- `a8f1ee7` — Fix cross-platform validation failures
+- `8e6c8a0` — Capture optimized Linux crash diagnostics
+- `aff2ab2` — Initialize Valijson subschema optionals
+- `3d1c3ee` — Construct Valijson optionals disengaged
+- `d28ffe6` — Replace vulnerable Valijson metadata optionals
+
+All commits contain the required Copilot trailers. The fix-forward history is
+retained because release instructions prohibit history rewriting.
+
+- Local implementation SHA:
+  `d28ffe663fe9aaabdd6b34fc19fb834727d938c2`
+- Verified remote implementation SHA:
+  `d28ffe663fe9aaabdd6b34fc19fb834727d938c2`
+- Push: normal, no force, only `Release/2.0.0`
+- Required CI: 21/21 passed in run `33579694425`
+- Final task-board/evidence closure: this docs-only commit; its pushed ref and
+  CI conclusion are verified in the execution report.

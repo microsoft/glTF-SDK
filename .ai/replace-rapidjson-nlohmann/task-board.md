@@ -4,8 +4,6 @@
 
 | M | ID | Task | Skill | Notes |
 |---|----|------|-------|-------|
-| | T-35 | Execute `implementation_plan/06_01_run_final_full_validation_and_record_evidence.md` | execute-implementation-plan | |
-| | T-36 | Execute `implementation_plan/06_02_create_commits_push_and_verify_remote_ci.md` | execute-implementation-plan | |
 
 ## Completed
 
@@ -51,12 +49,14 @@
 | | U-04 | Register the unit-test executable with CTest | discovered-work | done 2026-09-01 - final validation exposed `No tests were found`; added `add_test(NAME GLTFSDK.Test COMMAND GLTFSDK.Test)`, regenerated x64/Win32 trees, and Debug/RelWithDebInfo CTest gates each passed 1/1 while running the complete 504-test executable |
 | | U-05 | Preserve unified-diff context markers without failing repository whitespace gates | discovered-work | done 2026-09-01 - path-scoped `.gitattributes` preserves verbatim Valijson patch context markers; all retained patches apply cleanly and `git diff --cached --check` passes |
 | | U-06 | Preserve pinned official-suite bytes without failing repository whitespace gates | discovered-work | done 2026-09-01 - path-scoped `.gitattributes` preserves the selected upstream fixture bytes/tree hash while excluding their four intentional whitespace lines from false-positive diff checks; cached check passes |
+| | T-35 | Execute `implementation_plan/06_01_run_final_full_validation_and_record_evidence.md` | execute-implementation-plan | done 2026-09-01 - final x64/Win32 Debug+RelWithDebInfo 505/505 and CTest 1/1, ARM64 both configs, six 44-file packages, six installed consumers, optimized Clang 505/505, scans/hashes/YAML/diff checks passed; remote CI run `33579694425` passed all 21 jobs; evidence `final-validation.md` + `requirement-trace.md` |
+| | T-36 | Execute `implementation_plan/06_02_create_commits_push_and_verify_remote_ci.md` | execute-implementation-plan | done 2026-09-01 - explicit-path 10-commit implementation/fix-forward series through `d28ffe6`, every commit has required trailers, approved base remains ancestor, normal push to `origin/Release/2.0.0` succeeded, remote ref matched, and required CI run `33579694425` passed 21/21; this task-board/evidence closure is a final docs-only commit |
+| | U-07 | Remove unused deserializer scalar helpers rejected by Clang `-Werror` | discovered-work | done 2026-09-01 - deleted dead `ReadBoolean`/`ReadInt32`, MSVC and optimized Clang 505/505 passed, and Android/macOS/iOS/sanitizer jobs compile cleanly in successful run `33579694425` |
+| | U-08 | Keep byte-exact JSON baseline fixtures LF-only on Windows checkouts | discovered-work | done 2026-09-01 - `.gitattributes` enforces LF for migration fixtures; x64/Win32 Debug+RelWithDebInfo golden suites all pass in run `33579694425` |
+| | U-09 | Diagnose and fix optimized Linux schema-validation crash | discovered-work | done 2026-09-01 - GDB traced GCC RelWithDebInfo invalid free to Valijson issue-124 compatibility-optionals in the shared empty `Subschema`; patch `0004-replace-subschema-metadata-optionals.patch` replaces only metadata storage with nullable unique ownership, patterned-allocation regression added, local 505/505 and Linux RelWithDebInfo CI passed |
+| | U-10 | Make vendored-source and official-fixture hashes checkout-stable | discovered-work | done 2026-09-01 - LF attributes added for dependency/official-suite trees; nlohmann hash `AAF127C0...C5DE63`, Valijson final tree `D2DCF0FD...9AF2AE`, official suite `8A2103D0...BF3B7C`, all patch reapplications, scans, builds, tests, and run `33579694425` passed |
 
 ## Untriaged
 
 | ID | Discovered work | Evidence / disposition |
 |----|-----------------|------------------------|
-| U-07 | Remove unused deserializer scalar helpers rejected by Clang `-Werror` | Discovered 2026-09-01 in remote CI run `33575874769`: Android armeabi-v7a RelWithDebInfo failed because `ReadBoolean` and `ReadInt32` in `Deserialize.cpp` are unused under Clang. Delete the dead helpers, rerun local validation, push a fix-forward commit, and verify the complete replacement CI run. |
-| U-08 | Keep byte-exact JSON baseline fixtures LF-only on Windows checkouts | Discovered 2026-09-01 in remote CI run `33575874769`: all Windows host jobs built successfully but five golden tests failed after Git converted pretty fixtures to CRLF. Add a path-scoped `eol=lf` rule, validate from a fresh checkout-equivalent fixture copy, and verify the replacement CI run. |
-| U-09 | Diagnose and fix optimized Linux schema-validation crash | Discovered 2026-09-01 in remote CI runs `33575874769` and `33576636379`: Linux Debug and Debug ASAN/UBSAN pass, but GCC RelWithDebInfo segfaults in the first schema-validating deserializer test. Capture an optimized backtrace, fix the undefined behavior without weakening validation, and verify all local and remote gates. |
-| U-10 | Make vendored-source and official-fixture hashes checkout-stable | Discovered 2026-09-01 while reproducing U-09 patch hashes: host `core.autocrlf` can change checked-out third-party bytes even though Git blobs are canonical LF. Enforce LF for the approved dependency and official-suite trees, recompute hashes from reproducible all-LF imports, and verify scans/builds/tests. |

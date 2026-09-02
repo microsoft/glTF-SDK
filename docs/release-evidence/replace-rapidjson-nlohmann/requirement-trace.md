@@ -2,10 +2,10 @@
 
 Recorded: 2026-09-01
 
-`Passed` denotes durable implementation plus local evidence. `CI pending`
-denotes a gate implemented in the workflow matrix that requires the T-36
-remote push. `Release pending` denotes commit/ref evidence that can only be
-completed in T-36.
+`Passed` denotes durable implementation plus local and, where required,
+remote evidence. GitHub Actions run
+[`33579694425`](https://github.com/SergioRZMasson/glTF-SDK/actions/runs/33579694425)
+passed all 21 required jobs.
 
 ## Dependency and public API
 
@@ -72,15 +72,15 @@ completed in T-36.
 | --- | --- | --- |
 | REQ-BLD-1, REQ-BLD-2 | Root/consumer CMake require C++14; minimum CMake, Apple 10.11 deployment, and existing toolchain baselines are unchanged. | Passed |
 | REQ-BLD-3 | Final x64, Win32, and ARM64 Debug/RelWithDebInfo build/install matrix passes. | Passed |
-| REQ-BLD-4 | Linux/macOS workflows build, test, install, scan, and run consumers in both configurations. | CI pending |
-| REQ-BLD-5 | iOS device and 64-bit simulator workflows build/install both configurations. | CI pending |
-| REQ-BLD-6 | Android three-ABI workflow builds/installs both configurations. | CI pending |
-| REQ-BLD-7 | x64/Win32 full host tests pass; ARM64 links/installs; remaining host/cross gates are defined remotely. | CI pending |
+| REQ-BLD-4 | Linux/macOS workflows build, test, install, scan, and run consumers in both configurations; all jobs pass in run `33579694425`. | Passed |
+| REQ-BLD-5 | iOS device and 64-bit simulator workflows build/install both configurations; all jobs pass in run `33579694425`. | Passed |
+| REQ-BLD-6 | Android three-ABI workflow builds/installs both configurations; all jobs pass in run `33579694425`. | Passed |
+| REQ-BLD-7 | x64/Win32/Linux/macOS host tests pass; ARM64/iOS/Android configure, compile, link, and install gates pass. | Passed |
 | REQ-BLD-8 | Old Windows policy workaround is removed; six final Windows configurations pass. | Passed |
 | REQ-BLD-9 | Final invalid-proxy package matrix proves no RapidJSON, nlohmann/json, or Valijson download. | Passed |
 | REQ-BLD-10 | Six 44-file packages contain SDK artifacts/notices/licenses and no private dependency headers/targets. | Passed |
-| REQ-BLD-11 | Sanitizer workflow runs full plus malformed/deep focused suites with ASAN/UBSAN. | CI pending |
-| REQ-BLD-12 | Seven branch/PR-gated workflows define the complete required matrix and parse successfully. | CI pending |
+| REQ-BLD-11 | Linux Clang ASAN/UBSAN full plus malformed/deep focused suites pass in run `33579694425`. | Passed |
+| REQ-BLD-12 | Seven branch/PR-gated workflows define and passed the complete required matrix in run `33579694425`. | Passed |
 | REQ-TST-1 | x64 and Win32 Debug/RelWithDebInfo full runs each pass 505/505; optimized Clang passes 505/505 and CTest registration passes 1/1. | Passed |
 | REQ-TST-2 | `JsonTests` and deserializer regressions cover every strict syntax, UTF-8, BOM, stream, and depth case. | Passed |
 | REQ-TST-3 | JSON/deserializer/serializer numeric suites cover all listed ranges/categories/precision forms. | Passed |
@@ -90,7 +90,7 @@ completed in T-36.
 | REQ-TST-7 | All 48 production KHR/custom extension tests pass within the full suite. | Passed |
 | REQ-TST-8 | Six installed-only consumers build/link without vendor dependencies; host variants run. | Passed |
 | REQ-TST-9 | Shipped source, workflow, notice, public-header, filename, and package scans are clean. | Passed |
-| REQ-TST-10 | Local XML and matrix results are recorded in `final-validation.md`; remote-only results await T-36. | CI pending |
+| REQ-TST-10 | Local XML/matrix results and all 21 remote job conclusions are recorded in `final-validation.md`. | Passed |
 
 ## Performance, documentation, and release
 
@@ -106,7 +106,7 @@ completed in T-36.
 | REQ-DOC-5 | Release notes cover duplicate/UTF-8/BOM/sparse-alias/lexical behavior. | Passed |
 | REQ-DOC-6 | Current repository and installed notices contain all retained/new material and no obsolete dependency notice. | Passed |
 | REQ-REL-1 | Preflight records approved base `3193f83265a70585093f13d651167b763979ade1` and Microsoft Release/1.9.5 ancestry. | Passed |
-| REQ-REL-2 | This trace covers every approved requirement; remote-only rows must pass before closure. | CI pending |
-| REQ-REL-3 | Explicit, generated-output-free commit series on `Release/2.0.0`. | Release pending |
-| REQ-REL-4 | Normal push to `git@github.com:SergioRZMasson/glTF-SDK.git`. | Release pending |
-| REQ-REL-5 | Matching remote ref and passing required workflow URLs/conclusions. | Release pending |
+| REQ-REL-2 | This trace covers every approved requirement, and all local/remote gates pass. | Passed |
+| REQ-REL-3 | Explicit, generated-output-free commit series with required trailers is on `Release/2.0.0`. | Passed |
+| REQ-REL-4 | Normal, non-force push to `git@github.com:SergioRZMasson/glTF-SDK.git` succeeded. | Passed |
+| REQ-REL-5 | Remote implementation ref matched `d28ffe6`; run `33579694425` completed successfully with 21/21 jobs. | Passed |
