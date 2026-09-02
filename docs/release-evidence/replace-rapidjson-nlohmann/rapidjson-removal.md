@@ -13,8 +13,8 @@ Recorded: 2026-09-01
 The Valijson pruning retained all applicable author credit with
 parser-neutral wording. The final 48-file shipped subset has deterministic
 tree SHA-256
-`CCD9F7F326B8EC97939B9BD3DC29B425A7DD8748347F7CCAE68C467258EC49BD`.
-All three retained correction patches applied cleanly, and their SHA-256
+`13FA74916D7D9D424841C64569F905CC95FFFF4327874032D6C227C197395AC9`.
+All four retained correction patches applied cleanly, and their SHA-256
 values matched `External/Valijson/UPSTREAM.md`.
 
 ## Clean build and tests

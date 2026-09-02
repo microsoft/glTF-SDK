@@ -11,11 +11,31 @@
 #include <valijson/validator.hpp>
 
 #include <cstdint>
+#include <cstring>
+#include <new>
 #include <string>
 #include <type_traits>
 #include <vector>
 
 using namespace glTF::UnitTest;
+
+namespace
+{
+    void* AllocatePatternedMemory(std::size_t size)
+    {
+        void* memory = ::operator new(size, std::nothrow);
+        if (memory != nullptr)
+        {
+            std::memset(memory, 0xA5, size);
+        }
+        return memory;
+    }
+
+    void FreePatternedMemory(void* memory)
+    {
+        ::operator delete(memory);
+    }
+}
 
 namespace Microsoft
 {
@@ -110,6 +130,18 @@ namespace Microsoft
                     Assert::IsFalse(
                         validator.validate(schema, Adapter(invalidDocument), nullptr));
                     Assert::IsTrue(validDocument["value"].is_number_unsigned());
+                }
+
+                GLTFSDK_TEST_METHOD(JsonSchemaAdapterTests, InitializesDefaultSubschemaMetadata)
+                {
+                    valijson::Schema schema(
+                        AllocatePatternedMemory,
+                        FreePatternedMemory);
+                    const auto* empty = schema.emptySubschema();
+
+                    Assert::IsFalse(empty->hasDescription());
+                    Assert::IsFalse(empty->hasId());
+                    Assert::IsFalse(empty->hasTitle());
                 }
             };
         }

@@ -14,7 +14,7 @@ completed in T-36.
 | REQ-DEP-1, REQ-DEP-2, REQ-DEP-3, REQ-DEP-4 | `External/json` contains the approved 3.12.0 single header, license, and private CMake target; header SHA-256 is recorded in `docs/Dependencies.md`. | Passed |
 | REQ-DEP-5 | Six final invalid-proxy Windows package builds configured and built without JSON dependency network access. | Passed |
 | REQ-DEP-6 | No installed-package selection path is enabled; the mandatory vendored 3.12.0 target is authoritative. | Passed |
-| REQ-DEP-7, REQ-DEP-8 | `External/Valijson/UPSTREAM.md`, ordered adapter, forced Draft-04 session, three retained correction patches, and schema suites pin and verify 1.0.6. | Passed |
+| REQ-DEP-7, REQ-DEP-8 | `External/Valijson/UPSTREAM.md`, ordered adapter, forced Draft-04 session, four retained correction patches, and schema suites pin and verify 1.0.6. | Passed |
 | REQ-DEP-9 | `GLTFSDK/CMakeLists.txt` links both JSON targets privately; six installed-only consumers compile without vendor include/link paths. | Passed |
 | REQ-DEP-10 | `UPSTREAM.md`, `docs/Dependencies.md`, licenses, update steps, and `thirdPartyNotices.txt` retain exact provenance and notices. | Passed |
 | REQ-DEP-11, REQ-DEP-12, REQ-DEP-13 | `rapidjson-removal.md`; old external tree/header/build/install/workaround removed; shipped and six-package scans clean; no dependency header package exists. | Passed |
@@ -81,7 +81,7 @@ completed in T-36.
 | REQ-BLD-10 | Six 44-file packages contain SDK artifacts/notices/licenses and no private dependency headers/targets. | Passed |
 | REQ-BLD-11 | Sanitizer workflow runs full plus malformed/deep focused suites with ASAN/UBSAN. | CI pending |
 | REQ-BLD-12 | Seven branch/PR-gated workflows define the complete required matrix and parse successfully. | CI pending |
-| REQ-TST-1 | x64 and Win32 Debug/RelWithDebInfo full runs each pass 504/504; CTest registration passes 1/1. | Passed |
+| REQ-TST-1 | x64 and Win32 Debug/RelWithDebInfo full runs each pass 505/505; optimized Clang passes 505/505 and CTest registration passes 1/1. | Passed |
 | REQ-TST-2 | `JsonTests` and deserializer regressions cover every strict syntax, UTF-8, BOM, stream, and depth case. | Passed |
 | REQ-TST-3 | JSON/deserializer/serializer numeric suites cover all listed ranges/categories/precision forms. | Passed |
 | REQ-TST-4 | Golden, ordering, escaping, repeatability, and semantic round-trip suites pass. | Passed |

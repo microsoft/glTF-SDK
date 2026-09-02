@@ -43,7 +43,8 @@ C021A46604FBA44CBC2DAA487C38F5629331B40C7BBD2A52A0E3B578D9E076F2
 The tree hash is calculated by sorting imported files by forward-slash
 relative path and hashing, for each file, UTF-8 path bytes, a NUL byte, the
 exact file bytes, and a trailing NUL byte. The extracted source and copied
-destination produced the same hash.
+destination produced the same hash. Repository attributes force LF for this
+tree so the recorded exact-byte hashes are stable on every checkout.
 
 Upstream tests, examples, documentation, inspector, CMake files, submodules,
 `thirdparty/` dependencies, bundled parser sources, and all other repository
@@ -83,22 +84,32 @@ maintenance artifacts:
    - SHA-256:
      `E75B6C5AD75BC3B5409A5A175B5EC69B44CEF866BB6077DF8A71FA851C49F1C1`
    - Imported-tree hash after application:
-     `BFF781CCFA117877288DBACF614AA411548D2BBAE83BE008DAE72538E96CBD32`
+     `D7E82196CC4C5158E1F11598995780619F25467D81CFDE2E2BE394726FE3E5D0`
 3. `patches/0003-structured-validation-keywords.patch`
    - SHA-256:
      `2C95D14243C5E157A73BF2FCCC94E50D80CB7676805FABB475DF7609717E99AB`
+   - Imported-tree hash after application:
+     `8099487F6B16F6E2C75CF98495A69F1E0D008456447844B2619C41AE454D3CBE`
+4. `patches/0004-initialize-default-subschema-optionals.patch`
+   - SHA-256:
+     `AC1D5602770AE0DEA29B9FEBD6FCC5182866713D8CD1FB41184955EE5937B47C`
    - Final imported-tree hash after all patches:
-     `85D599BC6A0F5253F39E92DB652F0CD677F6D60A26C74C6A03C14849D40493DC`
+     `47A029CA079D795922A92482BA8A451486E94E539750AC7F1036D0C9532D30B2`
+   - Explicitly initializes metadata optionals in the default `Subschema`
+     constructor. This is the upstream issue 124 failure pattern, reproduced
+     by GCC 13 RelWithDebInfo while destroying the shared empty subschema.
 
 From the repository root, reapply the first patch to a pristine import with:
 
 ```powershell
-git apply --directory=External/Valijson `
+git -c core.autocrlf=false apply --directory=External/Valijson `
   External/Valijson/patches/0001-ordered-nlohmann-adapter.patch
-git apply --directory=External/Valijson `
+git -c core.autocrlf=false apply --directory=External/Valijson `
   External/Valijson/patches/0002-draft04-uri-and-reference-resolution.patch
-git apply --directory=External/Valijson `
+git -c core.autocrlf=false apply --directory=External/Valijson `
   External/Valijson/patches/0003-structured-validation-keywords.patch
+git -c core.autocrlf=false apply --directory=External/Valijson `
+  External/Valijson/patches/0004-initialize-default-subschema-optionals.patch
 ```
 
 Verify each patch before application with the same command plus
@@ -130,10 +141,10 @@ The final shipped subset contains 48 files: 46 headers plus `LICENSE` and
 `Authors`. Its deterministic tree SHA-256 is:
 
 ```text
-CCD9F7F326B8EC97939B9BD3DC29B425A7DD8748347F7CCAE68C467258EC49BD
+13FA74916D7D9D424841C64569F905CC95FFFF4327874032D6C227C197395AC9
 ```
 
-After applying the three patches, reproduce the pruning from the repository
+After applying the four patches, reproduce the pruning from the repository
 root with:
 
 ```powershell

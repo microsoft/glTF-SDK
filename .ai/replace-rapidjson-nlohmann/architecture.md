@@ -193,7 +193,8 @@ External/Valijson/
 |-- patches/
 |   |-- 0001-ordered-nlohmann-adapter.patch
 |   |-- 0002-draft04-uri-and-reference-resolution.patch
-|   `-- 0003-structured-validation-keywords.patch
+|   |-- 0003-structured-validation-keywords.patch
+|   `-- 0004-initialize-default-subschema-optionals.patch
 `-- include/
     |-- compat/
     |   `-- optional.hpp
@@ -748,7 +749,7 @@ There is no runtime fallback or dual-engine release mode.
 
 | Risk | Mitigation |
 |---|---|
-| Valijson 1.0.6 has disabled Draft-04 reference tests | Treat the three private patches and full official ref suite as R2 release blockers; retain RapidJSON until they pass |
+| Valijson 1.0.6 has disabled Draft-04 reference tests and an upstream C++14 optional-initialization defect | Treat the four private patches and full official ref suite as R2 release blockers; retain RapidJSON until they pass |
 | `ordered_json` has linear object lookup | Keep lookups explicit, avoid repeated construction-time searches, and benchmark extension-heavy/large manifests |
 | nlohmann parse/memory/compile regression | Separate benchmarks, private single-header inclusion limited to internal translation units, and review gate before push |
 | Header-only dependencies increase compile cost | Include vendor headers only from private JSON/schema translation units where practical; PImpl prevents public fan-out |
@@ -773,6 +774,7 @@ There is no runtime fallback or dual-engine release mode.
 - `External/Valijson/patches/0001-ordered-nlohmann-adapter.patch`
 - `External/Valijson/patches/0002-draft04-uri-and-reference-resolution.patch`
 - `External/Valijson/patches/0003-structured-validation-keywords.patch`
+- `External/Valijson/patches/0004-initialize-default-subschema-optionals.patch`
 - `External/Valijson/include/valijson/**`
 - `GLTFSDK/Source/Internal/Json.h`
 - `GLTFSDK/Source/Internal/JsonSchema.h`

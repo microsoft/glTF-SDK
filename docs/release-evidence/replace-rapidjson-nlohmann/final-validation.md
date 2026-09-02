@@ -36,19 +36,19 @@ Fresh `cmake_final_*` build trees produced:
 
 | Architecture | Configuration | SDK build/install | Full executable | CTest | Installed consumer |
 | --- | --- | --- | --- | --- | --- |
-| x64 | Debug | passed | 504/504 | 1/1 | built, linked, ran |
-| x64 | RelWithDebInfo | passed | 504/504 | 1/1 | built, linked, ran |
-| Win32 | Debug | passed | 504/504 | 1/1 | built, linked, ran |
-| Win32 | RelWithDebInfo | passed | 504/504 | 1/1 | built, linked, ran |
+| x64 | Debug | passed | 505/505 | 1/1 | built, linked, ran |
+| x64 | RelWithDebInfo | passed | 505/505 | 1/1 | built, linked, ran |
+| Win32 | Debug | passed | 505/505 | 1/1 | built, linked, ran |
+| Win32 | RelWithDebInfo | passed | 505/505 | 1/1 | built, linked, ran |
 | ARM64 | Debug | passed | cross-build only | n/a | built and linked |
 | ARM64 | RelWithDebInfo | passed | cross-build only | n/a | built and linked |
 
 The four host test runs generated XML under the corresponding ignored
-`Built/Int/cmake_final_*` trees. Each XML root reports 504 tests, zero
+`Built/Int/cmake_final_*` trees. Each XML root reports 505 tests, zero
 failures, and zero disabled tests.
 
 The final focused JSON/schema/deserializer/serializer/extensions/extras run
-passed 218/218. The full suite includes all 329 selected official Draft-04
+passed 219/219. The full suite includes all 329 selected official Draft-04
 cases, all 48 extension tests, strict malformed/UTF-8/BOM/depth regressions,
 pointer and extras behavior, deterministic serialization, and legacy CWE
 regressions.
@@ -57,6 +57,14 @@ The first required CTest probe exposed that the executable had never been
 registered and returned `No tests were found`. U-04 added the missing
 `add_test` registration. Reconfigured x64 and Win32 Debug/RelWithDebInfo
 CTest runs then each passed 1/1, executing the complete unit-test binary.
+
+Remote optimized Linux diagnostics subsequently reproduced upstream Valijson
+issue 124 while destroying the shared empty `Subschema`: its default
+constructor did not explicitly disengage three C++14 compatibility optionals.
+Patch `0004-initialize-default-subschema-optionals.patch` applies the upstream
+workaround to that constructor, and a patterned-allocation regression test
+locks the behavior. After the correction, full MSVC Debug,
+MSVC RelWithDebInfo, and optimized Clang suites each pass 505/505 locally.
 
 ## Offline and package gates
 
