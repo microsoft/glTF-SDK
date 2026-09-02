@@ -15,46 +15,80 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup CMake
-        uses: jwlawson/actions-setup-cmake@v2.0.2
+        uses: jwlawson/actions-setup-cmake@v2.2.0
         with:
-            cmake-version: ${{ inputs.cmake-version }}
+          cmake-version: ${{ inputs.cmake-version }}
 
       - name: Install Clang
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y clang lld
 
+      - name: Offline dependency configure
+        env:
+          CC: clang
+          CXX: clang++
+          HTTP_PROXY: http://127.0.0.1:9
+          HTTPS_PROXY: http://127.0.0.1:9
+          ALL_PROXY: http://127.0.0.1:9
+        run: >
+          cmake -S .
+          -B ./Built/Int/cmake_Linux_Offline
+          -G "Unix Makefiles"
+          -DCMAKE_BUILD_TYPE=Debug
+          -DENABLE_UNIT_TESTS=OFF
+          -DENABLE_SAMPLES=OFF
+          -DENABLE_BENCHMARKS=OFF
+
       - name: CMake Configure
         env:
           CC: clang
           CXX: clang++
         run: >
-          cmake -G "Unix Makefiles"
+          cmake -S .
           -B ./Built/Int/cmake_Linux_Sanitizer
-          -D CMAKE_BUILD_TYPE=Debug
-          -D CMAKE_C_COMPILER=clang
-          -D CMAKE_CXX_COMPILER=clang++
-          -D CMAKE_CXX_FLAGS="-fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer"
-          -D CMAKE_C_FLAGS="-fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer"
-          -D CMAKE_EXE_LINKER_FLAGS="-fsanitize=address,undefined"
-          -D CMAKE_SHARED_LINKER_FLAGS="-fsanitize=address,undefined"
-          -D ENABLE_SAMPLES=OFF
-          .
+          -G "Unix Makefiles"
+          -DCMAKE_BUILD_TYPE=Debug
+          -DCMAKE_C_COMPILER=clang
+          -DCMAKE_CXX_COMPILER=clang++
+          -DCMAKE_CXX_FLAGS="-fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer"
+          -DCMAKE_C_FLAGS="-fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer"
+          -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address,undefined"
+          -DCMAKE_SHARED_LINKER_FLAGS="-fsanitize=address,undefined"
+          -DENABLE_SAMPLES=OFF
 
-      - name: CMake Build
-        run: cmake --build . --target install --config Debug
-        working-directory: ./Built/Int/cmake_Linux_Sanitizer
+      - name: CMake Build and Install
+        run: >
+          cmake --build ./Built/Int/cmake_Linux_Sanitizer
+          --target install
+          --config Debug
+          --parallel
 
-      - name: Running Unit Tests
-        run: ./GLTFSDK.Test --gtest_output=xml:GLTFSDK.Test.Sanitizer.log
+      - name: Running Full Sanitizer Suite
+        run: >
+          ./GLTFSDK.Test
+          --gtest_output=xml:GLTFSDK.Test.Sanitizer.log
         working-directory: ./Built/Out/Linux/Debug/GLTFSDK.Test
         env:
           ASAN_OPTIONS: "detect_leaks=0:halt_on_error=1"
           UBSAN_OPTIONS: "print_stacktrace=1:halt_on_error=1"
 
-      - uses: actions/upload-artifact@v4
-        name: "Upload test results"
+      - name: Running Malformed and Deep Sanitizer Suite
+        run: >
+          ./GLTFSDK.Test
+          --gtest_filter=JsonTests.Strict*:JsonTests.Pointer*:GLTFTests.StrictPublic*:DeserializeTests.DeserializeFail*
+          --gtest_output=xml:GLTFSDK.Test.Sanitizer.Malformed.log
+        working-directory: ./Built/Out/Linux/Debug/GLTFSDK.Test
+        env:
+          ASAN_OPTIONS: "detect_leaks=0:halt_on_error=1"
+          UBSAN_OPTIONS: "print_stacktrace=1:halt_on_error=1"
+
+      - name: Upload sanitizer results
         if: always()
+        uses: actions/upload-artifact@v4
         with:
-            name: GLTFSDK.Test.Sanitizer
-            path: ${{ github.workspace }}/Built/Out/Linux/Debug/GLTFSDK.Test/GLTFSDK.Test.Sanitizer.log
+          name: GLTFSDK.Sanitizer
+          if-no-files-found: ignore
+          path: |
+            ${{ github.workspace }}/Built/Out/Linux/Debug/GLTFSDK.Test/GLTFSDK.Test.Sanitizer.log
+            ${{ github.workspace }}/Built/Out/Linux/Debug/GLTFSDK.Test/GLTFSDK.Test.Sanitizer.Malformed.log

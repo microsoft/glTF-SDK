@@ -1,4 +1,4 @@
-name: 'build ios'
+name: 'build android'
 
 on:
   workflow_call:
@@ -15,14 +15,12 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         platform: ${{ fromJson(inputs.platforms) }}
         config: ${{ fromJson(inputs.configurations) }}
-    env:
-      OUTPUT_PLATFORM: ${{ matrix.platform == 'OS' && 'iOS' || 'iOSSimulator64' }}
     steps:
       - name: Git Checkout
         uses: actions/checkout@v4
@@ -39,36 +37,38 @@ jobs:
           ALL_PROXY: http://127.0.0.1:9
         run: >
           cmake -S .
-          -B "./Built/Int/cmake_iOS_${{ matrix.platform }}_${{ matrix.config }}"
-          -G Xcode
-          -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/Build/CMake/ios.toolchain.cmake"
-          -DIOS_PLATFORM="${{ matrix.platform }}"
-          -DDEPLOYMENT_TARGET="10.11"
+          -B "./Built/Int/cmake_android_${{ matrix.platform }}_${{ matrix.config }}"
+          -G Ninja
+          -DCMAKE_TOOLCHAIN_FILE="$ANDROID_NDK_LATEST_HOME/build/cmake/android.toolchain.cmake"
+          -DCMAKE_BUILD_TYPE=${{ matrix.config }}
+          -DANDROID_ABI="${{ matrix.platform }}"
+          -DANDROID_PLATFORM=android-24
+          -DANDROID_OS_PLATFORM=ANDROID
           -DENABLE_UNIT_TESTS=OFF
           -DENABLE_SAMPLES=OFF
           -DENABLE_BENCHMARKS=OFF
 
       - name: CMake Build and Install
         run: >
-          cmake --build "./Built/Int/cmake_iOS_${{ matrix.platform }}_${{ matrix.config }}"
+          cmake --build "./Built/Int/cmake_android_${{ matrix.platform }}_${{ matrix.config }}"
           --target install
           --config "${{ matrix.config }}"
           --parallel
 
       - name: Verify Installed Package
         run: |
-          root="${{ github.workspace }}/Built/Out/${OUTPUT_PLATFORM}/${{ matrix.config }}/GLTFSDK"
+          root="${{ github.workspace }}/Built/Out/android_${{ matrix.platform }}/${{ matrix.config }}/GLTFSDK"
           legacy_vendor='rapid''json'
           if grep -RniE "${legacy_vendor}|nlohmann|valijson" "$root/Inc"; then
             echo "Installed public headers expose a JSON vendor"
             exit 1
           fi
-          find "$root" -type f | sed "s#^$root/##" | sort > "./Built/Int/package_iOS_${{ matrix.platform }}_${{ matrix.config }}.txt"
+          find "$root" -type f -printf '%P\n' | sort > "./Built/Int/package_android_${{ matrix.platform }}_${{ matrix.config }}.txt"
 
-      - name: Upload iOS evidence
+      - name: Upload Android evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: GLTFSDK.iOS.${{ matrix.platform }}.${{ matrix.config }}
+          name: GLTFSDK.Android.${{ matrix.platform }}.${{ matrix.config }}
           if-no-files-found: ignore
-          path: ${{ github.workspace }}/Built/Int/package_iOS_${{ matrix.platform }}_${{ matrix.config }}.txt
+          path: ${{ github.workspace }}/Built/Int/package_android_${{ matrix.platform }}_${{ matrix.config }}.txt
