@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "repository": "https://github.com/KhronosGroup/glTF-Sample-Assets",
+  "commit": "9429648735279342b4c32b8745f7904196607379",
+  "commitUrl": "https://github.com/KhronosGroup/glTF-Sample-Assets/commit/9429648735279342b4c32b8745f7904196607379",
+  "selection": [
+    {
+      "id": "Box-gltf",
+      "model": "Box",
+      "tier": "small/core",
+      "format": "gltf",
+      "entrypoint": "Models/Box/glTF/Box.gltf",
+      "totalBytes": 3546,
+      "license": {
+        "spdx": "CC-BY-4.0",
+        "modelLicenseUrl": "https://github.com/KhronosGroup/glTF-Sample-Assets/blob/9429648735279342b4c32b8745f7904196607379/Models/Box/LICENSE.md",
+        "licenseTextUrl": "https://creativecommons.org/licenses/by/4.0/legalcode"
+      },
+      "files": [
+        "Models/Box/glTF/Box.gltf",
+        "Models/Box/glTF/Box0.bin"
+      ]
+    },
+    {
+      "id": "Box-glb",
+      "model": "Box",
+      "tier": "small/core",
+      "format": "glb",
+      "entrypoint": "Models/Box/glTF-Binary/Box.glb",
+      "totalBytes": 1664,
+      "license": {
+        "spdx": "CC-BY-4.0",
+        "modelLicenseUrl": "https://github.com/KhronosGroup/glTF-Sample-Assets/blob/9429648735279342b4c32b8745f7904196607379/Models/Box/LICENSE.md",
+        "licenseTextUrl": "https://creativecommons.org/licenses/by/4.0/legalcode"
+      },
+      "files": [
+        "Models/Box/glTF-Binary/Box.glb"
+      ]
+    },
+    {
+      "id": "Avocado-gltf",
+      "model": "Avocado",
+      "tier": "texture-heavy",
+      "format": "gltf",
+      "entrypoint": "Models/Avocado/glTF/Avocado.gltf",
+      "totalBytes": 8110895,
+      "license": {
+        "spdx": "CC0-1.0",
+        "modelLicenseUrl": "https://github.com/KhronosGroup/glTF-Sample-Assets/blob/9429648735279342b4c32b8745f7904196607379/Models/Avocado/LICENSE.md",
+        "licenseTextUrl": "https://creativecommons.org/publicdomain/zero/1.0/legalcode"
+      },
+      "files": [
+        "Models/Avocado/glTF/Avocado.gltf",
+        "Models/Avocado/glTF/Avocado.bin",
+        "Models/Avocado/glTF/Avocado_baseColor.png",
+        "Models/Avocado/glTF/Avocado_normal.png",
+        "Models/Avocado/glTF/Avocado_roughnessMetallic.png"
+      ]
+    },
+    {
+      "id": "Avocado-glb",
+      "model": "Avocado",
+      "tier": "texture-heavy",
+      "format": "glb",
+      "entrypoint": "Models/Avocado/glTF-Binary/Avocado.glb",
+      "totalBytes": 8110040,
+      "license": {
+        "spdx": "CC0-1.0",
+        "modelLicenseUrl": "https://github.com/KhronosGroup/glTF-Sample-Assets/blob/9429648735279342b4c32b8745f7904196607379/Models/Avocado/LICENSE.md",
+        "licenseTextUrl": "https://creativecommons.org/publicdomain/zero/1.0/legalcode"
+      },
+      "files": [
+        "Models/Avocado/glTF-Binary/Avocado.glb"
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "Models/Box/glTF/Box.gltf",
+      "bytes": 2898,
+      "sha256": "4A0D69EECFCE0672A50B71DC218CBACEC6C53FE2445040C235C6314B1B2C41B9",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/9429648735279342b4c32b8745f7904196607379/Models/Box/glTF/Box.gltf"
+    },
+    {
+      "path": "Models/Box/glTF/Box0.bin",
+      "bytes": 648,
+      "sha256": "3266A8E39B9F425B3341CBE5EEC7849F44310256BFA651E6B8B40C85CE0CCAFB",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/9429648735279342b4c32b8745f7904196607379/Models/Box/glTF/Box0.bin"
+    },
+    {
+      "path": "Models/Box/glTF-Binary/Box.glb",
+      "bytes": 1664,
+      "sha256": "ED52F7192B8311D700AC0CE80644E3852CD01537E4D62241B9ACBA023DA3D54E",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/9429648735279342b4c32b8745f7904196607379/Models/Box/glTF-Binary/Box.glb"
+    },
+    {
+      "path": "Models/Avocado/glTF/Avocado.gltf",
+      "bytes": 2413,
+      "sha256": "C9BDE1D2F09514DAD0A16971DF2222BEB582FAD5DFC86203DE1D56389D52FEDA",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/9429648735279342b4c32b8745f7904196607379/Models/Avocado/glTF/Avocado.gltf"
+    },
+    {
+      "path": "Models/Avocado/glTF/Avocado.bin",
+      "bytes": 23580,
+      "sha256": "3BF7CE0EC994562EABF0CB72A52BBC7976818D630D62609A966B53A5FF9B9180",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/9429648735279342b4c32b8745f7904196607379/Models/Avocado/glTF/Avocado.bin"
+    },
+    {
+      "path": "Models/Avocado/glTF/Avocado_baseColor.png",
+      "bytes": 3158729,
+      "sha256": "385DCE948C3B9E8BC93E1C930D796E72B02CBD474B121A160D577DE95EBBB48F",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/9429648735279342b4c32b8745f7904196607379/Models/Avocado/glTF/Avocado_baseColor.png"
+    },
+    {
+      "path": "Models/Avocado/glTF/Avocado_normal.png",
+      "bytes": 3271114,
+      "sha256": "25783C211761B7E32497FDD3E2490F3BAC05B738E5E2BC62FC5B78A270BB4E50",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/9429648735279342b4c32b8745f7904196607379/Models/Avocado/glTF/Avocado_normal.png"
+    },
+    {
+      "path": "Models/Avocado/glTF/Avocado_roughnessMetallic.png",
+      "bytes": 1655059,
+      "sha256": "33EE80F7CCFD36825ACFBD5EF0A51326BEA49E33EFED852DCA44798798BD6901",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/9429648735279342b4c32b8745f7904196607379/Models/Avocado/glTF/Avocado_roughnessMetallic.png"
+    },
+    {
+      "path": "Models/Avocado/glTF-Binary/Avocado.glb",
+      "bytes": 8110040,
+      "sha256": "CCC9C3CE56423720B09399C2351537207CD5A65F859F9E6E2F30922762F3ABD4",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/9429648735279342b4c32b8745f7904196607379/Models/Avocado/glTF-Binary/Avocado.glb"
+    }
+  ]
+}

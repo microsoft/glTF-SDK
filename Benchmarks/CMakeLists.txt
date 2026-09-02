@@ -24,3 +24,5 @@ if(MSVC)
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
     target_compile_options(GLTFSDK.JsonBenchmarks PRIVATE "-Wall;-Wextra;-Werror")
 endif()
+
+add_subdirectory(LoadExport)
