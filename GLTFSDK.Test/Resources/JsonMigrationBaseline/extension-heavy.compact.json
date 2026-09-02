@@ -1,0 +1,1 @@
+{"asset":{"generator":"JSON migration baseline","version":"2.0"},"materials":[{"name":"Extension material","extensions":{"KHR_materials_clearcoat":{"clearcoatFactor":0.75,"clearcoatRoughnessFactor":0.25}}}],"extensionsUsed":["KHR_materials_clearcoat"]}

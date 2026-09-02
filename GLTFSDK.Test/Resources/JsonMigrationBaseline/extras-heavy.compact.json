@@ -1,0 +1,1 @@
+{"asset":{"generator":"JSON migration baseline","version":"2.0","extras":{"integer":7,"unsigned":4294967295,"floating":1.25,"boolean":true,"string":"baseline","array":[null,false,-2,3.5,"text"],"nested":{"first":1,"second":{"leaf":"value"}}}}}
