@@ -1,62 +1,89 @@
 [![Build Status](https://github.com/microsoft/glTF-SDK/actions/workflows/ci.yml/badge.svg)](https://github.com/microsoft/glTF-SDK/actions/workflows/ci.yml)
 
-> **Note:** This is the `Release/1.9.5` legacy maintenance branch. It is maintained for clients that depend on this specific version. For the latest development, see the `master` branch.
+> **Note:** This is the `Release/2.0.0` branch. It contains intentional source
+> and ABI breaks from 1.9.5. See the
+> [2.0 migration guide](docs/MigrationGuide-2.0.md) and
+> [release notes](docs/ReleaseNotes/2.0.0.md).
 
 # Microsoft glTF SDK - A C++ Deserializer/Serializer for glTF
 
-* Windows/macOS/Android Compatible
-* glTF & glB support, including embedded Base64 support
-* Flexibility and ease of integration to any 3D engine
+* Windows, Linux, macOS, iOS, and Android support
+* glTF and GLB support, including embedded Base64 resources
 * Strongly typed extension support
-* Built-in schema validation during deserialization
-* Low memory overhead
-* Utilities for converting input data of any type (e.g. float/uint8/uint16 RGB/RGBA color) into a single type such as float RGBA color
+* Built-in JSON Schema Draft-04 validation
+* C++14 baseline
 
-# Project setup and build
+## JSON implementation in 2.0
 
-This quick overview will help you get started developing in the glTF SDK
-repository. We support development on Windows, macOS, and Linux. This overview is intended
-for developers familiar with common native development practices.
+The SDK uses a private, vendored nlohmann/json 3.12.0 ordered DOM and a
+corrected private Valijson 1.0.6 Draft-04 validator. Neither dependency appears
+in installed public headers or needs to be installed by SDK consumers.
 
-## **CMake Configure and Build**
+2.0 removes the public `GLTFSDK/RapidJsonUtils.h` surface,
+`ExtrasDocument::GetDocument()`, and the DOM-taking schema-validation overload.
+Use `ExtrasDocument::ToJson()`, `ExtrasDocument::HasMember()`, its typed and
+JSON Pointer operations, and the string-based `ValidateDocumentAgainstSchema`
+API instead.
 
-**Required Tools:** [git](https://git-scm.com/), [CMake (version 3.X.X)](https://cmake.org/), [powershell](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell?view=powershell-7.5)
+Parsing now rejects duplicate object names, invalid UTF-8, comments, trailing
+commas, non-finite spellings, and inputs deeper than 256 object/array
+containers. String and stream overloads share the same parser. A UTF-8 BOM is
+accepted only with `DeserializeFlags::IgnoreByteOrderMark`, including compact
+stream input.
 
-The first step for all development environments and targets is to clone the repo. Use a
-git-enabled terminal to follow the steps below.
+## Configure and build
 
-```
+Required tools are Git, CMake, a supported C++14 toolchain, and PowerShell
+(`pwsh` or Windows PowerShell) for schema-header generation.
+
+```powershell
 git clone https://github.com/microsoft/glTF-SDK.git
+cd glTF-SDK
+cmake -S . -B Built
+cmake --build Built --target install --config Debug
 ```
 
-glTF SDK build system is based on CMake, which customarily uses a separate
-build directory. Build directory location is up to you, but we highly recommend using
-the `Built` directory from the repository root. The `.gitignore` file is set up to
-ignore this `Built` directory.
+The build is offline with respect to the JSON dependencies: their exact
+headers are committed under `External/`. Unit-test configuration may still use
+the repository's existing GoogleTest fallback when no installed GoogleTest
+package is found.
 
-**NOTE:** We don't currently support usage of CMake 4.0 or higher.
+Installed artifacts are written to
+`Built/Out/<platform>/<configuration>/GLTFSDK`. The package contains the SDK
+library, public headers, and required notices, but no nlohmann/json, Valijson,
+or RapidJSON headers or CMake targets.
 
-Use the following command to output a platform specific project using CMake:
+Optional targets:
 
+```powershell
+# Dependency-free JSON benchmark harness
+cmake -S . -B Built/Bench -DENABLE_UNIT_TESTS=OFF -DENABLE_SAMPLES=OFF -DENABLE_BENCHMARKS=ON
+cmake --build Built/Bench --config RelWithDebInfo --target GLTFSDK.JsonBenchmarks
+
+# Configure the installed-only public consumer independently
+cmake -S GLTFSDK.PublicConsumer.Test -B Built/PublicConsumer `
+  -DGLTFSDK_ROOT=Built/Out/windows_x64/Debug/GLTFSDK
+cmake --build Built/PublicConsumer --config Debug
 ```
-cmake -B Built
-```
 
-Use the following command to build the binaries and install: 
+## Running tests
 
-```
-cmake --build ./Built --target install --config Debug
-```
+From the installed test folder:
 
-This will install all binaries produced by this repo into a "Built/Out". This include the static library, the Serialize and Deserialize applications as well as the GLTFSDK.Test test application.
-
-## **Running tests**
-
-To run the test application and save the results just use the following command from the GLTFSDK.Test installation folder:
-
-```
+```powershell
 .\GLTFSDK.Test.exe --gtest_output=xml:GLTFSDK.Test.log
 ```
+
+The Release/2.0.0 CI matrix covers Windows x64/Win32/ARM64, Linux, macOS,
+iOS device/simulator, three Android ABIs, and Linux ASAN/UBSAN.
+
+## Documentation
+
+* [2.0.0 release notes](docs/ReleaseNotes/2.0.0.md)
+* [2.0 migration guide](docs/MigrationGuide-2.0.md)
+* [Dependency and provenance details](docs/Dependencies.md)
+* [Known downstream source breaks](docs/DownstreamBreaks-2.0.md)
+* [Release evidence](docs/release-evidence/replace-rapidjson-nlohmann)
 
 # Trademarks
 
@@ -64,14 +91,7 @@ glTF is a trademark of The Khronos Group Inc.
 
 # Contributing
 
-This project welcomes contributions and suggestions.  Most contributions require you to agree to a
-Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
-the rights to use your contribution. For details, visit https://cla.microsoft.com.
-
-When you submit a pull request, a CLA-bot will automatically determine whether you need to provide
-a CLA and decorate the PR appropriately (e.g., label, comment). Simply follow the instructions
-provided by the bot. You will only need to do this once across all repos using our CLA.
-
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
-For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
-contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+This project welcomes contributions and suggestions. Most contributions
+require a Contributor License Agreement. See
+https://cla.microsoft.com and the
+[Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
