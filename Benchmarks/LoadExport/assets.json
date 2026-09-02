@@ -1,16 +1,64 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "repository": "https://github.com/KhronosGroup/glTF-Sample-Assets",
   "commit": "9429648735279342b4c32b8745f7904196607379",
   "commitUrl": "https://github.com/KhronosGroup/glTF-Sample-Assets/commit/9429648735279342b4c32b8745f7904196607379",
+  "sampleClasses": {
+    "standard": {
+      "measuredSamples": 100,
+      "description": "Small and medium cases retain 100 measured samples."
+    },
+    "large": {
+      "measuredSamples": 30,
+      "description": "Genuinely large cases use 30 measured samples. A preliminary full-corpus cycle took about 13 seconds for RapidJSON and 82-91 seconds for nlohmann, dominated by repeated NodePerformanceTest schema/object construction and untimed output reload checks; the same reduction is applied to both branches."
+    }
+  },
+  "handlerMode": {
+    "description": "The same KHR extension handler set available in both Release/1.9.5-lineage branches is enabled globally. Listed typed extensions use SDK handlers; listed raw extensions remain in glTFProperty::extensions and are serialized unchanged semantically."
+  },
+  "typedHandlerExtensions": [
+    "KHR_materials_pbrSpecularGlossiness",
+    "KHR_materials_unlit",
+    "KHR_materials_clearcoat",
+    "KHR_materials_volume",
+    "KHR_materials_iridescence",
+    "KHR_materials_transmission",
+    "KHR_materials_sheen",
+    "KHR_materials_specular",
+    "KHR_draco_mesh_compression",
+    "EXT_mesh_gpu_instancing",
+    "KHR_texture_transform"
+  ],
   "selection": [
     {
       "id": "Box-gltf",
       "model": "Box",
       "tier": "small/core",
+      "sampleClass": "standard",
       "format": "gltf",
       "entrypoint": "Models/Box/glTF/Box.gltf",
+      "sourceUrl": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/9429648735279342b4c32b8745f7904196607379/Models/Box/glTF/Box.gltf",
+      "entrypointBytes": 2898,
+      "entrypointSha256": "4A0D69EECFCE0672A50B71DC218CBACEC6C53FE2445040C235C6314B1B2C41B9",
       "totalBytes": 3546,
+      "complexity": {
+        "scenes": 1,
+        "meshes": 1,
+        "nodes": 2,
+        "materials": 1,
+        "accessors": 3,
+        "animations": 0,
+        "skins": 0,
+        "images": 0,
+        "textures": 0,
+        "meshPrimitives": 1
+      },
+      "extensions": {
+        "used": [],
+        "required": [],
+        "typed": [],
+        "raw": []
+      },
       "license": {
         "spdx": "CC-BY-4.0",
         "modelLicenseUrl": "https://github.com/KhronosGroup/glTF-Sample-Assets/blob/9429648735279342b4c32b8745f7904196607379/Models/Box/LICENSE.md",
@@ -25,9 +73,31 @@
       "id": "Box-glb",
       "model": "Box",
       "tier": "small/core",
+      "sampleClass": "standard",
       "format": "glb",
       "entrypoint": "Models/Box/glTF-Binary/Box.glb",
+      "sourceUrl": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/9429648735279342b4c32b8745f7904196607379/Models/Box/glTF-Binary/Box.glb",
+      "entrypointBytes": 1664,
+      "entrypointSha256": "ED52F7192B8311D700AC0CE80644E3852CD01537E4D62241B9ACBA023DA3D54E",
       "totalBytes": 1664,
+      "complexity": {
+        "scenes": 1,
+        "meshes": 1,
+        "nodes": 2,
+        "materials": 1,
+        "accessors": 3,
+        "animations": 0,
+        "skins": 0,
+        "images": 0,
+        "textures": 0,
+        "meshPrimitives": 1
+      },
+      "extensions": {
+        "used": [],
+        "required": [],
+        "typed": [],
+        "raw": []
+      },
       "license": {
         "spdx": "CC-BY-4.0",
         "modelLicenseUrl": "https://github.com/KhronosGroup/glTF-Sample-Assets/blob/9429648735279342b4c32b8745f7904196607379/Models/Box/LICENSE.md",
@@ -40,10 +110,32 @@
     {
       "id": "Avocado-gltf",
       "model": "Avocado",
-      "tier": "texture-heavy",
+      "tier": "medium/texture-heavy",
+      "sampleClass": "standard",
       "format": "gltf",
       "entrypoint": "Models/Avocado/glTF/Avocado.gltf",
+      "sourceUrl": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/9429648735279342b4c32b8745f7904196607379/Models/Avocado/glTF/Avocado.gltf",
+      "entrypointBytes": 2413,
+      "entrypointSha256": "C9BDE1D2F09514DAD0A16971DF2222BEB582FAD5DFC86203DE1D56389D52FEDA",
       "totalBytes": 8110895,
+      "complexity": {
+        "scenes": 1,
+        "meshes": 1,
+        "nodes": 1,
+        "materials": 1,
+        "accessors": 5,
+        "animations": 0,
+        "skins": 0,
+        "images": 3,
+        "textures": 3,
+        "meshPrimitives": 1
+      },
+      "extensions": {
+        "used": [],
+        "required": [],
+        "typed": [],
+        "raw": []
+      },
       "license": {
         "spdx": "CC0-1.0",
         "modelLicenseUrl": "https://github.com/KhronosGroup/glTF-Sample-Assets/blob/9429648735279342b4c32b8745f7904196607379/Models/Avocado/LICENSE.md",
@@ -60,10 +152,32 @@
     {
       "id": "Avocado-glb",
       "model": "Avocado",
-      "tier": "texture-heavy",
+      "tier": "medium/texture-heavy",
+      "sampleClass": "standard",
       "format": "glb",
       "entrypoint": "Models/Avocado/glTF-Binary/Avocado.glb",
+      "sourceUrl": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/9429648735279342b4c32b8745f7904196607379/Models/Avocado/glTF-Binary/Avocado.glb",
+      "entrypointBytes": 8110040,
+      "entrypointSha256": "CCC9C3CE56423720B09399C2351537207CD5A65F859F9E6E2F30922762F3ABD4",
       "totalBytes": 8110040,
+      "complexity": {
+        "scenes": 1,
+        "meshes": 1,
+        "nodes": 1,
+        "materials": 1,
+        "accessors": 5,
+        "animations": 0,
+        "skins": 0,
+        "images": 3,
+        "textures": 3,
+        "meshPrimitives": 1
+      },
+      "extensions": {
+        "used": [],
+        "required": [],
+        "typed": [],
+        "raw": []
+      },
       "license": {
         "spdx": "CC0-1.0",
         "modelLicenseUrl": "https://github.com/KhronosGroup/glTF-Sample-Assets/blob/9429648735279342b4c32b8745f7904196607379/Models/Avocado/LICENSE.md",
@@ -72,6 +186,542 @@
       "files": [
         "Models/Avocado/glTF-Binary/Avocado.glb"
       ]
+    },
+    {
+      "id": "MorphStressTest-glb",
+      "model": "MorphStressTest",
+      "tier": "medium/geometry-animation",
+      "sampleClass": "standard",
+      "format": "glb",
+      "entrypoint": "Models/MorphStressTest/glTF-Binary/MorphStressTest.glb",
+      "sourceUrl": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/9429648735279342b4c32b8745f7904196607379/Models/MorphStressTest/glTF-Binary/MorphStressTest.glb",
+      "entrypointBytes": 575900,
+      "entrypointSha256": "005F1D9DD938C553A506D6BF3D21830FC3F2EC3A199D9332E9A625BAF7342BEF",
+      "totalBytes": 575900,
+      "complexity": {
+        "scenes": 1,
+        "meshes": 1,
+        "nodes": 1,
+        "materials": 2,
+        "accessors": 48,
+        "animations": 3,
+        "skins": 0,
+        "images": 3,
+        "textures": 3,
+        "meshPrimitives": 2
+      },
+      "extensions": {
+        "used": [],
+        "required": [],
+        "typed": [],
+        "raw": []
+      },
+      "license": {
+        "spdx": "CC-BY-4.0",
+        "modelLicenseUrl": "https://github.com/KhronosGroup/glTF-Sample-Assets/blob/9429648735279342b4c32b8745f7904196607379/Models/MorphStressTest/LICENSE.md",
+        "licenseTextUrl": "https://creativecommons.org/licenses/by/4.0/legalcode"
+      },
+      "files": [
+        "Models/MorphStressTest/glTF-Binary/MorphStressTest.glb"
+      ]
+    },
+    {
+      "id": "SpecularTest-glb",
+      "model": "SpecularTest",
+      "tier": "small/material-grid",
+      "sampleClass": "standard",
+      "format": "glb",
+      "entrypoint": "Models/SpecularTest/glTF-Binary/SpecularTest.glb",
+      "sourceUrl": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/9429648735279342b4c32b8745f7904196607379/Models/SpecularTest/glTF-Binary/SpecularTest.glb",
+      "entrypointBytes": 223376,
+      "entrypointSha256": "CF789C68C3AB4B74877DA3C5992C612C213F9C901ED4FAFBF9BE362F434E48D9",
+      "totalBytes": 223376,
+      "complexity": {
+        "scenes": 1,
+        "meshes": 24,
+        "nodes": 25,
+        "materials": 24,
+        "accessors": 11,
+        "animations": 0,
+        "skins": 0,
+        "images": 4,
+        "textures": 4,
+        "meshPrimitives": 24
+      },
+      "extensions": {
+        "used": [
+          "KHR_materials_specular"
+        ],
+        "required": [],
+        "typed": [
+          "KHR_materials_specular"
+        ],
+        "raw": []
+      },
+      "license": {
+        "spdx": "CC-BY-4.0",
+        "modelLicenseUrl": "https://github.com/KhronosGroup/glTF-Sample-Assets/blob/9429648735279342b4c32b8745f7904196607379/Models/SpecularTest/LICENSE.md",
+        "licenseTextUrl": "https://creativecommons.org/licenses/by/4.0/legalcode"
+      },
+      "files": [
+        "Models/SpecularTest/glTF-Binary/SpecularTest.glb"
+      ]
+    },
+    {
+      "id": "EmissiveStrengthTest-glb",
+      "model": "EmissiveStrengthTest",
+      "tier": "small/material-grid",
+      "sampleClass": "standard",
+      "format": "glb",
+      "entrypoint": "Models/EmissiveStrengthTest/glTF-Binary/EmissiveStrengthTest.glb",
+      "sourceUrl": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/9429648735279342b4c32b8745f7904196607379/Models/EmissiveStrengthTest/glTF-Binary/EmissiveStrengthTest.glb",
+      "entrypointBytes": 10668,
+      "entrypointSha256": "074898EC4C3636230FAFFE0CACAC7403C3F6135DB61F943DA28FFAA88CA2A39F",
+      "totalBytes": 10668,
+      "complexity": {
+        "scenes": 1,
+        "meshes": 6,
+        "nodes": 6,
+        "materials": 6,
+        "accessors": 15,
+        "animations": 0,
+        "skins": 0,
+        "images": 1,
+        "textures": 1,
+        "meshPrimitives": 6
+      },
+      "extensions": {
+        "used": [
+          "KHR_materials_emissive_strength"
+        ],
+        "required": [],
+        "typed": [],
+        "raw": [
+          "KHR_materials_emissive_strength"
+        ]
+      },
+      "license": {
+        "spdx": "CC-BY-4.0",
+        "modelLicenseUrl": "https://github.com/KhronosGroup/glTF-Sample-Assets/blob/9429648735279342b4c32b8745f7904196607379/Models/EmissiveStrengthTest/LICENSE.md",
+        "licenseTextUrl": "https://creativecommons.org/licenses/by/4.0/legalcode"
+      },
+      "files": [
+        "Models/EmissiveStrengthTest/glTF-Binary/EmissiveStrengthTest.glb"
+      ]
+    },
+    {
+      "id": "SimpleInstancing-glb",
+      "model": "SimpleInstancing",
+      "tier": "small/scene-instancing",
+      "sampleClass": "standard",
+      "format": "glb",
+      "entrypoint": "Models/SimpleInstancing/glTF-Binary/SimpleInstancing.glb",
+      "sourceUrl": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/9429648735279342b4c32b8745f7904196607379/Models/SimpleInstancing/glTF-Binary/SimpleInstancing.glb",
+      "entrypointBytes": 7356,
+      "entrypointSha256": "1C9425627481346A8C226118F7000DB7CD7F80198E9F54331F8B664D16726F3F",
+      "totalBytes": 7356,
+      "complexity": {
+        "scenes": 1,
+        "meshes": 1,
+        "nodes": 1,
+        "materials": 0,
+        "accessors": 6,
+        "animations": 0,
+        "skins": 0,
+        "images": 0,
+        "textures": 0,
+        "meshPrimitives": 1
+      },
+      "extensions": {
+        "used": [
+          "EXT_mesh_gpu_instancing"
+        ],
+        "required": [],
+        "typed": [
+          "EXT_mesh_gpu_instancing"
+        ],
+        "raw": []
+      },
+      "license": {
+        "spdx": "CC0-1.0",
+        "modelLicenseUrl": "https://github.com/KhronosGroup/glTF-Sample-Assets/blob/9429648735279342b4c32b8745f7904196607379/Models/SimpleInstancing/LICENSE.md",
+        "licenseTextUrl": "https://creativecommons.org/publicdomain/zero/1.0/legalcode"
+      },
+      "files": [
+        "Models/SimpleInstancing/glTF-Binary/SimpleInstancing.glb"
+      ]
+    },
+    {
+      "id": "XmpMetadataRoundedCube-glb",
+      "model": "XmpMetadataRoundedCube",
+      "tier": "small/metadata",
+      "sampleClass": "standard",
+      "format": "glb",
+      "entrypoint": "Models/XmpMetadataRoundedCube/glTF-Binary/XmpMetadataRoundedCube.glb",
+      "sourceUrl": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/9429648735279342b4c32b8745f7904196607379/Models/XmpMetadataRoundedCube/glTF-Binary/XmpMetadataRoundedCube.glb",
+      "entrypointBytes": 105936,
+      "entrypointSha256": "92A22170651513274577F81A3AF1CF548C2049E31CFEDE85A5E96170C583E451",
+      "totalBytes": 105936,
+      "complexity": {
+        "scenes": 1,
+        "meshes": 1,
+        "nodes": 1,
+        "materials": 1,
+        "accessors": 3,
+        "animations": 0,
+        "skins": 0,
+        "images": 0,
+        "textures": 0,
+        "meshPrimitives": 1
+      },
+      "extensions": {
+        "used": [
+          "KHR_xmp_json_ld"
+        ],
+        "required": [],
+        "typed": [],
+        "raw": [
+          "KHR_xmp_json_ld"
+        ]
+      },
+      "license": {
+        "spdx": "CC-BY-4.0",
+        "modelLicenseUrl": "https://github.com/KhronosGroup/glTF-Sample-Assets/blob/9429648735279342b4c32b8745f7904196607379/Models/XmpMetadataRoundedCube/LICENSE.md",
+        "licenseTextUrl": "https://creativecommons.org/licenses/by/4.0/legalcode"
+      },
+      "files": [
+        "Models/XmpMetadataRoundedCube/glTF-Binary/XmpMetadataRoundedCube.glb"
+      ]
+    },
+    {
+      "id": "TextureTransformMultiTest-glb",
+      "model": "TextureTransformMultiTest",
+      "tier": "medium/material-grid",
+      "sampleClass": "standard",
+      "format": "glb",
+      "entrypoint": "Models/TextureTransformMultiTest/glTF-Binary/TextureTransformMultiTest.glb",
+      "sourceUrl": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/9429648735279342b4c32b8745f7904196607379/Models/TextureTransformMultiTest/glTF-Binary/TextureTransformMultiTest.glb",
+      "entrypointBytes": 388264,
+      "entrypointSha256": "569AEDB53822D5721E7E06AF5983348683D4B2FFB1D469338AD4F02BF6A74911",
+      "totalBytes": 388264,
+      "complexity": {
+        "scenes": 1,
+        "meshes": 29,
+        "nodes": 29,
+        "materials": 29,
+        "accessors": 35,
+        "animations": 0,
+        "skins": 0,
+        "images": 4,
+        "textures": 4,
+        "meshPrimitives": 29
+      },
+      "extensions": {
+        "used": [
+          "KHR_materials_clearcoat",
+          "KHR_materials_unlit",
+          "KHR_texture_transform"
+        ],
+        "required": [
+          "KHR_texture_transform"
+        ],
+        "typed": [
+          "KHR_materials_clearcoat",
+          "KHR_materials_unlit",
+          "KHR_texture_transform"
+        ],
+        "raw": []
+      },
+      "license": {
+        "spdx": "CC-BY-4.0",
+        "modelLicenseUrl": "https://github.com/KhronosGroup/glTF-Sample-Assets/blob/9429648735279342b4c32b8745f7904196607379/Models/TextureTransformMultiTest/LICENSE.md",
+        "licenseTextUrl": "https://creativecommons.org/licenses/by/4.0/legalcode"
+      },
+      "files": [
+        "Models/TextureTransformMultiTest/glTF-Binary/TextureTransformMultiTest.glb"
+      ]
+    },
+    {
+      "id": "IridescenceSuzanne-glb",
+      "model": "IridescenceSuzanne",
+      "tier": "medium/material-scene",
+      "sampleClass": "standard",
+      "format": "glb",
+      "entrypoint": "Models/IridescenceSuzanne/glTF-Binary/IridescenceSuzanne.glb",
+      "sourceUrl": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/9429648735279342b4c32b8745f7904196607379/Models/IridescenceSuzanne/glTF-Binary/IridescenceSuzanne.glb",
+      "entrypointBytes": 507608,
+      "entrypointSha256": "866762602D60A0942B7608BFABF4E8686A29033636224F4B55C5E56ABE8ABF8F",
+      "totalBytes": 507608,
+      "complexity": {
+        "scenes": 1,
+        "meshes": 3,
+        "nodes": 4,
+        "materials": 3,
+        "accessors": 4,
+        "animations": 0,
+        "skins": 0,
+        "images": 1,
+        "textures": 1,
+        "meshPrimitives": 3
+      },
+      "extensions": {
+        "used": [
+          "KHR_lights_punctual",
+          "KHR_materials_ior",
+          "KHR_materials_iridescence",
+          "KHR_materials_transmission",
+          "KHR_materials_volume"
+        ],
+        "required": [
+          "KHR_materials_iridescence"
+        ],
+        "typed": [
+          "KHR_materials_iridescence",
+          "KHR_materials_transmission",
+          "KHR_materials_volume"
+        ],
+        "raw": [
+          "KHR_lights_punctual",
+          "KHR_materials_ior"
+        ]
+      },
+      "license": {
+        "spdx": "CC0-1.0",
+        "modelLicenseUrl": "https://github.com/KhronosGroup/glTF-Sample-Assets/blob/9429648735279342b4c32b8745f7904196607379/Models/IridescenceSuzanne/LICENSE.md",
+        "licenseTextUrl": "https://creativecommons.org/publicdomain/zero/1.0/legalcode"
+      },
+      "files": [
+        "Models/IridescenceSuzanne/glTF-Binary/IridescenceSuzanne.glb"
+      ]
+    },
+    {
+      "id": "SheenTestGrid-glb",
+      "model": "SheenTestGrid",
+      "tier": "medium/material-grid",
+      "sampleClass": "standard",
+      "format": "glb",
+      "entrypoint": "Models/SheenTestGrid/glTF-Binary/SheenTestGrid.glb",
+      "sourceUrl": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/9429648735279342b4c32b8745f7904196607379/Models/SheenTestGrid/glTF-Binary/SheenTestGrid.glb",
+      "entrypointBytes": 1841064,
+      "entrypointSha256": "B3D82DDE0AE6B93BEF1A8085EC05540B21139F9917BFE771135C5AED9BA1C101",
+      "totalBytes": 1841064,
+      "complexity": {
+        "scenes": 1,
+        "meshes": 20,
+        "nodes": 20,
+        "materials": 19,
+        "accessors": 61,
+        "animations": 0,
+        "skins": 0,
+        "images": 1,
+        "textures": 1,
+        "meshPrimitives": 20
+      },
+      "extensions": {
+        "used": [
+          "KHR_materials_sheen"
+        ],
+        "required": [
+          "KHR_materials_sheen"
+        ],
+        "typed": [
+          "KHR_materials_sheen"
+        ],
+        "raw": []
+      },
+      "license": {
+        "spdx": "CC0-1.0",
+        "modelLicenseUrl": "https://github.com/KhronosGroup/glTF-Sample-Assets/blob/9429648735279342b4c32b8745f7904196607379/Models/SheenTestGrid/LICENSE.md",
+        "licenseTextUrl": "https://creativecommons.org/publicdomain/zero/1.0/legalcode"
+      },
+      "files": [
+        "Models/SheenTestGrid/glTF-Binary/SheenTestGrid.glb"
+      ]
+    },
+    {
+      "id": "MaterialsVariantsShoe-glb",
+      "model": "MaterialsVariantsShoe",
+      "tier": "medium/material-texture",
+      "sampleClass": "standard",
+      "format": "glb",
+      "entrypoint": "Models/MaterialsVariantsShoe/glTF-Binary/MaterialsVariantsShoe.glb",
+      "sourceUrl": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/9429648735279342b4c32b8745f7904196607379/Models/MaterialsVariantsShoe/glTF-Binary/MaterialsVariantsShoe.glb",
+      "entrypointBytes": 7833592,
+      "entrypointSha256": "E1D7CB190382111E5A5B37B51E9A7F007F7EB2AB1B6185E0188E8D0A0D1265A7",
+      "totalBytes": 7833592,
+      "complexity": {
+        "scenes": 1,
+        "meshes": 1,
+        "nodes": 3,
+        "materials": 3,
+        "accessors": 4,
+        "animations": 0,
+        "skins": 0,
+        "images": 5,
+        "textures": 5,
+        "meshPrimitives": 1
+      },
+      "extensions": {
+        "used": [
+          "KHR_materials_variants"
+        ],
+        "required": [],
+        "typed": [],
+        "raw": [
+          "KHR_materials_variants"
+        ]
+      },
+      "license": {
+        "spdx": "CC-BY-4.0",
+        "modelLicenseUrl": "https://github.com/KhronosGroup/glTF-Sample-Assets/blob/9429648735279342b4c32b8745f7904196607379/Models/MaterialsVariantsShoe/LICENSE.md",
+        "licenseTextUrl": "https://creativecommons.org/licenses/by/4.0/legalcode"
+      },
+      "files": [
+        "Models/MaterialsVariantsShoe/glTF-Binary/MaterialsVariantsShoe.glb"
+      ]
+    },
+    {
+      "id": "ABeautifulGame-glb",
+      "model": "ABeautifulGame",
+      "tier": "large/material-texture",
+      "sampleClass": "large",
+      "format": "glb",
+      "entrypoint": "Models/ABeautifulGame/glTF-Binary/ABeautifulGame.glb",
+      "sourceUrl": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/9429648735279342b4c32b8745f7904196607379/Models/ABeautifulGame/glTF-Binary/ABeautifulGame.glb",
+      "entrypointBytes": 42977928,
+      "entrypointSha256": "BD7133B4B322AAE97C589B8839DAE8155AD2546ACB35AE32A127E722A959D007",
+      "totalBytes": 42977928,
+      "complexity": {
+        "scenes": 1,
+        "meshes": 15,
+        "nodes": 49,
+        "materials": 15,
+        "accessors": 75,
+        "animations": 0,
+        "skins": 0,
+        "images": 33,
+        "textures": 38,
+        "meshPrimitives": 15
+      },
+      "extensions": {
+        "used": [
+          "KHR_materials_transmission",
+          "KHR_materials_volume"
+        ],
+        "required": [],
+        "typed": [
+          "KHR_materials_transmission",
+          "KHR_materials_volume"
+        ],
+        "raw": []
+      },
+      "license": {
+        "spdx": "CC-BY-4.0",
+        "modelLicenseUrl": "https://github.com/KhronosGroup/glTF-Sample-Assets/blob/9429648735279342b4c32b8745f7904196607379/Models/ABeautifulGame/LICENSE.md",
+        "licenseTextUrl": "https://creativecommons.org/licenses/by/4.0/legalcode"
+      },
+      "files": [
+        "Models/ABeautifulGame/glTF-Binary/ABeautifulGame.glb"
+      ],
+      "notes": "Large 43 MB scene with 33 embedded images and typed transmission/volume material handlers."
+    },
+    {
+      "id": "ABeautifulGame-draco-glb",
+      "model": "ABeautifulGame",
+      "tier": "large/compressed-material",
+      "sampleClass": "large",
+      "format": "glb",
+      "entrypoint": "Models/ABeautifulGame/glTF-Binary-KTX-ETC1S-Draco/ABeautifulGame.glb",
+      "sourceUrl": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/9429648735279342b4c32b8745f7904196607379/Models/ABeautifulGame/glTF-Binary-KTX-ETC1S-Draco/ABeautifulGame.glb",
+      "entrypointBytes": 12105252,
+      "entrypointSha256": "D950162D41E0064BE9DFAC0C09D80C7A23719A37AF37F08CD79385B8AF0AF0C1",
+      "totalBytes": 12105252,
+      "complexity": {
+        "scenes": 1,
+        "meshes": 15,
+        "nodes": 49,
+        "materials": 15,
+        "accessors": 32,
+        "animations": 0,
+        "skins": 0,
+        "images": 33,
+        "textures": 33,
+        "meshPrimitives": 15
+      },
+      "extensions": {
+        "used": [
+          "KHR_draco_mesh_compression",
+          "KHR_materials_transmission",
+          "KHR_materials_volume",
+          "KHR_texture_basisu"
+        ],
+        "required": [
+          "KHR_draco_mesh_compression",
+          "KHR_texture_basisu"
+        ],
+        "typed": [
+          "KHR_draco_mesh_compression",
+          "KHR_materials_transmission",
+          "KHR_materials_volume"
+        ],
+        "raw": [
+          "KHR_texture_basisu"
+        ]
+      },
+      "license": {
+        "spdx": "CC-BY-4.0",
+        "modelLicenseUrl": "https://github.com/KhronosGroup/glTF-Sample-Assets/blob/9429648735279342b4c32b8745f7904196607379/Models/ABeautifulGame/LICENSE.md",
+        "licenseTextUrl": "https://creativecommons.org/licenses/by/4.0/legalcode"
+      },
+      "files": [
+        "Models/ABeautifulGame/glTF-Binary-KTX-ETC1S-Draco/ABeautifulGame.glb"
+      ],
+      "notes": "Compressed GLB: typed Draco/transmission/volume plus raw-preserved required KHR_texture_basisu."
+    },
+    {
+      "id": "NodePerformanceTest-glb",
+      "model": "NodePerformanceTest",
+      "tier": "large/scene-structure",
+      "sampleClass": "large",
+      "format": "glb",
+      "entrypoint": "Models/NodePerformanceTest/glTF-Binary/NodePerformanceTest.glb",
+      "sourceUrl": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/9429648735279342b4c32b8745f7904196607379/Models/NodePerformanceTest/glTF-Binary/NodePerformanceTest.glb",
+      "entrypointBytes": 37986536,
+      "entrypointSha256": "81EEC3B14B8ED25068448FFDC824528D03F1E844B20E017F5C3AAB3F076B1FB8",
+      "totalBytes": 37986536,
+      "complexity": {
+        "scenes": 1,
+        "meshes": 10000,
+        "nodes": 10002,
+        "materials": 10000,
+        "accessors": 39993,
+        "animations": 0,
+        "skins": 0,
+        "images": 100,
+        "textures": 10000,
+        "meshPrimitives": 10000
+      },
+      "extensions": {
+        "used": [
+          "KHR_lights_punctual"
+        ],
+        "required": [
+          "KHR_lights_punctual"
+        ],
+        "typed": [],
+        "raw": [
+          "KHR_lights_punctual"
+        ]
+      },
+      "license": {
+        "spdx": "CC0-1.0",
+        "modelLicenseUrl": "https://github.com/KhronosGroup/glTF-Sample-Assets/blob/9429648735279342b4c32b8745f7904196607379/Models/NodePerformanceTest/LICENSE.md",
+        "licenseTextUrl": "https://creativecommons.org/publicdomain/zero/1.0/legalcode"
+      },
+      "files": [
+        "Models/NodePerformanceTest/glTF-Binary/NodePerformanceTest.glb"
+      ],
+      "notes": "10,000 meshes/materials and 10,002 nodes; required KHR_lights_punctual is raw-preserved."
     }
   ],
   "files": [
@@ -128,6 +778,78 @@
       "bytes": 8110040,
       "sha256": "CCC9C3CE56423720B09399C2351537207CD5A65F859F9E6E2F30922762F3ABD4",
       "url": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/9429648735279342b4c32b8745f7904196607379/Models/Avocado/glTF-Binary/Avocado.glb"
+    },
+    {
+      "path": "Models/MorphStressTest/glTF-Binary/MorphStressTest.glb",
+      "bytes": 575900,
+      "sha256": "005F1D9DD938C553A506D6BF3D21830FC3F2EC3A199D9332E9A625BAF7342BEF",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/9429648735279342b4c32b8745f7904196607379/Models/MorphStressTest/glTF-Binary/MorphStressTest.glb"
+    },
+    {
+      "path": "Models/SpecularTest/glTF-Binary/SpecularTest.glb",
+      "bytes": 223376,
+      "sha256": "CF789C68C3AB4B74877DA3C5992C612C213F9C901ED4FAFBF9BE362F434E48D9",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/9429648735279342b4c32b8745f7904196607379/Models/SpecularTest/glTF-Binary/SpecularTest.glb"
+    },
+    {
+      "path": "Models/EmissiveStrengthTest/glTF-Binary/EmissiveStrengthTest.glb",
+      "bytes": 10668,
+      "sha256": "074898EC4C3636230FAFFE0CACAC7403C3F6135DB61F943DA28FFAA88CA2A39F",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/9429648735279342b4c32b8745f7904196607379/Models/EmissiveStrengthTest/glTF-Binary/EmissiveStrengthTest.glb"
+    },
+    {
+      "path": "Models/SimpleInstancing/glTF-Binary/SimpleInstancing.glb",
+      "bytes": 7356,
+      "sha256": "1C9425627481346A8C226118F7000DB7CD7F80198E9F54331F8B664D16726F3F",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/9429648735279342b4c32b8745f7904196607379/Models/SimpleInstancing/glTF-Binary/SimpleInstancing.glb"
+    },
+    {
+      "path": "Models/XmpMetadataRoundedCube/glTF-Binary/XmpMetadataRoundedCube.glb",
+      "bytes": 105936,
+      "sha256": "92A22170651513274577F81A3AF1CF548C2049E31CFEDE85A5E96170C583E451",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/9429648735279342b4c32b8745f7904196607379/Models/XmpMetadataRoundedCube/glTF-Binary/XmpMetadataRoundedCube.glb"
+    },
+    {
+      "path": "Models/TextureTransformMultiTest/glTF-Binary/TextureTransformMultiTest.glb",
+      "bytes": 388264,
+      "sha256": "569AEDB53822D5721E7E06AF5983348683D4B2FFB1D469338AD4F02BF6A74911",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/9429648735279342b4c32b8745f7904196607379/Models/TextureTransformMultiTest/glTF-Binary/TextureTransformMultiTest.glb"
+    },
+    {
+      "path": "Models/IridescenceSuzanne/glTF-Binary/IridescenceSuzanne.glb",
+      "bytes": 507608,
+      "sha256": "866762602D60A0942B7608BFABF4E8686A29033636224F4B55C5E56ABE8ABF8F",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/9429648735279342b4c32b8745f7904196607379/Models/IridescenceSuzanne/glTF-Binary/IridescenceSuzanne.glb"
+    },
+    {
+      "path": "Models/SheenTestGrid/glTF-Binary/SheenTestGrid.glb",
+      "bytes": 1841064,
+      "sha256": "B3D82DDE0AE6B93BEF1A8085EC05540B21139F9917BFE771135C5AED9BA1C101",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/9429648735279342b4c32b8745f7904196607379/Models/SheenTestGrid/glTF-Binary/SheenTestGrid.glb"
+    },
+    {
+      "path": "Models/MaterialsVariantsShoe/glTF-Binary/MaterialsVariantsShoe.glb",
+      "bytes": 7833592,
+      "sha256": "E1D7CB190382111E5A5B37B51E9A7F007F7EB2AB1B6185E0188E8D0A0D1265A7",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/9429648735279342b4c32b8745f7904196607379/Models/MaterialsVariantsShoe/glTF-Binary/MaterialsVariantsShoe.glb"
+    },
+    {
+      "path": "Models/ABeautifulGame/glTF-Binary/ABeautifulGame.glb",
+      "bytes": 42977928,
+      "sha256": "BD7133B4B322AAE97C589B8839DAE8155AD2546ACB35AE32A127E722A959D007",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/9429648735279342b4c32b8745f7904196607379/Models/ABeautifulGame/glTF-Binary/ABeautifulGame.glb"
+    },
+    {
+      "path": "Models/ABeautifulGame/glTF-Binary-KTX-ETC1S-Draco/ABeautifulGame.glb",
+      "bytes": 12105252,
+      "sha256": "D950162D41E0064BE9DFAC0C09D80C7A23719A37AF37F08CD79385B8AF0AF0C1",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/9429648735279342b4c32b8745f7904196607379/Models/ABeautifulGame/glTF-Binary-KTX-ETC1S-Draco/ABeautifulGame.glb"
+    },
+    {
+      "path": "Models/NodePerformanceTest/glTF-Binary/NodePerformanceTest.glb",
+      "bytes": 37986536,
+      "sha256": "81EEC3B14B8ED25068448FFDC824528D03F1E844B20E017F5C3AAB3F076B1FB8",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/9429648735279342b4c32b8745f7904196607379/Models/NodePerformanceTest/glTF-Binary/NodePerformanceTest.glb"
     }
   ]
 }

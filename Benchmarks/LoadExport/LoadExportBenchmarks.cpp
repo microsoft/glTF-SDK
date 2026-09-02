@@ -4,6 +4,7 @@
 #include <GLTFSDK/Constants.h>
 #include <GLTFSDK/Deserialize.h>
 #include <GLTFSDK/Document.h>
+#include <GLTFSDK/ExtensionsKHR.h>
 #include <GLTFSDK/GLBResourceReader.h>
 #include <GLTFSDK/GLBResourceWriter.h>
 #include <GLTFSDK/GLTFResourceReader.h>
@@ -26,6 +27,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
@@ -46,6 +48,7 @@ namespace
         std::string sourceCommit;
         std::size_t sample = 0U;
         std::uint32_t orderSeed = 0U;
+        std::vector<std::string> caseIds;
         bool warmup = false;
     };
 
@@ -55,6 +58,9 @@ namespace
         std::string model;
         std::string format;
         std::string relativePath;
+        std::vector<std::string> typedExtensions;
+        std::vector<std::string> rawExtensions;
+        std::vector<std::string> requiredExtensions;
     };
 
     struct LoadedAsset
@@ -80,6 +86,12 @@ namespace
     {
         std::size_t assetIndex;
         std::string operation;
+    };
+
+    struct ExtensionCoverage
+    {
+        std::set<std::string> typed;
+        std::set<std::string> raw;
     };
 
     std::string JoinPath(const std::string& directory, const std::string& child)
@@ -138,6 +150,18 @@ namespace
     void Consume(std::size_t value)
     {
         g_sink ^= value + 0x9e3779b9U + (g_sink << 6U) + (g_sink >> 2U);
+    }
+
+    const ExtensionSerializer& GetExtensionSerializer()
+    {
+        static const ExtensionSerializer serializer = KHR::GetKHRExtensionSerializer();
+        return serializer;
+    }
+
+    const ExtensionDeserializer& GetExtensionDeserializer()
+    {
+        static const ExtensionDeserializer deserializer = KHR::GetKHRExtensionDeserializer();
+        return deserializer;
     }
 
     class FileStreamReader final : public IStreamReader
@@ -276,14 +300,16 @@ namespace
             const auto manifest = ReadText(*sourceStream);
             loaded.sourceBytes = manifest.size();
             GLTFResourceReader resourceReader(streamReader);
-            loaded.document = Deserialize(manifest);
+            loaded.document = Deserialize(manifest, GetExtensionDeserializer());
             LoadReferencedResources(resourceReader, loaded, countedExternalUris);
         }
         else if (asset.format == "glb")
         {
             loaded.sourceBytes = GetStreamLength(*sourceStream);
             GLBResourceReader resourceReader(streamReader, sourceStream);
-            loaded.document = Deserialize(resourceReader.GetJson());
+            loaded.document = Deserialize(
+                resourceReader.GetJson(),
+                GetExtensionDeserializer());
             LoadReferencedResources(resourceReader, loaded, countedExternalUris);
         }
         else
@@ -294,7 +320,237 @@ namespace
         return loaded;
     }
 
-    void ValidateLoadedAsset(const LoadedAsset& loaded)
+    void RecordPropertyExtensions(
+        const glTFProperty& property,
+        ExtensionCoverage& coverage);
+
+    void RecordExtension(
+        const Extension& extension,
+        ExtensionCoverage& coverage)
+    {
+        using namespace KHR::Materials;
+        using namespace KHR::MeshPrimitives;
+        using namespace KHR::Nodes;
+        using namespace KHR::TextureInfos;
+
+        if (const auto* pbr = dynamic_cast<const PBRSpecularGlossiness*>(&extension))
+        {
+            coverage.typed.insert(PBRSPECULARGLOSSINESS_NAME);
+            RecordPropertyExtensions(pbr->diffuseTexture, coverage);
+            RecordPropertyExtensions(pbr->specularGlossinessTexture, coverage);
+        }
+        else if (dynamic_cast<const Unlit*>(&extension))
+        {
+            coverage.typed.insert(UNLIT_NAME);
+        }
+        else if (const auto* clearcoat = dynamic_cast<const Clearcoat*>(&extension))
+        {
+            coverage.typed.insert(CLEARCOAT_NAME);
+            RecordPropertyExtensions(clearcoat->texture, coverage);
+            RecordPropertyExtensions(clearcoat->roughnessTexture, coverage);
+            RecordPropertyExtensions(clearcoat->normalTexture, coverage);
+        }
+        else if (const auto* volume = dynamic_cast<const Volume*>(&extension))
+        {
+            coverage.typed.insert(VOLUME_NAME);
+            RecordPropertyExtensions(volume->thicknessTexture, coverage);
+        }
+        else if (const auto* iridescence = dynamic_cast<const Iridescence*>(&extension))
+        {
+            coverage.typed.insert(IRIDESCENCE_NAME);
+            RecordPropertyExtensions(iridescence->texture, coverage);
+            RecordPropertyExtensions(iridescence->thicknessTexture, coverage);
+        }
+        else if (const auto* transmission = dynamic_cast<const Transmission*>(&extension))
+        {
+            coverage.typed.insert(TRANSMISSION_NAME);
+            RecordPropertyExtensions(transmission->texture, coverage);
+        }
+        else if (const auto* sheen = dynamic_cast<const Sheen*>(&extension))
+        {
+            coverage.typed.insert(SHEEN_NAME);
+            RecordPropertyExtensions(sheen->colorTexture, coverage);
+            RecordPropertyExtensions(sheen->roughnessTexture, coverage);
+        }
+        else if (const auto* specular = dynamic_cast<const Specular*>(&extension))
+        {
+            coverage.typed.insert(SPECULAR_NAME);
+            RecordPropertyExtensions(specular->texture, coverage);
+            RecordPropertyExtensions(specular->colorTexture, coverage);
+        }
+        else if (dynamic_cast<const DracoMeshCompression*>(&extension))
+        {
+            coverage.typed.insert(DRACOMESHCOMPRESSION_NAME);
+        }
+        else if (dynamic_cast<const MeshGPUInstancing*>(&extension))
+        {
+            coverage.typed.insert(MESHGPUINSTANCING_NAME);
+        }
+        else if (dynamic_cast<const TextureTransform*>(&extension))
+        {
+            coverage.typed.insert(TEXTURETRANSFORM_NAME);
+        }
+        else
+        {
+            throw std::runtime_error(
+                "Unexpected registered extension type in benchmark corpus");
+        }
+
+        const auto* extensionProperty =
+            dynamic_cast<const glTFProperty*>(&extension);
+        if (extensionProperty)
+        {
+            RecordPropertyExtensions(*extensionProperty, coverage);
+        }
+    }
+
+    void RecordPropertyExtensions(
+        const glTFProperty& property,
+        ExtensionCoverage& coverage)
+    {
+        for (const auto& extension : property.extensions)
+        {
+            coverage.raw.insert(extension.first);
+        }
+        for (const auto& extension : property.GetExtensions())
+        {
+            RecordExtension(extension.get(), coverage);
+        }
+    }
+
+    template<typename T>
+    void RecordContainerExtensions(
+        const IndexedContainer<const T>& container,
+        ExtensionCoverage& coverage)
+    {
+        for (const auto& value : container.Elements())
+        {
+            RecordPropertyExtensions(value, coverage);
+        }
+    }
+
+    ExtensionCoverage GetExtensionCoverage(const Document& document)
+    {
+        ExtensionCoverage coverage;
+        RecordPropertyExtensions(document, coverage);
+        RecordPropertyExtensions(document.asset, coverage);
+        RecordContainerExtensions(document.accessors, coverage);
+        RecordContainerExtensions(document.buffers, coverage);
+        RecordContainerExtensions(document.bufferViews, coverage);
+        RecordContainerExtensions(document.images, coverage);
+        RecordContainerExtensions(document.nodes, coverage);
+        RecordContainerExtensions(document.samplers, coverage);
+        RecordContainerExtensions(document.scenes, coverage);
+        RecordContainerExtensions(document.skins, coverage);
+        RecordContainerExtensions(document.textures, coverage);
+
+        for (const auto& camera : document.cameras.Elements())
+        {
+            RecordPropertyExtensions(camera, coverage);
+            RecordPropertyExtensions(*camera.projection, coverage);
+        }
+        for (const auto& material : document.materials.Elements())
+        {
+            RecordPropertyExtensions(material, coverage);
+            RecordPropertyExtensions(material.metallicRoughness, coverage);
+            RecordPropertyExtensions(
+                material.metallicRoughness.baseColorTexture,
+                coverage);
+            RecordPropertyExtensions(
+                material.metallicRoughness.metallicRoughnessTexture,
+                coverage);
+            RecordPropertyExtensions(material.normalTexture, coverage);
+            RecordPropertyExtensions(material.occlusionTexture, coverage);
+            RecordPropertyExtensions(material.emissiveTexture, coverage);
+        }
+        for (const auto& mesh : document.meshes.Elements())
+        {
+            RecordPropertyExtensions(mesh, coverage);
+            for (const auto& primitive : mesh.primitives)
+            {
+                RecordPropertyExtensions(primitive, coverage);
+            }
+        }
+        for (const auto& animation : document.animations.Elements())
+        {
+            RecordPropertyExtensions(animation, coverage);
+            for (const auto& channel : animation.channels.Elements())
+            {
+                RecordPropertyExtensions(channel, coverage);
+                RecordPropertyExtensions(channel.target, coverage);
+            }
+            for (const auto& sampler : animation.samplers.Elements())
+            {
+                RecordPropertyExtensions(sampler, coverage);
+            }
+        }
+
+        return coverage;
+    }
+
+    std::set<std::string> ToSet(const std::vector<std::string>& values)
+    {
+        return std::set<std::string>(values.begin(), values.end());
+    }
+
+    bool SetsEqual(
+        const std::unordered_set<std::string>& actual,
+        const std::set<std::string>& expected)
+    {
+        if (actual.size() != expected.size())
+        {
+            return false;
+        }
+        for (const auto& value : expected)
+        {
+            if (actual.find(value) == actual.end())
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    void ValidateExtensionCoverage(
+        const Document& document,
+        const AssetCase& asset)
+    {
+        const auto expectedTyped = ToSet(asset.typedExtensions);
+        const auto expectedRaw = ToSet(asset.rawExtensions);
+        auto expectedUsed = expectedTyped;
+        expectedUsed.insert(expectedRaw.begin(), expectedRaw.end());
+        const auto expectedRequired =
+            ToSet(asset.requiredExtensions);
+
+        if (!SetsEqual(document.extensionsUsed, expectedUsed))
+        {
+            throw std::runtime_error(
+                "extensionsUsed differs from the corpus manifest for " +
+                asset.id);
+        }
+        if (!SetsEqual(document.extensionsRequired, expectedRequired))
+        {
+            throw std::runtime_error(
+                "extensionsRequired differs from the corpus manifest for " +
+                asset.id);
+        }
+
+        const auto actual = GetExtensionCoverage(document);
+        if (actual.typed != expectedTyped)
+        {
+            throw std::runtime_error(
+                "SDK-typed extension coverage differs for " + asset.id);
+        }
+        if (actual.raw != expectedRaw)
+        {
+            throw std::runtime_error(
+                "Raw-preserved extension coverage differs for " + asset.id);
+        }
+    }
+
+    void ValidateLoadedAsset(
+        const LoadedAsset& loaded,
+        const AssetCase& asset)
     {
         if (loaded.buffers.size() != loaded.document.buffers.Size())
         {
@@ -313,6 +569,7 @@ namespace
             }
         }
 
+        ValidateExtensionCoverage(loaded.document, asset);
         Consume(
             loaded.document.accessors.Size() +
             loaded.document.meshes.Size() +
@@ -373,7 +630,9 @@ namespace
                 written);
         }
 
-        const auto manifest = Serialize(loaded.document);
+        const auto manifest = Serialize(
+            loaded.document,
+            GetExtensionSerializer());
         writer.WriteExternal(outputFileName, manifest);
     }
 
@@ -421,7 +680,9 @@ namespace
                 written);
         }
 
-        const auto manifest = Serialize(loaded.document);
+        const auto manifest = Serialize(
+            loaded.document,
+            GetExtensionSerializer());
         writer.Flush(manifest, outputFileName);
     }
 
@@ -449,7 +710,7 @@ namespace
         AssetCase outputAsset = asset;
         outputAsset.relativePath = GetFileName(asset.relativePath);
         const auto actual = LoadAsset(outputDirectory, outputAsset);
-        ValidateLoadedAsset(actual);
+        ValidateLoadedAsset(actual, asset);
 
         if (!(expected.document == actual.document))
         {
@@ -462,6 +723,12 @@ namespace
         if (expected.images != actual.images)
         {
             throw std::runtime_error("Round-tripped image bytes differ from source");
+        }
+        if (expected.document.extensionsRequired !=
+            actual.document.extensionsRequired)
+        {
+            throw std::runtime_error(
+                "Round-tripped required extensions differ from source");
         }
     }
 
@@ -491,13 +758,13 @@ namespace
             {
                 loaded = LoadAsset(options.assetRoot, asset);
             });
-            ValidateLoadedAsset(loaded);
+            ValidateLoadedAsset(loaded, asset);
             result.inputBytes = loaded.sourceBytes;
         }
         else if (operation == "export")
         {
             const auto loaded = LoadAsset(options.assetRoot, asset);
-            ValidateLoadedAsset(loaded);
+            ValidateLoadedAsset(loaded, asset);
             result.inputBytes = loaded.sourceBytes;
             result.outputDirectory = JoinPath(options.outputRoot, asset.id + "-export");
             result.elapsedMicroseconds = MeasureMicroseconds([&]()
@@ -515,7 +782,7 @@ namespace
                 loaded = LoadAsset(options.assetRoot, asset);
                 ExportAsset(loaded, asset, result.outputDirectory);
             });
-            ValidateLoadedAsset(loaded);
+            ValidateLoadedAsset(loaded, asset);
             ValidateRoundTrip(loaded, asset, result.outputDirectory);
             result.inputBytes = loaded.sourceBytes;
         }
@@ -530,11 +797,55 @@ namespace
     std::vector<AssetCase> GetAssetCases()
     {
         return {
-            { "Box-gltf", "Box", "gltf", "Models/Box/glTF/Box.gltf" },
-            { "Box-glb", "Box", "glb", "Models/Box/glTF-Binary/Box.glb" },
-            { "Avocado-gltf", "Avocado", "gltf", "Models/Avocado/glTF/Avocado.gltf" },
-            { "Avocado-glb", "Avocado", "glb", "Models/Avocado/glTF-Binary/Avocado.glb" }
+            { "Box-gltf", "Box", "gltf", "Models/Box/glTF/Box.gltf", {}, {}, {} },
+            { "Box-glb", "Box", "glb", "Models/Box/glTF-Binary/Box.glb", {}, {}, {} },
+            { "Avocado-gltf", "Avocado", "gltf", "Models/Avocado/glTF/Avocado.gltf", {}, {}, {} },
+            { "Avocado-glb", "Avocado", "glb", "Models/Avocado/glTF-Binary/Avocado.glb", {}, {}, {} },
+            { "MorphStressTest-glb", "MorphStressTest", "glb", "Models/MorphStressTest/glTF-Binary/MorphStressTest.glb", {}, {}, {} },
+            { "SpecularTest-glb", "SpecularTest", "glb", "Models/SpecularTest/glTF-Binary/SpecularTest.glb", { "KHR_materials_specular" }, {}, {} },
+            { "EmissiveStrengthTest-glb", "EmissiveStrengthTest", "glb", "Models/EmissiveStrengthTest/glTF-Binary/EmissiveStrengthTest.glb", {}, { "KHR_materials_emissive_strength" }, {} },
+            { "SimpleInstancing-glb", "SimpleInstancing", "glb", "Models/SimpleInstancing/glTF-Binary/SimpleInstancing.glb", { "EXT_mesh_gpu_instancing" }, {}, {} },
+            { "XmpMetadataRoundedCube-glb", "XmpMetadataRoundedCube", "glb", "Models/XmpMetadataRoundedCube/glTF-Binary/XmpMetadataRoundedCube.glb", {}, { "KHR_xmp_json_ld" }, {} },
+            { "TextureTransformMultiTest-glb", "TextureTransformMultiTest", "glb", "Models/TextureTransformMultiTest/glTF-Binary/TextureTransformMultiTest.glb", { "KHR_materials_clearcoat", "KHR_materials_unlit", "KHR_texture_transform" }, {}, { "KHR_texture_transform" } },
+            { "IridescenceSuzanne-glb", "IridescenceSuzanne", "glb", "Models/IridescenceSuzanne/glTF-Binary/IridescenceSuzanne.glb", { "KHR_materials_iridescence", "KHR_materials_transmission", "KHR_materials_volume" }, { "KHR_lights_punctual", "KHR_materials_ior" }, { "KHR_materials_iridescence" } },
+            { "SheenTestGrid-glb", "SheenTestGrid", "glb", "Models/SheenTestGrid/glTF-Binary/SheenTestGrid.glb", { "KHR_materials_sheen" }, {}, { "KHR_materials_sheen" } },
+            { "MaterialsVariantsShoe-glb", "MaterialsVariantsShoe", "glb", "Models/MaterialsVariantsShoe/glTF-Binary/MaterialsVariantsShoe.glb", {}, { "KHR_materials_variants" }, {} },
+            { "ABeautifulGame-glb", "ABeautifulGame", "glb", "Models/ABeautifulGame/glTF-Binary/ABeautifulGame.glb", { "KHR_materials_transmission", "KHR_materials_volume" }, {}, {} },
+            { "ABeautifulGame-draco-glb", "ABeautifulGame", "glb", "Models/ABeautifulGame/glTF-Binary-KTX-ETC1S-Draco/ABeautifulGame.glb", { "KHR_draco_mesh_compression", "KHR_materials_transmission", "KHR_materials_volume" }, { "KHR_texture_basisu" }, { "KHR_draco_mesh_compression", "KHR_texture_basisu" } },
+            { "NodePerformanceTest-glb", "NodePerformanceTest", "glb", "Models/NodePerformanceTest/glTF-Binary/NodePerformanceTest.glb", {}, { "KHR_lights_punctual" }, { "KHR_lights_punctual" } }
         };
+    }
+
+    std::vector<AssetCase> SelectAssetCases(
+        const std::vector<AssetCase>& allAssets,
+        const std::vector<std::string>& requestedIds)
+    {
+        if (requestedIds.empty())
+        {
+            return allAssets;
+        }
+
+        const std::set<std::string> requested(
+            requestedIds.begin(),
+            requestedIds.end());
+        if (requested.size() != requestedIds.size())
+        {
+            throw std::runtime_error("Duplicate --case value");
+        }
+
+        std::vector<AssetCase> selected;
+        for (const auto& asset : allAssets)
+        {
+            if (requested.find(asset.id) != requested.end())
+            {
+                selected.push_back(asset);
+            }
+        }
+        if (selected.size() != requested.size())
+        {
+            throw std::runtime_error("Unknown --case value");
+        }
+        return selected;
     }
 
     Options ParseOptions(int argc, char** argv)
@@ -581,6 +892,10 @@ namespace
             {
                 options.orderSeed = static_cast<std::uint32_t>(
                     std::stoul(requireValue("--order-seed")));
+            }
+            else if (argument == "--case")
+            {
+                options.caseIds.push_back(requireValue("--case"));
             }
             else if (argument == "--warmup")
             {
@@ -644,7 +959,9 @@ int main(int argc, char** argv)
     try
     {
         const auto options = ParseOptions(argc, argv);
-        const auto assets = GetAssetCases();
+        const auto assets = SelectAssetCases(
+            GetAssetCases(),
+            options.caseIds);
         const std::vector<std::string> operations = { "load", "export", "roundtrip" };
 
         std::vector<WorkItem> workItems;

@@ -1,6 +1,7 @@
 param(
     [string]$Destination,
-    [switch]$ForceDownload
+    [switch]$ForceDownload,
+    [switch]$VerifyOnly
 )
 
 $ErrorActionPreference = "Stop"
@@ -8,6 +9,10 @@ $ErrorActionPreference = "Stop"
 $repoRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot "..\.."))
 $manifestPath = Join-Path $PSScriptRoot "assets.json"
 $manifest = Get-Content $manifestPath -Raw | ConvertFrom-Json
+
+if ($ForceDownload -and $VerifyOnly) {
+    throw "-ForceDownload and -VerifyOnly cannot be combined"
+}
 
 if (-not $Destination) {
     $Destination = Join-Path $repoRoot ("Built\Int\LoadExportAssets\" + $manifest.commit)
@@ -49,6 +54,9 @@ foreach ($file in $manifest.files) {
         Write-Host "Verified $relativePath"
         continue
     }
+    if ($VerifyOnly) {
+        throw "Missing or invalid pinned corpus file: $relativePath"
+    }
 
     $parent = Split-Path $targetPath -Parent
     New-Item -ItemType Directory -Force $parent | Out-Null
@@ -77,16 +85,9 @@ foreach ($file in $manifest.files) {
     Move-Item $downloadPath $targetPath -Force
 }
 
-foreach ($selection in $manifest.selection) {
-    [long]$actualBytes = 0
-    foreach ($relativePath in $selection.files) {
-        $path = Join-Path $Destination (([string]$relativePath) -replace "/", "\")
-        $actualBytes += (Get-Item $path).Length
-    }
-    if ($actualBytes -ne [long]$selection.totalBytes) {
-        throw "Selection $($selection.id) has $actualBytes bytes; expected $($selection.totalBytes)"
-    }
-}
+& (Join-Path $PSScriptRoot "ValidateAssets.ps1") `
+    -AssetRoot $Destination `
+    -ManifestPath $manifestPath
 
 Write-Host "Pinned glTF-Sample-Assets commit: $($manifest.commit)"
 Write-Host "Verified asset root: $Destination"

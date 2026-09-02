@@ -14,17 +14,38 @@ The matched comparison uses the identical harness source on:
 
 `assets.json` pins KhronosGroup/glTF-Sample-Assets commit
 `9429648735279342b4c32b8745f7904196607379`, immutable raw URLs, byte lengths,
-SHA-256 values, model licenses, and these matched variants:
+SHA-256 values, model licenses, structural counts, exact
+`extensionsUsed`/`extensionsRequired` arrays, and the typed-versus-raw
+extension mode for every case.
 
-- Box glTF + GLB: small/core tier.
-- Avocado glTF + GLB: texture-heavy tier with roughly 8.1 MB of encoded image
-  and geometry data.
+The original Box and Avocado glTF+GLB cases remain for continuity. The
+expanded corpus adds 12 GLBs spanning:
+
+- 43 MB ABeautifulGame and 38 MB NodePerformanceTest large tiers; the latter
+  has 10,002 nodes and 10,000 meshes/materials.
+- Morph/animation, material-grid, texture-heavy, metadata, instancing,
+  compressed-resource, and large scene-structure tiers.
+- SDK-typed `KHR_materials_clearcoat`, transmission, volume, sheen, specular,
+  iridescence, unlit, `KHR_texture_transform`,
+  `KHR_draco_mesh_compression`, and `EXT_mesh_gpu_instancing`.
+- Raw-preserved `KHR_materials_ior`, `KHR_lights_punctual`,
+  `KHR_texture_basisu`, `KHR_materials_emissive_strength`,
+  `KHR_materials_variants`, and `KHR_xmp_json_ld`.
+
+The same `KHR::GetKHRExtensionDeserializer` and serializer are enabled on both
+branches. Unsupported extensions stay in the SDK raw extension map.
 
 No model binaries are committed. Fetch and verify them explicitly:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\Benchmarks\LoadExport\FetchAssets.ps1
 ```
+
+`FetchAssets.ps1` downloads only on explicit invocation, caches under
+`Built\Int`, checks every byte length and SHA-256, then reparses each manifest
+with `ValidateAssets.ps1` to verify counts and exact extension metadata. An
+offline integrity-only check is available with `-VerifyOnly`; normal
+builds/tests/CI never fetch this corpus.
 
 ## Timing boundaries
 
@@ -58,23 +79,31 @@ cmake -S E:\Base3D\glTF-SDK -B E:\Base3D\glTF-SDK\Built\Int\load-export -A x64 -
 cmake --build E:\Base3D\glTF-SDK\Built\Int\load-export --config Release --target GLTFSDK.LoadExportBenchmarks GLTFSDK.Test --parallel
 ```
 
+Validate corpus integrity and one complete untimed load/export/reload pass,
+including typed/raw extension representation and resource bytes:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File E:\Base3D\glTF-SDK-perf-1.9.5\Benchmarks\LoadExport\TestCorpus.ps1 -BuildDir E:\Base3D\glTF-SDK-perf-1.9.5\Built\Int\load-export
+powershell -ExecutionPolicy Bypass -File E:\Base3D\glTF-SDK\Benchmarks\LoadExport\TestCorpus.ps1 -BuildDir E:\Base3D\glTF-SDK\Built\Int\load-export
+```
+
 ## Matched run
 
-The runner performs at least five warm-up cycles and 30 measured cycles per
-asset/format/operation. It alternates implementation order (AB, BA, AB, ...)
-and gives both executables the same deterministic shuffled work order in each
-cycle. All output goes to disk.
+The runner performs at least five warm-up cycles, 100 measured samples for
+small/medium cases, and 30 for the three genuinely large cases. It alternates
+implementation order (AB, BA, AB, ...) and gives both executables the same
+deterministic shuffled work order in each cycle. All output goes to disk.
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\Benchmarks\LoadExport\RunMatchedBenchmarks.ps1 `
   -BaselineBuildDir E:\Base3D\glTF-SDK-perf-1.9.5\Built\Int\load-export `
   -CandidateBuildDir E:\Base3D\glTF-SDK\Built\Int\load-export `
-  -Warmups 5 -Samples 100
+  -Warmups 5 -Samples 100 -LargeSamples 30
 ```
 
-The script rejects toolchain/configuration mismatches and writes raw CSV,
-environment JSON, canonical output hashes, summary JSON, and a Markdown
-comparison under
+The script rejects toolchain/configuration or matched-file mismatches and
+writes raw CSV, environment JSON, canonical output hashes, per-tier and
+per-extension aggregates, summary JSON, and a Markdown comparison under
 `docs/release-evidence/replace-rapidjson-nlohmann/load-export/`.
 
 Each timed output is reloaded outside the timer. The reloaded `Document`, every
