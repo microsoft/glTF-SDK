@@ -1,0 +1,6 @@
+"case","n","mean_ms","median_ms","p95_ms"
+"ABeautifulGame-draco-glb","10","36.49","36.3","38.41"
+"ABeautifulGame-glb","10","82.38","81.74","87.85"
+"Avocado-glb","10","24.9","24.04","33.21"
+"NodePerformanceTest-glb","10","1936.12","1923.51","2003.42"
+"SpecularTest-glb","10","7.72","7.58","8.75"

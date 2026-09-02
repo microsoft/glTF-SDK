@@ -1,0 +1,34 @@
+{
+  "profileRows": 294,
+  "aggregateRows": 900,
+  "groups": [
+    "controls",
+    "counts",
+    "scaling",
+    "serialization",
+    "variants"
+  ],
+  "cases": [
+    "ABeautifulGame-draco-glb",
+    "ABeautifulGame-glb",
+    "Avocado-glb",
+    "NodePerformance-100",
+    "NodePerformance-1000",
+    "NodePerformance-5000",
+    "NodePerformanceTest-glb",
+    "SpecularTest-glb"
+  ],
+  "variants": [
+    "cached-sax-scalar-unique-fallback",
+    "current",
+    "ordered-fallback",
+    "plain-ordered-fallback",
+    "sax-default-fallback",
+    "sax-default-scalar-unique-fallback",
+    "sax-disable-root",
+    "sax-indexed-fallback",
+    "sax-indexed-scalar-unique-fallback",
+    "sax-ordered-fallback",
+    "sax-scalar-unique-fallback"
+  ]
+}

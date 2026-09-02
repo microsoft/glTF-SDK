@@ -1,0 +1,69 @@
+{
+  "source": "NodePerformanceTest.glb from glTF-Sample-Assets 9429648735279342b4c32b8745f7904196607379",
+  "method": "Retain first N node/mesh/material/texture groups, retain camera and KHR_lights_punctual nodes, compute dense accessor closure, remap retained accessor/image bufferViews, preserve all images and the original binary chunk.",
+  "subsets": [
+    {
+      "file": "NodePerformance-100.glb",
+      "bytes": 25751692,
+      "sha256": "1FA91E24A0A9822CFEC25A6AD391CA2C6EB25B88749894FAED3D91892D4EE487",
+      "jsonChunkBytes": 133596,
+      "nodes": 102,
+      "meshes": 100,
+      "materials": 100,
+      "textures": 100,
+      "images": 100,
+      "accessors": 400,
+      "bufferViews": 500,
+      "sceneRootNodes": 102,
+      "binaryBufferBytes": 25618068,
+      "extensionsUsed": [
+        "KHR_lights_punctual"
+      ],
+      "extensionsRequired": [
+        "KHR_lights_punctual"
+      ]
+    },
+    {
+      "file": "NodePerformance-1000.glb",
+      "bytes": 26848568,
+      "sha256": "DA7A95AC12E8343770A5FB31791CD7909B541B1D81FE2734D4A11CED127FE9AD",
+      "jsonChunkBytes": 1230472,
+      "nodes": 1002,
+      "meshes": 1000,
+      "materials": 1000,
+      "textures": 1000,
+      "images": 100,
+      "accessors": 4000,
+      "bufferViews": 4100,
+      "sceneRootNodes": 1002,
+      "binaryBufferBytes": 25618068,
+      "extensionsUsed": [
+        "KHR_lights_punctual"
+      ],
+      "extensionsRequired": [
+        "KHR_lights_punctual"
+      ]
+    },
+    {
+      "file": "NodePerformance-5000.glb",
+      "bytes": 31785668,
+      "sha256": "9A3567E3B8F5E468D8FE5FA2E9F0448A82558AF2711B83CB0D4BE30242ABDB11",
+      "jsonChunkBytes": 6167572,
+      "nodes": 5002,
+      "meshes": 5000,
+      "materials": 5000,
+      "textures": 5000,
+      "images": 100,
+      "accessors": 19997,
+      "bufferViews": 20097,
+      "sceneRootNodes": 5002,
+      "binaryBufferBytes": 25618068,
+      "extensionsUsed": [
+        "KHR_lights_punctual"
+      ],
+      "extensionsRequired": [
+        "KHR_lights_punctual"
+      ]
+    }
+  ]
+}
