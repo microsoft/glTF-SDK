@@ -22,6 +22,7 @@ compile/run probe, strict parser/writer tests, full tests, and benchmark review.
 - Archive SHA-256:
   `BF0839DE19510FF7792D8A8ACA94EA11A288775726B36C4C9A2662651870F8DA`
 - License: BSD-2-Clause, `External/Valijson/LICENSE`
+- Patch ledger: `External/Valijson/PATCHES.md`
 - CMake target: `ValiJSON::valijson`
 - Visibility/install: private build-only interface; no install/export rules
 
@@ -36,13 +37,16 @@ Repository patches, in order:
 2. `0002-draft04-uri-and-reference-resolution.patch`
 3. `0003-structured-validation-keywords.patch`
 4. `0004-replace-subschema-metadata-optionals.patch`
+5. `0005-optimize-scalar-unique-items.patch`
 
 Exact patch hashes, intermediate/final tree hashes, import commands, and
 reapplication instructions are maintained in
 `External/Valijson/UPSTREAM.md`. An update must start from a pristine import,
 reapply or regenerate each patch, verify the resulting tree hash, run all
-adapter/reference/diagnostic tests, run the selected official Draft-04 suite,
-and repeat platform/package/benchmark gates.
+adapter/reference/diagnostic/uniqueness tests, run the selected official
+Draft-04 suite, and repeat platform/package/benchmark gates. Repository
+patches remain covered by the bundled Valijson license and add no dependency
+or notice.
 
 ## JSON Schema Test Suite
 

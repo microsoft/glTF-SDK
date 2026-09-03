@@ -189,12 +189,14 @@ External/Valijson/
 |-- CMakeLists.txt
 |-- LICENSE
 |-- Authors
+|-- PATCHES.md
 |-- UPSTREAM.md
 |-- patches/
 |   |-- 0001-ordered-nlohmann-adapter.patch
 |   |-- 0002-draft04-uri-and-reference-resolution.patch
 |   |-- 0003-structured-validation-keywords.patch
-|   `-- 0004-replace-subschema-metadata-optionals.patch
+|   |-- 0004-replace-subschema-metadata-optionals.patch
+|   `-- 0005-optimize-scalar-unique-items.patch
 `-- include/
     |-- compat/
     |   `-- optional.hpp
@@ -206,7 +208,7 @@ Acquisition is an implementation-time maintenance operation, never a CMake
 operation: obtain tag `v1.0.6` at commit
 `4edda758546436462da479bb8c8514f8a95c35ad`, copy `include/valijson`,
 the C++14-required `include/compat/optional.hpp`, `LICENSE`, and `Authors`,
-apply the three tracked patches, prune the unused legacy-parser adapter and
+apply the five tracked patches, prune the unused legacy-parser adapter and
 utility, and record the source
 URL, tag, commit, archive hash, commands, and resulting-tree hash in
 `UPSTREAM.md`, and commit the resulting headers. Valijson's examples, tests,
@@ -770,11 +772,13 @@ There is no runtime fallback or dual-engine release mode.
 - `External/Valijson/CMakeLists.txt`
 - `External/Valijson/LICENSE`
 - `External/Valijson/Authors`
+- `External/Valijson/PATCHES.md`
 - `External/Valijson/UPSTREAM.md`
 - `External/Valijson/patches/0001-ordered-nlohmann-adapter.patch`
 - `External/Valijson/patches/0002-draft04-uri-and-reference-resolution.patch`
 - `External/Valijson/patches/0003-structured-validation-keywords.patch`
 - `External/Valijson/patches/0004-replace-subschema-metadata-optionals.patch`
+- `External/Valijson/patches/0005-optimize-scalar-unique-items.patch`
 - `External/Valijson/include/valijson/**`
 - `GLTFSDK/Source/Internal/Json.h`
 - `GLTFSDK/Source/Internal/JsonSchema.h`

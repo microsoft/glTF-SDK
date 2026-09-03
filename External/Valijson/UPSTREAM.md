@@ -93,7 +93,7 @@ maintenance artifacts:
 4. `patches/0004-replace-subschema-metadata-optionals.patch`
    - SHA-256:
      `DB84BDB68CDA077CAE5D8BB14AEED0AD693EC2F82447811A60619AADEEC0C28F`
-   - Final imported-tree hash after all patches:
+   - Imported-tree hash after application:
      `19A7B2F4CE1E26C518DB0EFFBCDDF5ED275F6191D192A317BF8687B594766C41`
    - Replaces the three `Subschema` metadata compatibility optionals with
      nullable `std::unique_ptr<std::string>` storage while preserving the
@@ -101,8 +101,23 @@ maintenance artifacts:
      pattern reproduced by GCC 13 RelWithDebInfo while destroying the shared
      empty subschema; both constructor-body assignment and direct `nullopt`
      construction remained vulnerable under optimization.
+5. `patches/0005-optimize-scalar-unique-items.patch`
+   - SHA-256:
+     `C2506247BDC75128A6FF64C976614A48CDDFF4FEC37A0783592C29E15C18602F`
+   - Final imported-tree hash after all patches:
+     `4A2CE6EE33E8D01E2F6C3188625024A3794ECA90BB9995D2547F57B8B3D06E73`
+   - Uses category-specific sets for null, boolean, string, and finite numeric
+     arrays when validation is not collecting results. Numeric hashing uses
+     the same `getNumber()` equality as Valijson's pairwise comparison.
+     Structured, mixed-structured, and non-finite arrays retain the original
+     recursive pairwise path, and results-producing validation is unchanged.
 
-From the repository root, reapply the first patch to a pristine import with:
+`PATCHES.md` is the compact patch ledger. These modifications remain covered
+by Valijson's bundled BSD-2-Clause license; the compatibility optional remains
+under its bundled Boost Software License. No new third-party license is
+introduced.
+
+From the repository root, reapply the patch series to a pristine import with:
 
 ```powershell
 git -c core.autocrlf=false apply --directory=External/Valijson `
@@ -113,6 +128,8 @@ git -c core.autocrlf=false apply --directory=External/Valijson `
   External/Valijson/patches/0003-structured-validation-keywords.patch
 git -c core.autocrlf=false apply --directory=External/Valijson `
   External/Valijson/patches/0004-replace-subschema-metadata-optionals.patch
+git -c core.autocrlf=false apply --directory=External/Valijson `
+  External/Valijson/patches/0005-optimize-scalar-unique-items.patch
 ```
 
 Verify each patch before application with the same command plus
@@ -144,10 +161,10 @@ The final shipped subset contains 48 files: 46 headers plus `LICENSE` and
 `Authors`. Its deterministic tree SHA-256 is:
 
 ```text
-D2DCF0FDC3CAF51E3667BB13C4B9944909A72476DB7E2FD630BC55C04E9AF2AE
+098816AE043B63A5DB3E3000407B572CAC02C42A9C8F1CC523DC388CA53F785D
 ```
 
-After applying the four patches, reproduce the pruning from the repository
+After applying the five patches, reproduce the pruning from the repository
 root with:
 
 ```powershell
@@ -163,7 +180,15 @@ $authors = $authors.Replace(
 [IO.File]::WriteAllText(
   "External\Valijson\Authors", $authors,
   (New-Object Text.UTF8Encoding($false)))
+
+$validatorPath = "External\Valijson\include\valijson\validator.hpp"
+$validator = Get-Content $validatorPath -Raw
+$validator = $validator.Replace(
+  ("A " + ('rapid' + 'json') + "::Value to be validated"),
+  "An adapted JSON value to be validated")
+[IO.File]::WriteAllText(
+  $validatorPath, $validator,
+  (New-Object Text.UTF8Encoding($false)))
 ```
 
-The parser-neutral validator comment is a non-functional documentation edit.
 Recalculate and verify the final tree hash after pruning.

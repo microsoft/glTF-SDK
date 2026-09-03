@@ -34,6 +34,9 @@ SOFTWARE.
 
 Valijson
 
+Repository-maintained patches are listed in
+External/Valijson/PATCHES.md and remain covered by this license.
+
 Copyright (c) 2016, Tristan Penman
 Copyright (c) 2016, Akamai Technologies, Inc.
 All rights reserved.

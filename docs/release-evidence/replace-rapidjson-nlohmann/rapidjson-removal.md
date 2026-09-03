@@ -11,11 +11,14 @@ Recorded: 2026-09-01
 - obsolete vendor-specific test and Valijson adapter/utility content
 
 The Valijson pruning retained all applicable author credit with
-parser-neutral wording. The final 48-file shipped subset has deterministic
-tree SHA-256
+parser-neutral wording. At removal time, the four-patch 48-file tree had
+SHA-256
 `D2DCF0FDC3CAF51E3667BB13C4B9944909A72476DB7E2FD630BC55C04E9AF2AE`.
-All four retained correction patches applied cleanly, and their SHA-256
-values matched `External/Valijson/UPSTREAM.md`.
+T-40 subsequently added the maintained scalar-uniqueness patch; the current
+five-patch shipped tree is
+`098816AE043B63A5DB3E3000407B572CAC02C42A9C8F1CC523DC388CA53F785D`.
+Every patch hash and ordered reapplication matches
+`External/Valijson/UPSTREAM.md`.
 
 ## Clean build and tests
 

@@ -14,7 +14,7 @@ passed all 21 required jobs.
 | REQ-DEP-1, REQ-DEP-2, REQ-DEP-3, REQ-DEP-4 | `External/json` contains the approved 3.12.0 single header, license, and private CMake target; header SHA-256 is recorded in `docs/Dependencies.md`. | Passed |
 | REQ-DEP-5 | Six final invalid-proxy Windows package builds configured and built without JSON dependency network access. | Passed |
 | REQ-DEP-6 | No installed-package selection path is enabled; the mandatory vendored 3.12.0 target is authoritative. | Passed |
-| REQ-DEP-7, REQ-DEP-8 | `External/Valijson/UPSTREAM.md`, ordered adapter, forced Draft-04 session, four retained correction patches, and schema suites pin and verify 1.0.6. | Passed |
+| REQ-DEP-7, REQ-DEP-8 | `External/Valijson/UPSTREAM.md`, `PATCHES.md`, ordered adapter, forced Draft-04 session, five retained correction/performance patches, and schema suites pin and verify 1.0.6. | Passed |
 | REQ-DEP-9 | `GLTFSDK/CMakeLists.txt` links both JSON targets privately; six installed-only consumers compile without vendor include/link paths. | Passed |
 | REQ-DEP-10 | `UPSTREAM.md`, `docs/Dependencies.md`, licenses, update steps, and `thirdPartyNotices.txt` retain exact provenance and notices. | Passed |
 | REQ-DEP-11, REQ-DEP-12, REQ-DEP-13 | `rapidjson-removal.md`; old external tree/header/build/install/workaround removed; shipped and six-package scans clean; no dependency header package exists. | Passed |
