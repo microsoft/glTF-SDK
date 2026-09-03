@@ -116,5 +116,22 @@ additional local Windows clang-cl ASAN probe successfully instrumented and ran
 all valid parser/uniqueness cases, but clang-cl's manually linked dynamic ASAN
 runtime converted every expected C++ exception into the same `0xc0000005` SEH
 failure, including unrelated established writer and JSON Pointer tests. It is
-not a usable repository gate. The complete Linux sanitizer job is therefore
-required before T-40 closure.
+not a usable repository gate.
+
+## Remote CI
+
+Implementation/evidence head
+`538ba17d60b519631a776300dcff33b8cfe1257a` was pushed normally to
+`origin/Release/2.0.0`. GitHub Actions run
+[`33763176875`](https://github.com/SergioRZMasson/glTF-SDK/actions/runs/33763176875)
+completed successfully with all 21 jobs passing. This includes:
+
+- Linux and macOS Debug/RelWithDebInfo tests, package scans, and consumers;
+- Windows x64/Win32/ARM64 Debug/RelWithDebInfo;
+- iOS device/simulator Debug/RelWithDebInfo;
+- Android three-ABI Debug/RelWithDebInfo; and
+- the complete Linux Clang ASAN/UBSAN full and malformed/deep suites.
+
+All temporary probes, output-equivalence worktrees, benchmark run directories,
+and profiling artifacts were removed. The retained RapidJSON comparison
+worktree remains at its required branch head.
