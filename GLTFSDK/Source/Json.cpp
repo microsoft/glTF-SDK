@@ -61,52 +61,205 @@ namespace
               static_cast<unsigned char>(bytes[1]) == 0xFEU));
     }
 
-    class StrictParseCallback
+    class StrictSaxDomParser final :
+        public nlohmann::json_sax<JsonValue>
     {
     public:
-        bool operator()(
-            int depth,
-            JsonValue::parse_event_t event,
-            JsonValue& parsed)
+        using string_t = JsonValue::string_t;
+        using binary_t = JsonValue::binary_t;
+        using number_integer_t = JsonValue::number_integer_t;
+        using number_unsigned_t = JsonValue::number_unsigned_t;
+        using number_float_t = JsonValue::number_float_t;
+
+        bool null() override
         {
-            if (event == JsonValue::parse_event_t::object_start ||
-                event == JsonValue::parse_event_t::array_start)
-            {
-                const auto level = static_cast<std::size_t>(depth) + 1U;
-                if (level > Microsoft::glTF::Internal::MaxJsonNestingDepth)
-                {
-                    throw Microsoft::glTF::GLTFException(
-                        "The document exceeds the maximum JSON nesting depth "
-                        "of 256");
-                }
-
-                if (event == JsonValue::parse_event_t::object_start)
-                {
-                    m_objectKeys.emplace_back();
-                }
-            }
-            else if (event == JsonValue::parse_event_t::key)
-            {
-                const auto& key =
-                    parsed.get_ref<const JsonValue::string_t&>();
-                if (m_objectKeys.empty() ||
-                    !m_objectKeys.back().insert(key).second)
-                {
-                    throw Microsoft::glTF::GLTFException(
-                        "The document contains a duplicate object member: " +
-                        key);
-                }
-            }
-            else if (event == JsonValue::parse_event_t::object_end)
-            {
-                m_objectKeys.pop_back();
-            }
-
+            AddValue(JsonValue(nullptr));
             return true;
         }
 
+        bool boolean(bool value) override
+        {
+            AddValue(JsonValue(value));
+            return true;
+        }
+
+        bool number_integer(number_integer_t value) override
+        {
+            AddValue(JsonValue(value));
+            return true;
+        }
+
+        bool number_unsigned(number_unsigned_t value) override
+        {
+            AddValue(JsonValue(value));
+            return true;
+        }
+
+        bool number_float(
+            number_float_t value,
+            const string_t&) override
+        {
+            AddValue(JsonValue(value));
+            return true;
+        }
+
+        bool string(string_t& value) override
+        {
+            AddValue(JsonValue(std::move(value)));
+            return true;
+        }
+
+        bool binary(binary_t& value) override
+        {
+            AddValue(JsonValue(std::move(value)));
+            return true;
+        }
+
+        bool start_object(std::size_t) override
+        {
+            CheckDepth();
+            JsonValue* object = AddValue(JsonValue::object());
+            m_frames.push_back(Frame{object, true});
+            return true;
+        }
+
+        bool key(string_t& value) override
+        {
+            if (m_frames.empty() ||
+                !m_frames.back().object ||
+                m_frames.back().hasKey)
+            {
+                ThrowBadFormatting();
+            }
+
+            Frame& frame = m_frames.back();
+            if (!frame.keys.insert(value).second)
+            {
+                throw Microsoft::glTF::GLTFException(
+                    "The document contains a duplicate object member: " +
+                    value);
+            }
+            frame.key = std::move(value);
+            frame.hasKey = true;
+            return true;
+        }
+
+        bool end_object() override
+        {
+            if (m_frames.empty() ||
+                !m_frames.back().object ||
+                m_frames.back().hasKey)
+            {
+                ThrowBadFormatting();
+            }
+            m_frames.pop_back();
+            return true;
+        }
+
+        bool start_array(std::size_t) override
+        {
+            CheckDepth();
+            JsonValue* array = AddValue(JsonValue::array());
+            m_frames.push_back(Frame{array, false});
+            return true;
+        }
+
+        bool end_array() override
+        {
+            if (m_frames.empty() || m_frames.back().object)
+            {
+                ThrowBadFormatting();
+            }
+            m_frames.pop_back();
+            return true;
+        }
+
+        bool parse_error(
+            std::size_t,
+            const std::string&,
+            const nlohmann::detail::exception&) override
+        {
+            m_parseError = true;
+            return false;
+        }
+
+        JsonValue TakeResult()
+        {
+            if (m_parseError || !m_frames.empty() || !m_hasResult)
+            {
+                ThrowBadFormatting();
+            }
+            return std::move(m_result);
+        }
+
     private:
-        std::vector<std::unordered_set<std::string>> m_objectKeys;
+        struct Frame
+        {
+            Frame(JsonValue* frameValue, bool isObject)
+                : value(frameValue), object(isObject)
+            {
+            }
+
+            JsonValue* value;
+            bool object;
+            bool hasKey = false;
+            std::string key;
+            std::unordered_set<std::string> keys;
+        };
+
+        [[noreturn]] static void ThrowBadFormatting()
+        {
+            throw Microsoft::glTF::GLTFException(
+                "The document is invalid due to bad JSON formatting");
+        }
+
+        void CheckDepth() const
+        {
+            if (m_frames.size() + 1U >
+                Microsoft::glTF::Internal::MaxJsonNestingDepth)
+            {
+                throw Microsoft::glTF::GLTFException(
+                    "The document exceeds the maximum JSON nesting depth "
+                    "of 256");
+            }
+        }
+
+        JsonValue* AddValue(JsonValue value)
+        {
+            if (m_frames.empty())
+            {
+                if (m_hasResult)
+                {
+                    ThrowBadFormatting();
+                }
+                m_result = std::move(value);
+                m_hasResult = true;
+                return &m_result;
+            }
+
+            Frame& frame = m_frames.back();
+            if (frame.object)
+            {
+                if (!frame.hasKey)
+                {
+                    ThrowBadFormatting();
+                }
+
+                JsonValue& inserted =
+                    (*frame.value)[std::move(frame.key)];
+                inserted = std::move(value);
+                frame.hasKey = false;
+                return &inserted;
+            }
+
+            frame.value->push_back(std::move(value));
+            return &frame.value->back();
+        }
+
+        JsonValue m_result;
+        std::vector<Frame> m_frames;
+        bool m_hasResult = false;
+        bool m_parseError = false;
     };
 
     template<typename Destination>
@@ -586,13 +739,19 @@ Microsoft::glTF::Internal::ParseJson(
 
     try
     {
-        StrictParseCallback callback;
-        return JsonValue::parse(
+        StrictSaxDomParser parser;
+        if (!JsonValue::sax_parse(
             bytes.begin() + static_cast<std::ptrdiff_t>(offset),
             bytes.end(),
-            callback,
+            &parser,
+            JsonValue::input_format_t::json,
             true,
-            false);
+            false))
+        {
+            throw GLTFException(
+                "The document is invalid due to bad JSON formatting");
+        }
+        return parser.TakeResult();
     }
     catch (const GLTFException&)
     {

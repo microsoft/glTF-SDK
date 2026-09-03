@@ -8,6 +8,7 @@
 
 #include <GLTFSDK/Exceptions.h>
 
+#include <initializer_list>
 #include <sstream>
 #include <limits>
 #include <string>
@@ -34,9 +35,53 @@ namespace
         });
     }
 
+    void ExpectStrictFailureMessageForStringAndStream(
+        const std::string& json,
+        const std::string& expected)
+    {
+        Assert::ExpectException<GLTFException>([&]()
+        {
+            try
+            {
+                Internal::ParseJson(json);
+            }
+            catch (const GLTFException& exception)
+            {
+                Assert::AreEqual(expected.c_str(), exception.what());
+                throw;
+            }
+        });
+
+        Assert::ExpectException<GLTFException>([&]()
+        {
+            try
+            {
+                std::stringstream stream(json);
+                Internal::ParseJson(stream);
+            }
+            catch (const GLTFException& exception)
+            {
+                Assert::AreEqual(expected.c_str(), exception.what());
+                throw;
+            }
+        });
+    }
+
     std::string NestedArray(std::size_t depth)
     {
         return std::string(depth, '[') + "0" + std::string(depth, ']');
+    }
+
+    std::string JsonStringWithBytes(
+        std::initializer_list<unsigned int> bytes)
+    {
+        std::string json = R"({"value":")";
+        for (const auto byte : bytes)
+        {
+            json.push_back(static_cast<char>(byte));
+        }
+        json += R"("})";
+        return json;
     }
 }
 
@@ -99,33 +144,138 @@ namespace Microsoft
                     Assert::IsTrue(Internal::IsJsonObject(fromString));
                 }
 
+                GLTFSDK_TEST_METHOD(JsonTests, StrictParsesRootKindsAndNumericCategories)
+                {
+                    Assert::IsTrue(
+                        Internal::IsJsonNull(Internal::ParseJson("null")));
+                    Assert::IsTrue(
+                        Internal::IsJsonBoolean(Internal::ParseJson("true")));
+                    Assert::IsTrue(
+                        Internal::IsJsonString(Internal::ParseJson(R"("text")")));
+                    Assert::IsTrue(
+                        Internal::IsJsonArray(Internal::ParseJson("[]")));
+                    Assert::IsTrue(
+                        Internal::IsJsonObject(Internal::ParseJson("{}")));
+
+                    const auto signedValue = Internal::ParseJson(
+                        "-9223372036854775808");
+                    const auto unsignedValue = Internal::ParseJson(
+                        "18446744073709551615");
+                    const auto floatingValue = Internal::ParseJson("1.5");
+
+                    std::int64_t signedResult = 0;
+                    std::uint64_t unsignedResult = 0U;
+                    double floatingResult = 0.0;
+                    Assert::IsTrue(Internal::IsJsonSignedInteger(signedValue));
+                    Assert::IsTrue(
+                        Internal::TryGetJsonInt64(
+                            signedValue, signedResult));
+                    Assert::IsTrue(
+                        signedResult ==
+                        std::numeric_limits<std::int64_t>::min());
+                    Assert::IsTrue(
+                        Internal::IsJsonUnsignedInteger(unsignedValue));
+                    Assert::IsTrue(
+                        Internal::TryGetJsonUInt64(
+                            unsignedValue, unsignedResult));
+                    Assert::IsTrue(
+                        unsignedResult ==
+                        std::numeric_limits<std::uint64_t>::max());
+                    Assert::IsTrue(
+                        Internal::IsJsonFloatingPoint(floatingValue));
+                    Assert::IsTrue(
+                        Internal::TryGetJsonDouble(
+                            floatingValue, floatingResult));
+                    Assert::IsTrue(floatingResult == 1.5);
+                }
+
+                GLTFSDK_TEST_METHOD(JsonTests, StrictPreservesParsedInsertionOrder)
+                {
+                    const auto value = Internal::ParseJson(
+                        R"({"third":3,"first":1,"second":{"z":0,"a":1}})");
+
+                    std::vector<std::string> rootKeys;
+                    for (auto iterator = value.begin();
+                         iterator != value.end();
+                         ++iterator)
+                    {
+                        rootKeys.push_back(iterator.key());
+                    }
+                    Assert::IsTrue(rootKeys == std::vector<std::string>({
+                        "third",
+                        "first",
+                        "second"
+                    }));
+
+                    const auto& nested = Internal::RequireJsonMember(
+                        value, "second", "Missing nested object");
+                    std::vector<std::string> nestedKeys;
+                    for (auto iterator = nested.begin();
+                         iterator != nested.end();
+                         ++iterator)
+                    {
+                        nestedKeys.push_back(iterator.key());
+                    }
+                    Assert::IsTrue(nestedKeys == std::vector<std::string>({
+                        "z",
+                        "a"
+                    }));
+                    Assert::AreEqual(
+                        R"({"third":3,"first":1,"second":{"z":0,"a":1}})",
+                        Internal::WriteJson(value).c_str());
+                }
+
                 GLTFSDK_TEST_METHOD(JsonTests, StrictRejectsDuplicateMembers)
                 {
-                    ExpectStrictFailureForStringAndStream(
-                        R"({"outer":{"value":1,"value":2}})");
+                    ExpectStrictFailureMessageForStringAndStream(
+                        R"({"outer":{"value":1,"value":2}})",
+                        "The document contains a duplicate object member: "
+                        "value");
+                    ExpectStrictFailureMessageForStringAndStream(
+                        R"({"outer":{"x":1,"\u0078":2}})",
+                        "The document contains a duplicate object member: x");
                 }
 
                 GLTFSDK_TEST_METHOD(JsonTests, StrictRejectsMalformedGrammar)
                 {
+                    const std::string expected =
+                        "The document is invalid due to bad JSON formatting";
+                    ExpectStrictFailureMessageForStringAndStream("", expected);
+                    ExpectStrictFailureMessageForStringAndStream("   ", expected);
+                    ExpectStrictFailureMessageForStringAndStream("{", expected);
+                    ExpectStrictFailureMessageForStringAndStream("[1,", expected);
+                    ExpectStrictFailureMessageForStringAndStream(
+                        R"({"value":})", expected);
                     ExpectStrictFailureForStringAndStream(
                         R"({"value":1} trailing)");
                     ExpectStrictFailureForStringAndStream(
                         R"({"value":1,})");
+                    ExpectStrictFailureForStringAndStream("[1,]");
                     ExpectStrictFailureForStringAndStream(
                         R"({"value":/*comment*/1})");
+                    ExpectStrictFailureForStringAndStream(
+                        "{\n// comment\n\"value\":1}");
                     ExpectStrictFailureForStringAndStream("[NaN]");
                     ExpectStrictFailureForStringAndStream("[Infinity]");
                     ExpectStrictFailureForStringAndStream("[-Infinity]");
+                    ExpectStrictFailureForStringAndStream("[1e9999]");
                 }
 
                 GLTFSDK_TEST_METHOD(JsonTests, StrictRejectsInvalidUtf8)
                 {
-                    std::string json = R"({"value":")";
-                    json.push_back(static_cast<char>(0xC3));
-                    json.push_back(static_cast<char>(0x28));
-                    json += R"("})";
+                    const std::string invalidValues[] = {
+                        JsonStringWithBytes({0xC3U, 0x28U}),
+                        JsonStringWithBytes({0x80U}),
+                        JsonStringWithBytes({0xC0U, 0xAFU}),
+                        JsonStringWithBytes({0xE2U, 0x82U}),
+                        JsonStringWithBytes({0xEDU, 0xA0U, 0x80U}),
+                        JsonStringWithBytes({0xF4U, 0x90U, 0x80U, 0x80U})
+                    };
 
-                    ExpectStrictFailureForStringAndStream(json);
+                    for (const auto& json : invalidValues)
+                    {
+                        ExpectStrictFailureForStringAndStream(json);
+                    }
                 }
 
                 GLTFSDK_TEST_METHOD(JsonTests, StrictAppliesBomPolicy)
@@ -157,6 +307,11 @@ namespace Microsoft
                     {
                         Internal::ParseJson(doubleBom, true);
                     });
+                    Assert::ExpectException<GLTFException>([&doubleBom]()
+                    {
+                        std::stringstream stream(doubleBom);
+                        Internal::ParseJson(stream, true);
+                    });
                 }
 
                 GLTFSDK_TEST_METHOD(JsonTests, StrictRejectsNonUtf8Bom)
@@ -183,11 +338,16 @@ namespace Microsoft
 
                 GLTFSDK_TEST_METHOD(JsonTests, StrictEnforcesDepthLimit)
                 {
+                    const auto belowLimit = NestedArray(
+                        Internal::MaxJsonNestingDepth - 1U);
                     const auto atLimit = NestedArray(
                         Internal::MaxJsonNestingDepth);
                     const auto overLimit = NestedArray(
                         Internal::MaxJsonNestingDepth + 1U);
 
+                    Assert::IsTrue(
+                        Internal::IsJsonArray(
+                            Internal::ParseJson(belowLimit)));
                     Assert::IsTrue(
                         Internal::IsJsonArray(Internal::ParseJson(atLimit)));
                     std::stringstream atLimitStream(atLimit);
@@ -195,6 +355,21 @@ namespace Microsoft
                         Internal::ParseJson(atLimitStream)));
 
                     ExpectStrictFailureForStringAndStream(overLimit);
+                }
+
+                GLTFSDK_TEST_METHOD(JsonTests, StrictCleansUpAfterSaxFailures)
+                {
+                    for (int iteration = 0; iteration < 32; ++iteration)
+                    {
+                        ExpectStrictFailureForStringAndStream(
+                            R"({"outer":[{"value":1},{"value":2,}]})");
+                        ExpectStrictFailureForStringAndStream(
+                            R"({"outer":{"duplicate":1,"duplicate":2}})");
+                    }
+
+                    const auto valid = Internal::ParseJson(
+                        R"({"outer":[{"value":1},{"value":2}]})");
+                    Assert::IsTrue(Internal::IsJsonObject(valid));
                 }
 
                 GLTFSDK_TEST_METHOD(JsonTests, StrictRejectsUnreadableStream)
