@@ -104,6 +104,28 @@ namespace
         });
     }
 
+    void ExpectValidationFailureEqual(
+        const std::string& schema,
+        const std::string& document,
+        const std::string& expected)
+    {
+        Assert::ExpectException<ValidationException>([&]()
+        {
+            try
+            {
+                ValidateDocumentAgainstSchema(
+                    document,
+                    "root.json",
+                    Locator(SingleSchema(schema)));
+            }
+            catch (const ValidationException& exception)
+            {
+                Assert::AreEqual(expected.c_str(), exception.what());
+                throw;
+            }
+        });
+    }
+
     struct SchemaFlagCase
     {
         const char* uri;
@@ -257,6 +279,42 @@ namespace Microsoft
                         }
                         Assert::IsTrue(rejected);
                     }
+                }
+
+                GLTFSDK_TEST_METHOD(JsonSchemaTests, UniqueItemsDiagnosticFallbackPreservesPath)
+                {
+                    ExpectValidationFailureEqual(
+                        R"({
+                            "type": "object",
+                            "properties": {
+                                "values": {
+                                    "type": "array",
+                                    "uniqueItems": true
+                                }
+                            }
+                        })",
+                        R"({"values":[{"nested":[1,2]},{"nested":[1,2]}]})",
+                        "Schema violation at #/values due to uniqueItems");
+                }
+
+                GLTFSDK_TEST_METHOD(JsonSchemaTests, UniqueItemsDoesNotSkipOtherConstraints)
+                {
+                    ExpectValidationFailureEqual(
+                        R"({
+                            "type": "object",
+                            "properties": {
+                                "values": {
+                                    "type": "array",
+                                    "uniqueItems": true,
+                                    "items": {
+                                        "type": "integer",
+                                        "minimum": 1
+                                    }
+                                }
+                            }
+                        })",
+                        R"({"values":[1,0]})",
+                        "Schema violation at #/values/1 due to minimum");
                 }
 
                 GLTFSDK_TEST_METHOD(JsonSchemaTests, FlagsSubstituteEveryBundledSchema)

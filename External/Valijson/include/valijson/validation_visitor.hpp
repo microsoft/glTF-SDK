@@ -3,6 +3,7 @@
 #include <cmath>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <utility>
 
 #include <valijson/internal/regex.hpp>
@@ -1411,6 +1412,51 @@ public:
         // Empty arrays are always valid
         if (array_size == 0) {
             return true;
+        }
+
+        if (!m_results) {
+            bool nullSeen = false;
+            bool boolSeen[2] = { false, false };
+            std::unordered_set<double> numbers;
+            std::unordered_set<std::string> strings;
+            bool allScalar = true;
+
+            for (const AdapterType value : m_target.asArray()) {
+                if (value.isNull()) {
+                    if (nullSeen) {
+                        return false;
+                    }
+                    nullSeen = true;
+                } else if (value.isBool()) {
+                    const bool boolean = value.getBool();
+                    if (boolSeen[boolean ? 1 : 0]) {
+                        return false;
+                    }
+                    boolSeen[boolean ? 1 : 0] = true;
+                } else if (value.isNumber()) {
+                    // Strict numeric equality compares getNumber() values.
+                    // Non-finite values use the original pairwise path.
+                    const double number = value.getNumber();
+                    if (!std::isfinite(number)) {
+                        allScalar = false;
+                        break;
+                    }
+                    if (!numbers.insert(number).second) {
+                        return false;
+                    }
+                } else if (value.isString()) {
+                    if (!strings.insert(value.getString()).second) {
+                        return false;
+                    }
+                } else {
+                    allScalar = false;
+                    break;
+                }
+            }
+
+            if (allScalar) {
+                return true;
+            }
         }
 
         bool validated = true;

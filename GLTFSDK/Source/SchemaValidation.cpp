@@ -238,7 +238,18 @@ struct Internal::Draft4ValidationSession::Impl
         valijson::Validator validator(
             valijson::Validator::kStrongTypes,
             valijson::Validator::kStrictDateTime);
-        if (validator.validate(schema, Adapter(document), &results))
+        bool valid = validator.validate(
+            schema,
+            Adapter(document),
+            nullptr);
+        if (!valid)
+        {
+            valid = validator.validate(
+                schema,
+                Adapter(document),
+                &results);
+        }
+        if (valid)
         {
             return;
         }
