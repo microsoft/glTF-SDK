@@ -1,0 +1,5176 @@
+{
+  "schemaVersion": 1,
+  "method": {
+    "sampleAssetCommit": "9429648735279342b4c32b8745f7904196607379",
+    "warmups": 5,
+    "standardSamples": 100,
+    "largeSamples": 30,
+    "configuration": "MSVC x64 Release",
+    "candidateCommit": "dc9c9f78dc33b9df5201e28dea2eeddcb5aa7b2e",
+    "rapidJsonCommit": "743b7ecd749a53e8d848db56839752a65205e915"
+  },
+  "nodePerformanceLoad": {
+    "caseId": "NodePerformanceTest-glb",
+    "operation": "load",
+    "asset": "NodePerformanceTest",
+    "format": "glb",
+    "tier": "large/scene-structure",
+    "complexityClass": "large",
+    "sampleClass": "large",
+    "extensionCoverage": "raw-only",
+    "extensionsUsed": [
+      "KHR_lights_punctual"
+    ],
+    "retainedRapidJson": {
+      "samples": 30,
+      "meanUs": 1919167.9966666666,
+      "medianUs": 1883577.3,
+      "p95Us": 2091949.6
+    },
+    "retainedPreFix": {
+      "samples": 30,
+      "meanUs": 15769761.153333334,
+      "medianUs": 15535308.3,
+      "p95Us": 16866381.3
+    },
+    "freshRapidJson": {
+      "samples": 30,
+      "meanUs": 1990664.8366666667,
+      "medianUs": 1950907.3,
+      "p95Us": 2150514.7
+    },
+    "postFix": {
+      "samples": 30,
+      "meanUs": 2019586.8599999999,
+      "medianUs": 1993403.6,
+      "p95Us": 2132922.9
+    },
+    "postVsPreFixMeanPercent": -87.19329455682269,
+    "postVsFreshRapidMeanPercent": 1.4528826149238976,
+    "preFixReductionMeanPercent": 87.19329455682269,
+    "retainedRegressionGapRecoveryMeanPercent": 99.27498510571007
+  },
+  "cases": [
+    {
+      "caseId": "ABeautifulGame-draco-glb",
+      "operation": "load",
+      "asset": "ABeautifulGame",
+      "format": "glb",
+      "tier": "large/compressed-material",
+      "complexityClass": "large",
+      "sampleClass": "large",
+      "extensionCoverage": "mixed-typed-raw",
+      "extensionsUsed": [
+        "KHR_draco_mesh_compression",
+        "KHR_materials_transmission",
+        "KHR_materials_volume",
+        "KHR_texture_basisu"
+      ],
+      "retainedRapidJson": {
+        "samples": 30,
+        "meanUs": 33841.05,
+        "medianUs": 31697.1,
+        "p95Us": 40823.9
+      },
+      "retainedPreFix": {
+        "samples": 30,
+        "meanUs": 38285.05333333334,
+        "medianUs": 34936.5,
+        "p95Us": 49235.0
+      },
+      "freshRapidJson": {
+        "samples": 30,
+        "meanUs": 34457.74333333333,
+        "medianUs": 33025.6,
+        "p95Us": 41880.1
+      },
+      "postFix": {
+        "samples": 30,
+        "meanUs": 39184.693333333336,
+        "medianUs": 35775.2,
+        "p95Us": 44862.8
+      },
+      "postVsPreFixMeanPercent": 2.3498465371516595,
+      "postVsFreshRapidMeanPercent": 13.718106709058054,
+      "preFixReductionMeanPercent": -2.3498465371516595,
+      "retainedRegressionGapRecoveryMeanPercent": -20.243909207988878
+    },
+    {
+      "caseId": "ABeautifulGame-draco-glb",
+      "operation": "export",
+      "asset": "ABeautifulGame",
+      "format": "glb",
+      "tier": "large/compressed-material",
+      "complexityClass": "large",
+      "sampleClass": "large",
+      "extensionCoverage": "mixed-typed-raw",
+      "extensionsUsed": [
+        "KHR_draco_mesh_compression",
+        "KHR_materials_transmission",
+        "KHR_materials_volume",
+        "KHR_texture_basisu"
+      ],
+      "retainedRapidJson": {
+        "samples": 30,
+        "meanUs": 78941.00666666667,
+        "medianUs": 71615.0,
+        "p95Us": 129289.3
+      },
+      "retainedPreFix": {
+        "samples": 30,
+        "meanUs": 78842.02333333335,
+        "medianUs": 72047.6,
+        "p95Us": 133475.0
+      },
+      "freshRapidJson": {
+        "samples": 30,
+        "meanUs": 83466.06333333332,
+        "medianUs": 73380.3,
+        "p95Us": 146758.0
+      },
+      "postFix": {
+        "samples": 30,
+        "meanUs": 82703.27333333335,
+        "medianUs": 73906.5,
+        "p95Us": 145007.3
+      },
+      "postVsPreFixMeanPercent": 4.897451684712809,
+      "postVsFreshRapidMeanPercent": -0.9138923887588554,
+      "preFixReductionMeanPercent": -4.897451684712809,
+      "retainedRegressionGapRecoveryMeanPercent": 3900.9092439808887
+    },
+    {
+      "caseId": "ABeautifulGame-draco-glb",
+      "operation": "roundtrip",
+      "asset": "ABeautifulGame",
+      "format": "glb",
+      "tier": "large/compressed-material",
+      "complexityClass": "large",
+      "sampleClass": "large",
+      "extensionCoverage": "mixed-typed-raw",
+      "extensionsUsed": [
+        "KHR_draco_mesh_compression",
+        "KHR_materials_transmission",
+        "KHR_materials_volume",
+        "KHR_texture_basisu"
+      ],
+      "retainedRapidJson": {
+        "samples": 30,
+        "meanUs": 108044.13333333333,
+        "medianUs": 103262.2,
+        "p95Us": 113405.2
+      },
+      "retainedPreFix": {
+        "samples": 30,
+        "meanUs": 113482.4,
+        "medianUs": 108063.5,
+        "p95Us": 131954.8
+      },
+      "freshRapidJson": {
+        "samples": 30,
+        "meanUs": 115020.65999999999,
+        "medianUs": 108153.8,
+        "p95Us": 166076.2
+      },
+      "postFix": {
+        "samples": 30,
+        "meanUs": 117325.51333333334,
+        "medianUs": 110609.7,
+        "p95Us": 134907.4
+      },
+      "postVsPreFixMeanPercent": 3.386528072488194,
+      "postVsFreshRapidMeanPercent": 2.0038602919974093,
+      "preFixReductionMeanPercent": -3.386528072488194,
+      "retainedRegressionGapRecoveryMeanPercent": -70.66798244538722
+    },
+    {
+      "caseId": "ABeautifulGame-glb",
+      "operation": "load",
+      "asset": "ABeautifulGame",
+      "format": "glb",
+      "tier": "large/material-texture",
+      "complexityClass": "large",
+      "sampleClass": "large",
+      "extensionCoverage": "typed-only",
+      "extensionsUsed": [
+        "KHR_materials_transmission",
+        "KHR_materials_volume"
+      ],
+      "retainedRapidJson": {
+        "samples": 30,
+        "meanUs": 79087.12666666666,
+        "medianUs": 75329.5,
+        "p95Us": 92389.4
+      },
+      "retainedPreFix": {
+        "samples": 30,
+        "meanUs": 86174.35666666667,
+        "medianUs": 78911.7,
+        "p95Us": 124865.5
+      },
+      "freshRapidJson": {
+        "samples": 30,
+        "meanUs": 81620.48333333334,
+        "medianUs": 76727.8,
+        "p95Us": 95709.7
+      },
+      "postFix": {
+        "samples": 30,
+        "meanUs": 85022.16666666667,
+        "medianUs": 79527.6,
+        "p95Us": 99886.4
+      },
+      "postVsPreFixMeanPercent": -1.3370450846030904,
+      "postVsFreshRapidMeanPercent": 4.1676833981012535,
+      "preFixReductionMeanPercent": 1.3370450846030904,
+      "retainedRegressionGapRecoveryMeanPercent": 16.257268354491114
+    },
+    {
+      "caseId": "ABeautifulGame-glb",
+      "operation": "export",
+      "asset": "ABeautifulGame",
+      "format": "glb",
+      "tier": "large/material-texture",
+      "complexityClass": "large",
+      "sampleClass": "large",
+      "extensionCoverage": "typed-only",
+      "extensionsUsed": [
+        "KHR_materials_transmission",
+        "KHR_materials_volume"
+      ],
+      "retainedRapidJson": {
+        "samples": 30,
+        "meanUs": 269554.20666666667,
+        "medianUs": 251953.1,
+        "p95Us": 328953.6
+      },
+      "retainedPreFix": {
+        "samples": 30,
+        "meanUs": 261613.76333333334,
+        "medianUs": 256985.7,
+        "p95Us": 287526.1
+      },
+      "freshRapidJson": {
+        "samples": 30,
+        "meanUs": 282594.86333333334,
+        "medianUs": 257942.8,
+        "p95Us": 445348.1
+      },
+      "postFix": {
+        "samples": 30,
+        "meanUs": 276742.07666666666,
+        "medianUs": 262623.0,
+        "p95Us": 371018.6
+      },
+      "postVsPreFixMeanPercent": 5.782690153827148,
+      "postVsFreshRapidMeanPercent": -2.071087420921397,
+      "preFixReductionMeanPercent": -5.782690153827148,
+      "retainedRegressionGapRecoveryMeanPercent": 190.52227562440888
+    },
+    {
+      "caseId": "ABeautifulGame-glb",
+      "operation": "roundtrip",
+      "asset": "ABeautifulGame",
+      "format": "glb",
+      "tier": "large/material-texture",
+      "complexityClass": "large",
+      "sampleClass": "large",
+      "extensionCoverage": "typed-only",
+      "extensionsUsed": [
+        "KHR_materials_transmission",
+        "KHR_materials_volume"
+      ],
+      "retainedRapidJson": {
+        "samples": 30,
+        "meanUs": 339134.43,
+        "medianUs": 331814.6,
+        "p95Us": 398997.9
+      },
+      "retainedPreFix": {
+        "samples": 30,
+        "meanUs": 352388.01666666666,
+        "medianUs": 338085.7,
+        "p95Us": 458764.4
+      },
+      "freshRapidJson": {
+        "samples": 30,
+        "meanUs": 352726.11000000004,
+        "medianUs": 346042.8,
+        "p95Us": 414230.1
+      },
+      "postFix": {
+        "samples": 30,
+        "meanUs": 351207.58666666667,
+        "medianUs": 342765.2,
+        "p95Us": 406387.1
+      },
+      "postVsPreFixMeanPercent": -0.334980176444704,
+      "postVsFreshRapidMeanPercent": -0.4305106115715035,
+      "preFixReductionMeanPercent": 0.334980176444704,
+      "retainedRegressionGapRecoveryMeanPercent": 8.90649474507021
+    },
+    {
+      "caseId": "Avocado-glb",
+      "operation": "load",
+      "asset": "Avocado",
+      "format": "glb",
+      "tier": "medium/texture-heavy",
+      "complexityClass": "medium",
+      "sampleClass": "standard",
+      "extensionCoverage": "core-only",
+      "extensionsUsed": [],
+      "retainedRapidJson": {
+        "samples": 100,
+        "meanUs": 23300.63,
+        "medianUs": 20266.1,
+        "p95Us": 27767.7
+      },
+      "retainedPreFix": {
+        "samples": 100,
+        "meanUs": 24869.409,
+        "medianUs": 22646.6,
+        "p95Us": 31635.9
+      },
+      "freshRapidJson": {
+        "samples": 100,
+        "meanUs": 25630.557999999997,
+        "medianUs": 20907.9,
+        "p95Us": 31587.2
+      },
+      "postFix": {
+        "samples": 100,
+        "meanUs": 25815.443,
+        "medianUs": 23417.4,
+        "p95Us": 30085.6
+      },
+      "postVsPreFixMeanPercent": 3.8040067618816344,
+      "postVsFreshRapidMeanPercent": 0.7213459808405344,
+      "preFixReductionMeanPercent": -3.8040067618816344,
+      "retainedRegressionGapRecoveryMeanPercent": -60.30384139512325
+    },
+    {
+      "caseId": "Avocado-glb",
+      "operation": "export",
+      "asset": "Avocado",
+      "format": "glb",
+      "tier": "medium/texture-heavy",
+      "complexityClass": "medium",
+      "sampleClass": "standard",
+      "extensionCoverage": "core-only",
+      "extensionsUsed": [],
+      "retainedRapidJson": {
+        "samples": 100,
+        "meanUs": 52754.703,
+        "medianUs": 48031.8,
+        "p95Us": 103577.8
+      },
+      "retainedPreFix": {
+        "samples": 100,
+        "meanUs": 53191.498,
+        "medianUs": 47673.8,
+        "p95Us": 96495.5
+      },
+      "freshRapidJson": {
+        "samples": 100,
+        "meanUs": 56168.890999999996,
+        "medianUs": 49899.0,
+        "p95Us": 113620.3
+      },
+      "postFix": {
+        "samples": 100,
+        "meanUs": 56649.78,
+        "medianUs": 49586.1,
+        "p95Us": 115186.3
+      },
+      "postVsPreFixMeanPercent": 6.501569104145176,
+      "postVsFreshRapidMeanPercent": 0.8561482903410054,
+      "preFixReductionMeanPercent": -6.501569104145176,
+      "retainedRegressionGapRecoveryMeanPercent": -791.7402900674259
+    },
+    {
+      "caseId": "Avocado-glb",
+      "operation": "roundtrip",
+      "asset": "Avocado",
+      "format": "glb",
+      "tier": "medium/texture-heavy",
+      "complexityClass": "medium",
+      "sampleClass": "standard",
+      "extensionCoverage": "core-only",
+      "extensionsUsed": [],
+      "retainedRapidJson": {
+        "samples": 100,
+        "meanUs": 81632.43400000001,
+        "medianUs": 69397.4,
+        "p95Us": 136403.7
+      },
+      "retainedPreFix": {
+        "samples": 100,
+        "meanUs": 79933.15400000001,
+        "medianUs": 70386.7,
+        "p95Us": 132672.1
+      },
+      "freshRapidJson": {
+        "samples": 100,
+        "meanUs": 84675.799,
+        "medianUs": 71427.6,
+        "p95Us": 153887.2
+      },
+      "postFix": {
+        "samples": 100,
+        "meanUs": 85453.334,
+        "medianUs": 73025.9,
+        "p95Us": 153056.6
+      },
+      "postVsPreFixMeanPercent": 6.905995477170827,
+      "postVsFreshRapidMeanPercent": 0.9182493807941552,
+      "preFixReductionMeanPercent": -6.905995477170827,
+      "retainedRegressionGapRecoveryMeanPercent": 324.85405583541245
+    },
+    {
+      "caseId": "Avocado-gltf",
+      "operation": "load",
+      "asset": "Avocado",
+      "format": "gltf",
+      "tier": "medium/texture-heavy",
+      "complexityClass": "medium",
+      "sampleClass": "standard",
+      "extensionCoverage": "core-only",
+      "extensionsUsed": [],
+      "retainedRapidJson": {
+        "samples": 100,
+        "meanUs": 19229.941000000003,
+        "medianUs": 16273.8,
+        "p95Us": 20707.7
+      },
+      "retainedPreFix": {
+        "samples": 100,
+        "meanUs": 20565.688000000002,
+        "medianUs": 18493.6,
+        "p95Us": 25410.9
+      },
+      "freshRapidJson": {
+        "samples": 100,
+        "meanUs": 19888.06,
+        "medianUs": 17291.5,
+        "p95Us": 23655.6
+      },
+      "postFix": {
+        "samples": 100,
+        "meanUs": 23243.985,
+        "medianUs": 19743.1,
+        "p95Us": 29361.3
+      },
+      "postVsPreFixMeanPercent": 13.023133483304806,
+      "postVsFreshRapidMeanPercent": 16.874069165117156,
+      "preFixReductionMeanPercent": -13.023133483304806,
+      "retainedRegressionGapRecoveryMeanPercent": -200.50930303418238
+    },
+    {
+      "caseId": "Avocado-gltf",
+      "operation": "export",
+      "asset": "Avocado",
+      "format": "gltf",
+      "tier": "medium/texture-heavy",
+      "complexityClass": "medium",
+      "sampleClass": "standard",
+      "extensionCoverage": "core-only",
+      "extensionsUsed": [],
+      "retainedRapidJson": {
+        "samples": 100,
+        "meanUs": 5497.965999999999,
+        "medianUs": 4788.9,
+        "p95Us": 6080.2
+      },
+      "retainedPreFix": {
+        "samples": 100,
+        "meanUs": 5113.561,
+        "medianUs": 4904.3,
+        "p95Us": 6347.0
+      },
+      "freshRapidJson": {
+        "samples": 100,
+        "meanUs": 5943.816,
+        "medianUs": 5079.9,
+        "p95Us": 6580.8
+      },
+      "postFix": {
+        "samples": 100,
+        "meanUs": 5389.45,
+        "medianUs": 5157.1,
+        "p95Us": 6737.9
+      },
+      "postVsPreFixMeanPercent": 5.395242180546984,
+      "postVsFreshRapidMeanPercent": -9.326769200123287,
+      "preFixReductionMeanPercent": -5.395242180546984,
+      "retainedRegressionGapRecoveryMeanPercent": 71.77039840792922
+    },
+    {
+      "caseId": "Avocado-gltf",
+      "operation": "roundtrip",
+      "asset": "Avocado",
+      "format": "gltf",
+      "tier": "medium/texture-heavy",
+      "complexityClass": "medium",
+      "sampleClass": "standard",
+      "extensionCoverage": "core-only",
+      "extensionsUsed": [],
+      "retainedRapidJson": {
+        "samples": 100,
+        "meanUs": 23440.397999999997,
+        "medianUs": 21195.9,
+        "p95Us": 27920.4
+      },
+      "retainedPreFix": {
+        "samples": 100,
+        "meanUs": 28229.47,
+        "medianUs": 23584.1,
+        "p95Us": 69193.0
+      },
+      "freshRapidJson": {
+        "samples": 100,
+        "meanUs": 25216.382999999998,
+        "medianUs": 23305.8,
+        "p95Us": 32035.3
+      },
+      "postFix": {
+        "samples": 100,
+        "meanUs": 27832.245,
+        "medianUs": 25235.4,
+        "p95Us": 32185.9
+      },
+      "postVsPreFixMeanPercent": -1.407128791295062,
+      "postVsFreshRapidMeanPercent": 10.373660647524275,
+      "preFixReductionMeanPercent": 1.407128791295062,
+      "retainedRegressionGapRecoveryMeanPercent": 8.294404427413117
+    },
+    {
+      "caseId": "Box-glb",
+      "operation": "load",
+      "asset": "Box",
+      "format": "glb",
+      "tier": "small/core",
+      "complexityClass": "small",
+      "sampleClass": "standard",
+      "extensionCoverage": "core-only",
+      "extensionsUsed": [],
+      "retainedRapidJson": {
+        "samples": 100,
+        "meanUs": 3471.389,
+        "medianUs": 2757.1,
+        "p95Us": 4321.0
+      },
+      "retainedPreFix": {
+        "samples": 100,
+        "meanUs": 7082.601,
+        "medianUs": 4975.1,
+        "p95Us": 8040.1
+      },
+      "freshRapidJson": {
+        "samples": 100,
+        "meanUs": 4055.0429999999997,
+        "medianUs": 2847.7,
+        "p95Us": 4612.9
+      },
+      "postFix": {
+        "samples": 100,
+        "meanUs": 5590.003000000001,
+        "medianUs": 5090.0,
+        "p95Us": 8104.7
+      },
+      "postVsPreFixMeanPercent": -21.074150583945066,
+      "postVsFreshRapidMeanPercent": 37.85311277833554,
+      "preFixReductionMeanPercent": 21.074150583945066,
+      "retainedRegressionGapRecoveryMeanPercent": 41.332328315258124
+    },
+    {
+      "caseId": "Box-glb",
+      "operation": "export",
+      "asset": "Box",
+      "format": "glb",
+      "tier": "small/core",
+      "complexityClass": "small",
+      "sampleClass": "standard",
+      "extensionCoverage": "core-only",
+      "extensionsUsed": [],
+      "retainedRapidJson": {
+        "samples": 100,
+        "meanUs": 570.1,
+        "medianUs": 551.6,
+        "p95Us": 705.4
+      },
+      "retainedPreFix": {
+        "samples": 100,
+        "meanUs": 628.489,
+        "medianUs": 615.7,
+        "p95Us": 748.1
+      },
+      "freshRapidJson": {
+        "samples": 100,
+        "meanUs": 601.116,
+        "medianUs": 581.3,
+        "p95Us": 758.2
+      },
+      "postFix": {
+        "samples": 100,
+        "meanUs": 682.8530000000001,
+        "medianUs": 662.4,
+        "p95Us": 827.1
+      },
+      "postVsPreFixMeanPercent": 8.649952505135337,
+      "postVsFreshRapidMeanPercent": 13.597541905389324,
+      "preFixReductionMeanPercent": -8.649952505135337,
+      "retainedRegressionGapRecoveryMeanPercent": -93.10657829385676
+    },
+    {
+      "caseId": "Box-glb",
+      "operation": "roundtrip",
+      "asset": "Box",
+      "format": "glb",
+      "tier": "small/core",
+      "complexityClass": "small",
+      "sampleClass": "standard",
+      "extensionCoverage": "core-only",
+      "extensionsUsed": [],
+      "retainedRapidJson": {
+        "samples": 100,
+        "meanUs": 3452.6459999999997,
+        "medianUs": 3248.5,
+        "p95Us": 4645.7
+      },
+      "retainedPreFix": {
+        "samples": 100,
+        "meanUs": 6176.578,
+        "medianUs": 5601.8,
+        "p95Us": 7994.9
+      },
+      "freshRapidJson": {
+        "samples": 100,
+        "meanUs": 3673.96,
+        "medianUs": 3435.2,
+        "p95Us": 4790.0
+      },
+      "postFix": {
+        "samples": 100,
+        "meanUs": 7065.919,
+        "medianUs": 5674.2,
+        "p95Us": 8433.4
+      },
+      "postVsPreFixMeanPercent": 14.398603887136199,
+      "postVsFreshRapidMeanPercent": 92.3243312393167,
+      "preFixReductionMeanPercent": -14.398603887136199,
+      "retainedRegressionGapRecoveryMeanPercent": -32.64916304812305
+    },
+    {
+      "caseId": "Box-gltf",
+      "operation": "load",
+      "asset": "Box",
+      "format": "gltf",
+      "tier": "small/core",
+      "complexityClass": "small",
+      "sampleClass": "standard",
+      "extensionCoverage": "core-only",
+      "extensionsUsed": [],
+      "retainedRapidJson": {
+        "samples": 100,
+        "meanUs": 4230.584,
+        "medianUs": 2973.7,
+        "p95Us": 4281.6
+      },
+      "retainedPreFix": {
+        "samples": 100,
+        "meanUs": 6590.9490000000005,
+        "medianUs": 5242.0,
+        "p95Us": 8443.0
+      },
+      "freshRapidJson": {
+        "samples": 100,
+        "meanUs": 3996.4309999999996,
+        "medianUs": 3164.4,
+        "p95Us": 4412.1
+      },
+      "postFix": {
+        "samples": 100,
+        "meanUs": 5893.066,
+        "medianUs": 5450.3,
+        "p95Us": 8325.8
+      },
+      "postVsPreFixMeanPercent": -10.588505539945775,
+      "postVsFreshRapidMeanPercent": 47.45821959643493,
+      "preFixReductionMeanPercent": 10.588505539945775,
+      "retainedRegressionGapRecoveryMeanPercent": 29.56674073713178
+    },
+    {
+      "caseId": "Box-gltf",
+      "operation": "export",
+      "asset": "Box",
+      "format": "gltf",
+      "tier": "small/core",
+      "complexityClass": "small",
+      "sampleClass": "standard",
+      "extensionCoverage": "core-only",
+      "extensionsUsed": [],
+      "retainedRapidJson": {
+        "samples": 100,
+        "meanUs": 849.335,
+        "medianUs": 822.6,
+        "p95Us": 1126.1
+      },
+      "retainedPreFix": {
+        "samples": 100,
+        "meanUs": 1470.724,
+        "medianUs": 885.1,
+        "p95Us": 1175.9
+      },
+      "freshRapidJson": {
+        "samples": 100,
+        "meanUs": 1022.1030000000001,
+        "medianUs": 883.6,
+        "p95Us": 1207.6
+      },
+      "postFix": {
+        "samples": 100,
+        "meanUs": 976.692,
+        "medianUs": 926.7,
+        "p95Us": 1244.1
+      },
+      "postVsPreFixMeanPercent": -33.59107487196782,
+      "postVsFreshRapidMeanPercent": -4.442898611979424,
+      "preFixReductionMeanPercent": 33.59107487196782,
+      "retainedRegressionGapRecoveryMeanPercent": 79.50446499696648
+    },
+    {
+      "caseId": "Box-gltf",
+      "operation": "roundtrip",
+      "asset": "Box",
+      "format": "gltf",
+      "tier": "small/core",
+      "complexityClass": "small",
+      "sampleClass": "standard",
+      "extensionCoverage": "core-only",
+      "extensionsUsed": [],
+      "retainedRapidJson": {
+        "samples": 100,
+        "meanUs": 5165.317,
+        "medianUs": 3779.7,
+        "p95Us": 5769.1
+      },
+      "retainedPreFix": {
+        "samples": 100,
+        "meanUs": 7193.355,
+        "medianUs": 6151.8,
+        "p95Us": 9578.9
+      },
+      "freshRapidJson": {
+        "samples": 100,
+        "meanUs": 4237.107,
+        "medianUs": 3961.3,
+        "p95Us": 5775.6
+      },
+      "postFix": {
+        "samples": 100,
+        "meanUs": 6797.616,
+        "medianUs": 6373.4,
+        "p95Us": 8856.6
+      },
+      "postVsPreFixMeanPercent": -5.501452382094302,
+      "postVsFreshRapidMeanPercent": 60.430595687104436,
+      "preFixReductionMeanPercent": 5.501452382094302,
+      "retainedRegressionGapRecoveryMeanPercent": 19.513391760903872
+    },
+    {
+      "caseId": "EmissiveStrengthTest-glb",
+      "operation": "load",
+      "asset": "EmissiveStrengthTest",
+      "format": "glb",
+      "tier": "small/material-grid",
+      "complexityClass": "small",
+      "sampleClass": "standard",
+      "extensionCoverage": "raw-only",
+      "extensionsUsed": [
+        "KHR_materials_emissive_strength"
+      ],
+      "retainedRapidJson": {
+        "samples": 100,
+        "meanUs": 4088.7529999999997,
+        "medianUs": 3321.3,
+        "p95Us": 4569.7
+      },
+      "retainedPreFix": {
+        "samples": 100,
+        "meanUs": 6774.941999999999,
+        "medianUs": 5718.4,
+        "p95Us": 9087.9
+      },
+      "freshRapidJson": {
+        "samples": 100,
+        "meanUs": 3878.768,
+        "medianUs": 3491.8,
+        "p95Us": 5252.2
+      },
+      "postFix": {
+        "samples": 100,
+        "meanUs": 6349.2919999999995,
+        "medianUs": 5872.8,
+        "p95Us": 9009.7
+      },
+      "postVsPreFixMeanPercent": -6.2827106121351255,
+      "postVsFreshRapidMeanPercent": 63.69352330430692,
+      "preFixReductionMeanPercent": 6.2827106121351255,
+      "retainedRegressionGapRecoveryMeanPercent": 15.845869371068073
+    },
+    {
+      "caseId": "EmissiveStrengthTest-glb",
+      "operation": "export",
+      "asset": "EmissiveStrengthTest",
+      "format": "glb",
+      "tier": "small/material-grid",
+      "complexityClass": "small",
+      "sampleClass": "standard",
+      "extensionCoverage": "raw-only",
+      "extensionsUsed": [
+        "KHR_materials_emissive_strength"
+      ],
+      "retainedRapidJson": {
+        "samples": 100,
+        "meanUs": 736.312,
+        "medianUs": 681.6,
+        "p95Us": 865.0
+      },
+      "retainedPreFix": {
+        "samples": 100,
+        "meanUs": 926.505,
+        "medianUs": 886.9,
+        "p95Us": 1159.4
+      },
+      "freshRapidJson": {
+        "samples": 100,
+        "meanUs": 742.0269999999999,
+        "medianUs": 721.3,
+        "p95Us": 920.5
+      },
+      "postFix": {
+        "samples": 100,
+        "meanUs": 1004.196,
+        "medianUs": 922.4,
+        "p95Us": 1408.9
+      },
+      "postVsPreFixMeanPercent": 8.385383780983377,
+      "postVsFreshRapidMeanPercent": 35.33146367989307,
+      "preFixReductionMeanPercent": -8.385383780983377,
+      "retainedRegressionGapRecoveryMeanPercent": -40.848506517064266
+    },
+    {
+      "caseId": "EmissiveStrengthTest-glb",
+      "operation": "roundtrip",
+      "asset": "EmissiveStrengthTest",
+      "format": "glb",
+      "tier": "small/material-grid",
+      "complexityClass": "small",
+      "sampleClass": "standard",
+      "extensionCoverage": "raw-only",
+      "extensionsUsed": [
+        "KHR_materials_emissive_strength"
+      ],
+      "retainedRapidJson": {
+        "samples": 100,
+        "meanUs": 4337.405,
+        "medianUs": 4049.4,
+        "p95Us": 5960.7
+      },
+      "retainedPreFix": {
+        "samples": 100,
+        "meanUs": 7589.041,
+        "medianUs": 6645.2,
+        "p95Us": 9184.8
+      },
+      "freshRapidJson": {
+        "samples": 100,
+        "meanUs": 5184.562,
+        "medianUs": 4300.2,
+        "p95Us": 6289.4
+      },
+      "postFix": {
+        "samples": 100,
+        "meanUs": 9752.196,
+        "medianUs": 6870.4,
+        "p95Us": 9354.7
+      },
+      "postVsPreFixMeanPercent": 28.503667327663663,
+      "postVsFreshRapidMeanPercent": 88.10067272799516,
+      "preFixReductionMeanPercent": -28.503667327663663,
+      "retainedRegressionGapRecoveryMeanPercent": -66.52512765881542
+    },
+    {
+      "caseId": "IridescenceSuzanne-glb",
+      "operation": "load",
+      "asset": "IridescenceSuzanne",
+      "format": "glb",
+      "tier": "medium/material-scene",
+      "complexityClass": "medium",
+      "sampleClass": "standard",
+      "extensionCoverage": "mixed-typed-raw",
+      "extensionsUsed": [
+        "KHR_lights_punctual",
+        "KHR_materials_ior",
+        "KHR_materials_iridescence",
+        "KHR_materials_transmission",
+        "KHR_materials_volume"
+      ],
+      "retainedRapidJson": {
+        "samples": 100,
+        "meanUs": 4061.324,
+        "medianUs": 3852.3,
+        "p95Us": 5329.7
+      },
+      "retainedPreFix": {
+        "samples": 100,
+        "meanUs": 7605.99,
+        "medianUs": 6292.8,
+        "p95Us": 9756.0
+      },
+      "freshRapidJson": {
+        "samples": 100,
+        "meanUs": 4299.538,
+        "medianUs": 4066.4,
+        "p95Us": 5773.0
+      },
+      "postFix": {
+        "samples": 100,
+        "meanUs": 8226.753,
+        "medianUs": 6478.1,
+        "p95Us": 9178.6
+      },
+      "postVsPreFixMeanPercent": 8.161501658561225,
+      "postVsFreshRapidMeanPercent": 91.34039517734234,
+      "preFixReductionMeanPercent": -8.161501658561225,
+      "retainedRegressionGapRecoveryMeanPercent": -17.5125949807401
+    },
+    {
+      "caseId": "IridescenceSuzanne-glb",
+      "operation": "export",
+      "asset": "IridescenceSuzanne",
+      "format": "glb",
+      "tier": "medium/material-scene",
+      "complexityClass": "medium",
+      "sampleClass": "standard",
+      "extensionCoverage": "mixed-typed-raw",
+      "extensionsUsed": [
+        "KHR_lights_punctual",
+        "KHR_materials_ior",
+        "KHR_materials_iridescence",
+        "KHR_materials_transmission",
+        "KHR_materials_volume"
+      ],
+      "retainedRapidJson": {
+        "samples": 100,
+        "meanUs": 5420.063,
+        "medianUs": 3650.6,
+        "p95Us": 5721.8
+      },
+      "retainedPreFix": {
+        "samples": 100,
+        "meanUs": 4737.135,
+        "medianUs": 3894.6,
+        "p95Us": 6212.3
+      },
+      "freshRapidJson": {
+        "samples": 100,
+        "meanUs": 4686.380999999999,
+        "medianUs": 3838.2,
+        "p95Us": 5546.4
+      },
+      "postFix": {
+        "samples": 100,
+        "meanUs": 4370.853,
+        "medianUs": 4092.8,
+        "p95Us": 6159.5
+      },
+      "postVsPreFixMeanPercent": -7.732141895892773,
+      "postVsFreshRapidMeanPercent": -6.732871271029807,
+      "preFixReductionMeanPercent": 7.732141895892773,
+      "retainedRegressionGapRecoveryMeanPercent": -53.6340580559005
+    },
+    {
+      "caseId": "IridescenceSuzanne-glb",
+      "operation": "roundtrip",
+      "asset": "IridescenceSuzanne",
+      "format": "glb",
+      "tier": "medium/material-scene",
+      "complexityClass": "medium",
+      "sampleClass": "standard",
+      "extensionCoverage": "mixed-typed-raw",
+      "extensionsUsed": [
+        "KHR_lights_punctual",
+        "KHR_materials_ior",
+        "KHR_materials_iridescence",
+        "KHR_materials_transmission",
+        "KHR_materials_volume"
+      ],
+      "retainedRapidJson": {
+        "samples": 100,
+        "meanUs": 9335.879,
+        "medianUs": 7575.0,
+        "p95Us": 12013.6
+      },
+      "retainedPreFix": {
+        "samples": 100,
+        "meanUs": 13017.681,
+        "medianUs": 10110.6,
+        "p95Us": 17335.1
+      },
+      "freshRapidJson": {
+        "samples": 100,
+        "meanUs": 9960.025,
+        "medianUs": 7836.8,
+        "p95Us": 11505.9
+      },
+      "postFix": {
+        "samples": 100,
+        "meanUs": 12251.613000000001,
+        "medianUs": 10448.0,
+        "p95Us": 14731.6
+      },
+      "postVsPreFixMeanPercent": -5.884826951897187,
+      "postVsFreshRapidMeanPercent": 23.007853895949072,
+      "preFixReductionMeanPercent": 5.884826951897187,
+      "retainedRegressionGapRecoveryMeanPercent": 20.806876632692344
+    },
+    {
+      "caseId": "MaterialsVariantsShoe-glb",
+      "operation": "load",
+      "asset": "MaterialsVariantsShoe",
+      "format": "glb",
+      "tier": "medium/material-texture",
+      "complexityClass": "medium",
+      "sampleClass": "standard",
+      "extensionCoverage": "raw-only",
+      "extensionsUsed": [
+        "KHR_materials_variants"
+      ],
+      "retainedRapidJson": {
+        "samples": 100,
+        "meanUs": 20288.733,
+        "medianUs": 19263.5,
+        "p95Us": 24462.7
+      },
+      "retainedPreFix": {
+        "samples": 100,
+        "meanUs": 24370.876,
+        "medianUs": 21904.0,
+        "p95Us": 32808.9
+      },
+      "freshRapidJson": {
+        "samples": 100,
+        "meanUs": 21982.959,
+        "medianUs": 20108.3,
+        "p95Us": 27408.1
+      },
+      "postFix": {
+        "samples": 100,
+        "meanUs": 24521.139,
+        "medianUs": 22700.4,
+        "p95Us": 30772.8
+      },
+      "postVsPreFixMeanPercent": 0.6165679067096276,
+      "postVsFreshRapidMeanPercent": 11.546125341906885,
+      "preFixReductionMeanPercent": -0.6165679067096276,
+      "retainedRegressionGapRecoveryMeanPercent": -3.6809832482595297
+    },
+    {
+      "caseId": "MaterialsVariantsShoe-glb",
+      "operation": "export",
+      "asset": "MaterialsVariantsShoe",
+      "format": "glb",
+      "tier": "medium/material-texture",
+      "complexityClass": "medium",
+      "sampleClass": "standard",
+      "extensionCoverage": "raw-only",
+      "extensionsUsed": [
+        "KHR_materials_variants"
+      ],
+      "retainedRapidJson": {
+        "samples": 100,
+        "meanUs": 53289.342000000004,
+        "medianUs": 46405.2,
+        "p95Us": 99116.0
+      },
+      "retainedPreFix": {
+        "samples": 100,
+        "meanUs": 52226.167,
+        "medianUs": 46888.6,
+        "p95Us": 95925.3
+      },
+      "freshRapidJson": {
+        "samples": 100,
+        "meanUs": 56721.100999999995,
+        "medianUs": 49158.2,
+        "p95Us": 120105.6
+      },
+      "postFix": {
+        "samples": 100,
+        "meanUs": 57108.75,
+        "medianUs": 48770.2,
+        "p95Us": 115009.2
+      },
+      "postVsPreFixMeanPercent": 9.34892081971093,
+      "postVsFreshRapidMeanPercent": 0.6834299637448944,
+      "preFixReductionMeanPercent": -9.34892081971093,
+      "retainedRegressionGapRecoveryMeanPercent": 459.2454675852974
+    },
+    {
+      "caseId": "MaterialsVariantsShoe-glb",
+      "operation": "roundtrip",
+      "asset": "MaterialsVariantsShoe",
+      "format": "glb",
+      "tier": "medium/material-texture",
+      "complexityClass": "medium",
+      "sampleClass": "standard",
+      "extensionCoverage": "raw-only",
+      "extensionsUsed": [
+        "KHR_materials_variants"
+      ],
+      "retainedRapidJson": {
+        "samples": 100,
+        "meanUs": 76994.837,
+        "medianUs": 66905.7,
+        "p95Us": 135925.6
+      },
+      "retainedPreFix": {
+        "samples": 100,
+        "meanUs": 78750.274,
+        "medianUs": 69403.1,
+        "p95Us": 135900.1
+      },
+      "freshRapidJson": {
+        "samples": 100,
+        "meanUs": 82698.933,
+        "medianUs": 70021.0,
+        "p95Us": 150198.8
+      },
+      "postFix": {
+        "samples": 100,
+        "meanUs": 81927.86,
+        "medianUs": 71388.8,
+        "p95Us": 150060.6
+      },
+      "postVsPreFixMeanPercent": 4.035015801976759,
+      "postVsFreshRapidMeanPercent": -0.9323856693531994,
+      "preFixReductionMeanPercent": -4.035015801976759,
+      "retainedRegressionGapRecoveryMeanPercent": -181.01395834769266
+    },
+    {
+      "caseId": "MorphStressTest-glb",
+      "operation": "load",
+      "asset": "MorphStressTest",
+      "format": "glb",
+      "tier": "medium/geometry-animation",
+      "complexityClass": "medium",
+      "sampleClass": "standard",
+      "extensionCoverage": "core-only",
+      "extensionsUsed": [],
+      "retainedRapidJson": {
+        "samples": 100,
+        "meanUs": 5705.648,
+        "medianUs": 4938.5,
+        "p95Us": 6604.6
+      },
+      "retainedPreFix": {
+        "samples": 100,
+        "meanUs": 8481.982,
+        "medianUs": 7185.5,
+        "p95Us": 11777.3
+      },
+      "freshRapidJson": {
+        "samples": 100,
+        "meanUs": 7468.776,
+        "medianUs": 5170.3,
+        "p95Us": 7765.0
+      },
+      "postFix": {
+        "samples": 100,
+        "meanUs": 9358.416,
+        "medianUs": 7143.8,
+        "p95Us": 10402.1
+      },
+      "postVsPreFixMeanPercent": 10.332891534077758,
+      "postVsFreshRapidMeanPercent": 25.300531171372654,
+      "preFixReductionMeanPercent": -10.332891534077758,
+      "retainedRegressionGapRecoveryMeanPercent": -31.568031800208452
+    },
+    {
+      "caseId": "MorphStressTest-glb",
+      "operation": "export",
+      "asset": "MorphStressTest",
+      "format": "glb",
+      "tier": "medium/geometry-animation",
+      "complexityClass": "medium",
+      "sampleClass": "standard",
+      "extensionCoverage": "core-only",
+      "extensionsUsed": [],
+      "retainedRapidJson": {
+        "samples": 100,
+        "meanUs": 5005.721,
+        "medianUs": 4196.5,
+        "p95Us": 5790.2
+      },
+      "retainedPreFix": {
+        "samples": 100,
+        "meanUs": 4899.8859999999995,
+        "medianUs": 4660.4,
+        "p95Us": 6164.1
+      },
+      "freshRapidJson": {
+        "samples": 100,
+        "meanUs": 5503.2390000000005,
+        "medianUs": 4487.3,
+        "p95Us": 7067.6
+      },
+      "postFix": {
+        "samples": 100,
+        "meanUs": 5359.592,
+        "medianUs": 4970.8,
+        "p95Us": 7388.1
+      },
+      "postVsPreFixMeanPercent": 9.381973376523458,
+      "postVsFreshRapidMeanPercent": -2.6102264502777515,
+      "preFixReductionMeanPercent": -9.381973376523458,
+      "retainedRegressionGapRecoveryMeanPercent": 434.36103368450887
+    },
+    {
+      "caseId": "MorphStressTest-glb",
+      "operation": "roundtrip",
+      "asset": "MorphStressTest",
+      "format": "glb",
+      "tier": "medium/geometry-animation",
+      "complexityClass": "medium",
+      "sampleClass": "standard",
+      "extensionCoverage": "core-only",
+      "extensionsUsed": [],
+      "retainedRapidJson": {
+        "samples": 100,
+        "meanUs": 9735.315,
+        "medianUs": 9115.3,
+        "p95Us": 12773.5
+      },
+      "retainedPreFix": {
+        "samples": 100,
+        "meanUs": 13100.864,
+        "medianUs": 11822.1,
+        "p95Us": 15901.8
+      },
+      "freshRapidJson": {
+        "samples": 100,
+        "meanUs": 11941.883,
+        "medianUs": 9698.9,
+        "p95Us": 13907.7
+      },
+      "postFix": {
+        "samples": 100,
+        "meanUs": 12902.48,
+        "medianUs": 11917.1,
+        "p95Us": 14407.7
+      },
+      "postVsPreFixMeanPercent": -1.514281806146526,
+      "postVsFreshRapidMeanPercent": 8.043932435110944,
+      "preFixReductionMeanPercent": 1.514281806146526,
+      "retainedRegressionGapRecoveryMeanPercent": 5.8945509335921145
+    },
+    {
+      "caseId": "NodePerformanceTest-glb",
+      "operation": "load",
+      "asset": "NodePerformanceTest",
+      "format": "glb",
+      "tier": "large/scene-structure",
+      "complexityClass": "large",
+      "sampleClass": "large",
+      "extensionCoverage": "raw-only",
+      "extensionsUsed": [
+        "KHR_lights_punctual"
+      ],
+      "retainedRapidJson": {
+        "samples": 30,
+        "meanUs": 1919167.9966666666,
+        "medianUs": 1883577.3,
+        "p95Us": 2091949.6
+      },
+      "retainedPreFix": {
+        "samples": 30,
+        "meanUs": 15769761.153333334,
+        "medianUs": 15535308.3,
+        "p95Us": 16866381.3
+      },
+      "freshRapidJson": {
+        "samples": 30,
+        "meanUs": 1990664.8366666667,
+        "medianUs": 1950907.3,
+        "p95Us": 2150514.7
+      },
+      "postFix": {
+        "samples": 30,
+        "meanUs": 2019586.8599999999,
+        "medianUs": 1993403.6,
+        "p95Us": 2132922.9
+      },
+      "postVsPreFixMeanPercent": -87.19329455682269,
+      "postVsFreshRapidMeanPercent": 1.4528826149238976,
+      "preFixReductionMeanPercent": 87.19329455682269,
+      "retainedRegressionGapRecoveryMeanPercent": 99.27498510571007
+    },
+    {
+      "caseId": "NodePerformanceTest-glb",
+      "operation": "export",
+      "asset": "NodePerformanceTest",
+      "format": "glb",
+      "tier": "large/scene-structure",
+      "complexityClass": "large",
+      "sampleClass": "large",
+      "extensionCoverage": "raw-only",
+      "extensionsUsed": [
+        "KHR_lights_punctual"
+      ],
+      "retainedRapidJson": {
+        "samples": 30,
+        "meanUs": 315108.7766666667,
+        "medianUs": 303394.0,
+        "p95Us": 337618.2
+      },
+      "retainedPreFix": {
+        "samples": 30,
+        "meanUs": 883543.1533333334,
+        "medianUs": 877492.1,
+        "p95Us": 932843.0
+      },
+      "freshRapidJson": {
+        "samples": 30,
+        "meanUs": 321448.4533333333,
+        "medianUs": 310472.2,
+        "p95Us": 354137.6
+      },
+      "postFix": {
+        "samples": 30,
+        "meanUs": 906142.1666666666,
+        "medianUs": 894672.1,
+        "p95Us": 967013.0
+      },
+      "postVsPreFixMeanPercent": 2.5577713151954318,
+      "postVsFreshRapidMeanPercent": 181.89345982854113,
+      "preFixReductionMeanPercent": -2.5577713151954318,
+      "retainedRegressionGapRecoveryMeanPercent": -3.975659154510528
+    },
+    {
+      "caseId": "NodePerformanceTest-glb",
+      "operation": "roundtrip",
+      "asset": "NodePerformanceTest",
+      "format": "glb",
+      "tier": "large/scene-structure",
+      "complexityClass": "large",
+      "sampleClass": "large",
+      "extensionCoverage": "raw-only",
+      "extensionsUsed": [
+        "KHR_lights_punctual"
+      ],
+      "retainedRapidJson": {
+        "samples": 30,
+        "meanUs": 2198224.4033333333,
+        "medianUs": 2150800.1,
+        "p95Us": 2404986.0
+      },
+      "retainedPreFix": {
+        "samples": 30,
+        "meanUs": 16600825.093333334,
+        "medianUs": 16419030.7,
+        "p95Us": 16990397.1
+      },
+      "freshRapidJson": {
+        "samples": 30,
+        "meanUs": 2275916.1333333333,
+        "medianUs": 2223146.4,
+        "p95Us": 2359942.5
+      },
+      "postFix": {
+        "samples": 30,
+        "meanUs": 2935946.7866666666,
+        "medianUs": 2925352.1,
+        "p95Us": 3095595.2
+      },
+      "postVsPreFixMeanPercent": -82.3144526241307,
+      "postVsFreshRapidMeanPercent": 29.000657962147518,
+      "preFixReductionMeanPercent": 82.3144526241307,
+      "retainedRegressionGapRecoveryMeanPercent": 94.87785297105717
+    },
+    {
+      "caseId": "SheenTestGrid-glb",
+      "operation": "load",
+      "asset": "SheenTestGrid",
+      "format": "glb",
+      "tier": "medium/material-grid",
+      "complexityClass": "medium",
+      "sampleClass": "standard",
+      "extensionCoverage": "typed-only",
+      "extensionsUsed": [
+        "KHR_materials_sheen"
+      ],
+      "retainedRapidJson": {
+        "samples": 100,
+        "meanUs": 8658.48,
+        "medianUs": 7597.5,
+        "p95Us": 11105.1
+      },
+      "retainedPreFix": {
+        "samples": 100,
+        "meanUs": 12618.521,
+        "medianUs": 10501.7,
+        "p95Us": 14372.2
+      },
+      "freshRapidJson": {
+        "samples": 100,
+        "meanUs": 9728.834,
+        "medianUs": 8022.3,
+        "p95Us": 11589.7
+      },
+      "postFix": {
+        "samples": 100,
+        "meanUs": 12997.34,
+        "medianUs": 10375.6,
+        "p95Us": 16737.6
+      },
+      "postVsPreFixMeanPercent": 3.002087170120805,
+      "postVsFreshRapidMeanPercent": 33.59607122497926,
+      "preFixReductionMeanPercent": -3.002087170120805,
+      "retainedRegressionGapRecoveryMeanPercent": -9.566037321330748
+    },
+    {
+      "caseId": "SheenTestGrid-glb",
+      "operation": "export",
+      "asset": "SheenTestGrid",
+      "format": "glb",
+      "tier": "medium/material-grid",
+      "complexityClass": "medium",
+      "sampleClass": "standard",
+      "extensionCoverage": "typed-only",
+      "extensionsUsed": [
+        "KHR_materials_sheen"
+      ],
+      "retainedRapidJson": {
+        "samples": 100,
+        "meanUs": 13065.148000000001,
+        "medianUs": 11722.5,
+        "p95Us": 14398.3
+      },
+      "retainedPreFix": {
+        "samples": 100,
+        "meanUs": 14565.328000000001,
+        "medianUs": 12543.8,
+        "p95Us": 19801.9
+      },
+      "freshRapidJson": {
+        "samples": 100,
+        "meanUs": 13596.375,
+        "medianUs": 12117.4,
+        "p95Us": 15377.5
+      },
+      "postFix": {
+        "samples": 100,
+        "meanUs": 14571.298,
+        "medianUs": 13215.7,
+        "p95Us": 18367.8
+      },
+      "postVsPreFixMeanPercent": 0.040987748439302876,
+      "postVsFreshRapidMeanPercent": 7.170462715245797,
+      "preFixReductionMeanPercent": -0.040987748439302876,
+      "retainedRegressionGapRecoveryMeanPercent": -0.3979522457304686
+    },
+    {
+      "caseId": "SheenTestGrid-glb",
+      "operation": "roundtrip",
+      "asset": "SheenTestGrid",
+      "format": "glb",
+      "tier": "medium/material-grid",
+      "complexityClass": "medium",
+      "sampleClass": "standard",
+      "extensionCoverage": "typed-only",
+      "extensionsUsed": [
+        "KHR_materials_sheen"
+      ],
+      "retainedRapidJson": {
+        "samples": 100,
+        "meanUs": 21743.195,
+        "medianUs": 19107.4,
+        "p95Us": 24922.1
+      },
+      "retainedPreFix": {
+        "samples": 100,
+        "meanUs": 25927.089,
+        "medianUs": 23119.7,
+        "p95Us": 31052.4
+      },
+      "freshRapidJson": {
+        "samples": 100,
+        "meanUs": 22510.072,
+        "medianUs": 20013.7,
+        "p95Us": 25786.5
+      },
+      "postFix": {
+        "samples": 100,
+        "meanUs": 25892.765,
+        "medianUs": 23844.0,
+        "p95Us": 29365.6
+      },
+      "postVsPreFixMeanPercent": -0.13238663237512135,
+      "postVsFreshRapidMeanPercent": 15.02746415027015,
+      "preFixReductionMeanPercent": 0.13238663237512135,
+      "retainedRegressionGapRecoveryMeanPercent": 0.8203840728278613
+    },
+    {
+      "caseId": "SimpleInstancing-glb",
+      "operation": "load",
+      "asset": "SimpleInstancing",
+      "format": "glb",
+      "tier": "small/scene-instancing",
+      "complexityClass": "small",
+      "sampleClass": "standard",
+      "extensionCoverage": "typed-only",
+      "extensionsUsed": [
+        "EXT_mesh_gpu_instancing"
+      ],
+      "retainedRapidJson": {
+        "samples": 100,
+        "meanUs": 3124.9759999999997,
+        "medianUs": 2869.1,
+        "p95Us": 4239.4
+      },
+      "retainedPreFix": {
+        "samples": 100,
+        "meanUs": 5553.578,
+        "medianUs": 5064.3,
+        "p95Us": 8073.5
+      },
+      "freshRapidJson": {
+        "samples": 100,
+        "meanUs": 3223.255,
+        "medianUs": 2937.4,
+        "p95Us": 4867.7
+      },
+      "postFix": {
+        "samples": 100,
+        "meanUs": 7652.3009999999995,
+        "medianUs": 5301.4,
+        "p95Us": 8122.7
+      },
+      "postVsPreFixMeanPercent": 37.790465894239695,
+      "postVsFreshRapidMeanPercent": 137.40910973534514,
+      "preFixReductionMeanPercent": -37.790465894239695,
+      "retainedRegressionGapRecoveryMeanPercent": -86.41691804585511
+    },
+    {
+      "caseId": "SimpleInstancing-glb",
+      "operation": "export",
+      "asset": "SimpleInstancing",
+      "format": "glb",
+      "tier": "small/scene-instancing",
+      "complexityClass": "small",
+      "sampleClass": "standard",
+      "extensionCoverage": "typed-only",
+      "extensionsUsed": [
+        "EXT_mesh_gpu_instancing"
+      ],
+      "retainedRapidJson": {
+        "samples": 100,
+        "meanUs": 662.7869999999999,
+        "medianUs": 637.4,
+        "p95Us": 815.3
+      },
+      "retainedPreFix": {
+        "samples": 100,
+        "meanUs": 1844.859,
+        "medianUs": 708.5,
+        "p95Us": 989.3
+      },
+      "freshRapidJson": {
+        "samples": 100,
+        "meanUs": 712.435,
+        "medianUs": 665.2,
+        "p95Us": 940.9
+      },
+      "postFix": {
+        "samples": 100,
+        "meanUs": 772.556,
+        "medianUs": 743.6,
+        "p95Us": 977.5
+      },
+      "postVsPreFixMeanPercent": -58.12384577899991,
+      "postVsFreshRapidMeanPercent": 8.438804943608904,
+      "preFixReductionMeanPercent": 58.12384577899991,
+      "retainedRegressionGapRecoveryMeanPercent": 90.71384822582718
+    },
+    {
+      "caseId": "SimpleInstancing-glb",
+      "operation": "roundtrip",
+      "asset": "SimpleInstancing",
+      "format": "glb",
+      "tier": "small/scene-instancing",
+      "complexityClass": "small",
+      "sampleClass": "standard",
+      "extensionCoverage": "typed-only",
+      "extensionsUsed": [
+        "EXT_mesh_gpu_instancing"
+      ],
+      "retainedRapidJson": {
+        "samples": 100,
+        "meanUs": 3716.053,
+        "medianUs": 3437.6,
+        "p95Us": 5291.4
+      },
+      "retainedPreFix": {
+        "samples": 100,
+        "meanUs": 7177.679,
+        "medianUs": 5821.0,
+        "p95Us": 7810.0
+      },
+      "freshRapidJson": {
+        "samples": 100,
+        "meanUs": 4575.448,
+        "medianUs": 3684.5,
+        "p95Us": 5981.8
+      },
+      "postFix": {
+        "samples": 100,
+        "meanUs": 6965.0740000000005,
+        "medianUs": 5890.3,
+        "p95Us": 7599.7
+      },
+      "postVsPreFixMeanPercent": -2.962029926387061,
+      "postVsFreshRapidMeanPercent": 52.22714803009454,
+      "preFixReductionMeanPercent": 2.962029926387061,
+      "retainedRegressionGapRecoveryMeanPercent": 6.141766903761399
+    },
+    {
+      "caseId": "SpecularTest-glb",
+      "operation": "load",
+      "asset": "SpecularTest",
+      "format": "glb",
+      "tier": "small/material-grid",
+      "complexityClass": "small",
+      "sampleClass": "standard",
+      "extensionCoverage": "typed-only",
+      "extensionsUsed": [
+        "KHR_materials_specular"
+      ],
+      "retainedRapidJson": {
+        "samples": 100,
+        "meanUs": 4782.515,
+        "medianUs": 4424.6,
+        "p95Us": 6678.7
+      },
+      "retainedPreFix": {
+        "samples": 100,
+        "meanUs": 8922.796,
+        "medianUs": 7310.5,
+        "p95Us": 11833.9
+      },
+      "freshRapidJson": {
+        "samples": 100,
+        "meanUs": 5472.47,
+        "medianUs": 4554.3,
+        "p95Us": 6361.3
+      },
+      "postFix": {
+        "samples": 100,
+        "meanUs": 9206.613000000001,
+        "medianUs": 7453.7,
+        "p95Us": 11229.8
+      },
+      "postVsPreFixMeanPercent": 3.18080789922801,
+      "postVsFreshRapidMeanPercent": 68.23505656495149,
+      "preFixReductionMeanPercent": -3.18080789922801,
+      "retainedRegressionGapRecoveryMeanPercent": -6.855017811593004
+    },
+    {
+      "caseId": "SpecularTest-glb",
+      "operation": "export",
+      "asset": "SpecularTest",
+      "format": "glb",
+      "tier": "small/material-grid",
+      "complexityClass": "small",
+      "sampleClass": "standard",
+      "extensionCoverage": "typed-only",
+      "extensionsUsed": [
+        "KHR_materials_specular"
+      ],
+      "retainedRapidJson": {
+        "samples": 100,
+        "meanUs": 2208.864,
+        "medianUs": 2080.2,
+        "p95Us": 3065.5
+      },
+      "retainedPreFix": {
+        "samples": 100,
+        "meanUs": 2809.511,
+        "medianUs": 2644.2,
+        "p95Us": 3841.5
+      },
+      "freshRapidJson": {
+        "samples": 100,
+        "meanUs": 2406.641,
+        "medianUs": 2198.1,
+        "p95Us": 3425.3
+      },
+      "postFix": {
+        "samples": 100,
+        "meanUs": 3503.1,
+        "medianUs": 2732.1,
+        "p95Us": 3952.8
+      },
+      "postVsPreFixMeanPercent": 24.687178658492527,
+      "postVsFreshRapidMeanPercent": 45.5597241134012,
+      "preFixReductionMeanPercent": -24.687178658492527,
+      "retainedRegressionGapRecoveryMeanPercent": -115.47364758335594
+    },
+    {
+      "caseId": "SpecularTest-glb",
+      "operation": "roundtrip",
+      "asset": "SpecularTest",
+      "format": "glb",
+      "tier": "small/material-grid",
+      "complexityClass": "small",
+      "sampleClass": "standard",
+      "extensionCoverage": "typed-only",
+      "extensionsUsed": [
+        "KHR_materials_specular"
+      ],
+      "retainedRapidJson": {
+        "samples": 100,
+        "meanUs": 8226.499,
+        "medianUs": 6510.6,
+        "p95Us": 10050.8
+      },
+      "retainedPreFix": {
+        "samples": 100,
+        "meanUs": 10413.594000000001,
+        "medianUs": 9935.7,
+        "p95Us": 12816.7
+      },
+      "freshRapidJson": {
+        "samples": 100,
+        "meanUs": 7251.632,
+        "medianUs": 6811.3,
+        "p95Us": 9288.1
+      },
+      "postFix": {
+        "samples": 100,
+        "meanUs": 11629.54,
+        "medianUs": 10270.7,
+        "p95Us": 14990.2
+      },
+      "postVsPreFixMeanPercent": 11.676525894902372,
+      "postVsFreshRapidMeanPercent": 60.371348132392846,
+      "preFixReductionMeanPercent": -11.676525894902372,
+      "retainedRegressionGapRecoveryMeanPercent": -55.59639613276969
+    },
+    {
+      "caseId": "TextureTransformMultiTest-glb",
+      "operation": "load",
+      "asset": "TextureTransformMultiTest",
+      "format": "glb",
+      "tier": "medium/material-grid",
+      "complexityClass": "medium",
+      "sampleClass": "standard",
+      "extensionCoverage": "typed-only",
+      "extensionsUsed": [
+        "KHR_materials_clearcoat",
+        "KHR_materials_unlit",
+        "KHR_texture_transform"
+      ],
+      "retainedRapidJson": {
+        "samples": 100,
+        "meanUs": 7174.326,
+        "medianUs": 6202.2,
+        "p95Us": 9138.1
+      },
+      "retainedPreFix": {
+        "samples": 100,
+        "meanUs": 12235.78,
+        "medianUs": 9344.5,
+        "p95Us": 17485.1
+      },
+      "freshRapidJson": {
+        "samples": 100,
+        "meanUs": 8543.43,
+        "medianUs": 6553.9,
+        "p95Us": 10094.3
+      },
+      "postFix": {
+        "samples": 100,
+        "meanUs": 11276.577,
+        "medianUs": 9341.7,
+        "p95Us": 15359.0
+      },
+      "postVsPreFixMeanPercent": -7.839328592047269,
+      "postVsFreshRapidMeanPercent": 31.991214301515893,
+      "preFixReductionMeanPercent": 7.839328592047269,
+      "retainedRegressionGapRecoveryMeanPercent": 18.951135385207515
+    },
+    {
+      "caseId": "TextureTransformMultiTest-glb",
+      "operation": "export",
+      "asset": "TextureTransformMultiTest",
+      "format": "glb",
+      "tier": "medium/material-grid",
+      "complexityClass": "medium",
+      "sampleClass": "standard",
+      "extensionCoverage": "typed-only",
+      "extensionsUsed": [
+        "KHR_materials_clearcoat",
+        "KHR_materials_unlit",
+        "KHR_texture_transform"
+      ],
+      "retainedRapidJson": {
+        "samples": 100,
+        "meanUs": 4015.013,
+        "medianUs": 3174.7,
+        "p95Us": 4120.7
+      },
+      "retainedPreFix": {
+        "samples": 100,
+        "meanUs": 5090.977,
+        "medianUs": 4274.9,
+        "p95Us": 5831.6
+      },
+      "freshRapidJson": {
+        "samples": 100,
+        "meanUs": 3452.054,
+        "medianUs": 3282.0,
+        "p95Us": 4375.5
+      },
+      "postFix": {
+        "samples": 100,
+        "meanUs": 4711.254,
+        "medianUs": 4495.5,
+        "p95Us": 6053.0
+      },
+      "postVsPreFixMeanPercent": -7.458745148524535,
+      "postVsFreshRapidMeanPercent": 36.47683379228714,
+      "preFixReductionMeanPercent": 7.458745148524535,
+      "retainedRegressionGapRecoveryMeanPercent": 35.291422389596676
+    },
+    {
+      "caseId": "TextureTransformMultiTest-glb",
+      "operation": "roundtrip",
+      "asset": "TextureTransformMultiTest",
+      "format": "glb",
+      "tier": "medium/material-grid",
+      "complexityClass": "medium",
+      "sampleClass": "standard",
+      "extensionCoverage": "typed-only",
+      "extensionsUsed": [
+        "KHR_materials_clearcoat",
+        "KHR_materials_unlit",
+        "KHR_texture_transform"
+      ],
+      "retainedRapidJson": {
+        "samples": 100,
+        "meanUs": 11742.499,
+        "medianUs": 9420.7,
+        "p95Us": 15381.1
+      },
+      "retainedPreFix": {
+        "samples": 100,
+        "meanUs": 15097.511,
+        "medianUs": 13813.1,
+        "p95Us": 18878.6
+      },
+      "freshRapidJson": {
+        "samples": 100,
+        "meanUs": 10570.688999999998,
+        "medianUs": 9711.4,
+        "p95Us": 14996.3
+      },
+      "postFix": {
+        "samples": 100,
+        "meanUs": 16396.811999999998,
+        "medianUs": 13814.6,
+        "p95Us": 22226.4
+      },
+      "postVsPreFixMeanPercent": 8.606060959319702,
+      "postVsFreshRapidMeanPercent": 55.11583019801264,
+      "preFixReductionMeanPercent": -8.606060959319702,
+      "retainedRegressionGapRecoveryMeanPercent": -38.72716401610478
+    },
+    {
+      "caseId": "XmpMetadataRoundedCube-glb",
+      "operation": "load",
+      "asset": "XmpMetadataRoundedCube",
+      "format": "glb",
+      "tier": "small/metadata",
+      "complexityClass": "small",
+      "sampleClass": "standard",
+      "extensionCoverage": "raw-only",
+      "extensionsUsed": [
+        "KHR_xmp_json_ld"
+      ],
+      "retainedRapidJson": {
+        "samples": 100,
+        "meanUs": 3749.026,
+        "medianUs": 2900.0,
+        "p95Us": 4364.1
+      },
+      "retainedPreFix": {
+        "samples": 100,
+        "meanUs": 6792.807,
+        "medianUs": 5159.5,
+        "p95Us": 8213.6
+      },
+      "freshRapidJson": {
+        "samples": 100,
+        "meanUs": 3292.159,
+        "medianUs": 2994.4,
+        "p95Us": 4479.5
+      },
+      "postFix": {
+        "samples": 100,
+        "meanUs": 6434.751,
+        "medianUs": 5360.1,
+        "p95Us": 7842.3
+      },
+      "postVsPreFixMeanPercent": -5.271105155791996,
+      "postVsFreshRapidMeanPercent": 95.45687191900512,
+      "preFixReductionMeanPercent": 5.271105155791996,
+      "retainedRegressionGapRecoveryMeanPercent": 11.763527008020604
+    },
+    {
+      "caseId": "XmpMetadataRoundedCube-glb",
+      "operation": "export",
+      "asset": "XmpMetadataRoundedCube",
+      "format": "glb",
+      "tier": "small/metadata",
+      "complexityClass": "small",
+      "sampleClass": "standard",
+      "extensionCoverage": "raw-only",
+      "extensionsUsed": [
+        "KHR_xmp_json_ld"
+      ],
+      "retainedRapidJson": {
+        "samples": 100,
+        "meanUs": 1345.1129999999998,
+        "medianUs": 1281.3,
+        "p95Us": 1798.9
+      },
+      "retainedPreFix": {
+        "samples": 100,
+        "meanUs": 2677.245,
+        "medianUs": 1432.5,
+        "p95Us": 2225.4
+      },
+      "freshRapidJson": {
+        "samples": 100,
+        "meanUs": 1508.539,
+        "medianUs": 1405.1,
+        "p95Us": 2091.9
+      },
+      "postFix": {
+        "samples": 100,
+        "meanUs": 1558.094,
+        "medianUs": 1466.6,
+        "p95Us": 1990.7
+      },
+      "postVsPreFixMeanPercent": -41.802337851037166,
+      "postVsFreshRapidMeanPercent": 3.284966447668908,
+      "preFixReductionMeanPercent": 41.802337851037166,
+      "retainedRegressionGapRecoveryMeanPercent": 84.01201982986669
+    },
+    {
+      "caseId": "XmpMetadataRoundedCube-glb",
+      "operation": "roundtrip",
+      "asset": "XmpMetadataRoundedCube",
+      "format": "glb",
+      "tier": "small/metadata",
+      "complexityClass": "small",
+      "sampleClass": "standard",
+      "extensionCoverage": "raw-only",
+      "extensionsUsed": [
+        "KHR_xmp_json_ld"
+      ],
+      "retainedRapidJson": {
+        "samples": 100,
+        "meanUs": 4971.568,
+        "medianUs": 4200.0,
+        "p95Us": 5774.0
+      },
+      "retainedPreFix": {
+        "samples": 100,
+        "meanUs": 7628.064,
+        "medianUs": 6611.2,
+        "p95Us": 10170.4
+      },
+      "freshRapidJson": {
+        "samples": 100,
+        "meanUs": 5202.233,
+        "medianUs": 4322.6,
+        "p95Us": 5999.8
+      },
+      "postFix": {
+        "samples": 100,
+        "meanUs": 8834.954,
+        "medianUs": 6760.1,
+        "p95Us": 10800.3
+      },
+      "postVsPreFixMeanPercent": 15.821707840941022,
+      "postVsFreshRapidMeanPercent": 69.83003260330707,
+      "preFixReductionMeanPercent": -15.821707840941022,
+      "retainedRegressionGapRecoveryMeanPercent": -45.431651318127315
+    }
+  ],
+  "aggregates": [
+    {
+      "groupKind": "overall",
+      "group": "all-cases",
+      "operation": "load",
+      "caseCount": 16,
+      "retainedRapidJson": {
+        "meanTotalUs": 2143962.498333333,
+        "medianTotalUs": 2088243.6,
+        "p95TotalUs": 2358733.0
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 16046686.482333334,
+        "medianTotalUs": 15778995.0,
+        "p95TotalUs": 17237420.1
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 2228203.3443333334,
+        "medianTotalUs": 2162771.3000000003,
+        "p95TotalUs": 2435963.1
+      },
+      "postFix": {
+        "meanTotalUs": 2300359.3989999997,
+        "medianTotalUs": 2242434.8000000003,
+        "p95TotalUs": 2472204.1
+      },
+      "postVsPreFixMeanPercent": -85.6645831428651,
+      "postVsFreshRapidMeanPercent": 3.238306541912808
+    },
+    {
+      "groupKind": "overall",
+      "group": "all-cases",
+      "operation": "export",
+      "caseCount": 16,
+      "retainedRapidJson": {
+        "meanTotalUs": 809024.457,
+        "medianTotalUs": 754987.0,
+        "p95TotalUs": 1043042.3
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 1374180.8250000002,
+        "medianTotalUs": 1338538.7,
+        "p95TotalUs": 1600761.4
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 840574.098,
+        "medianTotalUs": 776111.9,
+        "p95TotalUs": 1228261.8
+      },
+      "postFix": {
+        "meanTotalUs": 1422245.9846666667,
+        "medianTotalUs": 1368943.5999999999,
+        "p95TotalUs": 1768341.8
+      },
+      "postVsPreFixMeanPercent": 3.497731797172073,
+      "postVsFreshRapidMeanPercent": 69.19935887278157
+    },
+    {
+      "groupKind": "overall",
+      "group": "all-cases",
+      "operation": "roundtrip",
+      "caseCount": 16,
+      "retainedRapidJson": {
+        "meanTotalUs": 2909897.0116666667,
+        "medianTotalUs": 2813820.1,
+        "p95TotalUs": 3320220.8
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 17366929.864,
+        "medianTotalUs": 17128186.0,
+        "p95TotalUs": 18059605.1
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 3021361.629333333,
+        "medianTotalUs": 2915873.3,
+        "p95TotalUs": 3380691.2
+      },
+      "postFix": {
+        "meanTotalUs": 3718182.2946666665,
+        "medianTotalUs": 3650239.9,
+        "p95TotalUs": 4112959.0
+      },
+      "postVsPreFixMeanPercent": -78.59044561253106,
+      "postVsFreshRapidMeanPercent": 23.0631334749256
+    },
+    {
+      "groupKind": "complexityClass",
+      "group": "large",
+      "operation": "load",
+      "caseCount": 3,
+      "retainedRapidJson": {
+        "meanTotalUs": 2032096.1733333333,
+        "medianTotalUs": 1990603.9000000001,
+        "p95TotalUs": 2225162.9
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 15894220.563333334,
+        "medianTotalUs": 15649156.5,
+        "p95TotalUs": 17040481.8
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 2106743.0633333335,
+        "medianTotalUs": 2060660.7,
+        "p95TotalUs": 2288104.5
+      },
+      "postFix": {
+        "meanTotalUs": 2143793.7199999997,
+        "medianTotalUs": 2108706.4,
+        "p95TotalUs": 2277672.1
+      },
+      "postVsPreFixMeanPercent": -86.5121179647805,
+      "postVsFreshRapidMeanPercent": 1.7586699257024698
+    },
+    {
+      "groupKind": "complexityClass",
+      "group": "large",
+      "operation": "export",
+      "caseCount": 3,
+      "retainedRapidJson": {
+        "meanTotalUs": 663603.99,
+        "medianTotalUs": 626962.1,
+        "p95TotalUs": 795861.1
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 1223998.9400000002,
+        "medianTotalUs": 1206525.4,
+        "p95TotalUs": 1353844.1
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 687509.38,
+        "medianTotalUs": 641795.3,
+        "p95TotalUs": 946243.7
+      },
+      "postFix": {
+        "meanTotalUs": 1265587.5166666666,
+        "medianTotalUs": 1231201.6,
+        "p95TotalUs": 1483038.9
+      },
+      "postVsPreFixMeanPercent": 3.3977624740971115,
+      "postVsFreshRapidMeanPercent": 84.08294540892905
+    },
+    {
+      "groupKind": "complexityClass",
+      "group": "large",
+      "operation": "roundtrip",
+      "caseCount": 3,
+      "retainedRapidJson": {
+        "meanTotalUs": 2645402.966666667,
+        "medianTotalUs": 2585876.9,
+        "p95TotalUs": 2917389.1
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 17066695.51,
+        "medianTotalUs": 16865179.9,
+        "p95TotalUs": 17581116.3
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 2743662.9033333333,
+        "medianTotalUs": 2677343.0,
+        "p95TotalUs": 2940248.8
+      },
+      "postFix": {
+        "meanTotalUs": 3404479.8866666667,
+        "medianTotalUs": 3378727.0,
+        "p95TotalUs": 3636889.7
+      },
+      "postVsPreFixMeanPercent": -80.05190937711487,
+      "postVsFreshRapidMeanPercent": 24.085210414533545
+    },
+    {
+      "groupKind": "complexityClass",
+      "group": "medium",
+      "operation": "load",
+      "caseCount": 7,
+      "retainedRapidJson": {
+        "meanTotalUs": 88419.08200000001,
+        "medianTotalUs": 78393.9,
+        "p95TotalUs": 105115.6
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 110748.246,
+        "medianTotalUs": 96368.7,
+        "p95TotalUs": 143246.3
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 97542.155,
+        "medianTotalUs": 82120.6,
+        "p95TotalUs": 117872.9
+      },
+      "postFix": {
+        "meanTotalUs": 115439.65299999999,
+        "medianTotalUs": 99200.1,
+        "p95TotalUs": 141897.0
+      },
+      "postVsPreFixMeanPercent": 4.236100497699975,
+      "postVsFreshRapidMeanPercent": 18.34847507726274
+    },
+    {
+      "groupKind": "complexityClass",
+      "group": "medium",
+      "operation": "export",
+      "caseCount": 7,
+      "retainedRapidJson": {
+        "meanTotalUs": 139047.956,
+        "medianTotalUs": 121970.2,
+        "p95TotalUs": 238805.0
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 139824.552,
+        "medianTotalUs": 124840.4,
+        "p95TotalUs": 236777.7
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 146071.857,
+        "medianTotalUs": 127862.0,
+        "p95TotalUs": 272673.7
+      },
+      "postFix": {
+        "meanTotalUs": 148160.977,
+        "medianTotalUs": 130288.2,
+        "p95TotalUs": 274901.8
+      },
+      "postVsPreFixMeanPercent": 5.962060940484914,
+      "postVsFreshRapidMeanPercent": 1.4302002061903167
+    },
+    {
+      "groupKind": "complexityClass",
+      "group": "medium",
+      "operation": "roundtrip",
+      "caseCount": 7,
+      "retainedRapidJson": {
+        "meanTotalUs": 234624.557,
+        "medianTotalUs": 202717.4,
+        "p95TotalUs": 365340.0
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 254056.043,
+        "medianTotalUs": 222239.4,
+        "p95TotalUs": 420933.10000000003
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 247573.78399999999,
+        "medianTotalUs": 212015.2,
+        "p95TotalUs": 402317.7
+      },
+      "postFix": {
+        "meanTotalUs": 262657.109,
+        "medianTotalUs": 229673.8,
+        "p95TotalUs": 416034.4
+      },
+      "postVsPreFixMeanPercent": 3.3854994742242726,
+      "postVsFreshRapidMeanPercent": 6.092456461383654
+    },
+    {
+      "groupKind": "complexityClass",
+      "group": "small",
+      "operation": "load",
+      "caseCount": 6,
+      "retainedRapidJson": {
+        "meanTotalUs": 23447.243,
+        "medianTotalUs": 19245.8,
+        "p95TotalUs": 28454.5
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 41717.673,
+        "medianTotalUs": 33469.8,
+        "p95TotalUs": 53692.0
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 23918.126,
+        "medianTotalUs": 19990.0,
+        "p95TotalUs": 29985.7
+      },
+      "postFix": {
+        "meanTotalUs": 41126.026,
+        "medianTotalUs": 34528.3,
+        "p95TotalUs": 52635.0
+      },
+      "postVsPreFixMeanPercent": -1.418216687205934,
+      "postVsFreshRapidMeanPercent": 71.94501776602397
+    },
+    {
+      "groupKind": "complexityClass",
+      "group": "small",
+      "operation": "export",
+      "caseCount": 6,
+      "retainedRapidJson": {
+        "meanTotalUs": 6372.5109999999995,
+        "medianTotalUs": 6054.7,
+        "p95TotalUs": 8376.2
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 10357.333,
+        "medianTotalUs": 7172.9,
+        "p95TotalUs": 10139.6
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 6992.861,
+        "medianTotalUs": 6454.599999999999,
+        "p95TotalUs": 9344.4
+      },
+      "postFix": {
+        "meanTotalUs": 8497.491,
+        "medianTotalUs": 7453.8,
+        "p95TotalUs": 10401.1
+      },
+      "postVsPreFixMeanPercent": -17.956765510966967,
+      "postVsFreshRapidMeanPercent": 21.516658203273312
+    },
+    {
+      "groupKind": "complexityClass",
+      "group": "small",
+      "operation": "roundtrip",
+      "caseCount": 6,
+      "retainedRapidJson": {
+        "meanTotalUs": 29869.487999999998,
+        "medianTotalUs": 25225.8,
+        "p95TotalUs": 37491.7
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 46178.311,
+        "medianTotalUs": 40766.7,
+        "p95TotalUs": 57555.7
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 30124.942,
+        "medianTotalUs": 26515.1,
+        "p95TotalUs": 38124.7
+      },
+      "postFix": {
+        "meanTotalUs": 51045.299,
+        "medianTotalUs": 41839.1,
+        "p95TotalUs": 60034.9
+      },
+      "postVsPreFixMeanPercent": 10.539553947739659,
+      "postVsFreshRapidMeanPercent": 69.44530216854858
+    },
+    {
+      "groupKind": "tier",
+      "group": "large/compressed-material",
+      "operation": "load",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 33841.05,
+        "medianTotalUs": 31697.1,
+        "p95TotalUs": 40823.9
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 38285.05333333334,
+        "medianTotalUs": 34936.5,
+        "p95TotalUs": 49235.0
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 34457.74333333333,
+        "medianTotalUs": 33025.6,
+        "p95TotalUs": 41880.1
+      },
+      "postFix": {
+        "meanTotalUs": 39184.693333333336,
+        "medianTotalUs": 35775.2,
+        "p95TotalUs": 44862.8
+      },
+      "postVsPreFixMeanPercent": 2.3498465371516595,
+      "postVsFreshRapidMeanPercent": 13.718106709058054
+    },
+    {
+      "groupKind": "tier",
+      "group": "large/compressed-material",
+      "operation": "export",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 78941.00666666667,
+        "medianTotalUs": 71615.0,
+        "p95TotalUs": 129289.3
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 78842.02333333335,
+        "medianTotalUs": 72047.6,
+        "p95TotalUs": 133475.0
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 83466.06333333332,
+        "medianTotalUs": 73380.3,
+        "p95TotalUs": 146758.0
+      },
+      "postFix": {
+        "meanTotalUs": 82703.27333333335,
+        "medianTotalUs": 73906.5,
+        "p95TotalUs": 145007.3
+      },
+      "postVsPreFixMeanPercent": 4.897451684712809,
+      "postVsFreshRapidMeanPercent": -0.9138923887588554
+    },
+    {
+      "groupKind": "tier",
+      "group": "large/compressed-material",
+      "operation": "roundtrip",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 108044.13333333333,
+        "medianTotalUs": 103262.2,
+        "p95TotalUs": 113405.2
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 113482.4,
+        "medianTotalUs": 108063.5,
+        "p95TotalUs": 131954.8
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 115020.65999999999,
+        "medianTotalUs": 108153.8,
+        "p95TotalUs": 166076.2
+      },
+      "postFix": {
+        "meanTotalUs": 117325.51333333334,
+        "medianTotalUs": 110609.7,
+        "p95TotalUs": 134907.4
+      },
+      "postVsPreFixMeanPercent": 3.386528072488194,
+      "postVsFreshRapidMeanPercent": 2.0038602919974093
+    },
+    {
+      "groupKind": "tier",
+      "group": "large/material-texture",
+      "operation": "load",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 79087.12666666666,
+        "medianTotalUs": 75329.5,
+        "p95TotalUs": 92389.4
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 86174.35666666667,
+        "medianTotalUs": 78911.7,
+        "p95TotalUs": 124865.5
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 81620.48333333334,
+        "medianTotalUs": 76727.8,
+        "p95TotalUs": 95709.7
+      },
+      "postFix": {
+        "meanTotalUs": 85022.16666666667,
+        "medianTotalUs": 79527.6,
+        "p95TotalUs": 99886.4
+      },
+      "postVsPreFixMeanPercent": -1.3370450846030904,
+      "postVsFreshRapidMeanPercent": 4.1676833981012535
+    },
+    {
+      "groupKind": "tier",
+      "group": "large/material-texture",
+      "operation": "export",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 269554.20666666667,
+        "medianTotalUs": 251953.1,
+        "p95TotalUs": 328953.6
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 261613.76333333334,
+        "medianTotalUs": 256985.7,
+        "p95TotalUs": 287526.1
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 282594.86333333334,
+        "medianTotalUs": 257942.8,
+        "p95TotalUs": 445348.1
+      },
+      "postFix": {
+        "meanTotalUs": 276742.07666666666,
+        "medianTotalUs": 262623.0,
+        "p95TotalUs": 371018.6
+      },
+      "postVsPreFixMeanPercent": 5.782690153827148,
+      "postVsFreshRapidMeanPercent": -2.071087420921397
+    },
+    {
+      "groupKind": "tier",
+      "group": "large/material-texture",
+      "operation": "roundtrip",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 339134.43,
+        "medianTotalUs": 331814.6,
+        "p95TotalUs": 398997.9
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 352388.01666666666,
+        "medianTotalUs": 338085.7,
+        "p95TotalUs": 458764.4
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 352726.11000000004,
+        "medianTotalUs": 346042.8,
+        "p95TotalUs": 414230.1
+      },
+      "postFix": {
+        "meanTotalUs": 351207.58666666667,
+        "medianTotalUs": 342765.2,
+        "p95TotalUs": 406387.1
+      },
+      "postVsPreFixMeanPercent": -0.334980176444704,
+      "postVsFreshRapidMeanPercent": -0.4305106115715035
+    },
+    {
+      "groupKind": "tier",
+      "group": "large/scene-structure",
+      "operation": "load",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 1919167.9966666666,
+        "medianTotalUs": 1883577.3,
+        "p95TotalUs": 2091949.6
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 15769761.153333334,
+        "medianTotalUs": 15535308.3,
+        "p95TotalUs": 16866381.3
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 1990664.8366666667,
+        "medianTotalUs": 1950907.3,
+        "p95TotalUs": 2150514.7
+      },
+      "postFix": {
+        "meanTotalUs": 2019586.8599999999,
+        "medianTotalUs": 1993403.6,
+        "p95TotalUs": 2132922.9
+      },
+      "postVsPreFixMeanPercent": -87.19329455682269,
+      "postVsFreshRapidMeanPercent": 1.4528826149238976
+    },
+    {
+      "groupKind": "tier",
+      "group": "large/scene-structure",
+      "operation": "export",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 315108.7766666667,
+        "medianTotalUs": 303394.0,
+        "p95TotalUs": 337618.2
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 883543.1533333334,
+        "medianTotalUs": 877492.1,
+        "p95TotalUs": 932843.0
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 321448.4533333333,
+        "medianTotalUs": 310472.2,
+        "p95TotalUs": 354137.6
+      },
+      "postFix": {
+        "meanTotalUs": 906142.1666666666,
+        "medianTotalUs": 894672.1,
+        "p95TotalUs": 967013.0
+      },
+      "postVsPreFixMeanPercent": 2.5577713151954318,
+      "postVsFreshRapidMeanPercent": 181.89345982854113
+    },
+    {
+      "groupKind": "tier",
+      "group": "large/scene-structure",
+      "operation": "roundtrip",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 2198224.4033333333,
+        "medianTotalUs": 2150800.1,
+        "p95TotalUs": 2404986.0
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 16600825.093333334,
+        "medianTotalUs": 16419030.7,
+        "p95TotalUs": 16990397.1
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 2275916.1333333333,
+        "medianTotalUs": 2223146.4,
+        "p95TotalUs": 2359942.5
+      },
+      "postFix": {
+        "meanTotalUs": 2935946.7866666666,
+        "medianTotalUs": 2925352.1,
+        "p95TotalUs": 3095595.2
+      },
+      "postVsPreFixMeanPercent": -82.3144526241307,
+      "postVsFreshRapidMeanPercent": 29.000657962147518
+    },
+    {
+      "groupKind": "tier",
+      "group": "medium/geometry-animation",
+      "operation": "load",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 5705.648,
+        "medianTotalUs": 4938.5,
+        "p95TotalUs": 6604.6
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 8481.982,
+        "medianTotalUs": 7185.5,
+        "p95TotalUs": 11777.3
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 7468.776,
+        "medianTotalUs": 5170.3,
+        "p95TotalUs": 7765.0
+      },
+      "postFix": {
+        "meanTotalUs": 9358.416,
+        "medianTotalUs": 7143.8,
+        "p95TotalUs": 10402.1
+      },
+      "postVsPreFixMeanPercent": 10.332891534077758,
+      "postVsFreshRapidMeanPercent": 25.300531171372654
+    },
+    {
+      "groupKind": "tier",
+      "group": "medium/geometry-animation",
+      "operation": "export",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 5005.721,
+        "medianTotalUs": 4196.5,
+        "p95TotalUs": 5790.2
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 4899.8859999999995,
+        "medianTotalUs": 4660.4,
+        "p95TotalUs": 6164.1
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 5503.2390000000005,
+        "medianTotalUs": 4487.3,
+        "p95TotalUs": 7067.6
+      },
+      "postFix": {
+        "meanTotalUs": 5359.592,
+        "medianTotalUs": 4970.8,
+        "p95TotalUs": 7388.1
+      },
+      "postVsPreFixMeanPercent": 9.381973376523458,
+      "postVsFreshRapidMeanPercent": -2.6102264502777515
+    },
+    {
+      "groupKind": "tier",
+      "group": "medium/geometry-animation",
+      "operation": "roundtrip",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 9735.315,
+        "medianTotalUs": 9115.3,
+        "p95TotalUs": 12773.5
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 13100.864,
+        "medianTotalUs": 11822.1,
+        "p95TotalUs": 15901.8
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 11941.883,
+        "medianTotalUs": 9698.9,
+        "p95TotalUs": 13907.7
+      },
+      "postFix": {
+        "meanTotalUs": 12902.48,
+        "medianTotalUs": 11917.1,
+        "p95TotalUs": 14407.7
+      },
+      "postVsPreFixMeanPercent": -1.514281806146526,
+      "postVsFreshRapidMeanPercent": 8.043932435110944
+    },
+    {
+      "groupKind": "tier",
+      "group": "medium/material-grid",
+      "operation": "load",
+      "caseCount": 2,
+      "retainedRapidJson": {
+        "meanTotalUs": 15832.806,
+        "medianTotalUs": 13799.7,
+        "p95TotalUs": 20243.2
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 24854.301,
+        "medianTotalUs": 19846.2,
+        "p95TotalUs": 31857.3
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 18272.264000000003,
+        "medianTotalUs": 14576.2,
+        "p95TotalUs": 21684.0
+      },
+      "postFix": {
+        "meanTotalUs": 24273.917,
+        "medianTotalUs": 19717.300000000003,
+        "p95TotalUs": 32096.6
+      },
+      "postVsPreFixMeanPercent": -2.335145132425966,
+      "postVsFreshRapidMeanPercent": 32.84569990888922
+    },
+    {
+      "groupKind": "tier",
+      "group": "medium/material-grid",
+      "operation": "export",
+      "caseCount": 2,
+      "retainedRapidJson": {
+        "meanTotalUs": 17080.161,
+        "medianTotalUs": 14897.2,
+        "p95TotalUs": 18519.0
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 19656.305,
+        "medianTotalUs": 16818.699999999997,
+        "p95TotalUs": 25633.5
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 17048.429,
+        "medianTotalUs": 15399.4,
+        "p95TotalUs": 19753.0
+      },
+      "postFix": {
+        "meanTotalUs": 19282.552,
+        "medianTotalUs": 17711.2,
+        "p95TotalUs": 24420.8
+      },
+      "postVsPreFixMeanPercent": -1.9014407845218142,
+      "postVsFreshRapidMeanPercent": 13.104568168715133
+    },
+    {
+      "groupKind": "tier",
+      "group": "medium/material-grid",
+      "operation": "roundtrip",
+      "caseCount": 2,
+      "retainedRapidJson": {
+        "meanTotalUs": 33485.694,
+        "medianTotalUs": 28528.100000000002,
+        "p95TotalUs": 40303.2
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 41024.6,
+        "medianTotalUs": 36932.8,
+        "p95TotalUs": 49931.0
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 33080.761,
+        "medianTotalUs": 29725.1,
+        "p95TotalUs": 40782.8
+      },
+      "postFix": {
+        "meanTotalUs": 42289.577,
+        "medianTotalUs": 37658.6,
+        "p95TotalUs": 51592.0
+      },
+      "postVsPreFixMeanPercent": 3.0834596802893848,
+      "postVsFreshRapidMeanPercent": 27.837376534354814
+    },
+    {
+      "groupKind": "tier",
+      "group": "medium/material-scene",
+      "operation": "load",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 4061.324,
+        "medianTotalUs": 3852.3,
+        "p95TotalUs": 5329.7
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 7605.99,
+        "medianTotalUs": 6292.8,
+        "p95TotalUs": 9756.0
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 4299.538,
+        "medianTotalUs": 4066.4,
+        "p95TotalUs": 5773.0
+      },
+      "postFix": {
+        "meanTotalUs": 8226.753,
+        "medianTotalUs": 6478.1,
+        "p95TotalUs": 9178.6
+      },
+      "postVsPreFixMeanPercent": 8.161501658561225,
+      "postVsFreshRapidMeanPercent": 91.34039517734234
+    },
+    {
+      "groupKind": "tier",
+      "group": "medium/material-scene",
+      "operation": "export",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 5420.063,
+        "medianTotalUs": 3650.6,
+        "p95TotalUs": 5721.8
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 4737.135,
+        "medianTotalUs": 3894.6,
+        "p95TotalUs": 6212.3
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 4686.380999999999,
+        "medianTotalUs": 3838.2,
+        "p95TotalUs": 5546.4
+      },
+      "postFix": {
+        "meanTotalUs": 4370.853,
+        "medianTotalUs": 4092.8,
+        "p95TotalUs": 6159.5
+      },
+      "postVsPreFixMeanPercent": -7.732141895892773,
+      "postVsFreshRapidMeanPercent": -6.732871271029807
+    },
+    {
+      "groupKind": "tier",
+      "group": "medium/material-scene",
+      "operation": "roundtrip",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 9335.879,
+        "medianTotalUs": 7575.0,
+        "p95TotalUs": 12013.6
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 13017.681,
+        "medianTotalUs": 10110.6,
+        "p95TotalUs": 17335.1
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 9960.025,
+        "medianTotalUs": 7836.8,
+        "p95TotalUs": 11505.9
+      },
+      "postFix": {
+        "meanTotalUs": 12251.613000000001,
+        "medianTotalUs": 10448.0,
+        "p95TotalUs": 14731.6
+      },
+      "postVsPreFixMeanPercent": -5.884826951897187,
+      "postVsFreshRapidMeanPercent": 23.007853895949072
+    },
+    {
+      "groupKind": "tier",
+      "group": "medium/material-texture",
+      "operation": "load",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 20288.733,
+        "medianTotalUs": 19263.5,
+        "p95TotalUs": 24462.7
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 24370.876,
+        "medianTotalUs": 21904.0,
+        "p95TotalUs": 32808.9
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 21982.959,
+        "medianTotalUs": 20108.3,
+        "p95TotalUs": 27408.1
+      },
+      "postFix": {
+        "meanTotalUs": 24521.139,
+        "medianTotalUs": 22700.4,
+        "p95TotalUs": 30772.8
+      },
+      "postVsPreFixMeanPercent": 0.6165679067096276,
+      "postVsFreshRapidMeanPercent": 11.546125341906885
+    },
+    {
+      "groupKind": "tier",
+      "group": "medium/material-texture",
+      "operation": "export",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 53289.342000000004,
+        "medianTotalUs": 46405.2,
+        "p95TotalUs": 99116.0
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 52226.167,
+        "medianTotalUs": 46888.6,
+        "p95TotalUs": 95925.3
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 56721.100999999995,
+        "medianTotalUs": 49158.2,
+        "p95TotalUs": 120105.6
+      },
+      "postFix": {
+        "meanTotalUs": 57108.75,
+        "medianTotalUs": 48770.2,
+        "p95TotalUs": 115009.2
+      },
+      "postVsPreFixMeanPercent": 9.34892081971093,
+      "postVsFreshRapidMeanPercent": 0.6834299637448944
+    },
+    {
+      "groupKind": "tier",
+      "group": "medium/material-texture",
+      "operation": "roundtrip",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 76994.837,
+        "medianTotalUs": 66905.7,
+        "p95TotalUs": 135925.6
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 78750.274,
+        "medianTotalUs": 69403.1,
+        "p95TotalUs": 135900.1
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 82698.933,
+        "medianTotalUs": 70021.0,
+        "p95TotalUs": 150198.8
+      },
+      "postFix": {
+        "meanTotalUs": 81927.86,
+        "medianTotalUs": 71388.8,
+        "p95TotalUs": 150060.6
+      },
+      "postVsPreFixMeanPercent": 4.035015801976759,
+      "postVsFreshRapidMeanPercent": -0.9323856693531994
+    },
+    {
+      "groupKind": "tier",
+      "group": "medium/texture-heavy",
+      "operation": "load",
+      "caseCount": 2,
+      "retainedRapidJson": {
+        "meanTotalUs": 42530.571,
+        "medianTotalUs": 36539.899999999994,
+        "p95TotalUs": 48475.4
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 45435.097,
+        "medianTotalUs": 41140.2,
+        "p95TotalUs": 57046.8
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 45518.618,
+        "medianTotalUs": 38199.4,
+        "p95TotalUs": 55242.8
+      },
+      "postFix": {
+        "meanTotalUs": 49059.428,
+        "medianTotalUs": 43160.5,
+        "p95TotalUs": 59446.899999999994
+      },
+      "postVsPreFixMeanPercent": 7.976941261949981,
+      "postVsFreshRapidMeanPercent": 7.778817010657041
+    },
+    {
+      "groupKind": "tier",
+      "group": "medium/texture-heavy",
+      "operation": "export",
+      "caseCount": 2,
+      "retainedRapidJson": {
+        "meanTotalUs": 58252.669,
+        "medianTotalUs": 52820.700000000004,
+        "p95TotalUs": 109658.0
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 58305.059,
+        "medianTotalUs": 52578.100000000006,
+        "p95TotalUs": 102842.5
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 62112.706999999995,
+        "medianTotalUs": 54978.9,
+        "p95TotalUs": 120201.1
+      },
+      "postFix": {
+        "meanTotalUs": 62039.229999999996,
+        "medianTotalUs": 54743.2,
+        "p95TotalUs": 121924.2
+      },
+      "postVsPreFixMeanPercent": 6.404540298981594,
+      "postVsFreshRapidMeanPercent": -0.11829624492134751
+    },
+    {
+      "groupKind": "tier",
+      "group": "medium/texture-heavy",
+      "operation": "roundtrip",
+      "caseCount": 2,
+      "retainedRapidJson": {
+        "meanTotalUs": 105072.83200000001,
+        "medianTotalUs": 90593.29999999999,
+        "p95TotalUs": 164324.1
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 108162.62400000001,
+        "medianTotalUs": 93970.79999999999,
+        "p95TotalUs": 201865.1
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 109892.182,
+        "medianTotalUs": 94733.40000000001,
+        "p95TotalUs": 185922.5
+      },
+      "postFix": {
+        "meanTotalUs": 113285.579,
+        "medianTotalUs": 98261.29999999999,
+        "p95TotalUs": 185242.5
+      },
+      "postVsPreFixMeanPercent": 4.736344968849856,
+      "postVsFreshRapidMeanPercent": 3.087933043316946
+    },
+    {
+      "groupKind": "tier",
+      "group": "small/core",
+      "operation": "load",
+      "caseCount": 2,
+      "retainedRapidJson": {
+        "meanTotalUs": 7701.973,
+        "medianTotalUs": 5730.799999999999,
+        "p95TotalUs": 8602.6
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 13673.55,
+        "medianTotalUs": 10217.1,
+        "p95TotalUs": 16483.1
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 8051.473999999999,
+        "medianTotalUs": 6012.1,
+        "p95TotalUs": 9025.0
+      },
+      "postFix": {
+        "meanTotalUs": 11483.069,
+        "medianTotalUs": 10540.3,
+        "p95TotalUs": 16430.5
+      },
+      "postVsPreFixMeanPercent": -16.019841226309186,
+      "postVsFreshRapidMeanPercent": 42.62070522739067
+    },
+    {
+      "groupKind": "tier",
+      "group": "small/core",
+      "operation": "export",
+      "caseCount": 2,
+      "retainedRapidJson": {
+        "meanTotalUs": 1419.435,
+        "medianTotalUs": 1374.2,
+        "p95TotalUs": 1831.5
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 2099.2129999999997,
+        "medianTotalUs": 1500.8000000000002,
+        "p95TotalUs": 1924.0
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 1623.219,
+        "medianTotalUs": 1464.9,
+        "p95TotalUs": 1965.8
+      },
+      "postFix": {
+        "meanTotalUs": 1659.545,
+        "medianTotalUs": 1589.1,
+        "p95TotalUs": 2071.2
+      },
+      "postVsPreFixMeanPercent": -20.94442059952943,
+      "postVsFreshRapidMeanPercent": 2.2378988910307247
+    },
+    {
+      "groupKind": "tier",
+      "group": "small/core",
+      "operation": "roundtrip",
+      "caseCount": 2,
+      "retainedRapidJson": {
+        "meanTotalUs": 8617.963,
+        "medianTotalUs": 7028.2,
+        "p95TotalUs": 10414.8
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 13369.933,
+        "medianTotalUs": 11753.6,
+        "p95TotalUs": 17573.8
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 7911.067,
+        "medianTotalUs": 7396.5,
+        "p95TotalUs": 10565.6
+      },
+      "postFix": {
+        "meanTotalUs": 13863.535,
+        "medianTotalUs": 12047.599999999999,
+        "p95TotalUs": 17290.0
+      },
+      "postVsPreFixMeanPercent": 3.691880879283381,
+      "postVsFreshRapidMeanPercent": 75.24229032569184
+    },
+    {
+      "groupKind": "tier",
+      "group": "small/material-grid",
+      "operation": "load",
+      "caseCount": 2,
+      "retainedRapidJson": {
+        "meanTotalUs": 8871.268,
+        "medianTotalUs": 7745.900000000001,
+        "p95TotalUs": 11248.4
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 15697.738,
+        "medianTotalUs": 13028.9,
+        "p95TotalUs": 20921.8
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 9351.238000000001,
+        "medianTotalUs": 8046.1,
+        "p95TotalUs": 11613.5
+      },
+      "postFix": {
+        "meanTotalUs": 15555.905,
+        "medianTotalUs": 13326.5,
+        "p95TotalUs": 20239.5
+      },
+      "postVsPreFixMeanPercent": -0.903525081129515,
+      "postVsFreshRapidMeanPercent": 66.35128952979272
+    },
+    {
+      "groupKind": "tier",
+      "group": "small/material-grid",
+      "operation": "export",
+      "caseCount": 2,
+      "retainedRapidJson": {
+        "meanTotalUs": 2945.176,
+        "medianTotalUs": 2761.7999999999997,
+        "p95TotalUs": 3930.5
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 3736.016,
+        "medianTotalUs": 3531.1,
+        "p95TotalUs": 5000.9
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 3148.668,
+        "medianTotalUs": 2919.3999999999996,
+        "p95TotalUs": 4345.8
+      },
+      "postFix": {
+        "meanTotalUs": 4507.296,
+        "medianTotalUs": 3654.5,
+        "p95TotalUs": 5361.700000000001
+      },
+      "postVsPreFixMeanPercent": 20.644451201493787,
+      "postVsFreshRapidMeanPercent": 43.14929360605819
+    },
+    {
+      "groupKind": "tier",
+      "group": "small/material-grid",
+      "operation": "roundtrip",
+      "caseCount": 2,
+      "retainedRapidJson": {
+        "meanTotalUs": 12563.903999999999,
+        "medianTotalUs": 10560.0,
+        "p95TotalUs": 16011.5
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 18002.635000000002,
+        "medianTotalUs": 16580.9,
+        "p95TotalUs": 22001.5
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 12436.194,
+        "medianTotalUs": 11111.5,
+        "p95TotalUs": 15577.5
+      },
+      "postFix": {
+        "meanTotalUs": 21381.736,
+        "medianTotalUs": 17141.1,
+        "p95TotalUs": 24344.9
+      },
+      "postVsPreFixMeanPercent": 18.770035608676167,
+      "postVsFreshRapidMeanPercent": 71.93150894879898
+    },
+    {
+      "groupKind": "tier",
+      "group": "small/metadata",
+      "operation": "load",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 3749.026,
+        "medianTotalUs": 2900.0,
+        "p95TotalUs": 4364.1
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 6792.807,
+        "medianTotalUs": 5159.5,
+        "p95TotalUs": 8213.6
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 3292.159,
+        "medianTotalUs": 2994.4,
+        "p95TotalUs": 4479.5
+      },
+      "postFix": {
+        "meanTotalUs": 6434.751,
+        "medianTotalUs": 5360.1,
+        "p95TotalUs": 7842.3
+      },
+      "postVsPreFixMeanPercent": -5.271105155791996,
+      "postVsFreshRapidMeanPercent": 95.45687191900512
+    },
+    {
+      "groupKind": "tier",
+      "group": "small/metadata",
+      "operation": "export",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 1345.1129999999998,
+        "medianTotalUs": 1281.3,
+        "p95TotalUs": 1798.9
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 2677.245,
+        "medianTotalUs": 1432.5,
+        "p95TotalUs": 2225.4
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 1508.539,
+        "medianTotalUs": 1405.1,
+        "p95TotalUs": 2091.9
+      },
+      "postFix": {
+        "meanTotalUs": 1558.094,
+        "medianTotalUs": 1466.6,
+        "p95TotalUs": 1990.7
+      },
+      "postVsPreFixMeanPercent": -41.802337851037166,
+      "postVsFreshRapidMeanPercent": 3.284966447668908
+    },
+    {
+      "groupKind": "tier",
+      "group": "small/metadata",
+      "operation": "roundtrip",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 4971.568,
+        "medianTotalUs": 4200.0,
+        "p95TotalUs": 5774.0
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 7628.064,
+        "medianTotalUs": 6611.2,
+        "p95TotalUs": 10170.4
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 5202.233,
+        "medianTotalUs": 4322.6,
+        "p95TotalUs": 5999.8
+      },
+      "postFix": {
+        "meanTotalUs": 8834.954,
+        "medianTotalUs": 6760.1,
+        "p95TotalUs": 10800.3
+      },
+      "postVsPreFixMeanPercent": 15.821707840941022,
+      "postVsFreshRapidMeanPercent": 69.83003260330707
+    },
+    {
+      "groupKind": "tier",
+      "group": "small/scene-instancing",
+      "operation": "load",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 3124.9759999999997,
+        "medianTotalUs": 2869.1,
+        "p95TotalUs": 4239.4
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 5553.578,
+        "medianTotalUs": 5064.3,
+        "p95TotalUs": 8073.5
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 3223.255,
+        "medianTotalUs": 2937.4,
+        "p95TotalUs": 4867.7
+      },
+      "postFix": {
+        "meanTotalUs": 7652.3009999999995,
+        "medianTotalUs": 5301.4,
+        "p95TotalUs": 8122.7
+      },
+      "postVsPreFixMeanPercent": 37.790465894239695,
+      "postVsFreshRapidMeanPercent": 137.40910973534514
+    },
+    {
+      "groupKind": "tier",
+      "group": "small/scene-instancing",
+      "operation": "export",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 662.7869999999999,
+        "medianTotalUs": 637.4,
+        "p95TotalUs": 815.3
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 1844.859,
+        "medianTotalUs": 708.5,
+        "p95TotalUs": 989.3
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 712.435,
+        "medianTotalUs": 665.2,
+        "p95TotalUs": 940.9
+      },
+      "postFix": {
+        "meanTotalUs": 772.556,
+        "medianTotalUs": 743.6,
+        "p95TotalUs": 977.5
+      },
+      "postVsPreFixMeanPercent": -58.12384577899991,
+      "postVsFreshRapidMeanPercent": 8.438804943608904
+    },
+    {
+      "groupKind": "tier",
+      "group": "small/scene-instancing",
+      "operation": "roundtrip",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 3716.053,
+        "medianTotalUs": 3437.6,
+        "p95TotalUs": 5291.4
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 7177.679,
+        "medianTotalUs": 5821.0,
+        "p95TotalUs": 7810.0
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 4575.448,
+        "medianTotalUs": 3684.5,
+        "p95TotalUs": 5981.8
+      },
+      "postFix": {
+        "meanTotalUs": 6965.0740000000005,
+        "medianTotalUs": 5890.3,
+        "p95TotalUs": 7599.7
+      },
+      "postVsPreFixMeanPercent": -2.962029926387061,
+      "postVsFreshRapidMeanPercent": 52.22714803009454
+    },
+    {
+      "groupKind": "extensionCoverage",
+      "group": "core-only",
+      "operation": "load",
+      "caseCount": 5,
+      "retainedRapidJson": {
+        "meanTotalUs": 55938.192,
+        "medianTotalUs": 47209.2,
+        "p95TotalUs": 63682.600000000006
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 67590.629,
+        "medianTotalUs": 58542.799999999996,
+        "p95TotalUs": 85307.2
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 61038.867999999995,
+        "medianTotalUs": 49381.8,
+        "p95TotalUs": 72032.8
+      },
+      "postFix": {
+        "meanTotalUs": 69900.913,
+        "medianTotalUs": 60844.6,
+        "p95TotalUs": 86279.5
+      },
+      "postVsPreFixMeanPercent": 3.418053706823766,
+      "postVsFreshRapidMeanPercent": 14.518691598278014
+    },
+    {
+      "groupKind": "extensionCoverage",
+      "group": "core-only",
+      "operation": "export",
+      "caseCount": 5,
+      "retainedRapidJson": {
+        "meanTotalUs": 64677.825,
+        "medianTotalUs": 58391.4,
+        "p95TotalUs": 117279.7
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 65304.157999999996,
+        "medianTotalUs": 58739.3,
+        "p95TotalUs": 110930.6
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 69239.165,
+        "medianTotalUs": 60931.1,
+        "p95TotalUs": 129234.5
+      },
+      "postFix": {
+        "meanTotalUs": 69058.367,
+        "medianTotalUs": 61303.1,
+        "p95TotalUs": 131383.5
+      },
+      "postVsPreFixMeanPercent": 5.748805458911212,
+      "postVsFreshRapidMeanPercent": -0.26112099994272786
+    },
+    {
+      "groupKind": "extensionCoverage",
+      "group": "core-only",
+      "operation": "roundtrip",
+      "caseCount": 5,
+      "retainedRapidJson": {
+        "meanTotalUs": 123426.11,
+        "medianTotalUs": 106736.79999999999,
+        "p95TotalUs": 187512.40000000002
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 134633.421,
+        "medianTotalUs": 117546.5,
+        "p95TotalUs": 235340.7
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 129745.132,
+        "medianTotalUs": 111828.8,
+        "p95TotalUs": 210395.80000000002
+      },
+      "postFix": {
+        "meanTotalUs": 140051.594,
+        "medianTotalUs": 122226.0,
+        "p95TotalUs": 216940.2
+      },
+      "postVsPreFixMeanPercent": 4.024389308208999,
+      "postVsFreshRapidMeanPercent": 7.943621345269443
+    },
+    {
+      "groupKind": "extensionCoverage",
+      "group": "mixed-typed-raw",
+      "operation": "load",
+      "caseCount": 2,
+      "retainedRapidJson": {
+        "meanTotalUs": 37902.374,
+        "medianTotalUs": 35549.4,
+        "p95TotalUs": 46153.6
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 45891.043333333335,
+        "medianTotalUs": 41229.3,
+        "p95TotalUs": 58991.0
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 38757.28133333333,
+        "medianTotalUs": 37092.0,
+        "p95TotalUs": 47653.1
+      },
+      "postFix": {
+        "meanTotalUs": 47411.44633333334,
+        "medianTotalUs": 42253.299999999996,
+        "p95TotalUs": 54041.4
+      },
+      "postVsPreFixMeanPercent": 3.3130713306220443,
+      "postVsFreshRapidMeanPercent": 22.329133268067913
+    },
+    {
+      "groupKind": "extensionCoverage",
+      "group": "mixed-typed-raw",
+      "operation": "export",
+      "caseCount": 2,
+      "retainedRapidJson": {
+        "meanTotalUs": 84361.06966666666,
+        "medianTotalUs": 75265.6,
+        "p95TotalUs": 135011.1
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 83579.15833333334,
+        "medianTotalUs": 75942.20000000001,
+        "p95TotalUs": 139687.3
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 88152.44433333332,
+        "medianTotalUs": 77218.5,
+        "p95TotalUs": 152304.4
+      },
+      "postFix": {
+        "meanTotalUs": 87074.12633333335,
+        "medianTotalUs": 77999.3,
+        "p95TotalUs": 151166.8
+      },
+      "postVsPreFixMeanPercent": 4.181626220811238,
+      "postVsFreshRapidMeanPercent": -1.223242314101349
+    },
+    {
+      "groupKind": "extensionCoverage",
+      "group": "mixed-typed-raw",
+      "operation": "roundtrip",
+      "caseCount": 2,
+      "retainedRapidJson": {
+        "meanTotalUs": 117380.01233333333,
+        "medianTotalUs": 110837.2,
+        "p95TotalUs": 125418.8
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 126500.08099999999,
+        "medianTotalUs": 118174.1,
+        "p95TotalUs": 149289.9
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 124980.68499999998,
+        "medianTotalUs": 115990.6,
+        "p95TotalUs": 177582.1
+      },
+      "postFix": {
+        "meanTotalUs": 129577.12633333333,
+        "medianTotalUs": 121057.7,
+        "p95TotalUs": 149639.0
+      },
+      "postVsPreFixMeanPercent": 2.43244534628665,
+      "postVsFreshRapidMeanPercent": 3.6777213481694
+    },
+    {
+      "groupKind": "extensionCoverage",
+      "group": "raw-only",
+      "operation": "load",
+      "caseCount": 4,
+      "retainedRapidJson": {
+        "meanTotalUs": 1947294.5086666667,
+        "medianTotalUs": 1909062.1,
+        "p95TotalUs": 2125346.1
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 15807699.778333334,
+        "medianTotalUs": 15568090.200000001,
+        "p95TotalUs": 16916491.7
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 2019818.7226666666,
+        "medianTotalUs": 1977501.8,
+        "p95TotalUs": 2187654.5
+      },
+      "postFix": {
+        "meanTotalUs": 2056892.042,
+        "medianTotalUs": 2027336.9000000001,
+        "p95TotalUs": 2180547.6999999997
+      },
+      "postVsPreFixMeanPercent": -86.98803702725138,
+      "postVsFreshRapidMeanPercent": 1.8354775563416514
+    },
+    {
+      "groupKind": "extensionCoverage",
+      "group": "raw-only",
+      "operation": "export",
+      "caseCount": 4,
+      "retainedRapidJson": {
+        "meanTotalUs": 370479.54366666666,
+        "medianTotalUs": 351762.1,
+        "p95TotalUs": 439398.10000000003
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 939373.0703333335,
+        "medianTotalUs": 926700.1,
+        "p95TotalUs": 1032153.1
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 380420.1203333333,
+        "medianTotalUs": 361756.8,
+        "p95TotalUs": 477255.6
+      },
+      "postFix": {
+        "meanTotalUs": 965813.2066666667,
+        "medianTotalUs": 945831.2999999999,
+        "p95TotalUs": 1085421.8
+      },
+      "postVsPreFixMeanPercent": 2.8146576869561546,
+      "postVsFreshRapidMeanPercent": 153.8806848124641
+    },
+    {
+      "groupKind": "extensionCoverage",
+      "group": "raw-only",
+      "operation": "roundtrip",
+      "caseCount": 4,
+      "retainedRapidJson": {
+        "meanTotalUs": 2284528.2133333334,
+        "medianTotalUs": 2225955.2,
+        "p95TotalUs": 2552646.3
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 16694792.472333334,
+        "medianTotalUs": 16501690.2,
+        "p95TotalUs": 17145652.400000002
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 2369001.8613333334,
+        "medianTotalUs": 2301790.1999999997,
+        "p95TotalUs": 2522430.5
+      },
+      "postFix": {
+        "meanTotalUs": 3036461.7966666664,
+        "medianTotalUs": 3010371.4,
+        "p95TotalUs": 3265810.8000000003
+      },
+      "postVsPreFixMeanPercent": -81.81192248002662,
+      "postVsFreshRapidMeanPercent": 28.174732414843685
+    },
+    {
+      "groupKind": "extensionCoverage",
+      "group": "typed-only",
+      "operation": "load",
+      "caseCount": 5,
+      "retainedRapidJson": {
+        "meanTotalUs": 102827.42366666667,
+        "medianTotalUs": 96422.9,
+        "p95TotalUs": 123550.7
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 125505.03166666668,
+        "medianTotalUs": 111132.7,
+        "p95TotalUs": 176630.2
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 108588.47233333334,
+        "medianTotalUs": 98795.7,
+        "p95TotalUs": 128622.7
+      },
+      "postFix": {
+        "meanTotalUs": 126154.99766666668,
+        "medianTotalUs": 112000.0,
+        "p95TotalUs": 151335.5
+      },
+      "postVsPreFixMeanPercent": 0.5178804318589142,
+      "postVsFreshRapidMeanPercent": 16.177154863556314
+    },
+    {
+      "groupKind": "extensionCoverage",
+      "group": "typed-only",
+      "operation": "export",
+      "caseCount": 5,
+      "retainedRapidJson": {
+        "meanTotalUs": 289506.01866666664,
+        "medianTotalUs": 269567.9,
+        "p95TotalUs": 351353.39999999997
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 285924.43833333335,
+        "medianTotalUs": 277157.10000000003,
+        "p95TotalUs": 317990.39999999997
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 302762.36833333335,
+        "medianTotalUs": 276205.5,
+        "p95TotalUs": 469467.3
+      },
+      "postFix": {
+        "meanTotalUs": 300300.28466666664,
+        "medianTotalUs": 283809.9,
+        "p95TotalUs": 400369.69999999995
+      },
+      "postVsPreFixMeanPercent": 5.027848062631777,
+      "postVsFreshRapidMeanPercent": -0.8132066347017121
+    },
+    {
+      "groupKind": "extensionCoverage",
+      "group": "typed-only",
+      "operation": "roundtrip",
+      "caseCount": 5,
+      "retainedRapidJson": {
+        "meanTotalUs": 384562.676,
+        "medianTotalUs": 370290.89999999997,
+        "p95TotalUs": 454643.30000000005
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 411003.8896666667,
+        "medianTotalUs": 390775.2,
+        "p95TotalUs": 529322.1
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 397633.95100000006,
+        "medianTotalUs": 386263.7,
+        "p95TotalUs": 470282.8
+      },
+      "postFix": {
+        "meanTotalUs": 412091.77766666666,
+        "medianTotalUs": 396584.8,
+        "p95TotalUs": 480569.0
+      },
+      "postVsPreFixMeanPercent": 0.26469043903265216,
+      "postVsFreshRapidMeanPercent": 3.6359638381750257
+    },
+    {
+      "groupKind": "extension",
+      "group": "EXT_mesh_gpu_instancing",
+      "operation": "load",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 3124.9759999999997,
+        "medianTotalUs": 2869.1,
+        "p95TotalUs": 4239.4
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 5553.578,
+        "medianTotalUs": 5064.3,
+        "p95TotalUs": 8073.5
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 3223.255,
+        "medianTotalUs": 2937.4,
+        "p95TotalUs": 4867.7
+      },
+      "postFix": {
+        "meanTotalUs": 7652.3009999999995,
+        "medianTotalUs": 5301.4,
+        "p95TotalUs": 8122.7
+      },
+      "postVsPreFixMeanPercent": 37.790465894239695,
+      "postVsFreshRapidMeanPercent": 137.40910973534514
+    },
+    {
+      "groupKind": "extension",
+      "group": "EXT_mesh_gpu_instancing",
+      "operation": "export",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 662.7869999999999,
+        "medianTotalUs": 637.4,
+        "p95TotalUs": 815.3
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 1844.859,
+        "medianTotalUs": 708.5,
+        "p95TotalUs": 989.3
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 712.435,
+        "medianTotalUs": 665.2,
+        "p95TotalUs": 940.9
+      },
+      "postFix": {
+        "meanTotalUs": 772.556,
+        "medianTotalUs": 743.6,
+        "p95TotalUs": 977.5
+      },
+      "postVsPreFixMeanPercent": -58.12384577899991,
+      "postVsFreshRapidMeanPercent": 8.438804943608904
+    },
+    {
+      "groupKind": "extension",
+      "group": "EXT_mesh_gpu_instancing",
+      "operation": "roundtrip",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 3716.053,
+        "medianTotalUs": 3437.6,
+        "p95TotalUs": 5291.4
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 7177.679,
+        "medianTotalUs": 5821.0,
+        "p95TotalUs": 7810.0
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 4575.448,
+        "medianTotalUs": 3684.5,
+        "p95TotalUs": 5981.8
+      },
+      "postFix": {
+        "meanTotalUs": 6965.0740000000005,
+        "medianTotalUs": 5890.3,
+        "p95TotalUs": 7599.7
+      },
+      "postVsPreFixMeanPercent": -2.962029926387061,
+      "postVsFreshRapidMeanPercent": 52.22714803009454
+    },
+    {
+      "groupKind": "extension",
+      "group": "KHR_draco_mesh_compression",
+      "operation": "load",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 33841.05,
+        "medianTotalUs": 31697.1,
+        "p95TotalUs": 40823.9
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 38285.05333333334,
+        "medianTotalUs": 34936.5,
+        "p95TotalUs": 49235.0
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 34457.74333333333,
+        "medianTotalUs": 33025.6,
+        "p95TotalUs": 41880.1
+      },
+      "postFix": {
+        "meanTotalUs": 39184.693333333336,
+        "medianTotalUs": 35775.2,
+        "p95TotalUs": 44862.8
+      },
+      "postVsPreFixMeanPercent": 2.3498465371516595,
+      "postVsFreshRapidMeanPercent": 13.718106709058054
+    },
+    {
+      "groupKind": "extension",
+      "group": "KHR_draco_mesh_compression",
+      "operation": "export",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 78941.00666666667,
+        "medianTotalUs": 71615.0,
+        "p95TotalUs": 129289.3
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 78842.02333333335,
+        "medianTotalUs": 72047.6,
+        "p95TotalUs": 133475.0
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 83466.06333333332,
+        "medianTotalUs": 73380.3,
+        "p95TotalUs": 146758.0
+      },
+      "postFix": {
+        "meanTotalUs": 82703.27333333335,
+        "medianTotalUs": 73906.5,
+        "p95TotalUs": 145007.3
+      },
+      "postVsPreFixMeanPercent": 4.897451684712809,
+      "postVsFreshRapidMeanPercent": -0.9138923887588554
+    },
+    {
+      "groupKind": "extension",
+      "group": "KHR_draco_mesh_compression",
+      "operation": "roundtrip",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 108044.13333333333,
+        "medianTotalUs": 103262.2,
+        "p95TotalUs": 113405.2
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 113482.4,
+        "medianTotalUs": 108063.5,
+        "p95TotalUs": 131954.8
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 115020.65999999999,
+        "medianTotalUs": 108153.8,
+        "p95TotalUs": 166076.2
+      },
+      "postFix": {
+        "meanTotalUs": 117325.51333333334,
+        "medianTotalUs": 110609.7,
+        "p95TotalUs": 134907.4
+      },
+      "postVsPreFixMeanPercent": 3.386528072488194,
+      "postVsFreshRapidMeanPercent": 2.0038602919974093
+    },
+    {
+      "groupKind": "extension",
+      "group": "KHR_lights_punctual",
+      "operation": "load",
+      "caseCount": 2,
+      "retainedRapidJson": {
+        "meanTotalUs": 1923229.3206666666,
+        "medianTotalUs": 1887429.6,
+        "p95TotalUs": 2097279.3000000003
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 15777367.143333334,
+        "medianTotalUs": 15541601.100000001,
+        "p95TotalUs": 16876137.3
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 1994964.3746666666,
+        "medianTotalUs": 1954973.7,
+        "p95TotalUs": 2156287.7
+      },
+      "postFix": {
+        "meanTotalUs": 2027813.613,
+        "medianTotalUs": 1999881.7000000002,
+        "p95TotalUs": 2142101.5
+      },
+      "postVsPreFixMeanPercent": -87.14732569396507,
+      "postVsFreshRapidMeanPercent": 1.6466077665583365
+    },
+    {
+      "groupKind": "extension",
+      "group": "KHR_lights_punctual",
+      "operation": "export",
+      "caseCount": 2,
+      "retainedRapidJson": {
+        "meanTotalUs": 320528.8396666667,
+        "medianTotalUs": 307044.6,
+        "p95TotalUs": 343340.0
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 888280.2883333334,
+        "medianTotalUs": 881386.7,
+        "p95TotalUs": 939055.3
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 326134.8343333333,
+        "medianTotalUs": 314310.4,
+        "p95TotalUs": 359684.0
+      },
+      "postFix": {
+        "meanTotalUs": 910513.0196666666,
+        "medianTotalUs": 898764.9,
+        "p95TotalUs": 973172.5
+      },
+      "postVsPreFixMeanPercent": 2.5028959468467002,
+      "postVsFreshRapidMeanPercent": 179.18300157291898
+    },
+    {
+      "groupKind": "extension",
+      "group": "KHR_lights_punctual",
+      "operation": "roundtrip",
+      "caseCount": 2,
+      "retainedRapidJson": {
+        "meanTotalUs": 2207560.2823333335,
+        "medianTotalUs": 2158375.1,
+        "p95TotalUs": 2416999.6
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 16613842.774333334,
+        "medianTotalUs": 16429141.299999999,
+        "p95TotalUs": 17007732.200000003
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 2285876.158333333,
+        "medianTotalUs": 2230983.1999999997,
+        "p95TotalUs": 2371448.4
+      },
+      "postFix": {
+        "meanTotalUs": 2948198.3996666665,
+        "medianTotalUs": 2935800.1,
+        "p95TotalUs": 3110326.8000000003
+      },
+      "postVsPreFixMeanPercent": -82.25456663029622,
+      "postVsFreshRapidMeanPercent": 28.97454610210566
+    },
+    {
+      "groupKind": "extension",
+      "group": "KHR_materials_clearcoat",
+      "operation": "load",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 7174.326,
+        "medianTotalUs": 6202.2,
+        "p95TotalUs": 9138.1
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 12235.78,
+        "medianTotalUs": 9344.5,
+        "p95TotalUs": 17485.1
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 8543.43,
+        "medianTotalUs": 6553.9,
+        "p95TotalUs": 10094.3
+      },
+      "postFix": {
+        "meanTotalUs": 11276.577,
+        "medianTotalUs": 9341.7,
+        "p95TotalUs": 15359.0
+      },
+      "postVsPreFixMeanPercent": -7.839328592047269,
+      "postVsFreshRapidMeanPercent": 31.991214301515893
+    },
+    {
+      "groupKind": "extension",
+      "group": "KHR_materials_clearcoat",
+      "operation": "export",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 4015.013,
+        "medianTotalUs": 3174.7,
+        "p95TotalUs": 4120.7
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 5090.977,
+        "medianTotalUs": 4274.9,
+        "p95TotalUs": 5831.6
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 3452.054,
+        "medianTotalUs": 3282.0,
+        "p95TotalUs": 4375.5
+      },
+      "postFix": {
+        "meanTotalUs": 4711.254,
+        "medianTotalUs": 4495.5,
+        "p95TotalUs": 6053.0
+      },
+      "postVsPreFixMeanPercent": -7.458745148524535,
+      "postVsFreshRapidMeanPercent": 36.47683379228714
+    },
+    {
+      "groupKind": "extension",
+      "group": "KHR_materials_clearcoat",
+      "operation": "roundtrip",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 11742.499,
+        "medianTotalUs": 9420.7,
+        "p95TotalUs": 15381.1
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 15097.511,
+        "medianTotalUs": 13813.1,
+        "p95TotalUs": 18878.6
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 10570.688999999998,
+        "medianTotalUs": 9711.4,
+        "p95TotalUs": 14996.3
+      },
+      "postFix": {
+        "meanTotalUs": 16396.811999999998,
+        "medianTotalUs": 13814.6,
+        "p95TotalUs": 22226.4
+      },
+      "postVsPreFixMeanPercent": 8.606060959319702,
+      "postVsFreshRapidMeanPercent": 55.11583019801264
+    },
+    {
+      "groupKind": "extension",
+      "group": "KHR_materials_emissive_strength",
+      "operation": "load",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 4088.7529999999997,
+        "medianTotalUs": 3321.3,
+        "p95TotalUs": 4569.7
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 6774.941999999999,
+        "medianTotalUs": 5718.4,
+        "p95TotalUs": 9087.9
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 3878.768,
+        "medianTotalUs": 3491.8,
+        "p95TotalUs": 5252.2
+      },
+      "postFix": {
+        "meanTotalUs": 6349.2919999999995,
+        "medianTotalUs": 5872.8,
+        "p95TotalUs": 9009.7
+      },
+      "postVsPreFixMeanPercent": -6.2827106121351255,
+      "postVsFreshRapidMeanPercent": 63.69352330430692
+    },
+    {
+      "groupKind": "extension",
+      "group": "KHR_materials_emissive_strength",
+      "operation": "export",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 736.312,
+        "medianTotalUs": 681.6,
+        "p95TotalUs": 865.0
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 926.505,
+        "medianTotalUs": 886.9,
+        "p95TotalUs": 1159.4
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 742.0269999999999,
+        "medianTotalUs": 721.3,
+        "p95TotalUs": 920.5
+      },
+      "postFix": {
+        "meanTotalUs": 1004.196,
+        "medianTotalUs": 922.4,
+        "p95TotalUs": 1408.9
+      },
+      "postVsPreFixMeanPercent": 8.385383780983377,
+      "postVsFreshRapidMeanPercent": 35.33146367989307
+    },
+    {
+      "groupKind": "extension",
+      "group": "KHR_materials_emissive_strength",
+      "operation": "roundtrip",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 4337.405,
+        "medianTotalUs": 4049.4,
+        "p95TotalUs": 5960.7
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 7589.041,
+        "medianTotalUs": 6645.2,
+        "p95TotalUs": 9184.8
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 5184.562,
+        "medianTotalUs": 4300.2,
+        "p95TotalUs": 6289.4
+      },
+      "postFix": {
+        "meanTotalUs": 9752.196,
+        "medianTotalUs": 6870.4,
+        "p95TotalUs": 9354.7
+      },
+      "postVsPreFixMeanPercent": 28.503667327663663,
+      "postVsFreshRapidMeanPercent": 88.10067272799516
+    },
+    {
+      "groupKind": "extension",
+      "group": "KHR_materials_ior",
+      "operation": "load",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 4061.324,
+        "medianTotalUs": 3852.3,
+        "p95TotalUs": 5329.7
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 7605.99,
+        "medianTotalUs": 6292.8,
+        "p95TotalUs": 9756.0
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 4299.538,
+        "medianTotalUs": 4066.4,
+        "p95TotalUs": 5773.0
+      },
+      "postFix": {
+        "meanTotalUs": 8226.753,
+        "medianTotalUs": 6478.1,
+        "p95TotalUs": 9178.6
+      },
+      "postVsPreFixMeanPercent": 8.161501658561225,
+      "postVsFreshRapidMeanPercent": 91.34039517734234
+    },
+    {
+      "groupKind": "extension",
+      "group": "KHR_materials_ior",
+      "operation": "export",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 5420.063,
+        "medianTotalUs": 3650.6,
+        "p95TotalUs": 5721.8
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 4737.135,
+        "medianTotalUs": 3894.6,
+        "p95TotalUs": 6212.3
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 4686.380999999999,
+        "medianTotalUs": 3838.2,
+        "p95TotalUs": 5546.4
+      },
+      "postFix": {
+        "meanTotalUs": 4370.853,
+        "medianTotalUs": 4092.8,
+        "p95TotalUs": 6159.5
+      },
+      "postVsPreFixMeanPercent": -7.732141895892773,
+      "postVsFreshRapidMeanPercent": -6.732871271029807
+    },
+    {
+      "groupKind": "extension",
+      "group": "KHR_materials_ior",
+      "operation": "roundtrip",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 9335.879,
+        "medianTotalUs": 7575.0,
+        "p95TotalUs": 12013.6
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 13017.681,
+        "medianTotalUs": 10110.6,
+        "p95TotalUs": 17335.1
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 9960.025,
+        "medianTotalUs": 7836.8,
+        "p95TotalUs": 11505.9
+      },
+      "postFix": {
+        "meanTotalUs": 12251.613000000001,
+        "medianTotalUs": 10448.0,
+        "p95TotalUs": 14731.6
+      },
+      "postVsPreFixMeanPercent": -5.884826951897187,
+      "postVsFreshRapidMeanPercent": 23.007853895949072
+    },
+    {
+      "groupKind": "extension",
+      "group": "KHR_materials_iridescence",
+      "operation": "load",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 4061.324,
+        "medianTotalUs": 3852.3,
+        "p95TotalUs": 5329.7
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 7605.99,
+        "medianTotalUs": 6292.8,
+        "p95TotalUs": 9756.0
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 4299.538,
+        "medianTotalUs": 4066.4,
+        "p95TotalUs": 5773.0
+      },
+      "postFix": {
+        "meanTotalUs": 8226.753,
+        "medianTotalUs": 6478.1,
+        "p95TotalUs": 9178.6
+      },
+      "postVsPreFixMeanPercent": 8.161501658561225,
+      "postVsFreshRapidMeanPercent": 91.34039517734234
+    },
+    {
+      "groupKind": "extension",
+      "group": "KHR_materials_iridescence",
+      "operation": "export",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 5420.063,
+        "medianTotalUs": 3650.6,
+        "p95TotalUs": 5721.8
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 4737.135,
+        "medianTotalUs": 3894.6,
+        "p95TotalUs": 6212.3
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 4686.380999999999,
+        "medianTotalUs": 3838.2,
+        "p95TotalUs": 5546.4
+      },
+      "postFix": {
+        "meanTotalUs": 4370.853,
+        "medianTotalUs": 4092.8,
+        "p95TotalUs": 6159.5
+      },
+      "postVsPreFixMeanPercent": -7.732141895892773,
+      "postVsFreshRapidMeanPercent": -6.732871271029807
+    },
+    {
+      "groupKind": "extension",
+      "group": "KHR_materials_iridescence",
+      "operation": "roundtrip",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 9335.879,
+        "medianTotalUs": 7575.0,
+        "p95TotalUs": 12013.6
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 13017.681,
+        "medianTotalUs": 10110.6,
+        "p95TotalUs": 17335.1
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 9960.025,
+        "medianTotalUs": 7836.8,
+        "p95TotalUs": 11505.9
+      },
+      "postFix": {
+        "meanTotalUs": 12251.613000000001,
+        "medianTotalUs": 10448.0,
+        "p95TotalUs": 14731.6
+      },
+      "postVsPreFixMeanPercent": -5.884826951897187,
+      "postVsFreshRapidMeanPercent": 23.007853895949072
+    },
+    {
+      "groupKind": "extension",
+      "group": "KHR_materials_sheen",
+      "operation": "load",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 8658.48,
+        "medianTotalUs": 7597.5,
+        "p95TotalUs": 11105.1
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 12618.521,
+        "medianTotalUs": 10501.7,
+        "p95TotalUs": 14372.2
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 9728.834,
+        "medianTotalUs": 8022.3,
+        "p95TotalUs": 11589.7
+      },
+      "postFix": {
+        "meanTotalUs": 12997.34,
+        "medianTotalUs": 10375.6,
+        "p95TotalUs": 16737.6
+      },
+      "postVsPreFixMeanPercent": 3.002087170120805,
+      "postVsFreshRapidMeanPercent": 33.59607122497926
+    },
+    {
+      "groupKind": "extension",
+      "group": "KHR_materials_sheen",
+      "operation": "export",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 13065.148000000001,
+        "medianTotalUs": 11722.5,
+        "p95TotalUs": 14398.3
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 14565.328000000001,
+        "medianTotalUs": 12543.8,
+        "p95TotalUs": 19801.9
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 13596.375,
+        "medianTotalUs": 12117.4,
+        "p95TotalUs": 15377.5
+      },
+      "postFix": {
+        "meanTotalUs": 14571.298,
+        "medianTotalUs": 13215.7,
+        "p95TotalUs": 18367.8
+      },
+      "postVsPreFixMeanPercent": 0.040987748439302876,
+      "postVsFreshRapidMeanPercent": 7.170462715245797
+    },
+    {
+      "groupKind": "extension",
+      "group": "KHR_materials_sheen",
+      "operation": "roundtrip",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 21743.195,
+        "medianTotalUs": 19107.4,
+        "p95TotalUs": 24922.1
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 25927.089,
+        "medianTotalUs": 23119.7,
+        "p95TotalUs": 31052.4
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 22510.072,
+        "medianTotalUs": 20013.7,
+        "p95TotalUs": 25786.5
+      },
+      "postFix": {
+        "meanTotalUs": 25892.765,
+        "medianTotalUs": 23844.0,
+        "p95TotalUs": 29365.6
+      },
+      "postVsPreFixMeanPercent": -0.13238663237512135,
+      "postVsFreshRapidMeanPercent": 15.02746415027015
+    },
+    {
+      "groupKind": "extension",
+      "group": "KHR_materials_specular",
+      "operation": "load",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 4782.515,
+        "medianTotalUs": 4424.6,
+        "p95TotalUs": 6678.7
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 8922.796,
+        "medianTotalUs": 7310.5,
+        "p95TotalUs": 11833.9
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 5472.47,
+        "medianTotalUs": 4554.3,
+        "p95TotalUs": 6361.3
+      },
+      "postFix": {
+        "meanTotalUs": 9206.613000000001,
+        "medianTotalUs": 7453.7,
+        "p95TotalUs": 11229.8
+      },
+      "postVsPreFixMeanPercent": 3.18080789922801,
+      "postVsFreshRapidMeanPercent": 68.23505656495149
+    },
+    {
+      "groupKind": "extension",
+      "group": "KHR_materials_specular",
+      "operation": "export",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 2208.864,
+        "medianTotalUs": 2080.2,
+        "p95TotalUs": 3065.5
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 2809.511,
+        "medianTotalUs": 2644.2,
+        "p95TotalUs": 3841.5
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 2406.641,
+        "medianTotalUs": 2198.1,
+        "p95TotalUs": 3425.3
+      },
+      "postFix": {
+        "meanTotalUs": 3503.1,
+        "medianTotalUs": 2732.1,
+        "p95TotalUs": 3952.8
+      },
+      "postVsPreFixMeanPercent": 24.687178658492527,
+      "postVsFreshRapidMeanPercent": 45.5597241134012
+    },
+    {
+      "groupKind": "extension",
+      "group": "KHR_materials_specular",
+      "operation": "roundtrip",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 8226.499,
+        "medianTotalUs": 6510.6,
+        "p95TotalUs": 10050.8
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 10413.594000000001,
+        "medianTotalUs": 9935.7,
+        "p95TotalUs": 12816.7
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 7251.632,
+        "medianTotalUs": 6811.3,
+        "p95TotalUs": 9288.1
+      },
+      "postFix": {
+        "meanTotalUs": 11629.54,
+        "medianTotalUs": 10270.7,
+        "p95TotalUs": 14990.2
+      },
+      "postVsPreFixMeanPercent": 11.676525894902372,
+      "postVsFreshRapidMeanPercent": 60.371348132392846
+    },
+    {
+      "groupKind": "extension",
+      "group": "KHR_materials_transmission",
+      "operation": "load",
+      "caseCount": 3,
+      "retainedRapidJson": {
+        "meanTotalUs": 116989.50066666666,
+        "medianTotalUs": 110878.9,
+        "p95TotalUs": 138543.0
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 132065.40000000002,
+        "medianTotalUs": 120141.0,
+        "p95TotalUs": 183856.5
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 120377.76466666667,
+        "medianTotalUs": 113819.8,
+        "p95TotalUs": 143362.8
+      },
+      "postFix": {
+        "meanTotalUs": 132433.613,
+        "medianTotalUs": 121780.90000000001,
+        "p95TotalUs": 153927.8
+      },
+      "postVsPreFixMeanPercent": 0.2788111041953371,
+      "postVsFreshRapidMeanPercent": 10.015012628550394
+    },
+    {
+      "groupKind": "extension",
+      "group": "KHR_materials_transmission",
+      "operation": "export",
+      "caseCount": 3,
+      "retainedRapidJson": {
+        "meanTotalUs": 353915.27633333334,
+        "medianTotalUs": 327218.7,
+        "p95TotalUs": 463964.69999999995
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 345192.9216666667,
+        "medianTotalUs": 332927.9,
+        "p95TotalUs": 427213.39999999997
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 370747.3076666667,
+        "medianTotalUs": 335161.3,
+        "p95TotalUs": 597652.5
+      },
+      "postFix": {
+        "meanTotalUs": 363816.203,
+        "medianTotalUs": 340622.3,
+        "p95TotalUs": 522185.39999999997
+      },
+      "postVsPreFixMeanPercent": 5.395035692915147,
+      "postVsFreshRapidMeanPercent": -1.8694956169171595
+    },
+    {
+      "groupKind": "extension",
+      "group": "KHR_materials_transmission",
+      "operation": "roundtrip",
+      "caseCount": 3,
+      "retainedRapidJson": {
+        "meanTotalUs": 456514.4423333333,
+        "medianTotalUs": 442651.8,
+        "p95TotalUs": 524416.7000000001
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 478888.09766666667,
+        "medianTotalUs": 456259.8,
+        "p95TotalUs": 608054.3
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 477706.79500000004,
+        "medianTotalUs": 462033.39999999997,
+        "p95TotalUs": 591812.2
+      },
+      "postFix": {
+        "meanTotalUs": 480784.713,
+        "medianTotalUs": 463822.9,
+        "p95TotalUs": 556026.1
+      },
+      "postVsPreFixMeanPercent": 0.3960456195454397,
+      "postVsFreshRapidMeanPercent": 0.6443111197528489
+    },
+    {
+      "groupKind": "extension",
+      "group": "KHR_materials_unlit",
+      "operation": "load",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 7174.326,
+        "medianTotalUs": 6202.2,
+        "p95TotalUs": 9138.1
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 12235.78,
+        "medianTotalUs": 9344.5,
+        "p95TotalUs": 17485.1
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 8543.43,
+        "medianTotalUs": 6553.9,
+        "p95TotalUs": 10094.3
+      },
+      "postFix": {
+        "meanTotalUs": 11276.577,
+        "medianTotalUs": 9341.7,
+        "p95TotalUs": 15359.0
+      },
+      "postVsPreFixMeanPercent": -7.839328592047269,
+      "postVsFreshRapidMeanPercent": 31.991214301515893
+    },
+    {
+      "groupKind": "extension",
+      "group": "KHR_materials_unlit",
+      "operation": "export",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 4015.013,
+        "medianTotalUs": 3174.7,
+        "p95TotalUs": 4120.7
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 5090.977,
+        "medianTotalUs": 4274.9,
+        "p95TotalUs": 5831.6
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 3452.054,
+        "medianTotalUs": 3282.0,
+        "p95TotalUs": 4375.5
+      },
+      "postFix": {
+        "meanTotalUs": 4711.254,
+        "medianTotalUs": 4495.5,
+        "p95TotalUs": 6053.0
+      },
+      "postVsPreFixMeanPercent": -7.458745148524535,
+      "postVsFreshRapidMeanPercent": 36.47683379228714
+    },
+    {
+      "groupKind": "extension",
+      "group": "KHR_materials_unlit",
+      "operation": "roundtrip",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 11742.499,
+        "medianTotalUs": 9420.7,
+        "p95TotalUs": 15381.1
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 15097.511,
+        "medianTotalUs": 13813.1,
+        "p95TotalUs": 18878.6
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 10570.688999999998,
+        "medianTotalUs": 9711.4,
+        "p95TotalUs": 14996.3
+      },
+      "postFix": {
+        "meanTotalUs": 16396.811999999998,
+        "medianTotalUs": 13814.6,
+        "p95TotalUs": 22226.4
+      },
+      "postVsPreFixMeanPercent": 8.606060959319702,
+      "postVsFreshRapidMeanPercent": 55.11583019801264
+    },
+    {
+      "groupKind": "extension",
+      "group": "KHR_materials_variants",
+      "operation": "load",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 20288.733,
+        "medianTotalUs": 19263.5,
+        "p95TotalUs": 24462.7
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 24370.876,
+        "medianTotalUs": 21904.0,
+        "p95TotalUs": 32808.9
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 21982.959,
+        "medianTotalUs": 20108.3,
+        "p95TotalUs": 27408.1
+      },
+      "postFix": {
+        "meanTotalUs": 24521.139,
+        "medianTotalUs": 22700.4,
+        "p95TotalUs": 30772.8
+      },
+      "postVsPreFixMeanPercent": 0.6165679067096276,
+      "postVsFreshRapidMeanPercent": 11.546125341906885
+    },
+    {
+      "groupKind": "extension",
+      "group": "KHR_materials_variants",
+      "operation": "export",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 53289.342000000004,
+        "medianTotalUs": 46405.2,
+        "p95TotalUs": 99116.0
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 52226.167,
+        "medianTotalUs": 46888.6,
+        "p95TotalUs": 95925.3
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 56721.100999999995,
+        "medianTotalUs": 49158.2,
+        "p95TotalUs": 120105.6
+      },
+      "postFix": {
+        "meanTotalUs": 57108.75,
+        "medianTotalUs": 48770.2,
+        "p95TotalUs": 115009.2
+      },
+      "postVsPreFixMeanPercent": 9.34892081971093,
+      "postVsFreshRapidMeanPercent": 0.6834299637448944
+    },
+    {
+      "groupKind": "extension",
+      "group": "KHR_materials_variants",
+      "operation": "roundtrip",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 76994.837,
+        "medianTotalUs": 66905.7,
+        "p95TotalUs": 135925.6
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 78750.274,
+        "medianTotalUs": 69403.1,
+        "p95TotalUs": 135900.1
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 82698.933,
+        "medianTotalUs": 70021.0,
+        "p95TotalUs": 150198.8
+      },
+      "postFix": {
+        "meanTotalUs": 81927.86,
+        "medianTotalUs": 71388.8,
+        "p95TotalUs": 150060.6
+      },
+      "postVsPreFixMeanPercent": 4.035015801976759,
+      "postVsFreshRapidMeanPercent": -0.9323856693531994
+    },
+    {
+      "groupKind": "extension",
+      "group": "KHR_materials_volume",
+      "operation": "load",
+      "caseCount": 3,
+      "retainedRapidJson": {
+        "meanTotalUs": 116989.50066666666,
+        "medianTotalUs": 110878.9,
+        "p95TotalUs": 138543.0
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 132065.40000000002,
+        "medianTotalUs": 120141.0,
+        "p95TotalUs": 183856.5
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 120377.76466666667,
+        "medianTotalUs": 113819.8,
+        "p95TotalUs": 143362.8
+      },
+      "postFix": {
+        "meanTotalUs": 132433.613,
+        "medianTotalUs": 121780.90000000001,
+        "p95TotalUs": 153927.8
+      },
+      "postVsPreFixMeanPercent": 0.2788111041953371,
+      "postVsFreshRapidMeanPercent": 10.015012628550394
+    },
+    {
+      "groupKind": "extension",
+      "group": "KHR_materials_volume",
+      "operation": "export",
+      "caseCount": 3,
+      "retainedRapidJson": {
+        "meanTotalUs": 353915.27633333334,
+        "medianTotalUs": 327218.7,
+        "p95TotalUs": 463964.69999999995
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 345192.9216666667,
+        "medianTotalUs": 332927.9,
+        "p95TotalUs": 427213.39999999997
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 370747.3076666667,
+        "medianTotalUs": 335161.3,
+        "p95TotalUs": 597652.5
+      },
+      "postFix": {
+        "meanTotalUs": 363816.203,
+        "medianTotalUs": 340622.3,
+        "p95TotalUs": 522185.39999999997
+      },
+      "postVsPreFixMeanPercent": 5.395035692915147,
+      "postVsFreshRapidMeanPercent": -1.8694956169171595
+    },
+    {
+      "groupKind": "extension",
+      "group": "KHR_materials_volume",
+      "operation": "roundtrip",
+      "caseCount": 3,
+      "retainedRapidJson": {
+        "meanTotalUs": 456514.4423333333,
+        "medianTotalUs": 442651.8,
+        "p95TotalUs": 524416.7000000001
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 478888.09766666667,
+        "medianTotalUs": 456259.8,
+        "p95TotalUs": 608054.3
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 477706.79500000004,
+        "medianTotalUs": 462033.39999999997,
+        "p95TotalUs": 591812.2
+      },
+      "postFix": {
+        "meanTotalUs": 480784.713,
+        "medianTotalUs": 463822.9,
+        "p95TotalUs": 556026.1
+      },
+      "postVsPreFixMeanPercent": 0.3960456195454397,
+      "postVsFreshRapidMeanPercent": 0.6443111197528489
+    },
+    {
+      "groupKind": "extension",
+      "group": "KHR_texture_basisu",
+      "operation": "load",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 33841.05,
+        "medianTotalUs": 31697.1,
+        "p95TotalUs": 40823.9
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 38285.05333333334,
+        "medianTotalUs": 34936.5,
+        "p95TotalUs": 49235.0
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 34457.74333333333,
+        "medianTotalUs": 33025.6,
+        "p95TotalUs": 41880.1
+      },
+      "postFix": {
+        "meanTotalUs": 39184.693333333336,
+        "medianTotalUs": 35775.2,
+        "p95TotalUs": 44862.8
+      },
+      "postVsPreFixMeanPercent": 2.3498465371516595,
+      "postVsFreshRapidMeanPercent": 13.718106709058054
+    },
+    {
+      "groupKind": "extension",
+      "group": "KHR_texture_basisu",
+      "operation": "export",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 78941.00666666667,
+        "medianTotalUs": 71615.0,
+        "p95TotalUs": 129289.3
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 78842.02333333335,
+        "medianTotalUs": 72047.6,
+        "p95TotalUs": 133475.0
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 83466.06333333332,
+        "medianTotalUs": 73380.3,
+        "p95TotalUs": 146758.0
+      },
+      "postFix": {
+        "meanTotalUs": 82703.27333333335,
+        "medianTotalUs": 73906.5,
+        "p95TotalUs": 145007.3
+      },
+      "postVsPreFixMeanPercent": 4.897451684712809,
+      "postVsFreshRapidMeanPercent": -0.9138923887588554
+    },
+    {
+      "groupKind": "extension",
+      "group": "KHR_texture_basisu",
+      "operation": "roundtrip",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 108044.13333333333,
+        "medianTotalUs": 103262.2,
+        "p95TotalUs": 113405.2
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 113482.4,
+        "medianTotalUs": 108063.5,
+        "p95TotalUs": 131954.8
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 115020.65999999999,
+        "medianTotalUs": 108153.8,
+        "p95TotalUs": 166076.2
+      },
+      "postFix": {
+        "meanTotalUs": 117325.51333333334,
+        "medianTotalUs": 110609.7,
+        "p95TotalUs": 134907.4
+      },
+      "postVsPreFixMeanPercent": 3.386528072488194,
+      "postVsFreshRapidMeanPercent": 2.0038602919974093
+    },
+    {
+      "groupKind": "extension",
+      "group": "KHR_texture_transform",
+      "operation": "load",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 7174.326,
+        "medianTotalUs": 6202.2,
+        "p95TotalUs": 9138.1
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 12235.78,
+        "medianTotalUs": 9344.5,
+        "p95TotalUs": 17485.1
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 8543.43,
+        "medianTotalUs": 6553.9,
+        "p95TotalUs": 10094.3
+      },
+      "postFix": {
+        "meanTotalUs": 11276.577,
+        "medianTotalUs": 9341.7,
+        "p95TotalUs": 15359.0
+      },
+      "postVsPreFixMeanPercent": -7.839328592047269,
+      "postVsFreshRapidMeanPercent": 31.991214301515893
+    },
+    {
+      "groupKind": "extension",
+      "group": "KHR_texture_transform",
+      "operation": "export",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 4015.013,
+        "medianTotalUs": 3174.7,
+        "p95TotalUs": 4120.7
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 5090.977,
+        "medianTotalUs": 4274.9,
+        "p95TotalUs": 5831.6
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 3452.054,
+        "medianTotalUs": 3282.0,
+        "p95TotalUs": 4375.5
+      },
+      "postFix": {
+        "meanTotalUs": 4711.254,
+        "medianTotalUs": 4495.5,
+        "p95TotalUs": 6053.0
+      },
+      "postVsPreFixMeanPercent": -7.458745148524535,
+      "postVsFreshRapidMeanPercent": 36.47683379228714
+    },
+    {
+      "groupKind": "extension",
+      "group": "KHR_texture_transform",
+      "operation": "roundtrip",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 11742.499,
+        "medianTotalUs": 9420.7,
+        "p95TotalUs": 15381.1
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 15097.511,
+        "medianTotalUs": 13813.1,
+        "p95TotalUs": 18878.6
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 10570.688999999998,
+        "medianTotalUs": 9711.4,
+        "p95TotalUs": 14996.3
+      },
+      "postFix": {
+        "meanTotalUs": 16396.811999999998,
+        "medianTotalUs": 13814.6,
+        "p95TotalUs": 22226.4
+      },
+      "postVsPreFixMeanPercent": 8.606060959319702,
+      "postVsFreshRapidMeanPercent": 55.11583019801264
+    },
+    {
+      "groupKind": "extension",
+      "group": "KHR_xmp_json_ld",
+      "operation": "load",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 3749.026,
+        "medianTotalUs": 2900.0,
+        "p95TotalUs": 4364.1
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 6792.807,
+        "medianTotalUs": 5159.5,
+        "p95TotalUs": 8213.6
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 3292.159,
+        "medianTotalUs": 2994.4,
+        "p95TotalUs": 4479.5
+      },
+      "postFix": {
+        "meanTotalUs": 6434.751,
+        "medianTotalUs": 5360.1,
+        "p95TotalUs": 7842.3
+      },
+      "postVsPreFixMeanPercent": -5.271105155791996,
+      "postVsFreshRapidMeanPercent": 95.45687191900512
+    },
+    {
+      "groupKind": "extension",
+      "group": "KHR_xmp_json_ld",
+      "operation": "export",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 1345.1129999999998,
+        "medianTotalUs": 1281.3,
+        "p95TotalUs": 1798.9
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 2677.245,
+        "medianTotalUs": 1432.5,
+        "p95TotalUs": 2225.4
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 1508.539,
+        "medianTotalUs": 1405.1,
+        "p95TotalUs": 2091.9
+      },
+      "postFix": {
+        "meanTotalUs": 1558.094,
+        "medianTotalUs": 1466.6,
+        "p95TotalUs": 1990.7
+      },
+      "postVsPreFixMeanPercent": -41.802337851037166,
+      "postVsFreshRapidMeanPercent": 3.284966447668908
+    },
+    {
+      "groupKind": "extension",
+      "group": "KHR_xmp_json_ld",
+      "operation": "roundtrip",
+      "caseCount": 1,
+      "retainedRapidJson": {
+        "meanTotalUs": 4971.568,
+        "medianTotalUs": 4200.0,
+        "p95TotalUs": 5774.0
+      },
+      "retainedPreFix": {
+        "meanTotalUs": 7628.064,
+        "medianTotalUs": 6611.2,
+        "p95TotalUs": 10170.4
+      },
+      "freshRapidJson": {
+        "meanTotalUs": 5202.233,
+        "medianTotalUs": 4322.6,
+        "p95TotalUs": 5999.8
+      },
+      "postFix": {
+        "meanTotalUs": 8834.954,
+        "medianTotalUs": 6760.1,
+        "p95TotalUs": 10800.3
+      },
+      "postVsPreFixMeanPercent": 15.821707840941022,
+      "postVsFreshRapidMeanPercent": 69.83003260330707
+    }
+  ],
+  "memory": {
+    "retainedRapidJson": {
+      "large-enabled": {
+        "samples": 30,
+        "peakWorkingSetBytes": {
+          "mean": 403153032.53333336,
+          "median": 399007744.0,
+          "maximum": 420458496.0
+        },
+        "processDurationMs": {
+          "mean": 12905.608733333333,
+          "median": 12765.598,
+          "p95": 13450.968
+        }
+      },
+      "standard-only": {
+        "samples": 70,
+        "peakWorkingSetBytes": {
+          "mean": 42177155.657142855,
+          "median": 42471424.0,
+          "maximum": 43114496.0
+        },
+        "processDurationMs": {
+          "mean": 1191.7258,
+          "median": 1187.828,
+          "p95": 1261.427
+        }
+      }
+    },
+    "retainedPreFix": {
+      "large-enabled": {
+        "samples": 30,
+        "peakWorkingSetBytes": {
+          "mean": 452211643.73333335,
+          "median": 452472832.0,
+          "maximum": 454582272.0
+        },
+        "processDurationMs": {
+          "mean": 83994.41546666667,
+          "median": 83180.274,
+          "p95": 90621.269
+        }
+      },
+      "standard-only": {
+        "samples": 70,
+        "peakWorkingSetBytes": {
+          "mean": 42567855.54285714,
+          "median": 42856448.0,
+          "maximum": 43024384.0
+        },
+        "processDurationMs": {
+          "mean": 1373.1432285714286,
+          "median": 1359.994,
+          "p95": 1465.372
+        }
+      }
+    },
+    "freshRapidJson": {
+      "large-enabled": {
+        "samples": 30,
+        "peakWorkingSetBytes": {
+          "mean": 405633706.6666667,
+          "median": 399114240.0,
+          "maximum": 420831232.0
+        },
+        "processDurationMs": {
+          "mean": 13360.4128,
+          "median": 13090.514,
+          "p95": 16561.308
+        }
+      },
+      "standard-only": {
+        "samples": 70,
+        "peakWorkingSetBytes": {
+          "mean": 42182831.54285714,
+          "median": 42455040.0,
+          "maximum": 43384832.0
+        },
+        "processDurationMs": {
+          "mean": 1272.6717,
+          "median": 1257.788,
+          "p95": 1373.797
+        }
+      }
+    },
+    "postFix": {
+      "large-enabled": {
+        "samples": 30,
+        "peakWorkingSetBytes": {
+          "mean": 452110336.0,
+          "median": 452407296.0,
+          "maximum": 454569984.0
+        },
+        "processDurationMs": {
+          "mean": 15569.062333333333,
+          "median": 15460.349,
+          "p95": 16546.998
+        }
+      },
+      "standard-only": {
+        "samples": 70,
+        "peakWorkingSetBytes": {
+          "mean": 42546790.4,
+          "median": 42831872.0,
+          "maximum": 42995712.0
+        },
+        "processDurationMs": {
+          "mean": 1445.2575714285715,
+          "median": 1436.607,
+          "p95": 1563.57
+        }
+      }
+    }
+  },
+  "wallTime": {
+    "retainedSeconds": 3662.669214,
+    "freshSeconds": 1356.440782
+  },
+  "outputs": {
+    "retainedPreFixVsPostFixHashMatches": 15,
+    "retainedRapidVsFreshRapidHashMatches": 15,
+    "historicalOutputSizesMatch": true,
+    "currentPrePostOutputComparisons": 32,
+    "currentPrePostOutputsByteIdentical": true,
+    "postFixTotalBytes": 120831322,
+    "postFixTotalFiles": 21
+  }
+}

@@ -1,0 +1,703 @@
+{
+  "schemaVersion": 1,
+  "sampleAssetCommit": "9429648735279342b4c32b8745f7904196607379",
+  "preFixCommit": "20dbbc9db365cb50ea64cebf36559e2b18e60b99",
+  "postFixCommit": "dc9c9f78dc33b9df5201e28dea2eeddcb5aa7b2e",
+  "semanticRowsPerRun": 48,
+  "allSemanticChecksPassed": true,
+  "allOutputsByteIdentical": true,
+  "comparisons": [
+    {
+      "caseId": "Box-gltf",
+      "operation": "export",
+      "equal": true,
+      "preFix": {
+        "fileCount": 2,
+        "totalBytes": 1618,
+        "sha256": "3C980C11AF22743E70D6A34755F3856A488C494AF170A9B64090B03052649936",
+        "files": [
+          "Box.gltf|970|96266FC1446753B532616EBCC14E92C213F9AD73B4749BDFBBCAF275BF52653F",
+          "Box0.bin|648|3266A8E39B9F425B3341CBE5EEC7849F44310256BFA651E6B8B40C85CE0CCAFB"
+        ]
+      },
+      "postFix": {
+        "fileCount": 2,
+        "totalBytes": 1618,
+        "sha256": "3C980C11AF22743E70D6A34755F3856A488C494AF170A9B64090B03052649936",
+        "files": [
+          "Box.gltf|970|96266FC1446753B532616EBCC14E92C213F9AD73B4749BDFBBCAF275BF52653F",
+          "Box0.bin|648|3266A8E39B9F425B3341CBE5EEC7849F44310256BFA651E6B8B40C85CE0CCAFB"
+        ]
+      }
+    },
+    {
+      "caseId": "Box-gltf",
+      "operation": "roundtrip",
+      "equal": true,
+      "preFix": {
+        "fileCount": 2,
+        "totalBytes": 1618,
+        "sha256": "3C980C11AF22743E70D6A34755F3856A488C494AF170A9B64090B03052649936",
+        "files": [
+          "Box.gltf|970|96266FC1446753B532616EBCC14E92C213F9AD73B4749BDFBBCAF275BF52653F",
+          "Box0.bin|648|3266A8E39B9F425B3341CBE5EEC7849F44310256BFA651E6B8B40C85CE0CCAFB"
+        ]
+      },
+      "postFix": {
+        "fileCount": 2,
+        "totalBytes": 1618,
+        "sha256": "3C980C11AF22743E70D6A34755F3856A488C494AF170A9B64090B03052649936",
+        "files": [
+          "Box.gltf|970|96266FC1446753B532616EBCC14E92C213F9AD73B4749BDFBBCAF275BF52653F",
+          "Box0.bin|648|3266A8E39B9F425B3341CBE5EEC7849F44310256BFA651E6B8B40C85CE0CCAFB"
+        ]
+      }
+    },
+    {
+      "caseId": "Box-glb",
+      "operation": "export",
+      "equal": true,
+      "preFix": {
+        "fileCount": 1,
+        "totalBytes": 1632,
+        "sha256": "92E24B450EDF96029BFD157879B2E8D534DF9399E42C1E65980324EF585CF4C1",
+        "files": [
+          "Box.glb|1632|D7B8AFD59D7628D9B4A29E791E0EC2FF1AE36C6E0063348A7E3786D9D3A6B819"
+        ]
+      },
+      "postFix": {
+        "fileCount": 1,
+        "totalBytes": 1632,
+        "sha256": "92E24B450EDF96029BFD157879B2E8D534DF9399E42C1E65980324EF585CF4C1",
+        "files": [
+          "Box.glb|1632|D7B8AFD59D7628D9B4A29E791E0EC2FF1AE36C6E0063348A7E3786D9D3A6B819"
+        ]
+      }
+    },
+    {
+      "caseId": "Box-glb",
+      "operation": "roundtrip",
+      "equal": true,
+      "preFix": {
+        "fileCount": 1,
+        "totalBytes": 1632,
+        "sha256": "92E24B450EDF96029BFD157879B2E8D534DF9399E42C1E65980324EF585CF4C1",
+        "files": [
+          "Box.glb|1632|D7B8AFD59D7628D9B4A29E791E0EC2FF1AE36C6E0063348A7E3786D9D3A6B819"
+        ]
+      },
+      "postFix": {
+        "fileCount": 1,
+        "totalBytes": 1632,
+        "sha256": "92E24B450EDF96029BFD157879B2E8D534DF9399E42C1E65980324EF585CF4C1",
+        "files": [
+          "Box.glb|1632|D7B8AFD59D7628D9B4A29E791E0EC2FF1AE36C6E0063348A7E3786D9D3A6B819"
+        ]
+      }
+    },
+    {
+      "caseId": "Avocado-gltf",
+      "operation": "export",
+      "equal": true,
+      "preFix": {
+        "fileCount": 5,
+        "totalBytes": 8109904,
+        "sha256": "577BE81BE38882B7629C0391DDA4BFB51ACEB236413AB39AE26F9467ED82C14A",
+        "files": [
+          "Avocado.bin|23580|3BF7CE0EC994562EABF0CB72A52BBC7976818D630D62609A966B53A5FF9B9180",
+          "Avocado.gltf|1422|3A3FB8E18BA8507A8A07EDF27405664FA95233423926AC6939C678E3B9BF48C2",
+          "Avocado_baseColor.png|3158729|385DCE948C3B9E8BC93E1C930D796E72B02CBD474B121A160D577DE95EBBB48F",
+          "Avocado_normal.png|3271114|25783C211761B7E32497FDD3E2490F3BAC05B738E5E2BC62FC5B78A270BB4E50",
+          "Avocado_roughnessMetallic.png|1655059|33EE80F7CCFD36825ACFBD5EF0A51326BEA49E33EFED852DCA44798798BD6901"
+        ]
+      },
+      "postFix": {
+        "fileCount": 5,
+        "totalBytes": 8109904,
+        "sha256": "577BE81BE38882B7629C0391DDA4BFB51ACEB236413AB39AE26F9467ED82C14A",
+        "files": [
+          "Avocado.bin|23580|3BF7CE0EC994562EABF0CB72A52BBC7976818D630D62609A966B53A5FF9B9180",
+          "Avocado.gltf|1422|3A3FB8E18BA8507A8A07EDF27405664FA95233423926AC6939C678E3B9BF48C2",
+          "Avocado_baseColor.png|3158729|385DCE948C3B9E8BC93E1C930D796E72B02CBD474B121A160D577DE95EBBB48F",
+          "Avocado_normal.png|3271114|25783C211761B7E32497FDD3E2490F3BAC05B738E5E2BC62FC5B78A270BB4E50",
+          "Avocado_roughnessMetallic.png|1655059|33EE80F7CCFD36825ACFBD5EF0A51326BEA49E33EFED852DCA44798798BD6901"
+        ]
+      }
+    },
+    {
+      "caseId": "Avocado-gltf",
+      "operation": "roundtrip",
+      "equal": true,
+      "preFix": {
+        "fileCount": 5,
+        "totalBytes": 8109904,
+        "sha256": "577BE81BE38882B7629C0391DDA4BFB51ACEB236413AB39AE26F9467ED82C14A",
+        "files": [
+          "Avocado.bin|23580|3BF7CE0EC994562EABF0CB72A52BBC7976818D630D62609A966B53A5FF9B9180",
+          "Avocado.gltf|1422|3A3FB8E18BA8507A8A07EDF27405664FA95233423926AC6939C678E3B9BF48C2",
+          "Avocado_baseColor.png|3158729|385DCE948C3B9E8BC93E1C930D796E72B02CBD474B121A160D577DE95EBBB48F",
+          "Avocado_normal.png|3271114|25783C211761B7E32497FDD3E2490F3BAC05B738E5E2BC62FC5B78A270BB4E50",
+          "Avocado_roughnessMetallic.png|1655059|33EE80F7CCFD36825ACFBD5EF0A51326BEA49E33EFED852DCA44798798BD6901"
+        ]
+      },
+      "postFix": {
+        "fileCount": 5,
+        "totalBytes": 8109904,
+        "sha256": "577BE81BE38882B7629C0391DDA4BFB51ACEB236413AB39AE26F9467ED82C14A",
+        "files": [
+          "Avocado.bin|23580|3BF7CE0EC994562EABF0CB72A52BBC7976818D630D62609A966B53A5FF9B9180",
+          "Avocado.gltf|1422|3A3FB8E18BA8507A8A07EDF27405664FA95233423926AC6939C678E3B9BF48C2",
+          "Avocado_baseColor.png|3158729|385DCE948C3B9E8BC93E1C930D796E72B02CBD474B121A160D577DE95EBBB48F",
+          "Avocado_normal.png|3271114|25783C211761B7E32497FDD3E2490F3BAC05B738E5E2BC62FC5B78A270BB4E50",
+          "Avocado_roughnessMetallic.png|1655059|33EE80F7CCFD36825ACFBD5EF0A51326BEA49E33EFED852DCA44798798BD6901"
+        ]
+      }
+    },
+    {
+      "caseId": "Avocado-glb",
+      "operation": "export",
+      "equal": true,
+      "preFix": {
+        "fileCount": 1,
+        "totalBytes": 8110104,
+        "sha256": "C813BA5B22D1EAAA78AECE97500EB82FD483EF1AFC4C3B5494F0C45F40C6B307",
+        "files": [
+          "Avocado.glb|8110104|F5A55B5CBE7DF0D8B91D2ED55D75A14D7190850F7BDCF821A68DBFE84FF212BC"
+        ]
+      },
+      "postFix": {
+        "fileCount": 1,
+        "totalBytes": 8110104,
+        "sha256": "C813BA5B22D1EAAA78AECE97500EB82FD483EF1AFC4C3B5494F0C45F40C6B307",
+        "files": [
+          "Avocado.glb|8110104|F5A55B5CBE7DF0D8B91D2ED55D75A14D7190850F7BDCF821A68DBFE84FF212BC"
+        ]
+      }
+    },
+    {
+      "caseId": "Avocado-glb",
+      "operation": "roundtrip",
+      "equal": true,
+      "preFix": {
+        "fileCount": 1,
+        "totalBytes": 8110104,
+        "sha256": "C813BA5B22D1EAAA78AECE97500EB82FD483EF1AFC4C3B5494F0C45F40C6B307",
+        "files": [
+          "Avocado.glb|8110104|F5A55B5CBE7DF0D8B91D2ED55D75A14D7190850F7BDCF821A68DBFE84FF212BC"
+        ]
+      },
+      "postFix": {
+        "fileCount": 1,
+        "totalBytes": 8110104,
+        "sha256": "C813BA5B22D1EAAA78AECE97500EB82FD483EF1AFC4C3B5494F0C45F40C6B307",
+        "files": [
+          "Avocado.glb|8110104|F5A55B5CBE7DF0D8B91D2ED55D75A14D7190850F7BDCF821A68DBFE84FF212BC"
+        ]
+      }
+    },
+    {
+      "caseId": "MorphStressTest-glb",
+      "operation": "export",
+      "equal": true,
+      "preFix": {
+        "fileCount": 1,
+        "totalBytes": 576088,
+        "sha256": "CDA1351EF0C8C769370AC8A8864AA69ED8954A545B4C2DEC8E93582523D8B9AE",
+        "files": [
+          "MorphStressTest.glb|576088|C166DEBBE1D6580023E00ED7482A1F5DC6CFFC3E961BABA13C962DAD992E1E46"
+        ]
+      },
+      "postFix": {
+        "fileCount": 1,
+        "totalBytes": 576088,
+        "sha256": "CDA1351EF0C8C769370AC8A8864AA69ED8954A545B4C2DEC8E93582523D8B9AE",
+        "files": [
+          "MorphStressTest.glb|576088|C166DEBBE1D6580023E00ED7482A1F5DC6CFFC3E961BABA13C962DAD992E1E46"
+        ]
+      }
+    },
+    {
+      "caseId": "MorphStressTest-glb",
+      "operation": "roundtrip",
+      "equal": true,
+      "preFix": {
+        "fileCount": 1,
+        "totalBytes": 576088,
+        "sha256": "CDA1351EF0C8C769370AC8A8864AA69ED8954A545B4C2DEC8E93582523D8B9AE",
+        "files": [
+          "MorphStressTest.glb|576088|C166DEBBE1D6580023E00ED7482A1F5DC6CFFC3E961BABA13C962DAD992E1E46"
+        ]
+      },
+      "postFix": {
+        "fileCount": 1,
+        "totalBytes": 576088,
+        "sha256": "CDA1351EF0C8C769370AC8A8864AA69ED8954A545B4C2DEC8E93582523D8B9AE",
+        "files": [
+          "MorphStressTest.glb|576088|C166DEBBE1D6580023E00ED7482A1F5DC6CFFC3E961BABA13C962DAD992E1E46"
+        ]
+      }
+    },
+    {
+      "caseId": "SpecularTest-glb",
+      "operation": "export",
+      "equal": true,
+      "preFix": {
+        "fileCount": 1,
+        "totalBytes": 224024,
+        "sha256": "FD18D6C208FA96D1E8CEC2150441A59024D7EAE161F613C9D37CC67E9E0C9E52",
+        "files": [
+          "SpecularTest.glb|224024|A4B24ED3FA8805D97A61E97BF73AE57AC3E9D4F879AB05A69EB079946CBBD6CE"
+        ]
+      },
+      "postFix": {
+        "fileCount": 1,
+        "totalBytes": 224024,
+        "sha256": "FD18D6C208FA96D1E8CEC2150441A59024D7EAE161F613C9D37CC67E9E0C9E52",
+        "files": [
+          "SpecularTest.glb|224024|A4B24ED3FA8805D97A61E97BF73AE57AC3E9D4F879AB05A69EB079946CBBD6CE"
+        ]
+      }
+    },
+    {
+      "caseId": "SpecularTest-glb",
+      "operation": "roundtrip",
+      "equal": true,
+      "preFix": {
+        "fileCount": 1,
+        "totalBytes": 224024,
+        "sha256": "FD18D6C208FA96D1E8CEC2150441A59024D7EAE161F613C9D37CC67E9E0C9E52",
+        "files": [
+          "SpecularTest.glb|224024|A4B24ED3FA8805D97A61E97BF73AE57AC3E9D4F879AB05A69EB079946CBBD6CE"
+        ]
+      },
+      "postFix": {
+        "fileCount": 1,
+        "totalBytes": 224024,
+        "sha256": "FD18D6C208FA96D1E8CEC2150441A59024D7EAE161F613C9D37CC67E9E0C9E52",
+        "files": [
+          "SpecularTest.glb|224024|A4B24ED3FA8805D97A61E97BF73AE57AC3E9D4F879AB05A69EB079946CBBD6CE"
+        ]
+      }
+    },
+    {
+      "caseId": "EmissiveStrengthTest-glb",
+      "operation": "export",
+      "equal": true,
+      "preFix": {
+        "fileCount": 1,
+        "totalBytes": 10908,
+        "sha256": "B832BEC9D3292D156C31D976432E8001C96700F931B91890F51D0901D6E072B6",
+        "files": [
+          "EmissiveStrengthTest.glb|10908|40D9242BC1827B5CD30CB5F49A29A84C9034F01835E793668F2653ED0920D9EF"
+        ]
+      },
+      "postFix": {
+        "fileCount": 1,
+        "totalBytes": 10908,
+        "sha256": "B832BEC9D3292D156C31D976432E8001C96700F931B91890F51D0901D6E072B6",
+        "files": [
+          "EmissiveStrengthTest.glb|10908|40D9242BC1827B5CD30CB5F49A29A84C9034F01835E793668F2653ED0920D9EF"
+        ]
+      }
+    },
+    {
+      "caseId": "EmissiveStrengthTest-glb",
+      "operation": "roundtrip",
+      "equal": true,
+      "preFix": {
+        "fileCount": 1,
+        "totalBytes": 10908,
+        "sha256": "B832BEC9D3292D156C31D976432E8001C96700F931B91890F51D0901D6E072B6",
+        "files": [
+          "EmissiveStrengthTest.glb|10908|40D9242BC1827B5CD30CB5F49A29A84C9034F01835E793668F2653ED0920D9EF"
+        ]
+      },
+      "postFix": {
+        "fileCount": 1,
+        "totalBytes": 10908,
+        "sha256": "B832BEC9D3292D156C31D976432E8001C96700F931B91890F51D0901D6E072B6",
+        "files": [
+          "EmissiveStrengthTest.glb|10908|40D9242BC1827B5CD30CB5F49A29A84C9034F01835E793668F2653ED0920D9EF"
+        ]
+      }
+    },
+    {
+      "caseId": "SimpleInstancing-glb",
+      "operation": "export",
+      "equal": true,
+      "preFix": {
+        "fileCount": 1,
+        "totalBytes": 7288,
+        "sha256": "C0FBAFA443EAB474B2979F727901BDEB551A061458695683607C4C252695EC5B",
+        "files": [
+          "SimpleInstancing.glb|7288|D510662298F3D69A33745303C560753B7D7551BBAD6045BCDBFC988CC1D66619"
+        ]
+      },
+      "postFix": {
+        "fileCount": 1,
+        "totalBytes": 7288,
+        "sha256": "C0FBAFA443EAB474B2979F727901BDEB551A061458695683607C4C252695EC5B",
+        "files": [
+          "SimpleInstancing.glb|7288|D510662298F3D69A33745303C560753B7D7551BBAD6045BCDBFC988CC1D66619"
+        ]
+      }
+    },
+    {
+      "caseId": "SimpleInstancing-glb",
+      "operation": "roundtrip",
+      "equal": true,
+      "preFix": {
+        "fileCount": 1,
+        "totalBytes": 7288,
+        "sha256": "C0FBAFA443EAB474B2979F727901BDEB551A061458695683607C4C252695EC5B",
+        "files": [
+          "SimpleInstancing.glb|7288|D510662298F3D69A33745303C560753B7D7551BBAD6045BCDBFC988CC1D66619"
+        ]
+      },
+      "postFix": {
+        "fileCount": 1,
+        "totalBytes": 7288,
+        "sha256": "C0FBAFA443EAB474B2979F727901BDEB551A061458695683607C4C252695EC5B",
+        "files": [
+          "SimpleInstancing.glb|7288|D510662298F3D69A33745303C560753B7D7551BBAD6045BCDBFC988CC1D66619"
+        ]
+      }
+    },
+    {
+      "caseId": "XmpMetadataRoundedCube-glb",
+      "operation": "export",
+      "equal": true,
+      "preFix": {
+        "fileCount": 1,
+        "totalBytes": 105908,
+        "sha256": "A1E73A37B2ECF1DAB7BB03187B554F74A31ECA9EE10A9B75908743150B5C7086",
+        "files": [
+          "XmpMetadataRoundedCube.glb|105908|FC699D9A9F72BBD72FF675678A63C8BA55068B6AEEBF49F835EFC6528F72C078"
+        ]
+      },
+      "postFix": {
+        "fileCount": 1,
+        "totalBytes": 105908,
+        "sha256": "A1E73A37B2ECF1DAB7BB03187B554F74A31ECA9EE10A9B75908743150B5C7086",
+        "files": [
+          "XmpMetadataRoundedCube.glb|105908|FC699D9A9F72BBD72FF675678A63C8BA55068B6AEEBF49F835EFC6528F72C078"
+        ]
+      }
+    },
+    {
+      "caseId": "XmpMetadataRoundedCube-glb",
+      "operation": "roundtrip",
+      "equal": true,
+      "preFix": {
+        "fileCount": 1,
+        "totalBytes": 105908,
+        "sha256": "A1E73A37B2ECF1DAB7BB03187B554F74A31ECA9EE10A9B75908743150B5C7086",
+        "files": [
+          "XmpMetadataRoundedCube.glb|105908|FC699D9A9F72BBD72FF675678A63C8BA55068B6AEEBF49F835EFC6528F72C078"
+        ]
+      },
+      "postFix": {
+        "fileCount": 1,
+        "totalBytes": 105908,
+        "sha256": "A1E73A37B2ECF1DAB7BB03187B554F74A31ECA9EE10A9B75908743150B5C7086",
+        "files": [
+          "XmpMetadataRoundedCube.glb|105908|FC699D9A9F72BBD72FF675678A63C8BA55068B6AEEBF49F835EFC6528F72C078"
+        ]
+      }
+    },
+    {
+      "caseId": "TextureTransformMultiTest-glb",
+      "operation": "export",
+      "equal": true,
+      "preFix": {
+        "fileCount": 1,
+        "totalBytes": 387988,
+        "sha256": "46A349FD2C818CDE428794C1FBB1B94057F44AB92EB11F758B4F11DCEB72EB1B",
+        "files": [
+          "TextureTransformMultiTest.glb|387988|14F36E78872E821591A03D0A359B0ED1E8024EE9C4226B8869B72B48983864CB"
+        ]
+      },
+      "postFix": {
+        "fileCount": 1,
+        "totalBytes": 387988,
+        "sha256": "46A349FD2C818CDE428794C1FBB1B94057F44AB92EB11F758B4F11DCEB72EB1B",
+        "files": [
+          "TextureTransformMultiTest.glb|387988|14F36E78872E821591A03D0A359B0ED1E8024EE9C4226B8869B72B48983864CB"
+        ]
+      }
+    },
+    {
+      "caseId": "TextureTransformMultiTest-glb",
+      "operation": "roundtrip",
+      "equal": true,
+      "preFix": {
+        "fileCount": 1,
+        "totalBytes": 387988,
+        "sha256": "46A349FD2C818CDE428794C1FBB1B94057F44AB92EB11F758B4F11DCEB72EB1B",
+        "files": [
+          "TextureTransformMultiTest.glb|387988|14F36E78872E821591A03D0A359B0ED1E8024EE9C4226B8869B72B48983864CB"
+        ]
+      },
+      "postFix": {
+        "fileCount": 1,
+        "totalBytes": 387988,
+        "sha256": "46A349FD2C818CDE428794C1FBB1B94057F44AB92EB11F758B4F11DCEB72EB1B",
+        "files": [
+          "TextureTransformMultiTest.glb|387988|14F36E78872E821591A03D0A359B0ED1E8024EE9C4226B8869B72B48983864CB"
+        ]
+      }
+    },
+    {
+      "caseId": "IridescenceSuzanne-glb",
+      "operation": "export",
+      "equal": true,
+      "preFix": {
+        "fileCount": 1,
+        "totalBytes": 507344,
+        "sha256": "36E4BFE050C5F21C8B7038DD8BC44192896D18A0655C3F566AFAEF3722A52850",
+        "files": [
+          "IridescenceSuzanne.glb|507344|EA948F611EBF6DA0F852D58352C16EFD7AD4DA38B0DABC39CD5C8464D2BD7695"
+        ]
+      },
+      "postFix": {
+        "fileCount": 1,
+        "totalBytes": 507344,
+        "sha256": "36E4BFE050C5F21C8B7038DD8BC44192896D18A0655C3F566AFAEF3722A52850",
+        "files": [
+          "IridescenceSuzanne.glb|507344|EA948F611EBF6DA0F852D58352C16EFD7AD4DA38B0DABC39CD5C8464D2BD7695"
+        ]
+      }
+    },
+    {
+      "caseId": "IridescenceSuzanne-glb",
+      "operation": "roundtrip",
+      "equal": true,
+      "preFix": {
+        "fileCount": 1,
+        "totalBytes": 507344,
+        "sha256": "36E4BFE050C5F21C8B7038DD8BC44192896D18A0655C3F566AFAEF3722A52850",
+        "files": [
+          "IridescenceSuzanne.glb|507344|EA948F611EBF6DA0F852D58352C16EFD7AD4DA38B0DABC39CD5C8464D2BD7695"
+        ]
+      },
+      "postFix": {
+        "fileCount": 1,
+        "totalBytes": 507344,
+        "sha256": "36E4BFE050C5F21C8B7038DD8BC44192896D18A0655C3F566AFAEF3722A52850",
+        "files": [
+          "IridescenceSuzanne.glb|507344|EA948F611EBF6DA0F852D58352C16EFD7AD4DA38B0DABC39CD5C8464D2BD7695"
+        ]
+      }
+    },
+    {
+      "caseId": "SheenTestGrid-glb",
+      "operation": "export",
+      "equal": true,
+      "preFix": {
+        "fileCount": 1,
+        "totalBytes": 1840956,
+        "sha256": "58DF7C6B0B90247A98150CEC79886F355A1FA57CD474C016F6488639F3DA4143",
+        "files": [
+          "SheenTestGrid.glb|1840956|132EE62D15B5CCA9D7CAE16214C3FC0FF8E95CEFA44E44212C4DF416CB8365CC"
+        ]
+      },
+      "postFix": {
+        "fileCount": 1,
+        "totalBytes": 1840956,
+        "sha256": "58DF7C6B0B90247A98150CEC79886F355A1FA57CD474C016F6488639F3DA4143",
+        "files": [
+          "SheenTestGrid.glb|1840956|132EE62D15B5CCA9D7CAE16214C3FC0FF8E95CEFA44E44212C4DF416CB8365CC"
+        ]
+      }
+    },
+    {
+      "caseId": "SheenTestGrid-glb",
+      "operation": "roundtrip",
+      "equal": true,
+      "preFix": {
+        "fileCount": 1,
+        "totalBytes": 1840956,
+        "sha256": "58DF7C6B0B90247A98150CEC79886F355A1FA57CD474C016F6488639F3DA4143",
+        "files": [
+          "SheenTestGrid.glb|1840956|132EE62D15B5CCA9D7CAE16214C3FC0FF8E95CEFA44E44212C4DF416CB8365CC"
+        ]
+      },
+      "postFix": {
+        "fileCount": 1,
+        "totalBytes": 1840956,
+        "sha256": "58DF7C6B0B90247A98150CEC79886F355A1FA57CD474C016F6488639F3DA4143",
+        "files": [
+          "SheenTestGrid.glb|1840956|132EE62D15B5CCA9D7CAE16214C3FC0FF8E95CEFA44E44212C4DF416CB8365CC"
+        ]
+      }
+    },
+    {
+      "caseId": "MaterialsVariantsShoe-glb",
+      "operation": "export",
+      "equal": true,
+      "preFix": {
+        "fileCount": 1,
+        "totalBytes": 7832868,
+        "sha256": "623AEF35C7E81C18DC59867D5851F231F622129E7F5D9835A7301D4536D405C6",
+        "files": [
+          "MaterialsVariantsShoe.glb|7832868|5CCBCC83EEA9D50A5510FE6705D58AEB423D9021C6DE44428BCEBDF096467BD7"
+        ]
+      },
+      "postFix": {
+        "fileCount": 1,
+        "totalBytes": 7832868,
+        "sha256": "623AEF35C7E81C18DC59867D5851F231F622129E7F5D9835A7301D4536D405C6",
+        "files": [
+          "MaterialsVariantsShoe.glb|7832868|5CCBCC83EEA9D50A5510FE6705D58AEB423D9021C6DE44428BCEBDF096467BD7"
+        ]
+      }
+    },
+    {
+      "caseId": "MaterialsVariantsShoe-glb",
+      "operation": "roundtrip",
+      "equal": true,
+      "preFix": {
+        "fileCount": 1,
+        "totalBytes": 7832868,
+        "sha256": "623AEF35C7E81C18DC59867D5851F231F622129E7F5D9835A7301D4536D405C6",
+        "files": [
+          "MaterialsVariantsShoe.glb|7832868|5CCBCC83EEA9D50A5510FE6705D58AEB423D9021C6DE44428BCEBDF096467BD7"
+        ]
+      },
+      "postFix": {
+        "fileCount": 1,
+        "totalBytes": 7832868,
+        "sha256": "623AEF35C7E81C18DC59867D5851F231F622129E7F5D9835A7301D4536D405C6",
+        "files": [
+          "MaterialsVariantsShoe.glb|7832868|5CCBCC83EEA9D50A5510FE6705D58AEB423D9021C6DE44428BCEBDF096467BD7"
+        ]
+      }
+    },
+    {
+      "caseId": "ABeautifulGame-glb",
+      "operation": "export",
+      "equal": true,
+      "preFix": {
+        "fileCount": 1,
+        "totalBytes": 42978040,
+        "sha256": "9D52BF987F9D39C20996085AAAFE88B09415B43DB49BD249925E555409CBFD5F",
+        "files": [
+          "ABeautifulGame.glb|42978040|B70C303DB64576FEADBBE5553934D88170838ECABE6FEFDB585A5FBF79FDA617"
+        ]
+      },
+      "postFix": {
+        "fileCount": 1,
+        "totalBytes": 42978040,
+        "sha256": "9D52BF987F9D39C20996085AAAFE88B09415B43DB49BD249925E555409CBFD5F",
+        "files": [
+          "ABeautifulGame.glb|42978040|B70C303DB64576FEADBBE5553934D88170838ECABE6FEFDB585A5FBF79FDA617"
+        ]
+      }
+    },
+    {
+      "caseId": "ABeautifulGame-glb",
+      "operation": "roundtrip",
+      "equal": true,
+      "preFix": {
+        "fileCount": 1,
+        "totalBytes": 42978040,
+        "sha256": "9D52BF987F9D39C20996085AAAFE88B09415B43DB49BD249925E555409CBFD5F",
+        "files": [
+          "ABeautifulGame.glb|42978040|B70C303DB64576FEADBBE5553934D88170838ECABE6FEFDB585A5FBF79FDA617"
+        ]
+      },
+      "postFix": {
+        "fileCount": 1,
+        "totalBytes": 42978040,
+        "sha256": "9D52BF987F9D39C20996085AAAFE88B09415B43DB49BD249925E555409CBFD5F",
+        "files": [
+          "ABeautifulGame.glb|42978040|B70C303DB64576FEADBBE5553934D88170838ECABE6FEFDB585A5FBF79FDA617"
+        ]
+      }
+    },
+    {
+      "caseId": "ABeautifulGame-draco-glb",
+      "operation": "export",
+      "equal": true,
+      "preFix": {
+        "fileCount": 1,
+        "totalBytes": 12105120,
+        "sha256": "C57EB54F273D8E87273E837A67C89985C4AEFA6E6F74C3F9195BDFF489DBCDEA",
+        "files": [
+          "ABeautifulGame.glb|12105120|8B03681A5DCD7683CAD269DF6D96F6620C3BAB92777A5F43D23593C5AF70EF7E"
+        ]
+      },
+      "postFix": {
+        "fileCount": 1,
+        "totalBytes": 12105120,
+        "sha256": "C57EB54F273D8E87273E837A67C89985C4AEFA6E6F74C3F9195BDFF489DBCDEA",
+        "files": [
+          "ABeautifulGame.glb|12105120|8B03681A5DCD7683CAD269DF6D96F6620C3BAB92777A5F43D23593C5AF70EF7E"
+        ]
+      }
+    },
+    {
+      "caseId": "ABeautifulGame-draco-glb",
+      "operation": "roundtrip",
+      "equal": true,
+      "preFix": {
+        "fileCount": 1,
+        "totalBytes": 12105120,
+        "sha256": "C57EB54F273D8E87273E837A67C89985C4AEFA6E6F74C3F9195BDFF489DBCDEA",
+        "files": [
+          "ABeautifulGame.glb|12105120|8B03681A5DCD7683CAD269DF6D96F6620C3BAB92777A5F43D23593C5AF70EF7E"
+        ]
+      },
+      "postFix": {
+        "fileCount": 1,
+        "totalBytes": 12105120,
+        "sha256": "C57EB54F273D8E87273E837A67C89985C4AEFA6E6F74C3F9195BDFF489DBCDEA",
+        "files": [
+          "ABeautifulGame.glb|12105120|8B03681A5DCD7683CAD269DF6D96F6620C3BAB92777A5F43D23593C5AF70EF7E"
+        ]
+      }
+    },
+    {
+      "caseId": "NodePerformanceTest-glb",
+      "operation": "export",
+      "equal": true,
+      "preFix": {
+        "fileCount": 1,
+        "totalBytes": 38031532,
+        "sha256": "8CAF6BF0A1AB198DAE4C04513A06079B0CA79B67B2DEB53E9B8A1CADF68B0C17",
+        "files": [
+          "NodePerformanceTest.glb|38031532|5B2A4D7B9B08C11931E3B27A3BFABF492CE92DBD8CECCFAD9B737FE29F6D4E92"
+        ]
+      },
+      "postFix": {
+        "fileCount": 1,
+        "totalBytes": 38031532,
+        "sha256": "8CAF6BF0A1AB198DAE4C04513A06079B0CA79B67B2DEB53E9B8A1CADF68B0C17",
+        "files": [
+          "NodePerformanceTest.glb|38031532|5B2A4D7B9B08C11931E3B27A3BFABF492CE92DBD8CECCFAD9B737FE29F6D4E92"
+        ]
+      }
+    },
+    {
+      "caseId": "NodePerformanceTest-glb",
+      "operation": "roundtrip",
+      "equal": true,
+      "preFix": {
+        "fileCount": 1,
+        "totalBytes": 38031532,
+        "sha256": "8CAF6BF0A1AB198DAE4C04513A06079B0CA79B67B2DEB53E9B8A1CADF68B0C17",
+        "files": [
+          "NodePerformanceTest.glb|38031532|5B2A4D7B9B08C11931E3B27A3BFABF492CE92DBD8CECCFAD9B737FE29F6D4E92"
+        ]
+      },
+      "postFix": {
+        "fileCount": 1,
+        "totalBytes": 38031532,
+        "sha256": "8CAF6BF0A1AB198DAE4C04513A06079B0CA79B67B2DEB53E9B8A1CADF68B0C17",
+        "files": [
+          "NodePerformanceTest.glb|38031532|5B2A4D7B9B08C11931E3B27A3BFABF492CE92DBD8CECCFAD9B737FE29F6D4E92"
+        ]
+      }
+    }
+  ]
+}
