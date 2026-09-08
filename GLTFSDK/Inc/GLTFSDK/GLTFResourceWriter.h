@@ -4,6 +4,7 @@
 #pragma once
 
 #include <GLTFSDK/ResourceWriter.h>
+#include <limits>
 
 #include <memory>
 

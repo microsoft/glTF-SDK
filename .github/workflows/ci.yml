@@ -1,10 +1,12 @@
-name: Release/2.0.0 - CI
+name: Master - CI
 
 on:
   push:
-    branches: [ "Release/2.0.0" ]
+    branches: [ "master", "2.0.0-to-main" ]
   pull_request:
-    branches: [ "Release/2.0.0" ]
+    branches: [ "master" ]
+  schedule:
+    - cron: 0 23 * * 1-5
 
 permissions:
   contents: read

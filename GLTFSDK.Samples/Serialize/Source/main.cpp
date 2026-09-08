@@ -9,6 +9,11 @@
 #include <GLTFSDK/Serialize.h>
 
 #include <filesystem>
+#if defined(__EMSCRIPTEN__)
+namespace fs = std::__fs::filesystem;
+#else
+namespace fs = std::filesystem;
+#endif
 
 #include <fstream>
 #include <sstream>
@@ -28,7 +33,7 @@ namespace
     class StreamWriter : public IStreamWriter
     {
     public:
-        StreamWriter(std::filesystem::path pathBase) : m_pathBase(std::move(pathBase))
+        StreamWriter(fs::path pathBase) : m_pathBase(std::move(pathBase))
         {
             assert(m_pathBase.has_root_path());
         }
@@ -44,7 +49,7 @@ namespace
             //    if appropriate.
             // 3. Always open the file stream in binary mode. The glTF SDK will handle any text
             //    encoding issues for us.
-            auto streamPath = m_pathBase / std::filesystem::u8path(filename);
+            auto streamPath = m_pathBase / fs::u8path(filename);
             auto stream = std::make_shared<std::ofstream>(streamPath, std::ios_base::binary);
 
             // Check if the stream has no errors and is ready for I/O operations
@@ -57,7 +62,7 @@ namespace
         }
 
     private:
-        std::filesystem::path m_pathBase;
+        fs::path m_pathBase;
     };
 
     void CreateTriangleResources(Document& document, BufferBuilder& bufferBuilder, std::string& accessorIdIndices, std::string& accessorIdPositions)
@@ -169,13 +174,13 @@ namespace
         document.SetDefaultScene(std::move(scene), AppendIdPolicy::GenerateOnEmpty);
     }
 
-    void SerializeTriangle(const std::filesystem::path& path)
+    void SerializeTriangle(const fs::path& path)
     {
         // Pass the absolute path, without the filename, to the stream writer
         auto streamWriter = std::make_unique<StreamWriter>(path.parent_path());
 
-        std::filesystem::path pathFile = path.filename();
-        std::filesystem::path pathFileExt = pathFile.extension();
+        fs::path pathFile = path.filename();
+        fs::path pathFileExt = pathFile.extension();
 
         auto MakePathExt = [](const std::string& ext)
         {
@@ -259,11 +264,11 @@ int main(int argc, char* argv[])
             throw std::runtime_error("Unexpected number of command line arguments");
         }
 
-        std::filesystem::path path = argv[1U];
+        fs::path path = argv[1U];
 
         if (path.is_relative())
         {
-            auto pathCurrent = std::filesystem::current_path();
+            auto pathCurrent = fs::current_path();
 
             // Convert the relative path into an absolute path by appending the command line argument to the current path
             pathCurrent /= path;

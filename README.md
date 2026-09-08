@@ -1,7 +1,7 @@
 [![Build Status](https://github.com/microsoft/glTF-SDK/actions/workflows/ci.yml/badge.svg)](https://github.com/microsoft/glTF-SDK/actions/workflows/ci.yml)
 
-> **Note:** This is the `Release/2.0.0` branch. It contains intentional source
-> and ABI breaks from 1.9.5. See the
+> **2.0 migration:** This development line contains intentional source and ABI
+> breaks from 1.9.5. See the
 > [2.0 migration guide](docs/MigrationGuide-2.0.md) and
 > [release notes](docs/ReleaseNotes/2.0.0.md).
 
@@ -74,8 +74,8 @@ From the installed test folder:
 .\GLTFSDK.Test.exe --gtest_output=xml:GLTFSDK.Test.log
 ```
 
-The Release/2.0.0 CI matrix covers Windows x64/Win32/ARM64, Linux, macOS,
-iOS device/simulator, three Android ABIs, and Linux ASAN/UBSAN.
+The CI matrix covers Windows x64/Win32/ARM64, Linux, macOS, iOS
+device/simulator, three Android ABIs, and Linux ASAN/UBSAN.
 
 ## Documentation
 

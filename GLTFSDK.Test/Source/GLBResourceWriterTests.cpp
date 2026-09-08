@@ -41,6 +41,28 @@ namespace Microsoft
                     Assert::IsTrue(doc == roundTrippedDoc);
                 }
 
+                GLTFSDK_TEST_METHOD(GLBResourceWriterTests, FlushStream_Empty_Bin)
+                {
+                    auto streamWriter = std::make_shared<const StreamReaderWriter>();
+                    GLBResourceWriter writer(streamWriter);
+                    Document doc;
+                    const auto serializedJson = Serialize(doc, SerializeFlags::None);
+                    std::stringstream output(
+                        std::ios::in | std::ios::out | std::ios::binary);
+
+                    writer.FlushStream(serializedJson, &output);
+
+                    auto stream = std::make_shared<std::stringstream>(
+                        output.str(),
+                        std::ios::in | std::ios::out | std::ios::binary);
+                    GLBResourceReader resourceReader(streamWriter, stream);
+                    const Document roundTrippedDoc =
+                        Deserialize(resourceReader.GetJson());
+
+                    Assert::IsFalse(stream->fail());
+                    Assert::IsTrue(doc == roundTrippedDoc);
+                }
+
                 GLTFSDK_TEST_METHOD(GLBResourceWriterTests, GLBReader_RejectsOverflowingJsonChunkLength)
                 {
                     // A GLB whose JSON chunk length is 0xFFFFFFFF previously passed the header-size check in
