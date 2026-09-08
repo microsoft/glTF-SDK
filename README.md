@@ -1,9 +1,7 @@
 [![Build Status](https://github.com/microsoft/glTF-SDK/actions/workflows/ci.yml/badge.svg)](https://github.com/microsoft/glTF-SDK/actions/workflows/ci.yml)
 
 > **Note:** This is the `Release/2.0.0` branch. It contains intentional source
-> and ABI breaks from 1.9.5. See the
-> [2.0 migration guide](docs/MigrationGuide-2.0.md) and
-> [release notes](docs/ReleaseNotes/2.0.0.md).
+> and ABI breaks from 1.9.5. The public changes are summarized below.
 
 # Microsoft glTF SDK - A C++ Deserializer/Serializer for glTF
 
@@ -76,14 +74,6 @@ From the installed test folder:
 
 The Release/2.0.0 CI matrix covers Windows x64/Win32/ARM64, Linux, macOS,
 iOS device/simulator, three Android ABIs, and Linux ASAN/UBSAN.
-
-## Documentation
-
-* [2.0.0 release notes](docs/ReleaseNotes/2.0.0.md)
-* [2.0 migration guide](docs/MigrationGuide-2.0.md)
-* [Dependency and provenance details](docs/Dependencies.md)
-* [Known downstream source breaks](docs/DownstreamBreaks-2.0.md)
-* [Release evidence](docs/release-evidence/replace-rapidjson-nlohmann)
 
 # Trademarks
 

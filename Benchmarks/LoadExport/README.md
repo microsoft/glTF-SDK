@@ -104,7 +104,7 @@ powershell -ExecutionPolicy Bypass -File .\Benchmarks\LoadExport\RunMatchedBench
 The script rejects toolchain/configuration or matched-file mismatches and
 writes raw CSV, environment JSON, canonical output hashes, per-tier and
 per-extension aggregates, summary JSON, and a Markdown comparison under
-`docs/release-evidence/replace-rapidjson-nlohmann/load-export/`.
+`Built/BenchmarkResults/LoadExport/`.
 
 Each timed output is reloaded outside the timer. The reloaded `Document`, every
 buffer byte, and every encoded image byte must match the source. Peak working

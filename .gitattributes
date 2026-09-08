@@ -3,4 +3,3 @@ External/Valijson/** text eol=lf
 External/Valijson/patches/*.patch -whitespace
 GLTFSDK.Test/Resources/JSON-Schema-Test-Suite/** text eol=lf -whitespace
 GLTFSDK.Test/Resources/JsonMigrationBaseline/** text eol=lf
-docs/release-evidence/replace-rapidjson-nlohmann/node-performance-investigation/*.patch text eol=lf -whitespace
