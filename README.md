@@ -31,6 +31,25 @@ containers. String and stream overloads share the same parser. A UTF-8 BOM is
 accepted only with `DeserializeFlags::IgnoreByteOrderMark`, including compact
 stream input.
 
+## Performance and compatibility validation
+
+The 2.0 implementation builds the ordered DOM directly from strict SAX events
+and uses an average-linear scalar `uniqueItems` validation path with exhaustive
+diagnostic fallback. On the 10,002-node Khronos `NodePerformanceTest` asset,
+mean load time improved from 15,769.76 ms before these optimizations to
+2,019.59 ms. The matched RapidJSON 1.9.5 result was 1,919.17 ms on the same
+machine and optimized MSVC configuration.
+
+The end-to-end corpus covers 16 glTF/GLB cases, including typed and raw
+extensions, and verifies serialized documents, required extensions, buffers,
+and encoded images after export. Detailed methodology and raw results are in
+the [release evidence](docs/release-evidence/replace-rapidjson-nlohmann).
+
+The master integration retains the existing GLB stream-output API and WASM
+sample compatibility. The merged validation suite contains 515 tests and the
+CI matrix covers Windows x64/Win32/ARM64, Linux, macOS, iOS device/simulator,
+three Android ABIs, installed public consumers, and Linux ASAN/UBSAN.
+
 ## Configure and build
 
 Required tools are Git, CMake, a supported C++14 toolchain, and PowerShell
@@ -73,9 +92,6 @@ From the installed test folder:
 ```powershell
 .\GLTFSDK.Test.exe --gtest_output=xml:GLTFSDK.Test.log
 ```
-
-The CI matrix covers Windows x64/Win32/ARM64, Linux, macOS, iOS
-device/simulator, three Android ABIs, and Linux ASAN/UBSAN.
 
 ## Documentation
 
