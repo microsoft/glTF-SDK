@@ -269,7 +269,7 @@ if (-not $AssetRoot) {
     $AssetRoot = Join-Path $candidateRepo ("Built\Int\LoadExportAssets\" + $manifest.commit)
 }
 if (-not $EvidenceDir) {
-    $EvidenceDir = Join-Path $candidateRepo "docs\release-evidence\replace-rapidjson-nlohmann\load-export"
+    $EvidenceDir = Join-Path $candidateRepo "Built\BenchmarkResults\LoadExport"
 }
 if (-not $RunRoot) {
     $RunRoot = Join-Path $candidateRepo "Built\Int\LoadExportBenchmarkRun"

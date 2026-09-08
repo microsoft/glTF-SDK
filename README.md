@@ -1,9 +1,7 @@
 [![Build Status](https://github.com/microsoft/glTF-SDK/actions/workflows/ci.yml/badge.svg)](https://github.com/microsoft/glTF-SDK/actions/workflows/ci.yml)
 
 > **2.0 migration:** This development line contains intentional source and ABI
-> breaks from 1.9.5. See the
-> [2.0 migration guide](docs/MigrationGuide-2.0.md) and
-> [release notes](docs/ReleaseNotes/2.0.0.md).
+> breaks from 1.9.5. The public changes are summarized below.
 
 # Microsoft glTF SDK - A C++ Deserializer/Serializer for glTF
 
@@ -42,8 +40,9 @@ machine and optimized MSVC configuration.
 
 The end-to-end corpus covers 16 glTF/GLB cases, including typed and raw
 extensions, and verifies serialized documents, required extensions, buffers,
-and encoded images after export. Detailed methodology and raw results are in
-the [release evidence](docs/release-evidence/replace-rapidjson-nlohmann).
+and encoded images after export. The opt-in harness under `Benchmarks/`
+reproduces these measurements and writes results under the ignored
+`Built/BenchmarkResults` directory.
 
 The master integration retains the existing GLB stream-output API and WASM
 sample compatibility. The merged validation suite contains 515 tests and the
@@ -92,14 +91,6 @@ From the installed test folder:
 ```powershell
 .\GLTFSDK.Test.exe --gtest_output=xml:GLTFSDK.Test.log
 ```
-
-## Documentation
-
-* [2.0.0 release notes](docs/ReleaseNotes/2.0.0.md)
-* [2.0 migration guide](docs/MigrationGuide-2.0.md)
-* [Dependency and provenance details](docs/Dependencies.md)
-* [Known downstream source breaks](docs/DownstreamBreaks-2.0.md)
-* [Release evidence](docs/release-evidence/replace-rapidjson-nlohmann)
 
 # Trademarks
 

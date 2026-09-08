@@ -71,7 +71,7 @@ function Write-Utf8NoBom {
 $BuildDir = [System.IO.Path]::GetFullPath($BuildDir)
 $repoRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
 $assetDir = Join-Path $PSScriptRoot "Assets"
-$evidenceDir = Join-Path $repoRoot "docs\release-evidence\replace-rapidjson-nlohmann"
+$evidenceDir = Join-Path $repoRoot "Built\BenchmarkResults\Json"
 New-Item -ItemType Directory -Force $evidenceDir | Out-Null
 
 $slug = ($Label.ToLowerInvariant() -replace "[^a-z0-9._-]", "-")
