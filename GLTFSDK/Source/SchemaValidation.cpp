@@ -13,6 +13,7 @@
 #include <valijson/validation_results.hpp>
 #include <valijson/validator.hpp>
 
+#include <limits>
 #include <memory>
 #include <stdexcept>
 #include <string>
@@ -27,6 +28,11 @@ namespace
     using Adapter = valijson::adapters::NlohmannJsonAdapter;
     using JsonValue = Internal::JsonValue;
 
+    [[noreturn]] void ThrowSchemaPathTooLong()
+    {
+        throw GLTFException("Schema validation path is too long");
+    }
+
     std::string CanonicalDocumentUri(const std::string& uri)
     {
         const auto fragment = uri.find('#');
@@ -37,7 +43,25 @@ namespace
 
     std::string EscapePointerToken(const std::string& token)
     {
+        std::size_t escapedSize = 0U;
+        for (const char character : token)
+        {
+            const std::size_t characterSize =
+                character == '~' || character == '/' ? 2U : 1U;
+            if (characterSize >
+                (std::numeric_limits<std::size_t>::max)() - escapedSize)
+            {
+                ThrowSchemaPathTooLong();
+            }
+            escapedSize += characterSize;
+        }
+
         std::string escaped;
+        if (escapedSize > escaped.max_size())
+        {
+            ThrowSchemaPathTooLong();
+        }
+        escaped.reserve(escapedSize);
         for (const char character : token)
         {
             if (character == '~')
@@ -74,7 +98,18 @@ namespace
             {
                 token = token.substr(1U, token.size() - 2U);
             }
-            pointer += "/" + EscapePointerToken(token);
+
+            const std::string escaped = EscapePointerToken(token);
+            if (pointer.size() == pointer.max_size() ||
+                escaped.size() >
+                    pointer.max_size() - pointer.size() - 1U)
+            {
+                ThrowSchemaPathTooLong();
+            }
+
+            pointer.reserve(pointer.size() + 1U + escaped.size());
+            pointer.push_back('/');
+            pointer += escaped;
         }
         return pointer;
     }
@@ -261,10 +296,17 @@ struct Internal::Draft4ValidationSession::Impl
                 "Schema violation at # due to unknown");
         }
 
-        throw ValidationException(
-            "Schema violation at " +
-            ContextToPointer(error->context) +
-            " due to " + error->keyword);
+        try
+        {
+            throw ValidationException(
+                "Schema violation at " +
+                ContextToPointer(error->context) +
+                " due to " + error->keyword);
+        }
+        catch (const std::length_error&)
+        {
+            ThrowSchemaPathTooLong();
+        }
     }
 
     std::unique_ptr<const ISchemaLocator> schemaLocator;
